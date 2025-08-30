@@ -65,16 +65,6 @@ const AppointmentCard = ({ appointment }) => {
           </div>
           
           <div className="info-row">
-            <span className="info-label">📅 Fecha:</span>
-            <span className="info-value">{formatDate(appointment.date)}</span>
-          </div>
-          
-          <div className="info-row">
-            <span className="info-label">⏰ Hora:</span>
-            <span className="info-value highlight-time">{appointment.time}</span>
-          </div>
-          
-          <div className="info-row">
             <span className="info-label">🚪 Consultorio:</span>
             <span className="info-value">{appointment.room}</span>
           </div>
