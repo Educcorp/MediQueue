@@ -1,1 +1,50 @@
-/* Estilos globales */
+:root {
+  /* Paleta de colores principal */
+  --color-primary: #d8f0f4;      /* Azul claro - principal */
+  --color-secondary: #d7c0c6;    /* Rosa pálido - secundario */
+  --color-accent: #77b8ce;       /* Azul medio - acento */
+  --color-dark: #544e52;         /* Gris oscuro - texto */
+  --color-accent-red: #ea5d4b;   /* Rojo - destacado */
+  
+  /* Colores adicionales para mejor contraste */
+  --color-white: #ffffff;
+  --color-light-gray: #f8f9fa;
+  --color-border: #e9ecef;
+  --color-shadow: rgba(84, 78, 82, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  min-height: 100vh;
+  color: var(--color-dark);
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Estilos para scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dark);
+}
