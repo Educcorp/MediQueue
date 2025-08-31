@@ -1,53 +1,68 @@
-import React, { useState, useEffect } from 'react'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import AppointmentCard from '../components/AppointmentCard'
-import SpecialtyGrid from '../components/SpecialtyGrid'
-import '../styles/HomePage.css'
+import React, { useState } from 'react';
+import useTurns from '../hooks/useTurns';
+import '../styles/HomePage.css';
+import Header from '../components/Header';
 
 const HomePage = () => {
-  const [currentAppointment, setCurrentAppointment] = useState(null)
-  const [specialties] = useState([
-    { id: 1, name: 'Pediatría', icon: '👶', color: '#d8f0f4' },
-    { id: 2, name: 'Cardiología', icon: '❤️', color: '#d7c0c6' },
-    { id: 3, name: 'Traumatología', icon: '🦴', color: '#77b8ce' },
-    { id: 4, name: 'Nutricionista', icon: '🥗', color: '#544e52' },
-    { id: 5, name: 'Medicina General', icon: '🏥', color: '#ea5d4b' },
-    { id: 6, name: 'Oculista', icon: '👁️', color: '#d8f0f4' }
-  ])
-
-  // Simular un turno actual (en una aplicación real vendría de una API)
-  useEffect(() => {
-    const mockAppointment = {
-      id: 1,
-      patientName: 'Juan Pérez',
-      specialty: 'Cardiología',
-      doctor: 'Dr. María González',
-      date: '2024-01-15',
-      time: '14:30',
-      room: 'Consultorio 3',
-      status: 'confirmado'
-    }
-    setCurrentAppointment(mockAppointment)
-  }, [])
+  const { nextTurn, lastTurns, loading } = useTurns();
+  const [showHeader, setShowHeader] = useState(true);
 
   return (
-    <div className="home-page">
-      <Header />
-      
-      <main className="main">
-        <div className="container">
-          {/* Current Appointment Section */}
-          {currentAppointment && (
-            <section className="current-appointment-section">
-              <AppointmentCard appointment={currentAppointment} />
-            </section>
-          )}          
+    <div className="main-outer-container">
+      {/* Header sobrepuesto */}
+      {showHeader && (
+        <>
+          <div className="header-overlay">
+            <Header />
+            <button
+              className="header-hide-btn"
+              aria-label="Ocultar header"
+              onClick={() => setShowHeader(false)}
+            >
+              <span style={{fontSize: '1.5rem', display: 'inline-block', transform: 'rotate(90deg)'}}>❮</span>
+            </button>
+          </div>
+        </>
+      )}
+      {!showHeader && (
+        <button
+          className="header-show-btn"
+          aria-label="Mostrar header"
+          onClick={() => setShowHeader(true)}
+        >
+          <span style={{fontSize: '1.5rem', display: 'inline-block', transform: 'rotate(-90deg)'}}>❯</span>
+        </button>
+      )}
+      <div className="turns-homepage">
+        <div className="main-turn">
+          {loading ? (
+            <div className="main-loading">Cargando...</div>
+          ) : nextTurn ? (
+            <>
+              <div className="turn-id-big">{nextTurn.id}</div>
+              <div className="turn-room-big">{nextTurn.consultorio}</div>
+            </>
+          ) : (
+            <div className="main-no-turn">No hay turno siguiente</div>
+          )}
         </div>
-      </main>
-      <Footer/>
+        <div className="sidebar">
+          <div className="sidebar-list">
+            {loading ? (
+              <div className="sidebar-loading">Cargando...</div>
+            ) : (
+              lastTurns.map((turn, idx) => (
+                <div className="sidebar-turn" key={turn.id}>
+                  <span className="turn-id">{turn.id}</span>
+                  <span className="turn-room">{turn.consultorio}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;
