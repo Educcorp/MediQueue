@@ -28,23 +28,13 @@ const AdminUsersPage = () => {
             setLoading(true);
             setError(null);
 
-            // Por ahora usar datos simulados ya que no tenemos el endpoint implementado
-            const mockAdmins = [
-                {
-                    id_administrador: 1,
-                    nombre: 'Administrador Principal',
-                    email: 'admin@mediqueue.com'
-                },
-                {
-                    id_administrador: 2,
-                    nombre: 'Dr. Juan Pérez',
-                    email: 'juan.perez@mediqueue.com'
-                }
-            ];
+            // Usar el servicio real para obtener administradores
+            const administradores = await adminService.getAllAdmins();
+            setAdmins(administradores);
 
-            setAdmins(mockAdmins);
         } catch (error) {
             setError('Error cargando administradores: ' + error.message);
+            console.error('Error cargando administradores:', error);
         } finally {
             setLoading(false);
         }
@@ -79,14 +69,15 @@ const AdminUsersPage = () => {
 
         if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.nombre}"?`)) {
             try {
-                // Aquí iría la llamada al servicio
-                // await adminService.deleteAdmin(admin.id_administrador);
+                // Llamar al servicio real para eliminar
+                await adminService.deleteAdmin(admin.id_administrador);
 
-                // Por ahora simulamos la eliminación
-                setAdmins(prev => prev.filter(a => a.id_administrador !== admin.id_administrador));
+                // Recargar la lista de administradores
+                await loadAdmins();
                 alert('Administrador eliminado correctamente');
             } catch (error) {
                 alert('Error eliminando administrador: ' + error.message);
+                console.error('Error eliminando administrador:', error);
             }
         }
     };
@@ -107,15 +98,11 @@ const AdminUsersPage = () => {
         try {
             if (editingAdmin) {
                 // Actualizar administrador existente
-                const updatedAdmin = {
-                    ...editingAdmin,
+                await adminService.updateAdmin(editingAdmin.id_administrador, {
                     nombre: formData.nombre,
-                    email: formData.email
-                };
-
-                setAdmins(prev => prev.map(a =>
-                    a.id_administrador === editingAdmin.id_administrador ? updatedAdmin : a
-                ));
+                    email: formData.email,
+                    password: formData.password || undefined // Solo enviar password si se proporcionó
+                });
 
                 alert('Administrador actualizado correctamente');
             } else {
@@ -125,20 +112,37 @@ const AdminUsersPage = () => {
                     return;
                 }
 
-                const newAdmin = {
-                    id_administrador: Date.now(), // ID temporal
+                await adminService.createAdmin({
                     nombre: formData.nombre,
-                    email: formData.email
-                };
+                    email: formData.email,
+                    password: formData.password
+                });
 
-                setAdmins(prev => [...prev, newAdmin]);
                 alert('Administrador creado correctamente');
             }
 
+            // Recargar la lista de administradores
+            await loadAdmins();
             setShowModal(false);
             setFormData({ nombre: '', email: '', password: '' });
         } catch (error) {
-            alert('Error guardando administrador: ' + error.message);
+            let errorMessage = 'Error guardando administrador';
+
+            if (error.response && error.response.data) {
+                const { message, errors } = error.response.data;
+                errorMessage = message;
+
+                // Si hay errores de validación específicos, mostrarlos
+                if (errors && errors.length > 0) {
+                    const validationErrors = errors.map(err => err.message).join('\n');
+                    errorMessage += '\n\nDetalles:\n' + validationErrors;
+                }
+            } else {
+                errorMessage += ': ' + error.message;
+            }
+
+            alert(errorMessage);
+            console.error('Error guardando administrador:', error);
         }
     };
 
@@ -294,7 +298,11 @@ const AdminUsersPage = () => {
                                     value={formData.password}
                                     onChange={handleInputChange}
                                     required={!editingAdmin}
+                                    placeholder="Ej: Admin123"
                                 />
+                                <small style={{ color: '#666', fontSize: '0.8em', marginTop: '4px', display: 'block' }}>
+                                    Debe contener al menos una mayúscula, una minúscula y un número
+                                </small>
                             </div>
 
                             <div className="form-actions">

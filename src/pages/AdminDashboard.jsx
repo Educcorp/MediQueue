@@ -39,7 +39,7 @@ const AdminDashboard = () => {
                         <div className="welcome-card">
                             <h2>¡Bienvenido al Panel de Administración!</h2>
                             <div className="features-preview">
-                                
+
                             </div>
                         </div>
                     </div>
