@@ -38,16 +38,8 @@ const AdminDashboard = () => {
                     <div className="welcome-section">
                         <div className="welcome-card">
                             <h2>¡Bienvenido al Panel de Administración!</h2>
-                            <p>Has iniciado sesión exitosamente. El dashboard completo está en desarrollo.</p>
                             <div className="features-preview">
-                                <h3>Próximamente disponible:</h3>
-                                <ul>
-                                    <li>📊 Gestión de turnos en tiempo real</li>
-                                    <li>👥 Administración de pacientes</li>
-                                    <li>🏨 Configuración de áreas y consultorios</li>
-                                    <li>📈 Estadísticas y reportes</li>
-                                    <li>⚙️ Gestión de usuarios administradores</li>
-                                </ul>
+                                
                             </div>
                         </div>
                     </div>
