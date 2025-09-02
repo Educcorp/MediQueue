@@ -1,32 +1,105 @@
+import api from './api';
+
 // Servicios para operaciones de turnos
+const turnService = {
+    // Obtener todos los turnos
+    async getAllTurns() {
+        try {
+            const response = await api.get('/turnos');
+            return response.data.data || [];
+        } catch (error) {
+            console.error('Error obteniendo turnos:', error);
+            throw error;
+        }
+    },
 
-// Simulación de datos de turnos
-const mockTurns = [
-	{ id: 'A76', consultorio: 'Consultorio 1', status: 'next' },
-	{ id: 'A75', consultorio: 'Consultorio 1', status: 'past' },
-	{ id: 'A74', consultorio: 'Consultorio 1', status: 'past' },
-	{ id: 'A73', consultorio: 'Consultorio 1', status: 'past' },
-	{ id: 'U83', consultorio: 'Consultorio 2', status: 'past' },
-	{ id: 'A72', consultorio: 'Consultorio 1', status: 'past' },
-	{ id: 'U82', consultorio: 'Consultorio 2', status: 'past' },
-	{ id: 'U81', consultorio: 'Consultorio 2', status: 'past' },
-];
+    // Obtener turno por ID
+    async getTurnById(id) {
+        try {
+            const response = await api.get(`/turnos/${id}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error obteniendo turno:', error);
+            throw error;
+        }
+    },
 
-export function getNextTurn() {
-	// Devuelve el primer turno con status 'next'
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve(mockTurns.find(t => t.status === 'next'));
-		}, 300);
-	});
-}
+    // Crear nuevo turno
+    async createTurn(turnData) {
+        try {
+            const response = await api.post('/turnos', turnData);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error creando turno:', error);
+            throw error;
+        }
+    },
 
-export function getLastTurns(limit = 5) {
-	// Devuelve los últimos turnos con status 'past', ordenados del más reciente al menos reciente
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			const pastTurns = mockTurns.filter(t => t.status === 'past').slice(0, limit);
-			resolve(pastTurns);
-		}, 300);
-	});
-}
+    // Actualizar turno
+    async updateTurn(id, turnData) {
+        try {
+            const response = await api.put(`/turnos/${id}`, turnData);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error actualizando turno:', error);
+            throw error;
+        }
+    },
+
+    // Eliminar turno
+    async deleteTurn(id) {
+        try {
+            const response = await api.delete(`/turnos/${id}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error eliminando turno:', error);
+            throw error;
+        }
+    },
+
+    // Obtener turnos por fecha
+    async getTurnsByDate(date) {
+        try {
+            const response = await api.get(`/turnos/fecha/${date}`);
+            return response.data.data || [];
+        } catch (error) {
+            console.error('Error obteniendo turnos por fecha:', error);
+            throw error;
+        }
+    },
+
+    // Obtener turnos por estado
+    async getTurnsByStatus(status) {
+        try {
+            const response = await api.get(`/turnos/estado/${status}`);
+            return response.data.data || [];
+        } catch (error) {
+            console.error('Error obteniendo turnos por estado:', error);
+            throw error;
+        }
+    },
+
+    // Cambiar estado de turno
+    async changeTurnStatus(id, newStatus) {
+        try {
+            const response = await api.patch(`/turnos/${id}/estado`, { estado: newStatus });
+            return response.data.data;
+        } catch (error) {
+            console.error('Error cambiando estado de turno:', error);
+            throw error;
+        }
+    },
+
+    // Obtener estadísticas de turnos
+    async getTurnStatistics() {
+        try {
+            const response = await api.get('/turnos/estadisticas');
+            return response.data.data;
+        } catch (error) {
+            console.error('Error obteniendo estadísticas:', error);
+            throw error;
+        }
+    }
+};
+
+export default turnService;
