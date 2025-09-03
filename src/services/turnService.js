@@ -99,6 +99,28 @@ const turnService = {
             console.error('Error obteniendo estadísticas:', error);
             throw error;
         }
+    },
+
+    // Obtener el próximo turno
+    async getNextTurn() {
+        try {
+            const response = await api.get('/turnos/proximo');
+            return response.data.data;
+        } catch (error) {
+            console.error('Error obteniendo próximo turno:', error);
+            throw error;
+        }
+    },
+
+    // Obtener los últimos turnos
+    async getLastTurns(limit = 6) {
+        try {
+            const response = await api.get(`/turnos/ultimos?limit=${limit}`);
+            return response.data.data || [];
+        } catch (error) {
+            console.error('Error obteniendo últimos turnos:', error);
+            throw error;
+        }
     }
 };
 
