@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import useTurns from '../hooks/useTurns';
 import '../styles/HomePage.css';
-import Header from '../components/Header';
 
 const HomePage = () => {
   const { nextTurn, lastTurns, loading } = useTurns();
@@ -9,30 +8,6 @@ const HomePage = () => {
 
   return (
     <div className="main-outer-container">
-      {/* Header sobrepuesto */}
-      {showHeader && (
-        <>
-          <div className="header-overlay">
-            <Header />
-            <button
-              className="header-hide-btn"
-              aria-label="Ocultar header"
-              onClick={() => setShowHeader(false)}
-            >
-              <span style={{fontSize: '1.5rem', display: 'inline-block', transform: 'rotate(90deg)'}}>❮</span>
-            </button>
-          </div>
-        </>
-      )}
-      {!showHeader && (
-        <button
-          className="header-show-btn"
-          aria-label="Mostrar header"
-          onClick={() => setShowHeader(true)}
-        >
-          <span style={{fontSize: '1.5rem', display: 'inline-block', transform: 'rotate(-90deg)'}}>❯</span>
-        </button>
-      )}
       <div className="turns-homepage">
         <div className="main-turn">
           {loading ? (

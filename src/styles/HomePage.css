@@ -1,12 +1,27 @@
+/* Variables de colores de la paleta */
+:root {
+  --color-celeste: #d8f0f4;
+  --color-rosa-claro: #d7c0c6;
+  --color-azul: #77b8ce;
+  --color-gris-oscuro: #544e52;
+  --color-rojo: #ea5d4b;
+}
+
 .main-outer-container {
   position: relative;
   height: 100vh;
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  background: linear-gradient(135deg, var(--color-celeste) 0%, var(--color-azul) 100%);
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
   box-sizing: border-box;
-  padding-top: 70px; /* Altura aproximada del header para que el contenido no quede oculto */
+  padding: 0;
+  overflow: hidden;
 }
+
 .header-overlay {
   position: fixed;
   top: 0;
@@ -15,6 +30,7 @@
   z-index: 2000;
   background: transparent;
 }
+
 .header-hide-btn {
   position: absolute;
   top: 8px;
@@ -27,6 +43,7 @@
   border-radius: 50%;
   transition: background 0.2s, opacity 0.2s;
 }
+
 .header-show-btn {
   position: fixed;
   top: 8px;
@@ -40,21 +57,27 @@
   border-radius: 50%;
   transition: background 0.2s, opacity 0.2s;
 }
-.header-hide-btn span, .header-show-btn span {
+
+.header-hide-btn span,
+.header-show-btn span {
   color: #222;
   background: transparent;
   pointer-events: none;
 }
+
 @media (max-width: 900px) {
   .main-outer-container {
     padding-top: 56px;
   }
 }
+
 /* Botón para ocultar/mostrar header */
 .header-toggle-wrapper {
   position: relative;
 }
-.header-hide-btn, .header-show-btn {
+
+.header-hide-btn,
+.header-show-btn {
   position: absolute;
   top: 8px;
   left: 8px;
@@ -66,11 +89,14 @@
   border-radius: 50%;
   transition: background 0.2s, opacity 0.2s;
 }
-.header-hide-btn span, .header-show-btn span {
+
+.header-hide-btn span,
+.header-show-btn span {
   color: #222;
   background: transparent;
   pointer-events: none;
 }
+
 .header-show-btn {
   opacity: 0.97;
   background: transparent;
@@ -79,18 +105,21 @@
 }
 
 /* Eliminar barra azul y evitar scroll */
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
+
 .main-outer-container {
   min-height: 100vh;
   min-width: 100vw;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, var(--color-celeste, #d8f0f4) 0%, var(--color-azul, #77b8ce) 100%);
+  background: linear-gradient(135deg, var(--color-celeste) 0%, var(--color-azul) 100%);
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -98,10 +127,12 @@ html, body, #root {
   padding: 0;
   overflow: hidden;
 }
+
+
 .turns-homepage {
   display: flex;
   flex-direction: row;
-  background: #fff;
+  background: linear-gradient(135deg, #9f9f9f 50%, #FAFBFC 100%);
   border-radius: 32px;
   box-shadow: 0 8px 32px #544e5233;
   min-height: 0;
@@ -111,11 +142,14 @@ html, body, #root {
   margin: 0 auto;
   overflow: hidden;
 }
-.main-turn, .sidebar {
+
+.main-turn,
+.sidebar {
   min-height: 0;
   min-width: 0;
   overflow: auto;
 }
+
 @media (max-width: 900px) {
   .turns-homepage {
     flex-direction: column;
@@ -123,12 +157,15 @@ html, body, #root {
     width: 100vw;
     height: 100vh;
   }
-  .main-turn, .sidebar {
+
+  .main-turn,
+  .sidebar {
     min-height: 0;
     min-width: 0;
     overflow: auto;
   }
 }
+
 /* HomePage Styles */
 .home-page {
   min-height: 100vh;
@@ -143,17 +180,13 @@ html, body, #root {
   margin-bottom: 3rem;
   box-shadow: 0 4px 20px var(--color-shadow);
 }
-/* Estilos para la página de turnos tipo pantalla de sala de espera */
-.turns-homepage {
-  display: flex;
-  min-height: 100vh;
-  background: #fff;
-}
+
+
 
 .sidebar {
   width: 320px;
   min-width: 220px;
-  background: #f7f7fa;
+  background: #f1f1f1;
   border-right: 2px solid #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -177,34 +210,43 @@ html, body, #root {
 }
 
 .sidebar-turn {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px 0 #0001;
+  background: linear-gradient(135deg, #afafaf 60%, #fffafa 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(84, 78, 82, 0.1);
   padding: 1.2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  color: #222;
-  border-left: 6px solid #b23a48;
+  color: var(--color-gris-oscuro);
+  border-left: 4px solid #000000;
   min-height: 70px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar-turn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(84, 78, 82, 0.15);
 }
 
 .turn-id {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
+  color: var(--color-gris-oscuro);
 }
 
 .turn-room {
   font-size: 1rem;
-  color: #888;
-  margin-top: 0.2rem;
+  color: var(--color-gris-oscuro);
+  margin-top: 0.3rem;
+  opacity: 0.8;
 }
 
 .sidebar-loading {
   text-align: center;
-  color: #888;
+  color: var(--color-gris-oscuro);
+  opacity: 0.7;
 }
 
 .main-turn {
@@ -213,8 +255,13 @@ html, body, #root {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  background: #fff;
+  padding: 3rem;
+  background: linear-gradient(135deg, #9ba1a7 10%, #ffffff 80%, #fff3f3 100%);
+  position: relative;
+  border: 1px solid #544e52;
+  border-radius: 0;
+  margin: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .main-title {
@@ -228,21 +275,22 @@ html, body, #root {
 .turn-id-big {
   font-size: 8rem;
   font-weight: 900;
-  color: #222;
+  color: var(--color-gris-oscuro);
   letter-spacing: 0.1em;
   margin-bottom: 1.5rem;
-  text-shadow: 0 4px 16px #0002;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .turn-room-big {
   font-size: 2.5rem;
-  color: #b23a48;
+  color: var(--color-rojo);
   font-weight: 700;
   margin-bottom: 2rem;
   text-align: center;
 }
 
-.main-loading, .main-no-turn {
+.main-loading,
+.main-no-turn {
   font-size: 1.5rem;
   color: #888;
   margin-top: 2rem;
@@ -252,6 +300,7 @@ html, body, #root {
   .turns-homepage {
     flex-direction: column;
   }
+
   .sidebar {
     width: 100%;
     min-width: unset;
@@ -262,10 +311,12 @@ html, body, #root {
     gap: 0.5rem;
     overflow-x: auto;
   }
+
   .sidebar-list {
     flex-direction: row;
     gap: 0.5rem;
   }
+
   .sidebar-turn {
     min-width: 90px;
     font-size: 1.2rem;
@@ -279,12 +330,15 @@ html, body, #root {
   .main-turn {
     padding: 1rem 0.2rem;
   }
+
   .turn-id-big {
     font-size: 4rem;
   }
+
   .turn-room-big {
     font-size: 1.2rem;
   }
+
   .main-title {
     font-size: 1.2rem;
   }
@@ -418,24 +472,24 @@ html, body, #root {
     padding: 2rem 0;
     border-radius: 0 0 20px 20px;
   }
-  
+
   .hero-title {
     font-size: 2rem;
   }
-  
+
   .hero-subtitle {
     font-size: 1rem;
   }
-  
+
   .section-title {
     font-size: 1.5rem;
   }
-  
+
   .quick-actions-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .action-button {
     padding: 1.2rem 1.5rem;
     font-size: 1rem;
@@ -446,7 +500,7 @@ html, body, #root {
   .hero-title {
     font-size: 1.8rem;
   }
-  
+
   .hero-subtitle {
     font-size: 0.9rem;
   }
