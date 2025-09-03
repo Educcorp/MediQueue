@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminUsersPage from './pages/AdminUsersPage'
+import TurnManager from './components/Admin/TurnManager'
 import ProtectedRoute from './components/Common/ProtectedRoute'
 import './styles/App.css'
 
@@ -31,6 +32,16 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminUsersPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta para gestión de turnos */}
+        <Route
+          path="/admin/turns"
+          element={
+            <ProtectedRoute>
+              <TurnManager />
             </ProtectedRoute>
           }
         />

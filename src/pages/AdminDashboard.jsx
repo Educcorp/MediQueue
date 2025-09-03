@@ -3,83 +3,86 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-    const handleLogout = async () => {
-        await logout();
-        navigate('/admin');
-    };
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin');
+  };
 
-    return (
-        <div className="admin-dashboard">
-            {/* Header del Dashboard */}
-            <header className="dashboard-header">
-                <div className="header-content">
-                    <div className="header-left">
-                        <h1>🏥 MediQueue Admin</h1>
-                        <p>Sistema de Gestión Turnomática</p>
-                    </div>
-                    <div className="header-right">
-                        <div className="user-info">
-                            <span className="user-name">👤 {user?.nombre}</span>
-                            <span className="user-email">{user?.email}</span>
-                        </div>
-                        <button onClick={handleLogout} className="logout-button">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
-            </header>
+  return (
+    <div className="admin-dashboard">
+      {/* Header del Dashboard */}
+      <header className="dashboard-header">
+        <div className="header-content">
+          <div className="header-left">
+            <h1>🏥 MediQueue Admin</h1>
+            <p>Sistema de Gestión Turnomática</p>
+          </div>
+          <div className="header-right">
+            <div className="user-info">
+              <span className="user-name">👤 {user?.nombre}</span>
+              <span className="user-email">{user?.email}</span>
+            </div>
+            <button onClick={handleLogout} className="logout-button">
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </header>
 
-            {/* Contenido Principal */}
-            <main className="dashboard-main">
-                <div className="dashboard-container">
-                    <div className="welcome-section">
-                        <div className="welcome-card">
-                            <h2>¡Bienvenido al Panel de Administración!</h2>
-                            <div className="features-preview">
+      {/* Contenido Principal */}
+      <main className="dashboard-main">
+        <div className="dashboard-container">
+          <div className="welcome-section">
+            <div className="welcome-card">
+              <h2>¡Bienvenido al Panel de Administración!</h2>
+              <div className="features-preview">
 
-                            </div>
-                        </div>
-                    </div>
+              </div>
+            </div>
+          </div>
 
-                    {/* Sección de navegación placeholder */}
-                    <div className="navigation-section">
-                        <h3>Navegación Rápida</h3>
-                        <div className="nav-cards">
-                            <div className="nav-card">
-                                <h4>👥 Gestión de Administradores</h4>
-                                <p>Crear, editar y gestionar usuarios administradores</p>
-                                <button
-                                    className="nav-button"
-                                    onClick={() => navigate('/admin/users')}
-                                >
-                                    Gestionar Usuarios
-                                </button>
-                            </div>
+          {/* Sección de navegación placeholder */}
+          <div className="navigation-section">
+            <h3>Navegación Rápida</h3>
+            <div className="nav-cards">
+              <div className="nav-card">
+                <h4>👥 Gestión de Administradores</h4>
+                <p>Crear, editar y gestionar usuarios administradores</p>
+                <button
+                  className="nav-button"
+                  onClick={() => navigate('/admin/users')}
+                >
+                  Gestionar Usuarios
+                </button>
+              </div>
 
-                            <div className="nav-card disabled">
-                                <h4>📋 Gestión de Turnos</h4>
-                                <p>Próximamente disponible</p>
-                                <button className="nav-button" disabled>
-                                    Próximamente
-                                </button>
-                            </div>
+              <div className="nav-card">
+                <h4>📋 Gestión de Turnos</h4>
+                <p>Crear, editar y gestionar turnos médicos</p>
+                <button
+                  className="nav-button"
+                  onClick={() => navigate('/admin/turns')}
+                >
+                  Gestionar Turnos
+                </button>
+              </div>
 
-                            <div className="nav-card disabled">
-                                <h4>🏨 Áreas y Consultorios</h4>
-                                <p>Próximamente disponible</p>
-                                <button className="nav-button" disabled>
-                                    Próximamente
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+              <div className="nav-card disabled">
+                <h4>🏨 Áreas y Consultorios</h4>
+                <p>Próximamente disponible</p>
+                <button className="nav-button" disabled>
+                  Próximamente
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
 
-            <style jsx>{`
+      <style jsx>{`
         .admin-dashboard {
           min-height: 100vh;
           background: #f8fafc;
@@ -296,8 +299,8 @@ const AdminDashboard = () => {
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default AdminDashboard;
