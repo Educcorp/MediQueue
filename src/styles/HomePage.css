@@ -132,7 +132,7 @@ body,
 .turns-homepage {
   display: flex;
   flex-direction: row;
-  background: linear-gradient(135deg, #FAFBFC 50%, #FAFBFC 100%);
+  background: linear-gradient(135deg, #9f9f9f 50%, #FAFBFC 100%);
   border-radius: 32px;
   box-shadow: 0 8px 32px #544e5233;
   min-height: 0;
@@ -186,7 +186,7 @@ body,
 .sidebar {
   width: 320px;
   min-width: 220px;
-  background: #FAFBFC;
+  background: #f1f1f1;
   border-right: 2px solid #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -210,7 +210,7 @@ body,
 }
 
 .sidebar-turn {
-  background: linear-gradient(135deg, #ffa4a4 60%, #fffafa 100%);
+  background: linear-gradient(135deg, #afafaf 60%, #fffafa 100%);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(84, 78, 82, 0.1);
   padding: 1.2rem 1rem;
@@ -220,7 +220,7 @@ body,
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-gris-oscuro);
-  border-left: 4px solid var(--color-rojo);
+  border-left: 4px solid #000000;
   min-height: 70px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -256,7 +256,7 @@ body,
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  background: linear-gradient(135deg, #a0d1ff 10%, #ffffff 80%, #ff7171 100%);
+  background: linear-gradient(135deg, #9ba1a7 10%, #ffffff 80%, #fff3f3 100%);
   position: relative;
   border: 1px solid #544e52;
   border-radius: 0;
