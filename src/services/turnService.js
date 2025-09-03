@@ -3,9 +3,9 @@ import api from './api';
 // Servicios para operaciones de turnos
 const turnService = {
     // Obtener todos los turnos
-    async getAllTurns() {
+    async getAllTurns(filters) {
         try {
-            const response = await api.get('/turnos');
+            const response = await api.get('/turnos', { params: filters });
             return response.data.data || [];
         } catch (error) {
             console.error('Error obteniendo turnos:', error);
@@ -58,9 +58,9 @@ const turnService = {
     },
 
     // Obtener turnos por fecha
-    async getTurnsByDate(date) {
+    async getTurnsByDate(date, filters) {
         try {
-            const response = await api.get(`/turnos/fecha/${date}`);
+            const response = await api.get(`/turnos/fecha/${date}`, { params: filters });
             return response.data.data || [];
         } catch (error) {
             console.error('Error obteniendo turnos por fecha:', error);
@@ -69,9 +69,9 @@ const turnService = {
     },
 
     // Obtener turnos por estado
-    async getTurnsByStatus(status) {
+    async getTurnsByStatus(status, filters) {
         try {
-            const response = await api.get(`/turnos/estado/${status}`);
+            const response = await api.get(`/turnos/estado/${status}`, { params: filters });
             return response.data.data || [];
         } catch (error) {
             console.error('Error obteniendo turnos por estado:', error);
