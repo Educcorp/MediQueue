@@ -82,7 +82,7 @@ const AdminDashboard = () => {
         </div>
       </main>
 
-      <style jsx>{`
+      <style>{`
         .admin-dashboard {
           min-height: 100vh;
           background: #f8fafc;
