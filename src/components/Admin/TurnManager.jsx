@@ -15,12 +15,13 @@ const TurnManager = () => {
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [formData, setFormData] = useState({
     numero_turno: '',
-    estado: 'Pendiente',
+    estado: 'En espera',
     fecha: new Date().toISOString().split('T')[0],
     hora: '',
     id_paciente: '',
     id_consultorio: 1,
-    id_administrador: ''
+    id_administrador: '',
+    id_area: ''
   });
 
   const { user, logout } = useAuth();
@@ -28,8 +29,8 @@ const TurnManager = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'Pendiente', label: 'Pendiente', color: '#f6ad55' },
     { value: 'En espera', label: 'En espera', color: '#4299e1' },
+    { value: 'Llamando', label: 'Llamando', color: '#805ad5' },
     { value: 'Atendido', label: 'Atendido', color: '#48bb78' },
     { value: 'Cancelado', label: 'Cancelado', color: '#e53e3e' }
   ];
@@ -77,10 +78,10 @@ const TurnManager = () => {
       if (selectedStatus === 'todos') {
         // Intentar obtener turnos por fecha, si falla usar getAllTurns
         try {
-          turnsData = await turnService.getTurnsByDate(selectedDate);
+          turnsData = await turnService.getTurnsByDate(selectedDate, { id_area: formData.id_area || undefined });
         } catch (dateError) {
           console.warn('Error obteniendo turnos por fecha, usando getAllTurns:', dateError);
-          turnsData = await turnService.getAllTurns();
+          turnsData = await turnService.getAllTurns({ id_area: formData.id_area || undefined });
           // Filtrar por fecha en el frontend si es necesario
           if (turnsData && Array.isArray(turnsData)) {
             turnsData = turnsData.filter(turn => turn.fecha === selectedDate);
@@ -88,10 +89,10 @@ const TurnManager = () => {
         }
       } else {
         try {
-          turnsData = await turnService.getTurnsByStatus(selectedStatus);
+          turnsData = await turnService.getTurnsByStatus(selectedStatus, { id_area: formData.id_area || undefined });
         } catch (statusError) {
           console.warn('Error obteniendo turnos por estado, usando getAllTurns:', statusError);
-          turnsData = await turnService.getAllTurns();
+          turnsData = await turnService.getAllTurns({ id_area: formData.id_area || undefined });
           // Filtrar por estado en el frontend si es necesario
           if (turnsData && Array.isArray(turnsData)) {
             turnsData = turnsData.filter(turn => turn.estado === selectedStatus);
@@ -115,7 +116,7 @@ const TurnManager = () => {
     setEditingTurn(null);
     setFormData({
       numero_turno: '',
-      estado: 'Pendiente',
+      estado: 'En espera',
       fecha: selectedDate,
       hora: '',
       id_paciente: '',
@@ -166,8 +167,8 @@ const TurnManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.id_paciente || !formData.id_consultorio) {
-      alert('Seleccione paciente y consultorio');
+    if (!formData.id_consultorio) {
+      alert('Seleccione consultorio');
       return;
     }
 
@@ -178,10 +179,13 @@ const TurnManager = () => {
         alert('Turno actualizado correctamente');
       } else {
         // Crear nuevo turno
-        await turnService.createTurn({
-          id_consultorio: Number(formData.id_consultorio),
-          id_paciente: Number(formData.id_paciente)
-        });
+        {
+          const payload = { id_consultorio: Number(formData.id_consultorio) };
+          if (formData.id_paciente) {
+            payload.id_paciente = Number(formData.id_paciente);
+          }
+          await turnService.createTurn(payload);
+        }
         alert('Turno creado correctamente');
       }
 
@@ -189,7 +193,7 @@ const TurnManager = () => {
       setShowModal(false);
       setFormData({
         numero_turno: '',
-        estado: 'Pendiente',
+        estado: 'En espera',
         fecha: selectedDate,
         hora: '',
         id_paciente: '',
@@ -400,6 +404,7 @@ const TurnManager = () => {
                     value={formData.numero_turno}
                     onChange={handleInputChange}
                     min="1"
+                    placeholder="Generado automáticamente"
                     disabled
                   />
                 </div>
@@ -471,6 +476,18 @@ const TurnManager = () => {
                   onChange={handleInputChange}
                   required
                   min="1"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Área (opcional)</label>
+                <input
+                  type="number"
+                  name="id_area"
+                  value={formData.id_area}
+                  onChange={handleInputChange}
+                  min="1"
+                  placeholder="Filtrar por área para la tabla"
                 />
               </div>
 

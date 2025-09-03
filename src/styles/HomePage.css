@@ -5,6 +5,11 @@
   --color-azul: #77b8ce;
   --color-gris-oscuro: #544e52;
   --color-rojo: #ea5d4b;
+  --color-dark: #1f2937;
+  --color-white: #ffffff;
+  --color-accent: #77b8ce;
+  --color-accent-red: #ea5d4b;
+  --color-shadow: rgba(17, 24, 39, 0.12);
 }
 
 .main-outer-container {
@@ -132,7 +137,7 @@ body,
 .turns-homepage {
   display: flex;
   flex-direction: row;
-  background: linear-gradient(135deg, #9f9f9f 50%, #FAFBFC 100%);
+  background: linear-gradient(135deg, #eef2f7 0%, #ffffff 100%);
   border-radius: 32px;
   box-shadow: 0 8px 32px #544e5233;
   min-height: 0;
@@ -184,23 +189,24 @@ body,
 
 
 .sidebar {
-  width: 320px;
-  min-width: 220px;
-  background: #f1f1f1;
-  border-right: 2px solid #e0e0e0;
+  width: 340px;
+  min-width: 260px;
+  background: #0f172a;
+  border-right: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 2rem 1rem 1rem 1rem;
+  padding: 2rem 1.25rem 1.25rem 1.25rem;
   gap: 1rem;
 }
 
 .sidebar-title {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #b23a48;
-  margin-bottom: 1rem;
-  text-align: center;
+  color: #cbd5e1;
+  margin: 0 0 .5rem 0;
+  text-align: left;
+  opacity: .9;
 }
 
 .sidebar-list {
@@ -210,18 +216,17 @@ body,
 }
 
 .sidebar-turn {
-  background: linear-gradient(135deg, #afafaf 60%, #fffafa 100%);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(84, 78, 82, 0.1);
-  padding: 1.2rem 1rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  padding: 1rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-gris-oscuro);
-  border-left: 4px solid #000000;
-  min-height: 70px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  min-height: 64px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -231,16 +236,16 @@ body,
 }
 
 .turn-id {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-gris-oscuro);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
 }
 
 .turn-room {
-  font-size: 1rem;
-  color: var(--color-gris-oscuro);
-  margin-top: 0.3rem;
-  opacity: 0.8;
+  font-size: .9rem;
+  color: #cbd5e1;
+  margin-top: 0.25rem;
+  opacity: 0.9;
 }
 
 .sidebar-loading {
@@ -256,12 +261,12 @@ body,
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  background: linear-gradient(135deg, #9ba1a7 10%, #ffffff 80%, #fff3f3 100%);
+  background: radial-gradient(1200px 600px at 20% 10%, #ffffff 0%, #f7fafc 50%, #eef2f7 100%);
   position: relative;
-  border: 1px solid #544e52;
+  border: 0;
   border-radius: 0;
   margin: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
 .main-title {
@@ -273,17 +278,17 @@ body,
 }
 
 .turn-id-big {
-  font-size: 8rem;
+  font-size: clamp(3rem, 10vw, 9rem);
   font-weight: 900;
-  color: var(--color-gris-oscuro);
-  letter-spacing: 0.1em;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+  letter-spacing: 0.06em;
+  margin-bottom: .5rem;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .turn-room-big {
-  font-size: 2.5rem;
-  color: var(--color-rojo);
+  font-size: clamp(1rem, 3vw, 2rem);
+  color: #334155;
   font-weight: 700;
   margin-bottom: 2rem;
   text-align: center;
@@ -294,6 +299,83 @@ body,
   font-size: 1.5rem;
   color: #888;
   margin-top: 2rem;
+}
+
+/* Brand bar */
+.brand-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.brand-inner {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #0ea5e9;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: .02em;
+  box-shadow: 0 8px 20px rgba(14, 165, 233, .35)
+}
+
+.brand-name {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.brand-tag {
+  display: block;
+  font-size: .75rem;
+  color: #64748b
+}
+
+.current-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 24px 24px 32px;
+  width: min(860px, 90%);
+  box-shadow: 0 20px 60px rgba(2, 6, 23, .08);
+  text-align: center
+}
+
+.current-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px
+}
+
+.pill {
+  background: #0ea5e9;
+  color: #fff;
+  font-weight: 700;
+  font-size: .75rem;
+  padding: 6px 12px;
+  border-radius: 999px
 }
 
 @media (max-width: 900px) {
