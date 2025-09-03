@@ -166,8 +166,8 @@ const TurnManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.numero_turno || !formData.fecha || !formData.hora || !formData.id_paciente) {
-      alert('Por favor complete todos los campos requeridos');
+    if (!formData.id_paciente || !formData.id_consultorio) {
+      alert('Seleccione paciente y consultorio');
       return;
     }
 
@@ -178,7 +178,10 @@ const TurnManager = () => {
         alert('Turno actualizado correctamente');
       } else {
         // Crear nuevo turno
-        await turnService.createTurn(formData);
+        await turnService.createTurn({
+          id_consultorio: Number(formData.id_consultorio),
+          id_paciente: Number(formData.id_paciente)
+        });
         alert('Turno creado correctamente');
       }
 
@@ -390,24 +393,24 @@ const TurnManager = () => {
             <form onSubmit={handleSubmit} className="modal-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label>Número de Turno *</label>
+                  <label>Número de Turno</label>
                   <input
                     type="number"
                     name="numero_turno"
                     value={formData.numero_turno}
                     onChange={handleInputChange}
-                    required
                     min="1"
+                    disabled
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Estado *</label>
+                  <label>Estado</label>
                   <select
                     name="estado"
                     value={formData.estado}
                     onChange={handleInputChange}
-                    required
+                    disabled
                   >
                     {turnStatuses.map(status => (
                       <option key={status.value} value={status.value}>
@@ -420,24 +423,24 @@ const TurnManager = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Fecha *</label>
+                  <label>Fecha</label>
                   <input
                     type="date"
                     name="fecha"
                     value={formData.fecha}
                     onChange={handleInputChange}
-                    required
+                    disabled
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Hora *</label>
+                  <label>Hora</label>
                   <input
                     type="time"
                     name="hora"
                     value={formData.hora}
                     onChange={handleInputChange}
-                    required
+                    disabled
                   />
                 </div>
               </div>
@@ -453,7 +456,7 @@ const TurnManager = () => {
                   <option value="">Seleccionar paciente</option>
                   {patients.map(patient => (
                     <option key={patient.id_paciente} value={patient.id_paciente}>
-                      {patient.nombre} - {patient.email}
+                      {patient.nombre} {patient.apellido} {patient.telefono ? `- ${patient.telefono}` : ''}
                     </option>
                   ))}
                 </select>
@@ -484,7 +487,7 @@ const TurnManager = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .turn-manager-page {
           min-height: 100vh;
           background: #f8fafc;

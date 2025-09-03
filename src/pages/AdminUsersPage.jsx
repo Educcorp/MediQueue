@@ -4,321 +4,321 @@ import { useAuth } from '../context/AuthContext';
 import adminService from '../services/adminService';
 
 const AdminUsersPage = () => {
-    const [admins, setAdmins] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const [editingAdmin, setEditingAdmin] = useState(null);
-    const [formData, setFormData] = useState({
-        nombre: '',
-        email: '',
-        password: ''
+  const [admins, setAdmins] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [editingAdmin, setEditingAdmin] = useState(null);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    password: ''
+  });
+
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Cargar administradores al montar el componente
+  useEffect(() => {
+    loadAdmins();
+  }, []);
+
+  const loadAdmins = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Usar el servicio real para obtener administradores
+      const administradores = await adminService.getAllAdmins();
+      setAdmins(administradores);
+
+    } catch (error) {
+      setError('Error cargando administradores: ' + error.message);
+      console.error('Error cargando administradores:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin');
+  };
+
+  const handleAddNew = () => {
+    setEditingAdmin(null);
+    setFormData({ nombre: '', email: '', password: '' });
+    setShowModal(true);
+  };
+
+  const handleEdit = (admin) => {
+    setEditingAdmin(admin);
+    setFormData({
+      nombre: admin.nombre,
+      email: admin.email,
+      password: ''
     });
+    setShowModal(true);
+  };
 
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-
-    // Cargar administradores al montar el componente
-    useEffect(() => {
-        loadAdmins();
-    }, []);
-
-    const loadAdmins = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            // Usar el servicio real para obtener administradores
-            const administradores = await adminService.getAllAdmins();
-            setAdmins(administradores);
-
-        } catch (error) {
-            setError('Error cargando administradores: ' + error.message);
-            console.error('Error cargando administradores:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/admin');
-    };
-
-    const handleAddNew = () => {
-        setEditingAdmin(null);
-        setFormData({ nombre: '', email: '', password: '' });
-        setShowModal(true);
-    };
-
-    const handleEdit = (admin) => {
-        setEditingAdmin(admin);
-        setFormData({
-            nombre: admin.nombre,
-            email: admin.email,
-            password: ''
-        });
-        setShowModal(true);
-    };
-
-    const handleDelete = async (admin) => {
-        if (admin.id_administrador === user?.id_administrador) {
-            alert('No puedes eliminar tu propia cuenta');
-            return;
-        }
-
-        if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.nombre}"?`)) {
-            try {
-                // Llamar al servicio real para eliminar
-                await adminService.deleteAdmin(admin.id_administrador);
-
-                // Recargar la lista de administradores
-                await loadAdmins();
-                alert('Administrador eliminado correctamente');
-            } catch (error) {
-                alert('Error eliminando administrador: ' + error.message);
-                console.error('Error eliminando administrador:', error);
-            }
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!formData.nombre || !formData.email) {
-            alert('Por favor complete todos los campos requeridos');
-            return;
-        }
-
-        if (!formData.email.includes('@')) {
-            alert('Por favor ingrese un email válido');
-            return;
-        }
-
-        try {
-            if (editingAdmin) {
-                // Actualizar administrador existente
-                await adminService.updateAdmin(editingAdmin.id_administrador, {
-                    nombre: formData.nombre,
-                    email: formData.email,
-                    password: formData.password || undefined // Solo enviar password si se proporcionó
-                });
-
-                alert('Administrador actualizado correctamente');
-            } else {
-                // Crear nuevo administrador
-                if (!formData.password) {
-                    alert('La contraseña es requerida para nuevos administradores');
-                    return;
-                }
-
-                await adminService.createAdmin({
-                    nombre: formData.nombre,
-                    email: formData.email,
-                    password: formData.password
-                });
-
-                alert('Administrador creado correctamente');
-            }
-
-            // Recargar la lista de administradores
-            await loadAdmins();
-            setShowModal(false);
-            setFormData({ nombre: '', email: '', password: '' });
-        } catch (error) {
-            let errorMessage = 'Error guardando administrador';
-
-            if (error.response && error.response.data) {
-                const { message, errors } = error.response.data;
-                errorMessage = message;
-
-                // Si hay errores de validación específicos, mostrarlos
-                if (errors && errors.length > 0) {
-                    const validationErrors = errors.map(err => err.message).join('\n');
-                    errorMessage += '\n\nDetalles:\n' + validationErrors;
-                }
-            } else {
-                errorMessage += ': ' + error.message;
-            }
-
-            alert(errorMessage);
-            console.error('Error guardando administrador:', error);
-        }
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    if (loading) {
-        return (
-            <div className="loading-container">
-                <div className="loading-spinner">
-                    <div className="spinner"></div>
-                    <p>Cargando administradores...</p>
-                </div>
-            </div>
-        );
+  const handleDelete = async (admin) => {
+    if (admin.id_administrador === user?.id_administrador) {
+      alert('No puedes eliminar tu propia cuenta');
+      return;
     }
 
+    if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.nombre}"?`)) {
+      try {
+        // Llamar al servicio real para eliminar
+        await adminService.deleteAdmin(admin.id_administrador);
+
+        // Recargar la lista de administradores
+        await loadAdmins();
+        alert('Administrador eliminado correctamente');
+      } catch (error) {
+        alert('Error eliminando administrador: ' + error.message);
+        console.error('Error eliminando administrador:', error);
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.nombre || !formData.email) {
+      alert('Por favor complete todos los campos requeridos');
+      return;
+    }
+
+    if (!formData.email.includes('@')) {
+      alert('Por favor ingrese un email válido');
+      return;
+    }
+
+    try {
+      if (editingAdmin) {
+        // Actualizar administrador existente
+        await adminService.updateAdmin(editingAdmin.id_administrador, {
+          nombre: formData.nombre,
+          email: formData.email,
+          password: formData.password || undefined // Solo enviar password si se proporcionó
+        });
+
+        alert('Administrador actualizado correctamente');
+      } else {
+        // Crear nuevo administrador
+        if (!formData.password) {
+          alert('La contraseña es requerida para nuevos administradores');
+          return;
+        }
+
+        await adminService.createAdmin({
+          nombre: formData.nombre,
+          email: formData.email,
+          password: formData.password
+        });
+
+        alert('Administrador creado correctamente');
+      }
+
+      // Recargar la lista de administradores
+      await loadAdmins();
+      setShowModal(false);
+      setFormData({ nombre: '', email: '', password: '' });
+    } catch (error) {
+      let errorMessage = 'Error guardando administrador';
+
+      if (error.response && error.response.data) {
+        const { message, errors } = error.response.data;
+        errorMessage = message;
+
+        // Si hay errores de validación específicos, mostrarlos
+        if (errors && errors.length > 0) {
+          const validationErrors = errors.map(err => err.message).join('\n');
+          errorMessage += '\n\nDetalles:\n' + validationErrors;
+        }
+      } else {
+        errorMessage += ': ' + error.message;
+      }
+
+      alert(errorMessage);
+      console.error('Error guardando administrador:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  if (loading) {
     return (
-        <div className="admin-users-page">
-            {/* Header */}
-            <header className="page-header">
-                <div className="header-content">
-                    <div className="header-left">
-                        <button onClick={() => navigate('/admin/dashboard')} className="back-button">
-                            ← Volver al Dashboard
-                        </button>
-                        <h1>👥 Gestión de Administradores</h1>
-                    </div>
-                    <div className="header-right">
-                        <span className="user-info">👤 {user?.nombre}</span>
-                        <button onClick={handleLogout} className="logout-button">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
-            </header>
+      <div className="loading-container">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Cargando administradores...</p>
+        </div>
+      </div>
+    );
+  }
 
-            {/* Contenido principal */}
-            <main className="page-main">
-                <div className="page-container">
-                    {error && (
-                        <div className="error-banner">
-                            <span>❌ {error}</span>
-                            <button onClick={() => setError(null)}>✕</button>
-                        </div>
-                    )}
+  return (
+    <div className="admin-users-page">
+      {/* Header */}
+      <header className="page-header">
+        <div className="header-content">
+          <div className="header-left">
+            <button onClick={() => navigate('/admin/dashboard')} className="back-button">
+              ← Volver al Dashboard
+            </button>
+            <h1>👥 Gestión de Administradores</h1>
+          </div>
+          <div className="header-right">
+            <span className="user-info">👤 {user?.nombre}</span>
+            <button onClick={handleLogout} className="logout-button">
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </header>
 
-                    <div className="actions-bar">
-                        <button onClick={handleAddNew} className="add-button">
-                            + Nuevo Administrador
-                        </button>
-                        <button onClick={loadAdmins} className="refresh-button">
-                            🔄 Actualizar
-                        </button>
-                    </div>
+      {/* Contenido principal */}
+      <main className="page-main">
+        <div className="page-container">
+          {error && (
+            <div className="error-banner">
+              <span>❌ {error}</span>
+              <button onClick={() => setError(null)}>✕</button>
+            </div>
+          )}
 
-                    <div className="admins-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {admins.map(admin => (
-                                    <tr key={admin.id_administrador}>
-                                        <td>{admin.id_administrador}</td>
-                                        <td>{admin.nombre}</td>
-                                        <td>{admin.email}</td>
-                                        <td className="actions-cell">
-                                            <button
-                                                onClick={() => handleEdit(admin)}
-                                                className="edit-button"
-                                            >
-                                                ✏️ Editar
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(admin)}
-                                                className="delete-button"
-                                                disabled={admin.id_administrador === user?.id_administrador}
-                                            >
-                                                🗑️ Eliminar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+          <div className="actions-bar">
+            <button onClick={handleAddNew} className="add-button">
+              + Nuevo Administrador
+            </button>
+            <button onClick={loadAdmins} className="refresh-button">
+              🔄 Actualizar
+            </button>
+          </div>
 
-                        {admins.length === 0 && (
-                            <div className="empty-state">
-                                <p>No hay administradores registrados</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </main>
+          <div className="admins-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {admins.map(admin => (
+                  <tr key={admin.id_administrador}>
+                    <td>{admin.id_administrador}</td>
+                    <td>{admin.nombre}</td>
+                    <td>{admin.email}</td>
+                    <td className="actions-cell">
+                      <button
+                        onClick={() => handleEdit(admin)}
+                        className="edit-button"
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(admin)}
+                        className="delete-button"
+                        disabled={admin.id_administrador === user?.id_administrador}
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-            {/* Modal para crear/editar */}
-            {showModal && (
-                <div className="modal-overlay">
-                    <div className="modal">
-                        <div className="modal-header">
-                            <h2>
-                                {editingAdmin ? 'Editar Administrador' : 'Nuevo Administrador'}
-                            </h2>
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="close-button"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="modal-form">
-                            <div className="form-group">
-                                <label>Nombre *</label>
-                                <input
-                                    type="text"
-                                    name="nombre"
-                                    value={formData.nombre}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Email *</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>
-                                    Contraseña {editingAdmin ? '(dejar vacío para no cambiar)' : '*'}
-                                </label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleInputChange}
-                                    required={!editingAdmin}
-                                    placeholder="Ej: Admin123"
-                                />
-                                <small style={{ color: '#666', fontSize: '0.8em', marginTop: '4px', display: 'block' }}>
-                                    Debe contener al menos una mayúscula, una minúscula y un número
-                                </small>
-                            </div>
-
-                            <div className="form-actions">
-                                <button type="button" onClick={() => setShowModal(false)}>
-                                    Cancelar
-                                </button>
-                                <button type="submit" className="primary">
-                                    {editingAdmin ? 'Actualizar' : 'Crear'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+            {admins.length === 0 && (
+              <div className="empty-state">
+                <p>No hay administradores registrados</p>
+              </div>
             )}
+          </div>
+        </div>
+      </main>
 
-            <style jsx>{`
+      {/* Modal para crear/editar */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>
+                {editingAdmin ? 'Editar Administrador' : 'Nuevo Administrador'}
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="close-button"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="modal-form">
+              <div className="form-group">
+                <label>Nombre *</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>
+                  Contraseña {editingAdmin ? '(dejar vacío para no cambiar)' : '*'}
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required={!editingAdmin}
+                  placeholder="Ej: Admin123"
+                />
+                <small style={{ color: '#666', fontSize: '0.8em', marginTop: '4px', display: 'block' }}>
+                  Debe contener al menos una mayúscula, una minúscula y un número
+                </small>
+              </div>
+
+              <div className="form-actions">
+                <button type="button" onClick={() => setShowModal(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="primary">
+                  {editingAdmin ? 'Actualizar' : 'Crear'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <style>{`
         .admin-users-page {
           min-height: 100vh;
           background: #f8fafc;
@@ -724,8 +724,8 @@ const AdminUsersPage = () => {
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default AdminUsersPage;
