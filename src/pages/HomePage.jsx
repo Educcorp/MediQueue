@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useTurns from '../hooks/useTurns';
 import '../styles/HomePage.css';
 
 const HomePage = () => {
   const { nextTurn, lastTurns, loading } = useTurns();
   const [showHeader] = useState(true);
+  const navigate = useNavigate();
+
+  const handleTakeTurn = () => {
+    navigate('/tomar-turno');
+  };
 
   return (
     <div className="main-outer-container">
@@ -18,6 +24,11 @@ const HomePage = () => {
                 <span className="brand-name">MediQueue</span>
                 <span className="brand-tag">Tu turno, sin filas</span>
               </div>
+            </div>
+            <div className="brand-right">
+              <button onClick={handleTakeTurn} className="take-turn-btn">
+                📋 Tomar Turno
+              </button>
             </div>
           </div>
         </div>
