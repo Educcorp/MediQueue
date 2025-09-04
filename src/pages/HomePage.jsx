@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import useTurns from '../hooks/useTurns';
 import '../styles/HomePage.css';
 
 const HomePage = () => {
-  const { nextTurn, lastTurns, loading } = useTurns();
+  const { nextTurn, activeTurns, loading } = useTurns();
   const [showHeader] = useState(true);
-  const navigate = useNavigate();
 
-  const handleTakeTurn = () => {
-    navigate('/tomar-turno');
-  };
+  // Función eliminada junto con el botón
 
   return (
     <div className="main-outer-container">
@@ -26,9 +22,7 @@ const HomePage = () => {
               </div>
             </div>
             <div className="brand-right">
-              <button onClick={handleTakeTurn} className="take-turn-btn">
-                📋 Tomar Turno
-              </button>
+              {/* Botón eliminado según solicitud del usuario */}
             </div>
           </div>
         </div>
@@ -55,17 +49,26 @@ const HomePage = () => {
 
 
         <div className="sidebar">
-          <div className="sidebar-title">Últimos llamados</div>
+          <div className="sidebar-title">Turnos Activos</div>
           <div className="sidebar-list">
             {loading ? (
               <div className="sidebar-loading">Cargando...</div>
-            ) : (
-              lastTurns.map((turn) => (
-                <div className="sidebar-turn" key={turn.id}>
-                  <span className="turn-id">{turn.id}</span>
-                  <span className="turn-room">Consultorio {turn.consultorio}</span>
+            ) : activeTurns.length > 0 ? (
+              activeTurns.map((turn) => (
+                <div className="sidebar-turn" key={turn.id_turno}>
+                  <div className="turn-info">
+                    <span className="turn-id">#{turn.numero_turno}</span>
+                    <span className="turn-patient">{turn.nombre_paciente} {turn.apellido_paciente}</span>
+                    <span className="turn-room">Consultorio {turn.numero_consultorio}</span>
+                    <span className="turn-time">{turn.hora}</span>
+                  </div>
+                  <div className="turn-status">
+                    <span className="status-badge status-waiting">{turn.estado}</span>
+                  </div>
                 </div>
               ))
+            ) : (
+              <div className="sidebar-empty">No hay turnos activos</div>
             )}
           </div>
         </div>

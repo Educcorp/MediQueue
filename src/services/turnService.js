@@ -121,6 +121,17 @@ const turnService = {
             console.error('Error obteniendo últimos turnos:', error);
             throw error;
         }
+    },
+
+    // Obtener turnos activos (En espera)
+    async getActiveTurns() {
+        try {
+            const response = await api.get('/turnos/estado/En espera');
+            return response.data.data || [];
+        } catch (error) {
+            console.error('Error obteniendo turnos activos:', error);
+            throw error;
+        }
     }
 };
 

@@ -219,14 +219,13 @@ body,
   background: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-  padding: 1rem 1rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  font-size: 1.2rem;
-  font-weight: 700;
+  gap: 0.5rem;
+  font-size: 0.9rem;
   color: #e2e8f0;
-  min-height: 64px;
+  min-height: auto;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -235,17 +234,64 @@ body,
   box-shadow: 0 4px 16px rgba(84, 78, 82, 0.15);
 }
 
+.turn-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .turn-id {
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #fff;
+  line-height: 1;
+}
+
+.turn-patient {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  font-weight: 500;
 }
 
 .turn-room {
-  font-size: .9rem;
-  color: #cbd5e1;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.turn-time {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.turn-status {
+  display: flex;
+  justify-content: flex-end;
   margin-top: 0.25rem;
-  opacity: 0.9;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-waiting {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.sidebar-empty {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  padding: 2rem 1rem;
+  opacity: 0.7;
 }
 
 .sidebar-loading {
