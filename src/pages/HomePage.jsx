@@ -55,15 +55,16 @@ const HomePage = () => {
               <div className="sidebar-loading">Cargando...</div>
             ) : activeTurns.length > 0 ? (
               activeTurns.map((turn) => (
-                <div className="sidebar-turn" key={turn.id_turno}>
+                <div className="sidebar-turn" key={turn.numero_turno}>
                   <div className="turn-info">
                     <span className="turn-id">#{turn.numero_turno}</span>
                     <span className="turn-patient">{turn.nombre_paciente} {turn.apellido_paciente}</span>
                     <span className="turn-room">Consultorio {turn.numero_consultorio}</span>
-                    <span className="turn-time">{turn.hora}</span>
                   </div>
                   <div className="turn-status">
-                    <span className="status-badge status-waiting">{turn.estado}</span>
+                    <span className={`status-badge ${turn.estado === 'Llamando' ? 'status-calling' : 'status-waiting'}`}>
+                      {turn.estado}
+                    </span>
                   </div>
                 </div>
               ))
