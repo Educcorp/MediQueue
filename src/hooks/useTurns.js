@@ -3,17 +3,17 @@ import turnService from '../services/turnService';
 
 export default function useTurns() {
 	const [nextTurn, setNextTurn] = useState(null);
-	const [lastTurns, setLastTurns] = useState([]);
+	const [activeTurns, setActiveTurns] = useState([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		setLoading(true);
 		Promise.all([
 			turnService.getNextTurn(),
-			turnService.getLastTurns(6)
-		]).then(([next, last]) => {
+			turnService.getActiveTurns()
+		]).then(([next, active]) => {
 			setNextTurn(next);
-			setLastTurns(last);
+			setActiveTurns(active);
 			setLoading(false);
 		}).catch((error) => {
 			console.error('Error cargando turnos:', error);
@@ -21,5 +21,5 @@ export default function useTurns() {
 		});
 	}, []);
 
-	return { nextTurn, lastTurns, loading };
+	return { nextTurn, activeTurns, loading };
 }
