@@ -286,6 +286,22 @@ body,
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
+.status-calling {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 .sidebar-empty {
   text-align: center;
   color: #64748b;

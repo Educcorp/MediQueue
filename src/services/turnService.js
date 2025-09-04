@@ -123,10 +123,10 @@ const turnService = {
         }
     },
 
-    // Obtener turnos activos (En espera)
+    // Obtener turnos activos (En espera y Llamando)
     async getActiveTurns() {
         try {
-            const response = await api.get('/turnos/estado/En espera');
+            const response = await api.get('/turnos/publicos');
             return response.data.data || [];
         } catch (error) {
             console.error('Error obteniendo turnos activos:', error);
