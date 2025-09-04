@@ -354,6 +354,29 @@ body,
   color: #64748b
 }
 
+.brand-right {
+  display: flex;
+  align-items: center;
+}
+
+.take-turn-btn {
+  background: linear-gradient(135deg, #ea5d4b 0%, #c53030 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9em;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(234, 93, 75, 0.3);
+}
+
+.take-turn-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(234, 93, 75, 0.4);
+}
+
 .current-card {
   background: #fff;
   border-radius: 24px;
@@ -405,6 +428,17 @@ body,
     padding: 0.7rem 0.5rem;
     border-left: none;
     border-top: 6px solid #b23a48;
+  }
+
+  .brand-inner {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .take-turn-btn {
+    font-size: 0.8em;
+    padding: 8px 16px;
   }
 }
 

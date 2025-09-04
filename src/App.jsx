@@ -1,6 +1,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
+import TakeTurn from './pages/TakeTurn'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminUsersPage from './pages/AdminUsersPage'
@@ -14,6 +15,9 @@ function App() {
       <Routes>
         {/* Ruta pública principal */}
         <Route path="/" element={<HomePage />} />
+
+        {/* Ruta para tomar turnos */}
+        <Route path="/tomar-turno" element={<TakeTurn />} />
 
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLogin />} />
