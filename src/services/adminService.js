@@ -72,6 +72,13 @@ class AdminService {
             }
         } catch (error) {
             console.error('Error eliminando administrador:', error);
+            
+            // Si es un error HTTP con respuesta del servidor
+            if (error.response && error.response.data && error.response.data.message) {
+                throw new Error(error.response.data.message);
+            }
+            
+            // Si es un error de red u otro tipo
             throw error;
         }
     }

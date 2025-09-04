@@ -76,8 +76,11 @@ const AdminUsersPage = () => {
         await loadAdmins();
         alert('Administrador eliminado correctamente');
       } catch (error) {
-        alert('Error eliminando administrador: ' + error.message);
         console.error('Error eliminando administrador:', error);
+        
+        // Mostrar el mensaje específico del servidor o un mensaje genérico
+        const errorMessage = error.message || 'Error desconocido al eliminar administrador';
+        alert(`Error eliminando administrador: ${errorMessage}`);
       }
     }
   };
