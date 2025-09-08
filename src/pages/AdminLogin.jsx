@@ -83,13 +83,34 @@ const AdminLogin = () => {
       {/* Background Image */}
       <div className="background-image"></div>
 
+      {/* Transparent Header */}
+      <header className="transparent-header">
+        <div className="header-content">
+          <div className="logo-section">
+            <span className="logo-text">mediqueue</span>
+          </div>
+          <nav className="header-nav">
+            <div className="nav-item">Sistema <span className="dropdown-arrow">▼</span></div>
+            <div className="nav-item">Soluciones Médicas <span className="dropdown-arrow">▼</span></div>
+            <div className="nav-item">Acerca de</div>
+            <div className="nav-item">Insights</div>
+            <div className="nav-item">Contacto</div>
+          </nav>
+          <div className="header-right">
+            <div className="language-selector">🇺🇸</div>
+            <div className="login-link">🔗 MediQueue</div>
+          </div>
+        </div>
+      </header>
+
       {/* Left side content */}
       <div className="left-content">
         <div className="title-section">
           <h1 className="main-title">MediQueue</h1>
           <p className="subtitle">
-            Tu plataforma de gestión médica<br />
-            comienza aquí. Inicia sesión.
+            Tu plataforma de gestión<br />
+            médica comienza aquí.<br />
+            Inicia sesión.
           </p>
         </div>
 

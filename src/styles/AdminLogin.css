@@ -15,6 +15,87 @@
     overflow: hidden;
 }
 
+/* Transparent Header */
+.transparent-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 20;
+    padding: 20px 40px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+}
+
+.logo-text {
+    color: white;
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+}
+
+.header-nav {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.nav-item {
+    color: white;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.2s ease;
+}
+
+.nav-item:hover {
+    opacity: 0.8;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    margin-left: 4px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.language-selector {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-link {
+    color: white;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s ease;
+}
+
+.login-link:hover {
+    opacity: 0.8;
+}
+
 /* Background Image */
 .background-image {
     position: absolute;
@@ -44,9 +125,10 @@
 .left-content {
     position: absolute;
     left: 0;
-    top: 0;
-    width: 50%;
-    height: 100vh;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45%;
+    height: auto;
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -99,16 +181,18 @@
 
 /* Login Card */
 .login-card {
-    position: relative;
-    z-index: 10;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
+    z-index: 15;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px);
     border-radius: 24px;
     padding: 48px;
     width: 400px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    margin-left: auto;
-    margin-right: 120px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Avatar */
@@ -239,20 +323,24 @@
 /* Responsive Design */
 @media (max-width: 1200px) {
     .login-card {
-        margin-right: 60px;
+        width: 380px;
+        padding: 40px;
+    }
+
+    .header-nav {
+        gap: 24px;
     }
 }
 
 @media (max-width: 1024px) {
     .left-content {
-        width: 45%;
+        width: 40%;
         padding: 40px;
     }
 
     .login-card {
         width: 360px;
         padding: 40px;
-        margin-right: 40px;
     }
 
     .main-title {
@@ -262,13 +350,35 @@
     .subtitle {
         font-size: 18px;
     }
+
+    .transparent-header {
+        padding: 16px 24px;
+    }
+
+    .header-nav {
+        gap: 20px;
+    }
+
+    .nav-item {
+        font-size: 13px;
+    }
 }
 
 @media (max-width: 768px) {
     .elearning-login {
         flex-direction: column;
         justify-content: flex-start;
-        padding: 20px;
+        align-items: center;
+        padding: 80px 20px 20px 20px;
+    }
+
+    .transparent-header {
+        padding: 12px 20px;
+    }
+
+    .header-nav,
+    .header-right {
+        display: none;
     }
 
     .left-content {
@@ -277,6 +387,9 @@
         height: auto;
         padding: 40px 20px 20px 20px;
         text-align: center;
+        transform: none;
+        top: auto;
+        margin-bottom: 40px;
     }
 
     .title-section {
@@ -301,6 +414,9 @@
         max-width: 400px;
         margin: 0 auto;
         padding: 32px;
+        transform: none;
+        top: auto;
+        right: auto;
     }
 }
 
@@ -315,6 +431,8 @@
 
     .login-card {
         padding: 24px;
+        width: 100%;
+        max-width: 360px;
     }
 
     .avatar {
@@ -325,5 +443,13 @@
     .avatar svg {
         width: 30px;
         height: 30px;
+    }
+
+    .transparent-header {
+        padding: 10px 16px;
+    }
+
+    .logo-text {
+        font-size: 20px;
     }
 }
