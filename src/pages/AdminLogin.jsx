@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AdminLogin.css';
@@ -6,16 +6,10 @@ import '../styles/AdminLogin.css';
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    remember: false
+    password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-
-  // Referencias para animaciones
-  const formRef = useRef(null);
-  const buttonRef = useRef(null);
 
   const { login, isAuthenticated, error, clearError } = useAuth();
   const navigate = useNavigate();
@@ -32,30 +26,15 @@ const AdminLogin = () => {
     clearError();
   }, [clearError]);
 
-  // Animaciones de entrada
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (formRef.current) {
-        formRef.current.classList.add('login-form-active');
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
     // Limpiar errores al escribir
     setLocalError(null);
     clearError();
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -83,7 +62,7 @@ const AdminLogin = () => {
     setLocalError(null);
 
     try {
-      const result = await login(formData.email, formData.password, formData.remember);
+      const result = await login(formData.email, formData.password, false);
 
       if (result.success) {
         navigate('/admin/dashboard');
@@ -100,135 +79,96 @@ const AdminLogin = () => {
   const currentError = localError || error;
 
   return (
-    <div className="admin-login">
-      <div className="login-background-elements">
-        <div className="login-circle-1"></div>
-        <div className="login-circle-2"></div>
-        <div className="login-circle-3"></div>
+    <div className="elearning-login">
+      {/* Background Image */}
+      <div className="background-image"></div>
+
+      {/* Left side content */}
+      <div className="left-content">
+        <div className="title-section">
+          <h1 className="main-title">MediQueue</h1>
+          <p className="subtitle">
+            Tu plataforma de gestión médica<br />
+            comienza aquí. Inicia sesión.
+          </p>
+        </div>
+
+        <nav className="sidebar-menu">
+          <div className="menu-item">Certificados</div>
+          <div className="menu-item">Documentos</div>
+          <div className="menu-item">Entrenamientos</div>
+          <div className="menu-item">Videos</div>
+          <div className="menu-item">Fotos</div>
+          <div className="menu-item">Información</div>
+        </nav>
       </div>
 
-      <main className="login-main-content">
-        <div
-          ref={formRef}
-          className="login-form-container"
-        >
-          <div className="login-image-section">
-            <div className="login-image-overlay">
-              <div className="login-logo-section">
-                <div className="login-logo-main">
-                  <img
-                    src="/images/mediqueue_logo.png"
-                    alt="MediQueue Logo"
-                    className="login-logo-image-large"
-                  />
-                  <div className="login-logo-text-group">
-                    <span className="login-logo-text">Medi</span>
-                    <span className="login-logo-text2">Queue</span>
-                  </div>
-                </div>
-                <div className="login-logo-tagline">
-                  Sistema de Gestión de Turnos Médicos
-                </div>
-              </div>
-              <p className="login-image-text">
-                Tu sistema de gestión de turnos médicos confiable.
-                Simplifica la administración y mejora la experiencia del paciente.
-              </p>
-              <div className="login-image-quote">
-                "La eficiencia en la salud comienza con una buena organización." - MediQueue
-              </div>
-            </div>
-          </div>
-
-          <div className="login-form-content">
-            <div className="login-header">
-              <h1>¡Bienvenido de nuevo!</h1>
-              <p>Ingresa tus credenciales para acceder al panel administrativo</p>
-            </div>
-
-            {currentError && (
-              <div className="login-error-message">
-                <i className="fas fa-exclamation-triangle"></i>
-                {currentError}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div className="login-form-group">
-                <label>
-                  Email o Usuario
-                </label>
-                <div className="login-input-wrapper">
-                  <i className="fas fa-user login-input-icon"></i>
-                  <input
-                    type="text"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="login-input-field"
-                    placeholder="admin@mediqueue.com"
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="login-form-group">
-                <label>
-                  Contraseña
-                </label>
-                <div className="login-password-wrapper">
-                  <i className="fas fa-lock login-input-icon"></i>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="login-input-field"
-                    placeholder="••••••••••••"
-                    disabled={isLoading}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="login-password-toggle"
-                  >
-                    <i className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}></i>
-                  </button>
-                </div>
-              </div>
-
-              <div className="login-remember-row">
-
-              </div>
-
-              <button
-                ref={buttonRef}
-                type="submit"
-                className="login-button"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="login-loading-container">
-                    <div className="login-spinner"></div>
-                    <span>Iniciando sesión...</span>
-                  </div>
-                ) : (
-                  <>
-                    <i className="fas fa-sign-in-alt"></i>
-                    <span>Iniciar Sesión</span>
-                  </>
-                )}
-              </button>
-            </form>
-
-            <div className="login-footer">
-              <p>Sistema Turnomático MediQueue v1.0.0</p>
-            </div>
+      {/* Login card */}
+      <div className="login-card">
+        <div className="avatar-container">
+          <div className="avatar">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white" />
+              <path d="M12 14C8.13401 14 5 17.134 5 21V22H19V21C19 17.134 15.866 14 12 14Z" fill="white" />
+            </svg>
           </div>
         </div>
-      </main>
+
+        {currentError && (
+          <div className="error-message">
+            {currentError}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <input
+              type="text"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="E-Mail"
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="Password"
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="signin-button"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Iniciando...' : 'Sign In'}
+          </button>
+
+          <div className="recover-link">
+            <Link to="/forgot-password">Recover My Account</Link>
+          </div>
+        </form>
+
+        <div className="membership-notice">
+          <div className="notice-title">¿No eres miembro aún?</div>
+          <div className="notice-text">
+            Debes estar inscrito en un curso para ser<br />
+            miembro. Si aún no lo has hecho, consulta<br />
+            nuestros servicios médicos.
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
