@@ -135,7 +135,10 @@ const TakeTurn = () => {
         {showForm && (
           <div className="turn-form-card">
             <div className="form-header">
-              <h2>📋 Tomar Nuevo Turno</h2>
+              <h2>
+                <i className="mdi mdi-clipboard-text"></i>
+                Tomar Nuevo Turno
+              </h2>
               <p>Completa tus datos para generar tu turno</p>
             </div>
 
@@ -143,7 +146,8 @@ const TakeTurn = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="nombre" className="form-label">
-                    👤 Nombre *
+                    <i className="fas fa-user"></i>
+                    Nombre *
                   </label>
                   <input
                     type="text"
@@ -159,7 +163,8 @@ const TakeTurn = () => {
 
                 <div className="form-group">
                   <label htmlFor="apellido" className="form-label">
-                    👤 Apellido *
+                    <i className="fas fa-user"></i>
+                    Apellido *
                   </label>
                   <input
                     type="text"
@@ -177,7 +182,8 @@ const TakeTurn = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="telefono" className="form-label">
-                    📱 Teléfono *
+                    <i className="fas fa-phone"></i>
+                    Teléfono *
                   </label>
                   <input
                     type="tel"
@@ -193,7 +199,8 @@ const TakeTurn = () => {
 
                 <div className="form-group">
                   <label htmlFor="email" className="form-label">
-                    📧 Email (Opcional)
+                    <i className="fas fa-envelope"></i>
+                    Email (Opcional)
                   </label>
                   <input
                     type="email"
@@ -209,7 +216,8 @@ const TakeTurn = () => {
 
               <div className="form-group">
                 <label htmlFor="consultorio" className="form-label">
-                  🏥 Consultorio *
+                  <i className="mdi mdi-hospital-building"></i>
+                  Consultorio *
                 </label>
                 <select
                   id="consultorio"
@@ -231,7 +239,8 @@ const TakeTurn = () => {
               {/* Mensajes de Error */}
               {error && (
                 <div className="message error">
-                  <span>⚠️ {error}</span>
+                  <i className="fas fa-exclamation-triangle"></i>
+                  <span>{error}</span>
                 </div>
               )}
 
@@ -256,7 +265,8 @@ const TakeTurn = () => {
                     </>
                   ) : (
                     <>
-                      🎫 Generar Turno
+                      <i className="fas fa-ticket-alt"></i>
+                      Generar Turno
                     </>
                   )}
                 </button>
@@ -280,7 +290,8 @@ const TakeTurn = () => {
                 </>
               ) : (
                 <>
-                  🎫 Tomar Turno
+                  <i className="fas fa-ticket-alt"></i>
+                  Tomar Turno
                 </>
               )}
             </button>
@@ -288,13 +299,17 @@ const TakeTurn = () => {
             {/* Mensaje de error */}
             {error && (
               <div className="error-message">
-                <span>⚠️ {error}</span>
+                <i className="fas fa-exclamation-triangle"></i>
+                <span>{error}</span>
               </div>
             )}
 
             {/* Información adicional */}
             <div className="info-card">
-              <h3>ℹ️ Información Importante</h3>
+              <h3>
+                <i className="fas fa-info-circle"></i>
+                Información Importante
+              </h3>
               <ul className="info-list">
                 <li>Completa tus datos para generar tu turno</li>
                 <li>Tu turno será agregado a la cola de espera del consultorio seleccionado</li>
