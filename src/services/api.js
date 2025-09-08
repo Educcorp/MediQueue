@@ -15,7 +15,8 @@ const api = axios.create({
 // Interceptor para incluir token en requests
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('auth_token');
+        // Buscar token en localStorage primero, luego en sessionStorage
+        const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -32,10 +33,13 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
-        // Si el token expiró, limpiar localStorage y redirigir
+        // Si el token expiró, limpiar ambos storages y redirigir
         if (error.response?.status === 401) {
             localStorage.removeItem('auth_token');
             localStorage.removeItem('auth_user');
+            localStorage.removeItem('auth_remember');
+            sessionStorage.removeItem('auth_token');
+            sessionStorage.removeItem('auth_user');
             // Solo redirigir si estamos en una ruta protegida
             if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin') {
                 window.location.href = '/admin';
