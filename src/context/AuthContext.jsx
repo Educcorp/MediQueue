@@ -20,8 +20,9 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                const token = localStorage.getItem('auth_token');
-                const savedUser = localStorage.getItem('auth_user');
+                // Verificar tanto localStorage como sessionStorage
+                let token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+                let savedUser = localStorage.getItem('auth_user') || sessionStorage.getItem('auth_user');
 
                 if (token && savedUser) {
                     // Verificar que el token sea válido
@@ -29,15 +30,21 @@ export const AuthProvider = ({ children }) => {
                     if (isValid) {
                         setUser(JSON.parse(savedUser));
                     } else {
-                        // Token inválido, limpiar datos
+                        // Token inválido, limpiar datos de ambos storages
                         localStorage.removeItem('auth_token');
                         localStorage.removeItem('auth_user');
+                        localStorage.removeItem('auth_remember');
+                        sessionStorage.removeItem('auth_token');
+                        sessionStorage.removeItem('auth_user');
                     }
                 }
             } catch (error) {
                 console.error('Error verificando estado de autenticación:', error);
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('auth_user');
+                localStorage.removeItem('auth_remember');
+                sessionStorage.removeItem('auth_token');
+                sessionStorage.removeItem('auth_user');
             } finally {
                 setLoading(false);
             }
@@ -47,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // Función para iniciar sesión
-    const login = async (email, password) => {
+    const login = async (email, password, remember = false) => {
         try {
             setLoading(true);
             setError(null);
@@ -55,8 +62,17 @@ export const AuthProvider = ({ children }) => {
             const response = await authService.login(email, password);
 
             // Guardar token y datos del usuario
-            localStorage.setItem('auth_token', response.token);
-            localStorage.setItem('auth_user', JSON.stringify(response.user));
+            // Si "recordarme" está activado, usar localStorage, sino sessionStorage
+            const storage = remember ? localStorage : sessionStorage;
+            storage.setItem('auth_token', response.token);
+            storage.setItem('auth_user', JSON.stringify(response.user));
+
+            // También guardar la preferencia de "recordarme"
+            if (remember) {
+                localStorage.setItem('auth_remember', 'true');
+            } else {
+                localStorage.removeItem('auth_remember');
+            }
 
             setUser(response.user);
             return { success: true };
@@ -76,9 +92,12 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
         } finally {
-            // Limpiar datos locales independientemente del resultado
+            // Limpiar datos locales de ambos storages independientemente del resultado
             localStorage.removeItem('auth_token');
             localStorage.removeItem('auth_user');
+            localStorage.removeItem('auth_remember');
+            sessionStorage.removeItem('auth_token');
+            sessionStorage.removeItem('auth_user');
             setUser(null);
         }
     };
