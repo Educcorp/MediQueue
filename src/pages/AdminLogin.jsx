@@ -227,16 +227,6 @@ const AdminLogin = () => {
             {isLoading ? 'Iniciando...' : 'Iniciar sesión'}
           </button>
         </form>
-
-
-
-        {/* Membership Notice */}
-        <div className="membership-notice">
-          <div className="notice-title">¿No eres miembro aún?</div>
-          <div className="notice-text">
-            Solicita tu cuenta de administrador.
-          </div>
-        </div>
       </div>
     </div>
   );
