@@ -115,7 +115,11 @@ const AdminLogin = () => {
           <div className="login-image-section">
             <div className="login-image-overlay">
               <div className="login-logo-row">
-                <div className="login-logo-icon">🏥</div>
+                <img 
+                  src="/images/mediqueue_logo.png" 
+                  alt="MediQueue Logo" 
+                  className="login-logo-image" 
+                />
                 <span className="login-logo-text">Medi</span>
                 <span className="login-logo-text2">Queue</span>
               </div>
@@ -189,19 +193,7 @@ const AdminLogin = () => {
               </div>
 
               <div className="login-remember-row">
-                <label className="login-remember-checkbox">
-                  <div className={`login-checkmark ${formData.remember ? 'active' : ''}`}>
-                    <i className="fas fa-check" style={{ opacity: formData.remember ? 1 : 0 }}></i>
-                  </div>
-                  <input
-                    type="checkbox"
-                    name="remember"
-                    checked={formData.remember}
-                    onChange={handleChange}
-                    style={{ display: 'none' }}
-                  />
-                  <span>Recordarme</span>
-                </label>
+                
               </div>
 
               <button
