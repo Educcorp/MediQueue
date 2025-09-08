@@ -23,7 +23,7 @@
     width: 100%;
     z-index: 20;
     padding: 12px 40px;
-    height: 70px;
+    height: 80px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -156,8 +156,9 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 60px 40px 60px 60px;
+    padding: 80px 40px 60px 60px;
     color: white;
+    margin-top: 20px;
 }
 
 .title-section {
@@ -221,7 +222,7 @@
         0 12px 40px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    margin-top: 35px;
+    margin-top: 20px;
 }
 
 /* Avatar */
@@ -235,11 +236,13 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 24px rgba(74, 144, 226, 0.3);
+    box-shadow: 0 8px 24px rgba(119, 184, 206, 0.4);
+    overflow: hidden;
+    border: none;
 }
 
 /* Error Message */
@@ -288,7 +291,7 @@
 .signin-button {
     width: 100%;
     padding: 16px;
-    background: #4A90E2;
+    background: linear-gradient(135deg, #77b8ce 0%, #544e52 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -297,12 +300,13 @@
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(119, 184, 206, 0.3);
 }
 
 .signin-button:hover:not(:disabled) {
-    background: #357ABD;
+    background: linear-gradient(135deg, #544e52 0%, #77b8ce 100%);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    box-shadow: 0 6px 20px rgba(119, 184, 206, 0.4);
 }
 
 .signin-button:disabled {
@@ -318,7 +322,7 @@
 }
 
 .recover-link a {
-    color: #4A90E2;
+    color: #77b8ce;
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
@@ -326,6 +330,7 @@
 
 .recover-link a:hover {
     text-decoration: underline;
+    color: #544e52;
 }
 
 /* Membership Notice */
@@ -357,7 +362,7 @@
         background: rgba(255, 255, 255, 0.45);
         backdrop-filter: blur(40px);
         -webkit-backdrop-filter: blur(40px);
-        top: 56%;
+        top: 55%;
     }
 
     .header-nav {
@@ -386,7 +391,7 @@
         background: rgba(255, 255, 255, 0.45);
         backdrop-filter: blur(40px);
         -webkit-backdrop-filter: blur(40px);
-        top: 57%;
+        top: 55%;
     }
 
     .main-title {
@@ -399,7 +404,7 @@
 
     .transparent-header {
         padding: 10px 24px;
-        height: 60px;
+        height: 70px;
         background: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -425,7 +430,7 @@
 
     .transparent-header {
         padding: 8px 20px;
-        height: 50px;
+        height: 60px;
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
@@ -524,7 +529,7 @@
 
     .transparent-header {
         padding: 6px 16px;
-        height: 45px;
+        height: 55px;
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);

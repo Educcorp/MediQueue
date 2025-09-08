@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AdminLogin.css';
@@ -6,10 +6,23 @@ import '../styles/AdminLogin.css';
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    remember: false
   });
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [randomGif, setRandomGif] = useState('');
+
+  // Referencias para animaciones
+  const formRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  // Array de GIFs médicos
+  const medicalGifs = [
+    'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ4YXRubHRwbHZvd3R1NDB4NjBhYmRmZ242M3BrZWQzNHE5Y2UzOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VewYsVXoAV4WVEhYuk/giphy.gif',
+    'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cjdqNTBzcDEyM3MzNW44NGFoaTYzdHIwemVhc3NpamxobGxucXBqdiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/fqgf6H21b2we0cu1he/giphy.gif'
+  ];
 
   const { login, isAuthenticated, error, clearError } = useAuth();
   const navigate = useNavigate();
@@ -26,15 +39,34 @@ const AdminLogin = () => {
     clearError();
   }, [clearError]);
 
+  // Animaciones de entrada y GIF aleatorio
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formRef.current) {
+        formRef.current.classList.add('login-form-active');
+      }
+    }, 700);
+
+    // Seleccionar GIF aleatorio al cargar
+    const randomIndex = Math.floor(Math.random() * medicalGifs.length);
+    setRandomGif(medicalGifs[randomIndex]);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
     // Limpiar errores al escribir
     setLocalError(null);
     clearError();
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -62,7 +94,7 @@ const AdminLogin = () => {
     setLocalError(null);
 
     try {
-      const result = await login(formData.email, formData.password, false);
+      const result = await login(formData.email, formData.password, formData.remember);
 
       if (result.success) {
         navigate('/admin/dashboard');
@@ -80,76 +112,85 @@ const AdminLogin = () => {
 
   return (
     <div className="elearning-login">
-      {/* Background Image */}
       <div className="background-image"></div>
 
       {/* Transparent Header */}
-      <header className="transparent-header">
+      <div className="transparent-header">
         <div className="header-content">
           <div className="logo-section">
             <img
               src="/images/mediqueue_logo.png"
-              alt="MediQueue"
+              alt="MediQueue Logo"
               className="header-logo"
             />
             <span className="logo-text">MediQueue</span>
           </div>
-          <nav className="header-nav">
-            <div className="nav-item">Sistema <span className="dropdown-arrow">▼</span></div>
-            <div className="nav-item">Soluciones Médicas <span className="dropdown-arrow">▼</span></div>
+          <div className="header-nav">
+            <div className="nav-item">
+              Sistema <span className="dropdown-arrow">▼</span>
+            </div>
+            <div className="nav-item">
+              Soluciones Médicas <span className="dropdown-arrow">▼</span>
+            </div>
             <div className="nav-item">Acerca de</div>
             <div className="nav-item">Insights</div>
             <div className="nav-item">Contacto</div>
-          </nav>
+          </div>
           <div className="header-right">
-            <div className="language-selector">🇺🇸</div>
-            <div className="login-link">🔗 MediQueue</div>
+            <div className="language-selector">🌐</div>
+            <div className="login-link">
+              <span>🔒</span> MediQueue
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Left side content */}
+      {/* Left Content */}
       <div className="left-content">
         <div className="title-section">
-        <br />
-        <br />
-        <br />
-        <br />
-     
           <h1 className="main-title">MediQueue</h1>
           <p className="subtitle">
-            <br />
-            <br />
-            Tu plataforma de gestión<br />
-            médica comienza aquí.<br />
+            Tu plataforma de gestión <br /> médica comienza aquí. <br />
             Inicia sesión.
+            <br />
           </p>
         </div>
-        <nav className="sidebar-menu">
+        <div className="sidebar-menu">
           <div className="menu-item">Certificados</div>
           <div className="menu-item">Entrenamientos</div>
           <div className="menu-item">Videos</div>
           <div className="menu-item">Fotos</div>
-        </nav>
+        </div>
       </div>
 
-      {/* Login card */}
+      {/* Login Card */}
       <div className="login-card">
+        {/* Avatar with Random Medical GIF */}
         <div className="avatar-container">
           <div className="avatar">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white" />
-              <path d="M12 14C8.13401 14 5 17.134 5 21V22H19V21C19 17.134 15.866 14 12 14Z" fill="white" />
-            </svg>
+            {randomGif && (
+              <img
+                src={randomGif}
+                alt="Medical Animation"
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  objectFit: 'cover'
+                }}
+              />
+            )}
           </div>
         </div>
 
+        {/* Error Message */}
         {currentError && (
           <div className="error-message">
             {currentError}
           </div>
         )}
 
+        {/* Login Form */}
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <input
@@ -158,12 +199,11 @@ const AdminLogin = () => {
               value={formData.email}
               onChange={handleChange}
               className="form-input"
-              placeholder="E-Mail"
+              placeholder={formData.email || "damival.32@gmail.com"}
               disabled={isLoading}
               required
             />
           </div>
-
           <div className="form-group">
             <input
               type="password"
@@ -171,12 +211,11 @@ const AdminLogin = () => {
               value={formData.password}
               onChange={handleChange}
               className="form-input"
-              placeholder="Password"
+              placeholder="••••••••"
               disabled={isLoading}
               required
             />
           </div>
-
           <button
             type="submit"
             className="signin-button"
@@ -184,18 +223,13 @@ const AdminLogin = () => {
           >
             {isLoading ? 'Iniciando...' : 'Sign In'}
           </button>
-
-          <div className="recover-link">
-            <Link to="/forgot-password">Recover My Account</Link>
-          </div>
         </form>
 
+        {/* Membership Notice */}
         <div className="membership-notice">
           <div className="notice-title">¿No eres miembro aún?</div>
           <div className="notice-text">
-            Debes estar inscrito en un curso para ser<br />
-            miembro. Si aún no lo has hecho, consulta<br />
-            nuestros servicios médicos.
+            Debes estar inscrito en un curso para ser miembro. Si aún no lo has hecho, consulta nuestros servicios médicos.
           </div>
         </div>
       </div>
