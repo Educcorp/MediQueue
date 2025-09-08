@@ -137,9 +137,8 @@ const AdminLogin = () => {
             <div className="nav-item">Contacto</div>
           </div>
           <div className="header-right">
-            <div className="language-selector">🌐</div>
+            <div className="language-selector">ESP</div>
             <div className="login-link">
-              <span>🔒</span> MediQueue
             </div>
           </div>
         </div>
@@ -199,7 +198,7 @@ const AdminLogin = () => {
               value={formData.email}
               onChange={handleChange}
               className="form-input"
-              placeholder={formData.email || "damival.32@gmail.com"}
+              placeholder={formData.email || "Correo electrónico"}
               disabled={isLoading}
               required
             />
@@ -211,17 +210,21 @@ const AdminLogin = () => {
               value={formData.password}
               onChange={handleChange}
               className="form-input"
-              placeholder="••••••••"
+              placeholder="Contraseña"
               disabled={isLoading}
               required
             />
           </div>
           <button
             type="submit"
-            className="signin-button"
+            className={`signin-button ${isLoading ? 'loading' : ''}`}
             disabled={isLoading}
           >
-            {isLoading ? 'Iniciando...' : 'Sign In'}
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            {isLoading ? 'Iniciando...' : 'Iniciar sesión'}
           </button>
         </form>
 
@@ -231,7 +234,7 @@ const AdminLogin = () => {
         <div className="membership-notice">
           <div className="notice-title">¿No eres miembro aún?</div>
           <div className="notice-text">
-            Debes estar inscrito en un curso para ser miembro. Si aún no lo has hecho, consulta nuestros servicios médicos.
+            Solicita tu cuenta de administrador.
           </div>
         </div>
       </div>
