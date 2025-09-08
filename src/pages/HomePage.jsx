@@ -15,10 +15,15 @@ const HomePage = () => {
         <div className="brand-bar">
           <div className="brand-inner">
             <div className="brand-left">
-              <div className="brand-logo">MQ</div>
+              <div className="brand-logo">
+                <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="brand-logo-image" />
+              </div>
               <div className="brand-title">
                 <span className="brand-name">MediQueue</span>
-                <span className="brand-tag">Tu turno, sin filas</span>
+                <span className="brand-tag">
+                  <i className="mdi mdi-clock-outline"></i>
+                  Tu turno, sin filas
+                </span>
               </div>
             </div>
             <div className="brand-right">
@@ -32,24 +37,36 @@ const HomePage = () => {
         <div className="main-turn">
           <div className="current-card">
             <div className="current-header">
-              <span className="pill">Siguiente turno</span>
+              <span className="pill">
+                <i className="fas fa-arrow-right"></i>
+                Siguiente turno
+              </span>
             </div>
             {loading ? (
               <div className="main-loading">Cargando...</div>
             ) : nextTurn ? (
               <>
                 <div className="turn-id-big">{nextTurn.id}</div>
-                <div className="turn-room-big">Consultorio {nextTurn.consultorio}</div>
+                <div className="turn-room-big">
+                  <i className="mdi mdi-hospital-building"></i>
+                  Consultorio {nextTurn.consultorio}
+                </div>
               </>
             ) : (
-              <div className="main-no-turn">No hay turno siguiente</div>
+              <div className="main-no-turn">
+                <i className="mdi mdi-calendar-clock"></i>
+                No hay turno siguiente
+              </div>
             )}
           </div>
         </div>
 
 
         <div className="sidebar">
-          <div className="sidebar-title">Turnos Activos</div>
+          <div className="sidebar-title">
+            <i className="fas fa-list-ul"></i>
+            Turnos Activos
+          </div>
           <div className="sidebar-list">
             {loading ? (
               <div className="sidebar-loading">Cargando...</div>
@@ -59,7 +76,10 @@ const HomePage = () => {
                   <div className="turn-info">
                     <span className="turn-id">#{turn.numero_turno}</span>
                     <span className="turn-patient">{turn.nombre_paciente} {turn.apellido_paciente}</span>
-                    <span className="turn-room">Consultorio {turn.numero_consultorio}</span>
+                    <span className="turn-room">
+                      <i className="mdi mdi-hospital-building"></i>
+                      Consultorio {turn.numero_consultorio}
+                    </span>
                   </div>
                   <div className="turn-status">
                     <span className={`status-badge ${turn.estado === 'Llamando' ? 'status-calling' : 'status-waiting'}`}>
@@ -69,7 +89,10 @@ const HomePage = () => {
                 </div>
               ))
             ) : (
-              <div className="sidebar-empty">No hay turnos activos</div>
+              <div className="sidebar-empty">
+                <i className="mdi mdi-calendar-remove"></i>
+                No hay turnos activos
+              </div>
             )}
           </div>
         </div>
