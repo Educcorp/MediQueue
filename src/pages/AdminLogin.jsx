@@ -123,7 +123,7 @@ const AdminLogin = () => {
               alt="MediQueue Logo"
               className="header-logo"
             />
-            <span className="logo-text">MediQueue</span>
+            <span className="logo-text">MediQueue®</span>
           </div>
           <div className="header-nav">
             <div className="nav-item">
@@ -173,8 +173,8 @@ const AdminLogin = () => {
                 src={randomGif}
                 alt="Medical Animation"
                 style={{
-                  width: '60px',
-                  height: '60px',
+                  width: '110px',
+                  height: '110px',
                   borderRadius: '50%',
                   objectFit: 'cover'
                 }}
@@ -224,6 +224,8 @@ const AdminLogin = () => {
             {isLoading ? 'Iniciando...' : 'Sign In'}
           </button>
         </form>
+
+
 
         {/* Membership Notice */}
         <div className="membership-notice">

@@ -233,8 +233,8 @@
 }
 
 .avatar {
-    width: 80px;
-    height: 80px;
+    width: 122px;
+    height: 122px;
     border-radius: 50%;
     background: transparent;
     display: flex;
@@ -366,12 +366,12 @@
     }
 
     .header-nav {
-        gap: 24px;
+        gap: 4px;
     }
 
     .header-logo {
-        width: 100px;
-        height: 100px;
+        width: 300px;
+        height: 300px;
     }
 
     .logo-text {
@@ -513,13 +513,13 @@
     }
 
     .header-logo {
-        width: 60px;
-        height: 60px;
+        width: 90px;
+        height: 90px;
     }
 
     .avatar {
-        width: 60px;
-        height: 60px;
+        width: 10px;
+        height: 10px;
     }
 
     .avatar svg {
@@ -529,7 +529,7 @@
 
     .transparent-header {
         padding: 6px 16px;
-        height: 55px;
+        height: 65px;
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
