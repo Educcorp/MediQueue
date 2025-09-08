@@ -1,5 +1,5 @@
 /* HomePage Styles - Professional Medical Design */
-@import './theme.js';
+@import './theme.css';
 
 .main-outer-container {
   min-height: 100vh;
@@ -30,8 +30,13 @@
 }
 
 @keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
 }
 
 .brand-inner {
@@ -62,11 +67,10 @@
 }
 
 .brand-logo-image {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: white;
-  padding: 6px;
+  width: 60px;
+  height: auto;
+  max-height: 48px;
+  object-fit: contain;
   animation: pulse 2s infinite;
 }
 
@@ -115,7 +119,7 @@
   background: linear-gradient(135deg, rgba(216, 240, 244, 0.4) 0%, rgba(255, 255, 255, 0.9) 100%);
   border-radius: 24px;
   padding: 48px;
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(84, 78, 82, 0.15),
     0 8px 24px rgba(84, 78, 82, 0.1);
   border: 1px solid rgba(119, 184, 206, 0.2);
@@ -136,8 +140,13 @@
 }
 
 @keyframes rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .current-card {
@@ -172,8 +181,15 @@
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
 }
 
 .turn-id-big {
@@ -231,8 +247,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Sidebar */
@@ -240,7 +261,7 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(216, 240, 244, 0.3) 100%);
   border-radius: 20px;
   padding: 32px;
-  box-shadow: 
+  box-shadow:
     0 16px 32px rgba(84, 78, 82, 0.12),
     0 6px 16px rgba(84, 78, 82, 0.08);
   border: 1px solid rgba(119, 184, 206, 0.15);
@@ -397,10 +418,12 @@
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.02);
     opacity: 0.9;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;

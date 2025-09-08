@@ -14,11 +14,17 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
       <header className="dashboard-header">
         <div className="header-left">
-          <div className="header-logo">
-            <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="header-logo-image" />
-            <div className="header-titles">
+          <div className="header-logo-section">
+            <div className="header-logo-container">
+              <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="header-logo-image" />
+              <div className="header-logo-text-group">
+                <span className="header-logo-text">Medi</span>
+                <span className="header-logo-text2">Queue</span>
+              </div>
+            </div>
+            <div className="header-subtitle">
               <h1>Panel de Administración</h1>
-              <p>Sistema MediQueue</p>
+              <p>Sistema de Gestión Médica</p>
             </div>
           </div>
         </div>

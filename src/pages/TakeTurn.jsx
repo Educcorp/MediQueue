@@ -44,9 +44,9 @@ const TakeTurn = () => {
           return;
         }
       }
-      
+
       setConsultorios(consultoriosData);
-      
+
       if (consultoriosData.length === 0) {
         setError('No hay consultorios configurados en el sistema');
       }
@@ -89,7 +89,7 @@ const TakeTurn = () => {
       });
 
       const result = response.data.data;
-      
+
       // Limpiar formulario
       setFormData({
         nombre: '',
@@ -101,7 +101,7 @@ const TakeTurn = () => {
 
       // Redirigir inmediatamente a la página principal
       navigate('/');
-      
+
     } catch (error) {
       console.error('Error generando turno:', error);
       setError(error.response?.data?.message || 'Error al generar el turno');
@@ -130,7 +130,7 @@ const TakeTurn = () => {
   return (
     <div className="take-turn-container">
       <div className="take-turn-content">
-        
+
         {/* Formulario para tomar turno */}
         {showForm && (
           <div className="turn-form-card">
@@ -295,7 +295,7 @@ const TakeTurn = () => {
                 </>
               )}
             </button>
-            
+
             {/* Mensaje de error */}
             {error && (
               <div className="error-message">

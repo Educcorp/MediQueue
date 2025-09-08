@@ -114,14 +114,21 @@ const AdminLogin = () => {
         >
           <div className="login-image-section">
             <div className="login-image-overlay">
-              <div className="login-logo-row">
-                <img 
-                  src="/images/mediqueue_logo.png" 
-                  alt="MediQueue Logo" 
-                  className="login-logo-image" 
-                />
-                <span className="login-logo-text">Medi</span>
-                <span className="login-logo-text2">Queue</span>
+              <div className="login-logo-section">
+                <div className="login-logo-main">
+                  <img
+                    src="/images/mediqueue_logo.png"
+                    alt="MediQueue Logo"
+                    className="login-logo-image-large"
+                  />
+                  <div className="login-logo-text-group">
+                    <span className="login-logo-text">Medi</span>
+                    <span className="login-logo-text2">Queue</span>
+                  </div>
+                </div>
+                <div className="login-logo-tagline">
+                  Sistema de Gestión de Turnos Médicos
+                </div>
               </div>
               <p className="login-image-text">
                 Tu sistema de gestión de turnos médicos confiable.
@@ -193,7 +200,7 @@ const AdminLogin = () => {
               </div>
 
               <div className="login-remember-row">
-                
+
               </div>
 
               <button
