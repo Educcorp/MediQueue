@@ -5,6 +5,7 @@ import TakeTurn from './pages/TakeTurn'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminUsersPage from './pages/AdminUsersPage'
+import ConsultorioManagement from './pages/ConsultorioManagement'
 import TurnManager from './components/Admin/TurnManager'
 import ProtectedRoute from './components/Common/ProtectedRoute'
 import './styles/App.css'
@@ -46,6 +47,16 @@ function App() {
           element={
             <ProtectedRoute>
               <TurnManager />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta para gestión de consultorios */}
+        <Route
+          path="/admin/consultorios"
+          element={
+            <ProtectedRoute>
+              <ConsultorioManagement />
             </ProtectedRoute>
           }
         />
