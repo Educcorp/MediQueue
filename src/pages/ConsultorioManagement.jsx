@@ -97,15 +97,32 @@ const ConsultorioManagement = () => {
 
     // Eliminar un área (si backend lo permite: sin consultorios asociados)
     const handleDeleteArea = async (areaId) => {
-        if (!window.confirm('¿Eliminar esta área?')) return;
+        if (!window.confirm('¿Eliminar esta área? Se eliminarán sus consultorios.')) return;
         try {
             setLoading(true);
+            // Intento directo
             await areaService.remove(areaId);
-            await toggleConsultorioEstado();
         } catch (e) {
-            console.error(e);
-            alert('No se pudo eliminar el área. Verifique que no tenga consultorios asociados.');
+            // Si no se puede por consultorios asociados, los borramos y reintentamos
+            const apiMsg = e?.response?.data?.message || '';
+            if (apiMsg.toLowerCase().includes('consultorios asociados') || e?.response?.status === 409) {
+                try {
+                    const { consultorios } = await consultorioService.getByArea(areaId);
+                    for (const c of consultorios) {
+                        try { await consultorioService.remove(c.id_consultorio); } catch (_) { /* ignorar y continuar */ }
+                    }
+                    // Reintentar eliminar área
+                    await areaService.remove(areaId);
+                } catch (inner) {
+                    console.error(inner);
+                    alert('No se pudo eliminar el área tras eliminar consultorios. Revise si hay turnos asociados.');
+                }
+            } else {
+                console.error(e);
+                alert('No se pudo eliminar el área.');
+            }
         } finally {
+            await toggleConsultorioEstado();
             setLoading(false);
         }
     };

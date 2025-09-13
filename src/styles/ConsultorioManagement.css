@@ -350,6 +350,7 @@
     right: 0;
     bottom: 0;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+    pointer-events: none;
 }
 
 .area-icon {
@@ -390,6 +391,8 @@
 
 .area-tools {
     margin-left: auto;
+    position: relative;
+    z-index: 1;
 }
 
 .consultorios-list {
