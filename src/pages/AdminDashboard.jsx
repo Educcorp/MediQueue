@@ -71,10 +71,10 @@ const AdminDashboard = () => {
             <h2>Consultorios</h2>
           </div>
           <p>Gestión de consultorios y áreas médicas</p>
-          <div className="dashboard-link disabled">
-            <i className="fas fa-clock"></i>
-            Próximamente
-          </div>
+          <Link to="/admin/consultorios" className="dashboard-link">
+            <i className="fas fa-arrow-right"></i>
+            Ver Consultorios
+          </Link>
         </div>
 
         <div className="dashboard-card">
