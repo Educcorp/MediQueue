@@ -10,10 +10,6 @@ const TakeTurn = () => {
   const [showForm, setShowForm] = useState(false);
   const [consultorios, setConsultorios] = useState([]);
   const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
-    telefono: '',
-    email: '',
     id_consultorio: ''
   });
 
@@ -72,30 +68,15 @@ const TakeTurn = () => {
         return;
       }
 
-      if (!formData.nombre || !formData.apellido || !formData.telefono) {
-        setError('Por favor completa todos los campos obligatorios');
-        return;
-      }
-
-      // Crear turno con registro completo del paciente
-      const response = await api.post('/turnos/publico', {
-        id_consultorio: parseInt(formData.id_consultorio),
-        paciente: {
-          nombre: formData.nombre,
-          apellido: formData.apellido,
-          telefono: formData.telefono,
-          email: formData.email || null
-        }
+      // Crear turno sin registrar datos del paciente (paciente invitado)
+      const response = await api.post('/turnos/rapido', {
+        id_consultorio: parseInt(formData.id_consultorio)
       });
 
       const result = response.data.data;
 
       // Limpiar formulario
       setFormData({
-        nombre: '',
-        apellido: '',
-        telefono: '',
-        email: '',
         id_consultorio: ''
       });
 
@@ -139,80 +120,11 @@ const TakeTurn = () => {
                 <i className="mdi mdi-clipboard-text"></i>
                 Tomar Nuevo Turno
               </h2>
-              <p>Completa tus datos para generar tu turno</p>
+              <p>Selecciona tu consultorio y confirma para generar tu turno</p>
             </div>
 
             <form onSubmit={handleFormSubmit} className="turn-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="nombre" className="form-label">
-                    <i className="fas fa-user"></i>
-                    Nombre *
-                  </label>
-                  <input
-                    type="text"
-                    id="nombre"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Tu nombre"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="apellido" className="form-label">
-                    <i className="fas fa-user"></i>
-                    Apellido *
-                  </label>
-                  <input
-                    type="text"
-                    id="apellido"
-                    name="apellido"
-                    value={formData.apellido}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Tu apellido"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="telefono" className="form-label">
-                    <i className="fas fa-phone"></i>
-                    Teléfono *
-                  </label>
-                  <input
-                    type="tel"
-                    id="telefono"
-                    name="telefono"
-                    value={formData.telefono}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Tu número de teléfono"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="email" className="form-label">
-                    <i className="fas fa-envelope"></i>
-                    Email (Opcional)
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Tu email (opcional)"
-                  />
-                </div>
-              </div>
+              {/* Se elimina la captura de nombre, apellido, teléfono y email */}
 
               <div className="form-group">
                 <label htmlFor="consultorio" className="form-label">
@@ -311,7 +223,7 @@ const TakeTurn = () => {
                 Información Importante
               </h3>
               <ul className="info-list">
-                <li>Completa tus datos para generar tu turno</li>
+                <li>Solo debes seleccionar el consultorio y confirmar</li>
                 <li>Tu turno será agregado a la cola de espera del consultorio seleccionado</li>
                 <li>Puedes ver el estado de los turnos en la pantalla principal</li>
                 <li>Mantente atento a los llamados en la pantalla de turnos</li>
