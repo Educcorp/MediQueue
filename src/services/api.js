@@ -1,12 +1,10 @@
 import axios from 'axios';
-
-// URL base del backend
-const API_BASE_URL = 'http://localhost:3000/api';
+import { API_CONFIG } from '../utils/constants';
 
 // Crear instancia de axios con configuración base
 const api = axios.create({
-    baseURL: API_BASE_URL,
-    timeout: 10000,
+    baseURL: API_CONFIG.BASE_URL,
+    timeout: API_CONFIG.TIMEOUT,
     headers: {
         'Content-Type': 'application/json',
     },
