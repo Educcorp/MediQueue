@@ -13,14 +13,9 @@ const TakeTurn = () => {
   const [consultorios, setConsultorios] = useState([]);
   const [areas, setAreas] = useState([]);
   const [formData, setFormData] = useState({
-    uk_consultorio: '',
-    c_telefono: '',
-    s_nombre: '',
-    s_apellido: '',
-    s_email: '',
-    d_fecha_nacimiento: ''
+    uk_consultorio: ''
   });
-  const [showPatientForm, setShowPatientForm] = useState(false);
+  // Interfaz simplificada: no se solicitan datos de paciente
 
   // Cargar consultorios y áreas al montar el componente
   useEffect(() => {
@@ -74,38 +69,19 @@ const TakeTurn = () => {
         return;
       }
 
-      let result;
-
-      if (showPatientForm && (formData.c_telefono || formData.s_nombre)) {
-        // Crear turno con datos del paciente
-        result = await turnService.createTurnPublico({
-          uk_consultorio: formData.uk_consultorio,
-          c_telefono: formData.c_telefono || null,
-          s_nombre: formData.s_nombre || null,
-          s_apellido: formData.s_apellido || null,
-          s_email: formData.s_email || null,
-          d_fecha_nacimiento: formData.d_fecha_nacimiento || null
-        });
-      } else {
-        // Crear turno sin datos del paciente
-        result = await turnService.createTurnPublico({
-          uk_consultorio: formData.uk_consultorio
-        });
-      }
+      // Crear turno enviando únicamente el consultorio.
+      // El backend completará con null o placeholders ("Invitado").
+      const result = await turnService.createTurnPublico({
+        uk_consultorio: formData.uk_consultorio
+      });
 
       // Mostrar mensaje de éxito
       alert(`¡Turno generado exitosamente! Tu número de turno es: ${result.i_numero_turno}`);
 
       // Limpiar formulario
       setFormData({
-        uk_consultorio: '',
-        c_telefono: '',
-        s_nombre: '',
-        s_apellido: '',
-        s_email: '',
-        d_fecha_nacimiento: ''
+        uk_consultorio: ''
       });
-      setShowPatientForm(false);
 
       // Redirigir a la página principal
       navigate('/');
@@ -132,32 +108,12 @@ const TakeTurn = () => {
 
   const handleCloseForm = () => {
     setShowForm(false);
-    setShowPatientForm(false);
     setError('');
     setFormData({
-      uk_consultorio: '',
-      c_telefono: '',
-      s_nombre: '',
-      s_apellido: '',
-      s_email: '',
-      d_fecha_nacimiento: ''
+      uk_consultorio: ''
     });
   };
 
-  const togglePatientForm = () => {
-    setShowPatientForm(!showPatientForm);
-    if (!showPatientForm) {
-      // Limpiar datos del paciente al ocultar el formulario
-      setFormData(prev => ({
-        ...prev,
-        c_telefono: '',
-        s_nombre: '',
-        s_apellido: '',
-        s_email: '',
-        d_fecha_nacimiento: ''
-      }));
-    }
-  };
 
   const getConsultorioInfo = (consultorio) => {
     const area = areas.find(a => a.uk_area === consultorio.uk_area);
@@ -179,7 +135,7 @@ const TakeTurn = () => {
                 <i className="mdi mdi-clipboard-text"></i>
                 Tomar Nuevo Turno
               </h2>
-              <p>Selecciona tu consultorio y opcionalmente registra tus datos</p>
+              <p>Selecciona el consultorio al que te diriges</p>
             </div>
 
             <form onSubmit={handleFormSubmit} className="turn-form">
@@ -208,108 +164,7 @@ const TakeTurn = () => {
                 </select>
               </div>
 
-              {/* Toggle para mostrar formulario de paciente */}
-              <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={showPatientForm}
-                    onChange={togglePatientForm}
-                  />
-                  <span className="checkmark"></span>
-                  Registrar mis datos (opcional)
-                </label>
-              </div>
-
-              {/* Formulario de datos del paciente */}
-              {showPatientForm && (
-                <div className="patient-form">
-                  <h3>Datos Personales</h3>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="telefono" className="form-label">
-                        <i className="mdi mdi-phone"></i>
-                        Teléfono
-                      </label>
-                      <input
-                        type="tel"
-                        id="telefono"
-                        name="c_telefono"
-                        value={formData.c_telefono}
-                        onChange={handleInputChange}
-                        className="form-input"
-                        placeholder="Ej: +57 300 123 4567"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="nombre" className="form-label">
-                        <i className="mdi mdi-account"></i>
-                        Nombre
-                      </label>
-                      <input
-                        type="text"
-                        id="nombre"
-                        name="s_nombre"
-                        value={formData.s_nombre}
-                        onChange={handleInputChange}
-                        className="form-input"
-                        placeholder="Tu nombre"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="apellido" className="form-label">
-                        <i className="mdi mdi-account"></i>
-                        Apellido
-                      </label>
-                      <input
-                        type="text"
-                        id="apellido"
-                        name="s_apellido"
-                        value={formData.s_apellido}
-                        onChange={handleInputChange}
-                        className="form-input"
-                        placeholder="Tu apellido"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="email" className="form-label">
-                        <i className="mdi mdi-email"></i>
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="s_email"
-                        value={formData.s_email}
-                        onChange={handleInputChange}
-                        className="form-input"
-                        placeholder="tu@email.com"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="fecha_nacimiento" className="form-label">
-                        <i className="mdi mdi-calendar"></i>
-                        Fecha de Nacimiento
-                      </label>
-                      <input
-                        type="date"
-                        id="fecha_nacimiento"
-                        name="d_fecha_nacimiento"
-                        value={formData.d_fecha_nacimiento}
-                        onChange={handleInputChange}
-                        className="form-input"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* Interfaz simplificada: sin formulario de datos personales */}
 
               {/* Mensajes de Error */}
               {error && (
@@ -387,8 +242,8 @@ const TakeTurn = () => {
               </h3>
               <ul className="info-list">
                 <li>Selecciona el consultorio donde deseas ser atendido</li>
-                <li>Opcionalmente puedes registrar tus datos para un mejor seguimiento</li>
                 <li>Tu turno será agregado a la cola de espera del consultorio seleccionado</li>
+                <li>Si no registras datos, tu turno saldrá como "Invitado"</li>
                 <li>Puedes ver el estado de los turnos en la pantalla principal</li>
                 <li>Mantente atento a los llamados en la pantalla de turnos</li>
               </ul>
