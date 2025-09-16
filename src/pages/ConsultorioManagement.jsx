@@ -120,12 +120,12 @@ const ConsultorioManagement = () => {
 
         try {
             if (editingArea) {
-                await areaService.updateArea(editingArea.uk_area, {
+                await areaService.update(editingArea.uk_area, {
                     s_nombre_area: formData.s_nombre_area.trim()
                 });
                 alert('Área actualizada correctamente');
             } else {
-                await areaService.createArea({
+                await areaService.create({
                     s_nombre_area: formData.s_nombre_area.trim()
                 });
                 alert('Área creada correctamente');
@@ -154,13 +154,13 @@ const ConsultorioManagement = () => {
 
         try {
             if (editingConsultorio) {
-                await consultorioService.updateConsultorio(editingConsultorio.uk_consultorio, {
+                await consultorioService.update(editingConsultorio.uk_consultorio, {
                     i_numero_consultorio: parseInt(formData.i_numero_consultorio),
                     uk_area: formData.uk_area
                 });
                 alert('Consultorio actualizado correctamente');
             } else {
-                await consultorioService.createConsultorio({
+                await consultorioService.create({
                     i_numero_consultorio: parseInt(formData.i_numero_consultorio),
                     uk_area: formData.uk_area
                 });
@@ -183,7 +183,7 @@ const ConsultorioManagement = () => {
     const handleDeleteArea = async (area) => {
         if (window.confirm(`¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`)) {
             try {
-                await areaService.deleteArea(area.uk_area);
+                await areaService.remove(area.uk_area);
                 await loadData();
                 alert('Área eliminada correctamente');
             } catch (error) {
@@ -196,7 +196,7 @@ const ConsultorioManagement = () => {
     const handleDeleteConsultorio = async (consultorio) => {
         if (window.confirm(`¿Estás seguro de eliminar el consultorio ${consultorio.i_numero_consultorio}?`)) {
             try {
-                await consultorioService.deleteConsultorio(consultorio.uk_consultorio);
+                await consultorioService.remove(consultorio.uk_consultorio);
                 await loadData();
                 alert('Consultorio eliminado correctamente');
             } catch (error) {
