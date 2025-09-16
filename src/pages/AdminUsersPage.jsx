@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import adminService from '../services/adminService';
+import { TURN_STATUS_LABELS, USER_TYPE_LABELS } from '../utils/constants';
 
 const AdminUsersPage = () => {
   const [admins, setAdmins] = useState([]);
@@ -9,10 +10,15 @@ const AdminUsersPage = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    password: ''
+    s_nombre: '',
+    s_apellido: '',
+    s_email: '',
+    s_usuario: '',
+    s_password: '',
+    c_telefono: '',
+    tipo_usuario: 2
   });
 
   const { user, logout } = useAuth();
@@ -28,7 +34,6 @@ const AdminUsersPage = () => {
       setLoading(true);
       setError(null);
 
-      // Usar el servicio real para obtener administradores
       const administradores = await adminService.getAllAdmins();
       setAdmins(administradores);
 
@@ -47,32 +52,41 @@ const AdminUsersPage = () => {
 
   const handleAddNew = () => {
     setEditingAdmin(null);
-    setFormData({ nombre: '', email: '', password: '' });
+    setFormData({
+      s_nombre: '',
+      s_apellido: '',
+      s_email: '',
+      s_usuario: '',
+      s_password: '',
+      c_telefono: '',
+      tipo_usuario: 2
+    });
     setShowModal(true);
   };
 
   const handleEdit = (admin) => {
     setEditingAdmin(admin);
     setFormData({
-      nombre: admin.nombre,
-      email: admin.email,
-      password: ''
+      s_nombre: admin.s_nombre,
+      s_apellido: admin.s_apellido,
+      s_email: admin.s_email,
+      s_usuario: admin.s_usuario,
+      s_password: '',
+      c_telefono: admin.c_telefono || '',
+      tipo_usuario: admin.tipo_usuario
     });
     setShowModal(true);
   };
 
   const handleDelete = async (admin) => {
-    if (admin.id_administrador === user?.id_administrador) {
+    if (admin.uk_administrador === user?.uk_administrador) {
       alert('No puedes eliminar tu propia cuenta');
       return;
     }
 
-    if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.nombre}"?`)) {
+    if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.s_nombre} ${admin.s_apellido}"?`)) {
       try {
-        // Llamar al servicio real para eliminar
-        await adminService.deleteAdmin(admin.id_administrador);
-
-        // Recargar la lista de administradores
+        await adminService.deleteAdmin(admin.uk_administrador);
         await loadAdmins();
         alert('Administrador eliminado correctamente');
       } catch (error) {
@@ -85,12 +99,12 @@ const AdminUsersPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.nombre || !formData.email) {
+    if (!formData.s_nombre || !formData.s_apellido || !formData.s_email || !formData.s_usuario) {
       alert('Por favor complete todos los campos requeridos');
       return;
     }
 
-    if (!formData.email.includes('@')) {
+    if (!formData.s_email.includes('@')) {
       alert('Por favor ingrese un email válido');
       return;
     }
@@ -98,33 +112,48 @@ const AdminUsersPage = () => {
     try {
       if (editingAdmin) {
         // Actualizar administrador existente
-        await adminService.updateAdmin(editingAdmin.id_administrador, {
-          nombre: formData.nombre,
-          email: formData.email,
-          password: formData.password || undefined // Solo enviar password si se proporcionó
+        await adminService.updateAdmin(editingAdmin.uk_administrador, {
+          s_nombre: formData.s_nombre,
+          s_apellido: formData.s_apellido,
+          s_email: formData.s_email,
+          s_usuario: formData.s_usuario,
+          s_password: formData.s_password || undefined,
+          c_telefono: formData.c_telefono || undefined,
+          tipo_usuario: formData.tipo_usuario
         });
 
         alert('Administrador actualizado correctamente');
       } else {
         // Crear nuevo administrador
-        if (!formData.password) {
+        if (!formData.s_password) {
           alert('La contraseña es requerida para nuevos administradores');
           return;
         }
 
         await adminService.createAdmin({
-          nombre: formData.nombre,
-          email: formData.email,
-          password: formData.password
+          s_nombre: formData.s_nombre,
+          s_apellido: formData.s_apellido,
+          s_email: formData.s_email,
+          s_usuario: formData.s_usuario,
+          s_password: formData.s_password,
+          c_telefono: formData.c_telefono || undefined,
+          tipo_usuario: formData.tipo_usuario
         });
 
         alert('Administrador creado correctamente');
       }
 
-      // Recargar la lista de administradores
       await loadAdmins();
       setShowModal(false);
-      setFormData({ nombre: '', email: '', password: '' });
+      setFormData({
+        s_nombre: '',
+        s_apellido: '',
+        s_email: '',
+        s_usuario: '',
+        s_password: '',
+        c_telefono: '',
+        tipo_usuario: 2
+      });
     } catch (error) {
       let errorMessage = 'Error guardando administrador';
 
@@ -132,7 +161,6 @@ const AdminUsersPage = () => {
         const { message, errors } = error.response.data;
         errorMessage = message;
 
-        // Si hay errores de validación específicos, mostrarlos
         if (errors && errors.length > 0) {
           const validationErrors = errors.map(err => err.message).join('\n');
           errorMessage += '\n\nDetalles:\n' + validationErrors;
@@ -153,6 +181,18 @@ const AdminUsersPage = () => {
       [name]: value
     }));
   };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Filtrar administradores por término de búsqueda
+  const filteredAdmins = admins.filter(admin =>
+    admin.s_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    admin.s_apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    admin.s_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    admin.s_usuario.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -177,7 +217,7 @@ const AdminUsersPage = () => {
             <h1>👥 Gestión de Administradores</h1>
           </div>
           <div className="header-right">
-            <span className="user-info">👤 {user?.nombre}</span>
+            <span className="user-info">👤 {user?.s_nombre}</span>
             <button onClick={handleLogout} className="logout-button">
               Cerrar Sesión
             </button>
@@ -195,42 +235,77 @@ const AdminUsersPage = () => {
             </div>
           )}
 
-          <div className="actions-bar">
-            <button onClick={handleAddNew} className="add-button">
-              + Nuevo Administrador
-            </button>
-            <button onClick={loadAdmins} className="refresh-button">
-              🔄 Actualizar
-            </button>
+          {/* Barra de búsqueda y acciones */}
+          <div className="search-and-actions">
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Buscar administradores..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="search-input"
+              />
+              <i className="fas fa-search search-icon"></i>
+            </div>
+            <div className="actions-bar">
+              <button onClick={handleAddNew} className="add-button">
+                + Nuevo Administrador
+              </button>
+              <button onClick={loadAdmins} className="refresh-button">
+                🔄 Actualizar
+              </button>
+            </div>
           </div>
 
           <div className="admins-table">
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Nombre</th>
                   <th>Email</th>
+                  <th>Usuario</th>
+                  <th>Tipo</th>
+                  <th>Teléfono</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {admins.map(admin => (
-                  <tr key={admin.id_administrador}>
-                    <td>{admin.id_administrador}</td>
-                    <td>{admin.nombre}</td>
-                    <td>{admin.email}</td>
+                {filteredAdmins.map(admin => (
+                  <tr key={admin.uk_administrador}>
+                    <td>
+                      <div className="admin-name">
+                        <strong>{admin.s_nombre} {admin.s_apellido}</strong>
+                      </div>
+                    </td>
+                    <td>{admin.s_email}</td>
+                    <td>
+                      <span className="username-badge">{admin.s_usuario}</span>
+                    </td>
+                    <td>
+                      <span className={`type-badge ${admin.tipo_usuario === 1 ? 'admin' : 'supervisor'}`}>
+                        {USER_TYPE_LABELS[admin.tipo_usuario]}
+                      </span>
+                    </td>
+                    <td>{admin.c_telefono || 'No registrado'}</td>
+                    <td>
+                      <span className={`status-badge ${admin.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
+                        {admin.ck_estado === 'ACTIVO' ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
                     <td className="actions-cell">
                       <button
                         onClick={() => handleEdit(admin)}
                         className="edit-button"
+                        title="Editar administrador"
                       >
                         ✏️ Editar
                       </button>
                       <button
                         onClick={() => handleDelete(admin)}
                         className="delete-button"
-                        disabled={admin.id_administrador === user?.id_administrador}
+                        disabled={admin.uk_administrador === user?.uk_administrador}
+                        title={admin.uk_administrador === user?.uk_administrador ? 'No puedes eliminar tu propia cuenta' : 'Eliminar administrador'}
                       >
                         🗑️ Eliminar
                       </button>
@@ -240,9 +315,9 @@ const AdminUsersPage = () => {
               </tbody>
             </table>
 
-            {admins.length === 0 && (
+            {filteredAdmins.length === 0 && (
               <div className="empty-state">
-                <p>No hay administradores registrados</p>
+                <p>{searchTerm ? 'No se encontraron administradores' : 'No hay administradores registrados'}</p>
               </div>
             )}
           </div>
@@ -266,26 +341,79 @@ const AdminUsersPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-group">
-                <label>Nombre *</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleInputChange}
-                  required
-                />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Nombre *</label>
+                  <input
+                    type="text"
+                    name="s_nombre"
+                    value={formData.s_nombre}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Nombre del administrador"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Apellido *</label>
+                  <input
+                    type="text"
+                    name="s_apellido"
+                    value={formData.s_apellido}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Apellido del administrador"
+                  />
+                </div>
               </div>
 
-              <div className="form-group">
-                <label>Email *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Email *</label>
+                  <input
+                    type="email"
+                    name="s_email"
+                    value={formData.s_email}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="email@ejemplo.com"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Usuario *</label>
+                  <input
+                    type="text"
+                    name="s_usuario"
+                    value={formData.s_usuario}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Nombre de usuario"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Teléfono</label>
+                  <input
+                    type="tel"
+                    name="c_telefono"
+                    value={formData.c_telefono}
+                    onChange={handleInputChange}
+                    placeholder="+57 300 123 4567"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Tipo de Usuario *</label>
+                  <select
+                    name="tipo_usuario"
+                    value={formData.tipo_usuario}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value={2}>Supervisor</option>
+                    <option value={1}>Administrador</option>
+                  </select>
+                </div>
               </div>
 
               <div className="form-group">
@@ -294,14 +422,14 @@ const AdminUsersPage = () => {
                 </label>
                 <input
                   type="password"
-                  name="password"
-                  value={formData.password}
+                  name="s_password"
+                  value={formData.s_password}
                   onChange={handleInputChange}
                   required={!editingAdmin}
-                  placeholder="Ej: Admin123"
+                  placeholder="Mínimo 6 caracteres"
                 />
                 <small style={{ color: '#666', fontSize: '0.8em', marginTop: '4px', display: 'block' }}>
-                  Debe contener al menos una mayúscula, una minúscula y un número
+                  {editingAdmin ? 'Deja vacío para mantener la contraseña actual' : 'Debe contener al menos 6 caracteres'}
                 </small>
               </div>
 
@@ -422,10 +550,46 @@ const AdminUsersPage = () => {
           font-size: 1.2em;
         }
 
+        .search-and-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+          gap: 20px;
+        }
+
+        .search-bar {
+          position: relative;
+          flex: 1;
+          max-width: 400px;
+        }
+
+        .search-input {
+          width: 100%;
+          padding: 12px 16px 12px 40px;
+          border: 2px solid #e2e8f0;
+          border-radius: 8px;
+          font-size: 1em;
+          transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #a0aec0;
+        }
+
         .actions-bar {
           display: flex;
           gap: 15px;
-          margin-bottom: 30px;
         }
 
         .add-button {
@@ -489,9 +653,59 @@ const AdminUsersPage = () => {
           background: #f8fafc;
         }
 
+        .admin-name {
+          font-weight: 600;
+          color: #2d3748;
+        }
+
+        .username-badge {
+          background: #e2e8f0;
+          color: #4a5568;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.8em;
+          font-weight: 500;
+        }
+
+        .type-badge {
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.8em;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+        .type-badge.admin {
+          background: #fed7d7;
+          color: #c53030;
+        }
+
+        .type-badge.supervisor {
+          background: #bee3f8;
+          color: #2a4365;
+        }
+
+        .status-badge {
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.8em;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+        .status-badge.active {
+          background: #c6f6d5;
+          color: #22543d;
+        }
+
+        .status-badge.inactive {
+          background: #fed7d7;
+          color: #742a2a;
+        }
+
         .actions-cell {
           display: flex;
-          gap: 10px;
+          gap: 8px;
         }
 
         .edit-button {
@@ -556,7 +770,7 @@ const AdminUsersPage = () => {
           background: white;
           border-radius: 12px;
           width: 90%;
-          max-width: 500px;
+          max-width: 600px;
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
@@ -598,28 +812,35 @@ const AdminUsersPage = () => {
           padding: 25px;
         }
 
-        .form-group {
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
           margin-bottom: 20px;
         }
 
+        .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
         .form-group label {
-          display: block;
-          margin-bottom: 8px;
           font-weight: 600;
           color: #4a5568;
         }
 
-        .form-group input {
-          width: 100%;
+        .form-group input,
+        .form-group select {
           padding: 12px 16px;
           border: 2px solid #e2e8f0;
           border-radius: 8px;
           font-size: 1em;
           transition: all 0.3s ease;
-          box-sizing: border-box;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
           outline: none;
           border-color: #667eea;
           box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -701,8 +922,13 @@ const AdminUsersPage = () => {
             text-align: center;
           }
 
-          .actions-bar {
+          .search-and-actions {
             flex-direction: column;
+            align-items: stretch;
+          }
+
+          .actions-bar {
+            justify-content: center;
           }
 
           .admins-table {
@@ -712,6 +938,11 @@ const AdminUsersPage = () => {
           .actions-cell {
             flex-direction: column;
             gap: 5px;
+          }
+
+          .form-row {
+            grid-template-columns: 1fr;
+            gap: 15px;
           }
 
           .modal {
