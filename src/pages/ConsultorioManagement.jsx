@@ -139,7 +139,18 @@ const ConsultorioManagement = () => {
                 uk_area: ''
             });
         } catch (error) {
-            alert('Error guardando área: ' + error.message);
+            let errorMessage = 'Error guardando área: ' + error.message;
+
+            // Manejar errores específicos
+            if (error.response?.status === 409) {
+                errorMessage = 'Ya existe un área con ese nombre. Por favor, elige otro nombre.';
+            } else if (error.response?.status === 500) {
+                errorMessage = 'Error interno del servidor. Por favor, intenta nuevamente.';
+            } else if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+
+            alert(errorMessage);
             console.error('Error guardando área:', error);
         }
     };
@@ -175,7 +186,18 @@ const ConsultorioManagement = () => {
                 uk_area: ''
             });
         } catch (error) {
-            alert('Error guardando consultorio: ' + error.message);
+            let errorMessage = 'Error guardando consultorio: ' + error.message;
+
+            // Manejar errores específicos
+            if (error.response?.status === 409) {
+                errorMessage = 'Ya existe un consultorio con ese número en esta área. Por favor, elige otro número.';
+            } else if (error.response?.status === 500) {
+                errorMessage = 'Error interno del servidor. Por favor, intenta nuevamente.';
+            } else if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+
+            alert(errorMessage);
             console.error('Error guardando consultorio:', error);
         }
     };
