@@ -31,20 +31,12 @@ export const AuthProvider = ({ children }) => {
                         setUser(JSON.parse(savedUser));
                     } else {
                         // Token inválido, limpiar datos de ambos storages
-                        localStorage.removeItem('auth_token');
-                        localStorage.removeItem('auth_user');
-                        localStorage.removeItem('auth_remember');
-                        sessionStorage.removeItem('auth_token');
-                        sessionStorage.removeItem('auth_user');
+                        authService.clearAuthData();
                     }
                 }
             } catch (error) {
                 console.error('Error verificando estado de autenticación:', error);
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('auth_user');
-                localStorage.removeItem('auth_remember');
-                sessionStorage.removeItem('auth_token');
-                sessionStorage.removeItem('auth_user');
+                authService.clearAuthData();
             } finally {
                 setLoading(false);
             }
@@ -53,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         checkAuthStatus();
     }, []);
 
-    // Función para iniciar sesión
+    // Función para iniciar sesión por email
     const login = async (email, password, remember = false) => {
         try {
             setLoading(true);
@@ -61,19 +53,29 @@ export const AuthProvider = ({ children }) => {
 
             const response = await authService.login(email, password);
 
-            // Guardar token y datos del usuario
-            // Si "recordarme" está activado, usar localStorage, sino sessionStorage
-            const storage = remember ? localStorage : sessionStorage;
-            storage.setItem('auth_token', response.token);
-            storage.setItem('auth_user', JSON.stringify(response.user));
+            // Guardar datos de autenticación
+            authService.saveAuthData(response, remember);
+            setUser(response.user);
+            return { success: true };
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Error al iniciar sesión';
+            setError(errorMessage);
+            return { success: false, message: errorMessage };
+        } finally {
+            setLoading(false);
+        }
+    };
 
-            // También guardar la preferencia de "recordarme"
-            if (remember) {
-                localStorage.setItem('auth_remember', 'true');
-            } else {
-                localStorage.removeItem('auth_remember');
-            }
+    // Función para iniciar sesión por nombre de usuario
+    const loginByUsuario = async (usuario, password, remember = false) => {
+        try {
+            setLoading(true);
+            setError(null);
 
+            const response = await authService.loginByUsuario(usuario, password);
+
+            // Guardar datos de autenticación
+            authService.saveAuthData(response, remember);
             setUser(response.user);
             return { success: true };
         } catch (error) {
@@ -93,11 +95,7 @@ export const AuthProvider = ({ children }) => {
             console.error('Error al cerrar sesión:', error);
         } finally {
             // Limpiar datos locales de ambos storages independientemente del resultado
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_user');
-            localStorage.removeItem('auth_remember');
-            sessionStorage.removeItem('auth_token');
-            sessionStorage.removeItem('auth_user');
+            authService.clearAuthData();
             setUser(null);
         }
     };
@@ -105,7 +103,38 @@ export const AuthProvider = ({ children }) => {
     // Función para actualizar datos del usuario
     const updateUser = (updatedUser) => {
         setUser(updatedUser);
-        localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+        const remember = localStorage.getItem('auth_remember') === 'true';
+        const storage = remember ? localStorage : sessionStorage;
+        storage.setItem('auth_user', JSON.stringify(updatedUser));
+    };
+
+    // Función para cambiar contraseña
+    const changePassword = async (passwordActual, passwordNuevo) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await authService.changePassword(passwordActual, passwordNuevo);
+            return { success: true, data: response };
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Error al cambiar contraseña';
+            setError(errorMessage);
+            return { success: false, message: errorMessage };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Función para obtener estadísticas del usuario
+    const getEstadisticas = async () => {
+        try {
+            const response = await authService.getEstadisticas();
+            return { success: true, data: response };
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Error al obtener estadísticas';
+            setError(errorMessage);
+            return { success: false, message: errorMessage };
+        }
     };
 
     // Limpiar error
@@ -113,15 +142,41 @@ export const AuthProvider = ({ children }) => {
         setError(null);
     };
 
+    // Verificar si el usuario está autenticado
+    const isAuthenticated = () => {
+        return authService.isAuthenticated();
+    };
+
+    // Obtener usuario actual
+    const getCurrentUser = () => {
+        return authService.getCurrentUser();
+    };
+
+    // Verificar si es administrador principal
+    const isSuperAdmin = () => {
+        return authService.isSuperAdmin();
+    };
+
+    // Verificar si es supervisor o administrador
+    const isSupervisorOrAdmin = () => {
+        return authService.isSupervisorOrAdmin();
+    };
+
     const value = {
         user,
         loading,
         error,
         login,
+        loginByUsuario,
         logout,
         updateUser,
+        changePassword,
+        getEstadisticas,
         clearError,
-        isAuthenticated: !!user
+        isAuthenticated: isAuthenticated(),
+        getCurrentUser,
+        isSuperAdmin: isSuperAdmin(),
+        isSupervisorOrAdmin: isSupervisorOrAdmin()
     };
 
     return (

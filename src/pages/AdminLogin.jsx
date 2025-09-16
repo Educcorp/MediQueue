@@ -13,6 +13,7 @@ const AdminLogin = () => {
   const [localError, setLocalError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [randomGif, setRandomGif] = useState('');
+  const [loginType, setLoginType] = useState('email'); // 'email' o 'usuario'
 
   // Referencias para animaciones
   const formRef = useRef(null);
@@ -24,7 +25,7 @@ const AdminLogin = () => {
     'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cjdqNTBzcDEyM3MzNW44NGFoaTYzdHIwemVhc3NpamxobGxucXBqdiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/fqgf6H21b2we0cu1he/giphy.gif'
   ];
 
-  const { login, isAuthenticated, error, clearError } = useAuth();
+  const { login, loginByUsuario, isAuthenticated, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   // Redirigir si ya está autenticado
@@ -69,6 +70,13 @@ const AdminLogin = () => {
     setShowPassword(!showPassword);
   };
 
+  const toggleLoginType = () => {
+    setLoginType(prev => prev === 'email' ? 'usuario' : 'email');
+    setFormData(prev => ({ ...prev, email: '' }));
+    setLocalError(null);
+    clearError();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -78,23 +86,29 @@ const AdminLogin = () => {
       return;
     }
 
-    // Validar email o username (más flexible)
-    const isEmail = formData.email.includes('@');
-    if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setLocalError('Por favor, ingrese un email válido');
-      return;
-    }
-
-    if (!isEmail && formData.email.length < 3) {
-      setLocalError('El usuario debe tener al menos 3 caracteres');
-      return;
+    // Validar email o username según el tipo
+    if (loginType === 'email') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        setLocalError('Por favor, ingrese un email válido');
+        return;
+      }
+    } else {
+      if (formData.email.length < 3) {
+        setLocalError('El usuario debe tener al menos 3 caracteres');
+        return;
+      }
     }
 
     setIsLoading(true);
     setLocalError(null);
 
     try {
-      const result = await login(formData.email, formData.password, formData.remember);
+      let result;
+      if (loginType === 'email') {
+        result = await login(formData.email, formData.password, formData.remember);
+      } else {
+        result = await loginByUsuario(formData.email, formData.password, formData.remember);
+      }
 
       if (result.success) {
         navigate('/admin/dashboard');
@@ -182,6 +196,24 @@ const AdminLogin = () => {
           </div>
         </div>
 
+        {/* Login Type Toggle */}
+        <div className="login-type-toggle">
+          <button
+            type="button"
+            className={`toggle-btn ${loginType === 'email' ? 'active' : ''}`}
+            onClick={() => setLoginType('email')}
+          >
+            Email
+          </button>
+          <button
+            type="button"
+            className={`toggle-btn ${loginType === 'usuario' ? 'active' : ''}`}
+            onClick={() => setLoginType('usuario')}
+          >
+            Usuario
+          </button>
+        </div>
+
         {/* Error Message */}
         {currentError && (
           <div className="error-message">
@@ -198,14 +230,14 @@ const AdminLogin = () => {
               value={formData.email}
               onChange={handleChange}
               className="form-input"
-              placeholder={formData.email || "Correo electrónico"}
+              placeholder={loginType === 'email' ? "Correo electrónico" : "Nombre de usuario"}
               disabled={isLoading}
               required
             />
           </div>
           <div className="form-group">
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               name="password"
               value={formData.password}
               onChange={handleChange}
@@ -214,6 +246,27 @@ const AdminLogin = () => {
               disabled={isLoading}
               required
             />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={togglePasswordVisibility}
+              disabled={isLoading}
+            >
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </button>
+          </div>
+          <div className="form-group checkbox-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                name="remember"
+                checked={formData.remember}
+                onChange={handleChange}
+                disabled={isLoading}
+              />
+              <span className="checkmark"></span>
+              Recordarme
+            </label>
           </div>
           <button
             type="submit"
@@ -227,6 +280,13 @@ const AdminLogin = () => {
             {isLoading ? 'Iniciando...' : 'Iniciar sesión'}
           </button>
         </form>
+
+        {/* Footer Links */}
+        <div className="login-footer">
+          <Link to="/" className="footer-link">
+            ← Volver al inicio
+          </Link>
+        </div>
       </div>
     </div>
   );

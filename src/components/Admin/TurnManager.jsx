@@ -3,25 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
+import consultorioService from '../../services/consultorioService';
+import areaService from '../../services/areaService';
 
 const TurnManager = () => {
   const [turns, setTurns] = useState([]);
   const [patients, setPatients] = useState([]);
+  const [consultorios, setConsultorios] = useState([]);
+  const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingTurn, setEditingTurn] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedStatus, setSelectedStatus] = useState('todos');
+  const [selectedArea, setSelectedArea] = useState('todas');
   const [formData, setFormData] = useState({
-    numero_turno: '',
-    estado: 'En espera',
-    fecha: new Date().toISOString().split('T')[0],
-    hora: '',
-    id_paciente: '',
-    id_consultorio: 1,
-    id_administrador: '',
-    id_area: ''
+    uk_consultorio: '',
+    uk_paciente: '',
+    s_observaciones: ''
   });
 
   const { user, logout } = useAuth();
@@ -29,10 +29,11 @@ const TurnManager = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'En espera', label: 'En espera', color: '#4299e1' },
-    { value: 'Llamando', label: 'Llamando', color: '#805ad5' },
-    { value: 'Atendido', label: 'Atendido', color: '#48bb78' },
-    { value: 'Cancelado', label: 'Cancelado', color: '#e53e3e' }
+    { value: 'EN_ESPERA', label: 'En espera', color: '#4299e1' },
+    { value: 'LLAMANDO', label: 'Llamando', color: '#805ad5' },
+    { value: 'ATENDIDO', label: 'Atendido', color: '#48bb78' },
+    { value: 'CANCELADO', label: 'Cancelado', color: '#e53e3e' },
+    { value: 'NO_PRESENTE', label: 'No presente', color: '#a0aec0' }
   ];
 
   // Cargar datos al montar el componente
@@ -40,30 +41,35 @@ const TurnManager = () => {
     loadData();
   }, []);
 
-  // Cargar turnos cuando cambie la fecha o estado
+  // Cargar turnos cuando cambie la fecha, estado o área
   useEffect(() => {
     loadTurns();
-  }, [selectedDate, selectedStatus]);
+  }, [selectedDate, selectedStatus, selectedArea]);
 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Cargar pacientes y turnos en paralelo
-      const [patientsData, turnsData] = await Promise.all([
+      // Cargar datos en paralelo
+      const [patientsData, consultoriosData, areasData] = await Promise.all([
         patientService.getAllPatients().catch(err => {
           console.warn('Error cargando pacientes:', err);
-          return []; // Retornar array vacío si falla
+          return [];
         }),
-        turnService.getAllTurns().catch(err => {
-          console.warn('Error cargando turnos:', err);
-          return []; // Retornar array vacío si falla
+        consultorioService.getAll().catch(err => {
+          console.warn('Error cargando consultorios:', err);
+          return [];
+        }),
+        areaService.getAll().catch(err => {
+          console.warn('Error cargando áreas:', err);
+          return [];
         })
       ]);
 
       setPatients(patientsData);
-      setTurns(turnsData);
+      setConsultorios(consultoriosData);
+      setAreas(areasData);
     } catch (error) {
       setError('Error cargando datos: ' + error.message);
       console.error('Error cargando datos:', error);
@@ -75,35 +81,23 @@ const TurnManager = () => {
   const loadTurns = async () => {
     try {
       let turnsData;
-      if (selectedStatus === 'todos') {
-        // Intentar obtener turnos por fecha, si falla usar getAllTurns
-        try {
-          turnsData = await turnService.getTurnsByDate(selectedDate, { id_area: formData.id_area || undefined });
-        } catch (dateError) {
-          console.warn('Error obteniendo turnos por fecha, usando getAllTurns:', dateError);
-          turnsData = await turnService.getAllTurns({ id_area: formData.id_area || undefined });
-          // Filtrar por fecha en el frontend si es necesario
-          if (turnsData && Array.isArray(turnsData)) {
-            turnsData = turnsData.filter(turn => turn.fecha === selectedDate);
-          }
-        }
-      } else {
-        try {
-          turnsData = await turnService.getTurnsByStatus(selectedStatus, { id_area: formData.id_area || undefined });
-        } catch (statusError) {
-          console.warn('Error obteniendo turnos por estado, usando getAllTurns:', statusError);
-          turnsData = await turnService.getAllTurns({ id_area: formData.id_area || undefined });
-          // Filtrar por estado en el frontend si es necesario
-          if (turnsData && Array.isArray(turnsData)) {
-            turnsData = turnsData.filter(turn => turn.estado === selectedStatus);
-          }
-        }
+      const filters = {};
+
+      if (selectedArea !== 'todas') {
+        filters.uk_area = selectedArea;
       }
+
+      if (selectedStatus === 'todos') {
+        turnsData = await turnService.getTurnsByDate(selectedDate, filters);
+      } else {
+        turnsData = await turnService.getTurnsByStatus(selectedStatus, filters);
+      }
+
       setTurns(turnsData || []);
     } catch (error) {
       setError('Error cargando turnos: ' + error.message);
       console.error('Error cargando turnos:', error);
-      setTurns([]); // Asegurar que turns sea un array
+      setTurns([]);
     }
   };
 
@@ -115,13 +109,9 @@ const TurnManager = () => {
   const handleAddNew = () => {
     setEditingTurn(null);
     setFormData({
-      numero_turno: '',
-      estado: 'En espera',
-      fecha: selectedDate,
-      hora: '',
-      id_paciente: '',
-      id_consultorio: 1,
-      id_administrador: user?.id_administrador || ''
+      uk_consultorio: '',
+      uk_paciente: '',
+      s_observaciones: ''
     });
     setShowModal(true);
   };
@@ -129,21 +119,17 @@ const TurnManager = () => {
   const handleEdit = (turn) => {
     setEditingTurn(turn);
     setFormData({
-      numero_turno: turn.numero_turno,
-      estado: turn.estado,
-      fecha: turn.fecha,
-      hora: turn.hora,
-      id_paciente: turn.id_paciente,
-      id_consultorio: turn.id_consultorio,
-      id_administrador: turn.id_administrador
+      uk_consultorio: turn.uk_consultorio,
+      uk_paciente: turn.uk_paciente || '',
+      s_observaciones: turn.s_observaciones || ''
     });
     setShowModal(true);
   };
 
   const handleDelete = async (turn) => {
-    if (window.confirm(`¿Estás seguro de eliminar el turno #${turn.numero_turno}?`)) {
+    if (window.confirm(`¿Estás seguro de eliminar el turno #${turn.i_numero_turno}?`)) {
       try {
-        await turnService.deleteTurn(turn.id_turno);
+        await turnService.deleteTurn(turn.uk_turno);
         await loadTurns();
         alert('Turno eliminado correctamente');
       } catch (error) {
@@ -155,36 +141,76 @@ const TurnManager = () => {
 
   const handleStatusChange = async (turn, newStatus) => {
     try {
-      await turnService.changeTurnStatus(turn.id_turno, newStatus);
+      await turnService.updateTurnStatus(turn.uk_turno, newStatus);
       await loadTurns();
-      alert(`Estado del turno #${turn.numero_turno} actualizado a "${newStatus}"`);
+      alert(`Estado del turno #${turn.i_numero_turno} actualizado a "${turnStatuses.find(s => s.value === newStatus)?.label}"`);
     } catch (error) {
       alert('Error actualizando estado: ' + error.message);
       console.error('Error actualizando estado:', error);
     }
   };
 
+  const handleMarkAsAttended = async (turn) => {
+    try {
+      await turnService.markTurnAsAttended(turn.uk_turno);
+      await loadTurns();
+      alert(`Turno #${turn.i_numero_turno} marcado como atendido`);
+    } catch (error) {
+      alert('Error marcando turno como atendido: ' + error.message);
+      console.error('Error marcando turno como atendido:', error);
+    }
+  };
+
+  const handleMarkAsNoShow = async (turn) => {
+    try {
+      await turnService.markTurnAsNoShow(turn.uk_turno);
+      await loadTurns();
+      alert(`Turno #${turn.i_numero_turno} marcado como no presente`);
+    } catch (error) {
+      alert('Error marcando turno como no presente: ' + error.message);
+      console.error('Error marcando turno como no presente:', error);
+    }
+  };
+
+  const handleCancelTurn = async (turn) => {
+    if (window.confirm(`¿Estás seguro de cancelar el turno #${turn.i_numero_turno}?`)) {
+      try {
+        await turnService.cancelTurn(turn.uk_turno);
+        await loadTurns();
+        alert(`Turno #${turn.i_numero_turno} cancelado`);
+      } catch (error) {
+        alert('Error cancelando turno: ' + error.message);
+        console.error('Error cancelando turno:', error);
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.id_consultorio) {
+    if (!formData.uk_consultorio) {
       alert('Seleccione consultorio');
       return;
     }
 
     try {
       if (editingTurn) {
-        // Actualizar turno existente
-        await turnService.updateTurn(editingTurn.id_turno, formData);
+        // Actualizar observaciones del turno
+        await turnService.updateTurnObservations(editingTurn.uk_turno, formData.s_observaciones);
         alert('Turno actualizado correctamente');
       } else {
         // Crear nuevo turno
-        {
-          const payload = { id_consultorio: Number(formData.id_consultorio) };
-          if (formData.id_paciente) {
-            payload.id_paciente = Number(formData.id_paciente);
-          }
-          await turnService.createTurn(payload);
+        if (formData.uk_paciente) {
+          await turnService.createTurnWithPaciente({
+            uk_consultorio: formData.uk_consultorio,
+            uk_paciente: formData.uk_paciente,
+            s_observaciones: formData.s_observaciones
+          });
+        } else {
+          await turnService.createTurn({
+            uk_consultorio: formData.uk_consultorio,
+            s_observaciones: formData.s_observaciones
+          });
         }
         alert('Turno creado correctamente');
       }
@@ -192,13 +218,9 @@ const TurnManager = () => {
       await loadTurns();
       setShowModal(false);
       setFormData({
-        numero_turno: '',
-        estado: 'En espera',
-        fecha: selectedDate,
-        hora: '',
-        id_paciente: '',
-        id_consultorio: 1,
-        id_administrador: user?.id_administrador || ''
+        uk_consultorio: '',
+        uk_paciente: '',
+        s_observaciones: ''
       });
     } catch (error) {
       let errorMessage = 'Error guardando turno';
@@ -225,9 +247,27 @@ const TurnManager = () => {
     return statusObj ? statusObj.color : '#718096';
   };
 
-  const getPatientName = (patientId) => {
-    const patient = patients.find(p => p.id_paciente === patientId);
-    return patient ? patient.nombre : 'Paciente no encontrado';
+  const getStatusLabel = (status) => {
+    const statusObj = turnStatuses.find(s => s.value === status);
+    return statusObj ? statusObj.label : status;
+  };
+
+  const getPatientName = (uk_paciente) => {
+    if (!uk_paciente) return 'Sin paciente';
+    const patient = patients.find(p => p.uk_paciente === uk_paciente);
+    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Paciente no encontrado';
+  };
+
+  const getConsultorioInfo = (uk_consultorio) => {
+    const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
+    return consultorio ? `Consultorio ${consultorio.i_numero_consultorio}` : 'Consultorio no encontrado';
+  };
+
+  const getAreaInfo = (uk_consultorio) => {
+    const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
+    if (!consultorio) return '';
+    const area = areas.find(a => a.uk_area === consultorio.uk_area);
+    return area ? area.s_nombre_area : '';
   };
 
   if (loading) {
@@ -253,7 +293,7 @@ const TurnManager = () => {
             <h1>📋 Gestión de Turnos</h1>
           </div>
           <div className="header-right">
-            <span className="user-info">👤 {user?.nombre}</span>
+            <span className="user-info">👤 {user?.s_nombre}</span>
             <button onClick={handleLogout} className="logout-button">
               Cerrar Sesión
             </button>
@@ -297,6 +337,21 @@ const TurnManager = () => {
                 ))}
               </select>
             </div>
+            <div className="filter-group">
+              <label>Área:</label>
+              <select
+                value={selectedArea}
+                onChange={(e) => setSelectedArea(e.target.value)}
+                className="filter-select"
+              >
+                <option value="todas">Todas las áreas</option>
+                {areas.map(area => (
+                  <option key={area.uk_area} value={area.uk_area}>
+                    {area.s_nombre_area}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Barra de acciones */}
@@ -320,28 +375,30 @@ const TurnManager = () => {
                   <th>Hora</th>
                   <th>Estado</th>
                   <th>Consultorio</th>
+                  <th>Área</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {turns.map(turn => (
-                  <tr key={turn.id_turno}>
-                    <td className="turn-number">#{turn.numero_turno}</td>
-                    <td>{getPatientName(turn.id_paciente)}</td>
-                    <td>{new Date(turn.fecha).toLocaleDateString('es-ES')}</td>
-                    <td>{turn.hora}</td>
+                  <tr key={turn.uk_turno}>
+                    <td className="turn-number">#{turn.i_numero_turno}</td>
+                    <td>{getPatientName(turn.uk_paciente)}</td>
+                    <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
+                    <td>{turn.t_hora}</td>
                     <td>
                       <span
                         className="status-badge"
-                        style={{ backgroundColor: getStatusColor(turn.estado) }}
+                        style={{ backgroundColor: getStatusColor(turn.s_estado) }}
                       >
-                        {turn.estado}
+                        {getStatusLabel(turn.s_estado)}
                       </span>
                     </td>
-                    <td>Consultorio {turn.id_consultorio}</td>
+                    <td>{getConsultorioInfo(turn.uk_consultorio)}</td>
+                    <td>{getAreaInfo(turn.uk_consultorio)}</td>
                     <td className="actions-cell">
                       <select
-                        value={turn.estado}
+                        value={turn.s_estado}
                         onChange={(e) => handleStatusChange(turn, e.target.value)}
                         className="status-select"
                       >
@@ -351,18 +408,49 @@ const TurnManager = () => {
                           </option>
                         ))}
                       </select>
-                      <button
-                        onClick={() => handleEdit(turn)}
-                        className="edit-button"
-                      >
-                        ✏️ Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(turn)}
-                        className="delete-button"
-                      >
-                        🗑️ Eliminar
-                      </button>
+                      <div className="action-buttons">
+                        {turn.s_estado === 'EN_ESPERA' && (
+                          <button
+                            onClick={() => handleMarkAsAttended(turn)}
+                            className="action-button attended"
+                            title="Marcar como atendido"
+                          >
+                            ✓
+                          </button>
+                        )}
+                        {turn.s_estado === 'EN_ESPERA' && (
+                          <button
+                            onClick={() => handleMarkAsNoShow(turn)}
+                            className="action-button no-show"
+                            title="Marcar como no presente"
+                          >
+                            ✗
+                          </button>
+                        )}
+                        {turn.s_estado !== 'CANCELADO' && turn.s_estado !== 'ATENDIDO' && (
+                          <button
+                            onClick={() => handleCancelTurn(turn)}
+                            className="action-button cancel"
+                            title="Cancelar turno"
+                          >
+                            🗑️
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleEdit(turn)}
+                          className="action-button edit"
+                          title="Editar observaciones"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleDelete(turn)}
+                          className="action-button delete"
+                          title="Eliminar turno"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -371,7 +459,7 @@ const TurnManager = () => {
 
             {turns.length === 0 && (
               <div className="empty-state">
-                <p>No hay turnos registrados para la fecha seleccionada</p>
+                <p>No hay turnos registrados para los filtros seleccionados</p>
               </div>
             )}
           </div>
@@ -395,99 +483,47 @@ const TurnManager = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Número de Turno</label>
-                  <input
-                    type="number"
-                    name="numero_turno"
-                    value={formData.numero_turno}
-                    onChange={handleInputChange}
-                    min="1"
-                    placeholder="Generado automáticamente"
-                    disabled
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Estado</label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleInputChange}
-                    disabled
-                  >
-                    {turnStatuses.map(status => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha</label>
-                  <input
-                    type="date"
-                    name="fecha"
-                    value={formData.fecha}
-                    onChange={handleInputChange}
-                    disabled
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Hora</label>
-                  <input
-                    type="time"
-                    name="hora"
-                    value={formData.hora}
-                    onChange={handleInputChange}
-                    disabled
-                  />
-                </div>
-              </div>
-
               <div className="form-group">
-                <label>Paciente *</label>
+                <label>Consultorio *</label>
                 <select
-                  name="id_paciente"
-                  value={formData.id_paciente}
+                  name="uk_consultorio"
+                  value={formData.uk_consultorio}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">Seleccionar paciente</option>
-                  {patients.map(patient => (
-                    <option key={patient.id_paciente} value={patient.id_paciente}>
-                      {patient.nombre} {patient.apellido} {patient.telefono ? `- ${patient.telefono}` : ''}
+                  <option value="">Seleccionar consultorio</option>
+                  {consultorios.map(consultorio => (
+                    <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
+                      Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="form-group">
-                <label>Consultorio *</label>
-                <input
-                  type="number"
-                  name="id_consultorio"
-                  value={formData.id_consultorio}
+                <label>Paciente (opcional)</label>
+                <select
+                  name="uk_paciente"
+                  value={formData.uk_paciente}
                   onChange={handleInputChange}
-                  required
-                  min="1"
-                />
+                >
+                  <option value="">Sin paciente</option>
+                  {patients.map(patient => (
+                    <option key={patient.uk_paciente} value={patient.uk_paciente}>
+                      {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-group">
-                <label>Área (opcional)</label>
-                <input
-                  type="number"
-                  name="id_area"
-                  value={formData.id_area}
+                <label>Observaciones</label>
+                <textarea
+                  name="s_observaciones"
+                  value={formData.s_observaciones}
                   onChange={handleInputChange}
-                  min="1"
-                  placeholder="Filtrar por área para la tabla"
+                  rows="3"
+                  placeholder="Observaciones adicionales..."
                 />
               </div>
 
@@ -728,8 +764,9 @@ const TurnManager = () => {
 
         .actions-cell {
           display: flex;
+          flex-direction: column;
           gap: 8px;
-          align-items: center;
+          align-items: flex-start;
         }
 
         .status-select {
@@ -739,38 +776,57 @@ const TurnManager = () => {
           font-size: 0.8em;
           background: white;
           cursor: pointer;
+          margin-bottom: 5px;
         }
 
-        .edit-button {
-          background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-          color: white;
-          border: none;
-          padding: 6px 12px;
+        .action-buttons {
+          display: flex;
+          gap: 5px;
+          flex-wrap: wrap;
+        }
+
+        .action-button {
+          background: #f7fafc;
+          border: 1px solid #e2e8f0;
+          padding: 4px 8px;
           border-radius: 4px;
           cursor: pointer;
           font-size: 0.8em;
           transition: all 0.3s ease;
         }
 
-        .edit-button:hover {
+        .action-button:hover {
           transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
 
-        .delete-button {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.8em;
-          transition: all 0.3s ease;
+        .action-button.attended {
+          background: #c6f6d5;
+          border-color: #9ae6b4;
+          color: #22543d;
         }
 
-        .delete-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(197, 48, 48, 0.3);
+        .action-button.no-show {
+          background: #fed7d7;
+          border-color: #feb2b2;
+          color: #742a2a;
+        }
+
+        .action-button.cancel {
+          background: #fed7d7;
+          border-color: #feb2b2;
+          color: #742a2a;
+        }
+
+        .action-button.edit {
+          background: #bee3f8;
+          border-color: #90cdf4;
+          color: #2a4365;
+        }
+
+        .action-button.delete {
+          background: #fed7d7;
+          border-color: #feb2b2;
+          color: #742a2a;
         }
 
         .empty-state {
@@ -838,17 +894,11 @@ const TurnManager = () => {
           padding: 25px;
         }
 
-        .form-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 20px;
-        }
-
         .form-group {
           display: flex;
           flex-direction: column;
           gap: 8px;
+          margin-bottom: 20px;
         }
 
         .form-group label {
@@ -856,7 +906,7 @@ const TurnManager = () => {
           color: #4a5568;
         }
 
-        .form-group input, .form-group select {
+        .form-group input, .form-group select, .form-group textarea {
           padding: 12px 16px;
           border: 2px solid #e2e8f0;
           border-radius: 8px;
@@ -864,7 +914,7 @@ const TurnManager = () => {
           transition: all 0.3s ease;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
           outline: none;
           border-color: #667eea;
           box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -962,10 +1012,6 @@ const TurnManager = () => {
           .actions-cell {
             flex-direction: column;
             gap: 5px;
-          }
-
-          .form-row {
-            grid-template-columns: 1fr;
           }
 
           .modal {
