@@ -14,10 +14,10 @@ const HomePage = () => {
   // Cargar datos al montar el componente
   useEffect(() => {
     loadTurnsData();
-    
+
     // Configurar actualización automática cada 30 segundos
     const interval = setInterval(loadTurnsData, 30000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -99,8 +99,8 @@ const HomePage = () => {
               </div>
             </div>
             <div className="brand-right">
-              <button 
-                onClick={handleRefresh} 
+              <button
+                onClick={handleRefresh}
                 className="refresh-button"
                 disabled={loading}
                 title="Actualizar información"
@@ -164,8 +164,8 @@ const HomePage = () => {
           <div className="sidebar-title">
             <i className="fas fa-list-ul"></i>
             Turnos Activos
-            <button 
-              onClick={handleRefresh} 
+            <button
+              onClick={handleRefresh}
               className="sidebar-refresh"
               disabled={loading}
               title="Actualizar lista"

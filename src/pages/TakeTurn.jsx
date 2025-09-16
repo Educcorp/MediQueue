@@ -75,7 +75,7 @@ const TakeTurn = () => {
       }
 
       let result;
-      
+
       if (showPatientForm && (formData.c_telefono || formData.s_nombre)) {
         // Crear turno con datos del paciente
         result = await turnService.createTurnPublico({
@@ -225,7 +225,7 @@ const TakeTurn = () => {
               {showPatientForm && (
                 <div className="patient-form">
                   <h3>Datos Personales</h3>
-                  
+
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="telefono" className="form-label">
