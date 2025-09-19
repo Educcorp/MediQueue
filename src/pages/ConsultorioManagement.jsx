@@ -23,16 +23,32 @@ const ConsultorioManagement = () => {
     });
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Paleta de colores para las primeras 8 áreas médicas
+    const areaColorPalette = [
+        { color: '#4CAF50', gradient: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)' }, // Verde - Medicina General
+        { color: '#2196F3', gradient: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)' }, // Azul - Pediatría
+        { color: '#FF9800', gradient: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)' }, // Naranja - Cardiología
+        { color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E63 0%, #C2185B 100%)' }, // Rosa - Dermatología
+        { color: '#9C27B0', gradient: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)' }, // Púrpura - Ginecología
+        { color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)' }, // Cian - Oftalmología
+        { color: '#795548', gradient: 'linear-gradient(135deg, #795548 0%, #5D4037 100%)' }, // Marrón - Ortopedia
+        { color: '#607D8B', gradient: 'linear-gradient(135deg, #607D8B 0%, #455A64 100%)' }  // Azul Gris - Psiquiatría
+    ];
+
     // Mapa de iconos y colores por nombre de área
     const areaUI = {
-        'Medicina General': { icono: 'fas fa-stethoscope', color: '#4CAF50' },
-        'Pediatría': { icono: 'fas fa-baby', color: '#FF9800' },
-        'Cardiología': { icono: 'fas fa-heartbeat', color: '#F44336' },
-        'Dermatología': { icono: 'fas fa-user-md', color: '#9C27B0' },
-        'Ginecología': { icono: 'fas fa-female', color: '#E91E63' },
-        'Oftalmología': { icono: 'fas fa-eye', color: '#2196F3' },
-        'Ortopedia': { icono: 'fas fa-bone', color: '#795548' },
-        'Psiquiatría': { icono: 'fas fa-brain', color: '#9C27B0' }
+        'Medicina General': { icono: 'fas fa-stethoscope', color: areaColorPalette[0].color, gradient: areaColorPalette[0].gradient },
+        'Pediatría': { icono: 'fas fa-baby', color: areaColorPalette[1].color, gradient: areaColorPalette[1].gradient },
+        'Cardiología': { icono: 'fas fa-heartbeat', color: areaColorPalette[2].color, gradient: areaColorPalette[2].gradient },
+        'Dermatología': { icono: 'fas fa-user-md', color: areaColorPalette[3].color, gradient: areaColorPalette[3].gradient },
+        'Ginecología': { icono: 'fas fa-female', color: areaColorPalette[4].color, gradient: areaColorPalette[4].gradient },
+        'Oftalmología': { icono: 'fas fa-eye', color: areaColorPalette[5].color, gradient: areaColorPalette[5].gradient },
+        'Ortopedia': { icono: 'fas fa-bone', color: areaColorPalette[6].color, gradient: areaColorPalette[6].gradient },
+        'Psiquiatría': { icono: 'fas fa-brain', color: areaColorPalette[7].color, gradient: areaColorPalette[7].gradient },
+        'Neurología': { icono: 'fas fa-brain', color: '#FF5722', gradient: 'linear-gradient(135deg, #FF5722 0%, #D84315 100%)' },
+        'Urología': { icono: 'fas fa-male', color: '#3F51B5', gradient: 'linear-gradient(135deg, #3F51B5 0%, #303F9F 100%)' },
+        'Endocrinología': { icono: 'fas fa-flask', color: '#8BC34A', gradient: 'linear-gradient(135deg, #8BC34A 0%, #689F38 100%)' },
+        'Gastroenterología': { icono: 'fas fa-stomach', color: '#FFC107', gradient: 'linear-gradient(135deg, #FFC107 0%, #FF8F00 100%)' }
     };
 
     useEffect(() => {
@@ -251,7 +267,36 @@ const ConsultorioManagement = () => {
     };
 
     const getAreaUI = (areaName) => {
-        return areaUI[areaName] || { icono: 'fas fa-hospital', color: '#77b8ce' };
+        // Si el área está en el mapa predefinido, usar esos datos
+        if (areaUI[areaName]) {
+            return areaUI[areaName];
+        }
+
+        // Para áreas no predefinidas, asignar colores de la paleta de manera cíclica
+        const areaNames = areas.map(area => area.s_nombre_area);
+        const areaIndex = areaNames.indexOf(areaName);
+
+        if (areaIndex >= 0 && areaIndex < areaColorPalette.length) {
+            // Usar colores de la paleta para las primeras 8 áreas
+            return {
+                icono: 'fas fa-hospital',
+                color: areaColorPalette[areaIndex].color,
+                gradient: areaColorPalette[areaIndex].gradient
+            };
+        }
+
+        // Para áreas adicionales, usar colores aleatorios pero consistentes
+        const fallbackColors = [
+            '#FF5722', '#3F51B5', '#8BC34A', '#FFC107', '#FF6F00',
+            '#E1BEE7', '#B2DFDB', '#C8E6C9', '#FFCDD2', '#F8BBD9'
+        ];
+
+        const colorIndex = areaIndex % fallbackColors.length;
+        return {
+            icono: 'fas fa-hospital',
+            color: fallbackColors[colorIndex],
+            gradient: `linear-gradient(135deg, ${fallbackColors[colorIndex]} 0%, ${fallbackColors[colorIndex]}CC 100%)`
+        };
     };
 
     if (loading) {
@@ -374,14 +419,35 @@ const ConsultorioManagement = () => {
                     </div>
                 </div>
 
+                {/* Paleta de colores de demostración - solo se muestra si hay menos de 8 áreas */}
+                {areas.length < 8 && (
+                    <div className="color-palette-demo">
+                        <h3>Paleta de Colores para Áreas Médicas</h3>
+                        <p className="palette-description">
+                            Las primeras 8 áreas tendrán colores únicos asignados automáticamente:
+                        </p>
+                        <div className="palette-grid">
+                            {areaColorPalette.map((palette, index) => {
+                                const areaNames = ['Medicina General', 'Pediatría', 'Cardiología', 'Dermatología', 'Ginecología', 'Oftalmología', 'Ortopedia', 'Psiquiatría'];
+                                return (
+                                    <div key={index} className="palette-item" style={{ background: palette.gradient }}>
+                                        <span className="palette-number">{index + 1}</span>
+                                        <span className="palette-name">{areaNames[index]}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 <div className="areas-grid">
                     {filteredAreas.map((area) => {
                         const areaConsultorios = getConsultoriosByArea(area.uk_area);
-                        const { icono, color } = getAreaUI(area.s_nombre_area);
+                        const { icono, color, gradient } = getAreaUI(area.s_nombre_area);
 
                         return (
                             <div key={area.uk_area} className="area-card">
-                                <div className="area-header" style={{ backgroundColor: color }}>
+                                <div className="area-header" style={{ background: gradient }}>
                                     <div className="area-icon">
                                         <i className={icono}></i>
                                     </div>
@@ -823,6 +889,64 @@ const ConsultorioManagement = () => {
           gap: 15px;
         }
 
+        .color-palette-demo {
+          margin-bottom: 30px;
+          padding: 20px;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .color-palette-demo h3 {
+          margin: 0 0 10px 0;
+          color: #2d3748;
+          font-size: 1.2em;
+          font-weight: 600;
+        }
+
+        .palette-description {
+          margin: 0 0 20px 0;
+          color: #718096;
+          font-size: 0.95em;
+          line-height: 1.5;
+        }
+
+        .palette-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+        }
+
+        .palette-item {
+          padding: 15px;
+          border-radius: 8px;
+          color: white;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-weight: 600;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          transition: transform 0.3s ease;
+        }
+
+        .palette-item:hover {
+          transform: translateY(-2px);
+        }
+
+        .palette-number {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 5px 10px;
+          border-radius: 20px;
+          font-size: 0.9em;
+          min-width: 30px;
+          text-align: center;
+        }
+
+        .palette-name {
+          flex: 1;
+          font-size: 0.95em;
+        }
+
         .btn {
           padding: 12px 20px;
           border: none;
@@ -896,10 +1020,35 @@ const ConsultorioManagement = () => {
           display: flex;
           align-items: center;
           gap: 15px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .area-header::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.1);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .area-card:hover .area-header::before {
+          opacity: 1;
         }
 
         .area-icon {
           font-size: 2em;
+          position: relative;
+          z-index: 1;
+        }
+
+        .area-info {
+          position: relative;
+          z-index: 1;
         }
 
         .area-info h2 {
@@ -917,6 +1066,8 @@ const ConsultorioManagement = () => {
           margin-left: auto;
           display: flex;
           gap: 8px;
+          position: relative;
+          z-index: 1;
         }
 
         .status-badge {

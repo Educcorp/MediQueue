@@ -1065,3 +1065,4 @@ const PatientManagement = () => {
 };
 
 export default PatientManagement;
+
