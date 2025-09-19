@@ -2,12 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
+import QuickActions from '../components/Dashboard/QuickActions';
+import StatsWidgets from '../components/Dashboard/StatsWidgets';
 import turnService from '../services/turnService';
 import patientService from '../services/patientService';
 import consultorioService from '../services/consultorioService';
 import areaService from '../services/areaService';
 import adminService from '../services/adminService';
-import '../styles/AdminDashboard.css';
+import '../styles/AdminDashboardEnhanced.css';
+import '../styles/QuickActions.css';
+import '../styles/StatsWidgets.css';
+
+// React Icons imports
+import {
+  FaCalendarCheck,
+  FaUserInjured,
+  FaHospital,
+  FaUsersCog,
+  FaChartLine,
+  FaCog,
+  FaClock,
+  FaUserCheck,
+  FaBuilding,
+  FaChartBar,
+  FaUserShield,
+  FaArrowRight,
+  FaTachometerAlt,
+  FaCheckCircle,
+  FaInfoCircle
+} from 'react-icons/fa';
+
+import {
+  HiOutlineUsers,
+  HiOutlineViewGrid,
+  HiOutlineChartBar,
+  HiOutlineClock,
+  HiOutlineOfficeBuilding
+} from 'react-icons/hi';
+
+import {
+  MdToday
+} from 'react-icons/md';
+
+import {
+  LuTrendingUp
+} from 'react-icons/lu';
 
 const AdminDashboard = () => {
   const { user, logout, getEstadisticas } = useAuth();
@@ -110,90 +149,93 @@ const AdminDashboard = () => {
           <div className="stats-grid">
             <div className="stat-card primary">
               <div className="stat-icon">
-                <i className="mdi mdi-calendar-clock"></i>
+                <FaCalendarCheck />
               </div>
               <div className="stat-content">
                 <h3>{stats.totalTurns}</h3>
                 <p>Total Turnos</p>
                 <div className="stat-trend">
-                  <i className="mdi mdi-trending-up"></i>
+                  <LuTrendingUp />
                   <span>+12% este mes</span>
                 </div>
               </div>
             </div>
             <div className="stat-card success">
               <div className="stat-icon">
-                <i className="mdi mdi-clock-outline"></i>
+                <FaClock />
               </div>
               <div className="stat-content">
                 <h3>{stats.activeTurns}</h3>
                 <p>Turnos Activos</p>
                 <div className="stat-trend">
-                  <i className="mdi mdi-trending-up"></i>
+                  <FaCheckCircle />
                   <span>En tiempo real</span>
                 </div>
               </div>
             </div>
             <div className="stat-card info">
               <div className="stat-icon">
-                <i className="mdi mdi-account-group"></i>
+                <FaUserInjured />
               </div>
               <div className="stat-content">
                 <h3>{stats.totalPatients}</h3>
                 <p>Pacientes</p>
                 <div className="stat-trend">
-                  <i className="mdi mdi-trending-up"></i>
+                  <LuTrendingUp />
                   <span>+8% este mes</span>
                 </div>
               </div>
             </div>
             <div className="stat-card warning">
               <div className="stat-icon">
-                <i className="mdi mdi-hospital-building"></i>
+                <FaHospital />
               </div>
               <div className="stat-content">
                 <h3>{stats.totalConsultorios}</h3>
                 <p>Consultorios</p>
                 <div className="stat-trend">
-                  <i className="mdi mdi-check-circle"></i>
+                  <FaCheckCircle />
                   <span>Disponibles</span>
                 </div>
               </div>
             </div>
             <div className="stat-card secondary">
               <div className="stat-icon">
-                <i className="mdi mdi-domain"></i>
+                <FaBuilding />
               </div>
               <div className="stat-content">
                 <h3>{stats.totalAreas}</h3>
                 <p>Áreas</p>
                 <div className="stat-trend">
-                  <i className="mdi mdi-check-circle"></i>
+                  <FaCheckCircle />
                   <span>Configuradas</span>
                 </div>
               </div>
             </div>
             <div className="stat-card danger">
               <div className="stat-icon">
-                <i className="mdi mdi-account-supervisor"></i>
+                <FaUserShield />
               </div>
               <div className="stat-content">
                 <h3>{stats.totalAdmins}</h3>
                 <p>Administradores</p>
                 <div className="stat-trend">
-                  <i className="mdi mdi-shield-check"></i>
+                  <FaCheckCircle />
                   <span>Activos</span>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Widgets de estadísticas en tiempo real */}
+          <StatsWidgets stats={stats} loading={loading} />
+
           {/* Tarjetas de gestión */}
           <div className="dashboard-cards">
             <div className="dashboard-card turns-card">
               <div className="card-header">
                 <div className="card-icon">
-                  <i className="mdi mdi-calendar-clock"></i>
+                  <FaCalendarCheck />
                 </div>
                 <div className="card-title">
                   <h2>Gestionar Turnos</h2>
@@ -202,16 +244,16 @@ const AdminDashboard = () => {
               </div>
               <div className="card-stats">
                 <div className="stat-item">
-                  <i className="mdi mdi-clock-outline"></i>
+                  <FaClock />
                   <span>{stats.activeTurns} activos</span>
                 </div>
                 <div className="stat-item">
-                  <i className="mdi mdi-calendar-today"></i>
+                  <MdToday />
                   <span>{stats.todayTurns} hoy</span>
                 </div>
               </div>
               <Link to="/admin/turns" className="dashboard-link">
-                <i className="fas fa-arrow-right"></i>
+                <FaArrowRight />
                 Ver Turnos
               </Link>
             </div>
@@ -219,7 +261,7 @@ const AdminDashboard = () => {
             <div className="dashboard-card patients-card">
               <div className="card-header">
                 <div className="card-icon">
-                  <i className="mdi mdi-account-group"></i>
+                  <FaUserInjured />
                 </div>
                 <div className="card-title">
                   <h2>Gestionar Pacientes</h2>
@@ -228,12 +270,12 @@ const AdminDashboard = () => {
               </div>
               <div className="card-stats">
                 <div className="stat-item">
-                  <i className="mdi mdi-account"></i>
+                  <FaUserCheck />
                   <span>{stats.totalPatients} registrados</span>
                 </div>
               </div>
               <Link to="/admin/patients" className="dashboard-link">
-                <i className="fas fa-arrow-right"></i>
+                <FaArrowRight />
                 Ver Pacientes
               </Link>
             </div>
@@ -241,7 +283,7 @@ const AdminDashboard = () => {
             <div className="dashboard-card consultorios-card">
               <div className="card-header">
                 <div className="card-icon">
-                  <i className="mdi mdi-hospital-building"></i>
+                  <FaHospital />
                 </div>
                 <div className="card-title">
                   <h2>Consultorios</h2>
@@ -250,16 +292,16 @@ const AdminDashboard = () => {
               </div>
               <div className="card-stats">
                 <div className="stat-item">
-                  <i className="mdi mdi-hospital"></i>
+                  <FaBuilding />
                   <span>{stats.totalConsultorios} consultorios</span>
                 </div>
                 <div className="stat-item">
-                  <i className="mdi mdi-domain"></i>
+                  <HiOutlineOfficeBuilding />
                   <span>{stats.totalAreas} áreas</span>
                 </div>
               </div>
               <Link to="/admin/consultorios" className="dashboard-link">
-                <i className="fas fa-arrow-right"></i>
+                <FaArrowRight />
                 Ver Consultorios
               </Link>
             </div>
@@ -267,7 +309,7 @@ const AdminDashboard = () => {
             <div className="dashboard-card users-card">
               <div className="card-header">
                 <div className="card-icon">
-                  <i className="fas fa-users-cog"></i>
+                  <FaUsersCog />
                 </div>
                 <div className="card-title">
                   <h2>Gestionar Usuarios</h2>
@@ -276,12 +318,12 @@ const AdminDashboard = () => {
               </div>
               <div className="card-stats">
                 <div className="stat-item">
-                  <i className="mdi mdi-account-supervisor"></i>
+                  <FaUserShield />
                   <span>{stats.totalAdmins} administradores</span>
                 </div>
               </div>
               <Link to="/admin/users" className="dashboard-link">
-                <i className="fas fa-arrow-right"></i>
+                <FaArrowRight />
                 Ver Usuarios
               </Link>
             </div>
@@ -289,7 +331,7 @@ const AdminDashboard = () => {
             <div className="dashboard-card statistics-card">
               <div className="card-header">
                 <div className="card-icon">
-                  <i className="fas fa-chart-line"></i>
+                  <FaChartLine />
                 </div>
                 <div className="card-title">
                   <h2>Estadísticas</h2>
@@ -298,12 +340,12 @@ const AdminDashboard = () => {
               </div>
               <div className="card-stats">
                 <div className="stat-item">
-                  <i className="mdi mdi-check-circle"></i>
+                  <FaCheckCircle />
                   <span>{stats.completedTurns} atendidos</span>
                 </div>
               </div>
               <Link to="/admin/statistics" className="dashboard-link">
-                <i className="fas fa-arrow-right"></i>
+                <FaArrowRight />
                 Ver Estadísticas
               </Link>
             </div>
@@ -311,7 +353,7 @@ const AdminDashboard = () => {
             <div className="dashboard-card settings-card">
               <div className="card-header">
                 <div className="card-icon">
-                  <i className="fas fa-cog"></i>
+                  <FaCog />
                 </div>
                 <div className="card-title">
                   <h2>Configuración</h2>
@@ -320,34 +362,45 @@ const AdminDashboard = () => {
               </div>
               <div className="card-stats">
                 <div className="stat-item">
-                  <i className="mdi mdi-settings"></i>
+                  <FaCog />
                   <span>Sistema</span>
                 </div>
               </div>
               <Link to="/admin/settings" className="dashboard-link">
-                <i className="fas fa-arrow-right"></i>
+                <FaArrowRight />
                 Configurar
               </Link>
             </div>
           </div>
 
+          {/* Acciones rápidas */}
+          <QuickActions />
+
           {/* Información adicional */}
-          <div className="dashboard-info">
-            <div className="info-card">
-              <h3>
-                <i className="fas fa-info-circle"></i>
-                Información del Sistema
-              </h3>
+          <div className="system-info-section">
+            <div className="system-info-card">
+              <div className="info-header">
+                <h3>
+                  <FaInfoCircle />
+                  Información del Sistema
+                </h3>
+              </div>
               <div className="info-content">
-                <p>
-                  <strong>Versión:</strong> 2.0.0
-                </p>
-                <p>
-                  <strong>Última actualización:</strong> {new Date().toLocaleDateString('es-ES')}
-                </p>
-                <p>
-                  <strong>Estado:</strong> <span className="status-active">Activo</span>
-                </p>
+                <div className="info-item">
+                  <span className="info-label">Versión:</span>
+                  <span className="info-value">2.0.0</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Última actualización:</span>
+                  <span className="info-value">{new Date().toLocaleDateString('es-ES')}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Estado:</span>
+                  <span className="info-value status-active">
+                    <FaCheckCircle />
+                    Activo
+                  </span>
+                </div>
               </div>
             </div>
           </div>
