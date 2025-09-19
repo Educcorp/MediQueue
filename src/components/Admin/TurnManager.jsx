@@ -6,6 +6,7 @@ import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
 import areaService from '../../services/areaService';
+import '../../styles/AdminPages.css';
 
 const TurnManager = () => {
   const [turns, setTurns] = useState([]);
@@ -285,247 +286,247 @@ const TurnManager = () => {
   return (
     <div className="turn-manager-page">
       <AdminHeader />
-
-      {/* Contenido principal */}
-      <main className="page-main">
-        <div className="page-container">
-          {error && (
-            <div className="error-banner">
-              <span>❌ {error}</span>
-              <button onClick={() => setError(null)}>✕</button>
-            </div>
-          )}
-
-          {/* Filtros */}
-          <div className="filters-section">
-            <div className="filter-group">
-              <label>Fecha:</label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="filter-input"
-              />
-            </div>
-            <div className="filter-group">
-              <label>Estado:</label>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="filter-select"
-              >
-                <option value="todos">Todos los estados</option>
-                {turnStatuses.map(status => (
-                  <option key={status.value} value={status.value}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="filter-group">
-              <label>Área:</label>
-              <select
-                value={selectedArea}
-                onChange={(e) => setSelectedArea(e.target.value)}
-                className="filter-select"
-              >
-                <option value="todas">Todas las áreas</option>
-                {areas.map(area => (
-                  <option key={area.uk_area} value={area.uk_area}>
-                    {area.s_nombre_area}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Barra de acciones */}
-          <div className="actions-bar">
-            <button onClick={handleAddNew} className="add-button">
-              + Nuevo Turno
-            </button>
-            <button onClick={loadTurns} className="refresh-button">
-              🔄 Actualizar
-            </button>
-          </div>
-
-          {/* Tabla de turnos */}
-          <div className="turns-table">
-            <table>
-              <thead>
-                <tr>
-                  <th># Turno</th>
-                  <th>Paciente</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Estado</th>
-                  <th>Consultorio</th>
-                  <th>Área</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {turns.map(turn => (
-                  <tr key={turn.uk_turno}>
-                    <td className="turn-number">#{turn.i_numero_turno}</td>
-                    <td>{getPatientName(turn.uk_paciente)}</td>
-                    <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
-                    <td>{turn.t_hora}</td>
-                    <td>
-                      <span
-                        className="status-badge"
-                        style={{ backgroundColor: getStatusColor(turn.s_estado) }}
-                      >
-                        {getStatusLabel(turn.s_estado)}
-                      </span>
-                    </td>
-                    <td>{getConsultorioInfo(turn.uk_consultorio)}</td>
-                    <td>{getAreaInfo(turn.uk_consultorio)}</td>
-                    <td className="actions-cell">
-                      <select
-                        value={turn.s_estado}
-                        onChange={(e) => handleStatusChange(turn, e.target.value)}
-                        className="status-select"
-                      >
-                        {turnStatuses.map(status => (
-                          <option key={status.value} value={status.value}>
-                            {status.label}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="action-buttons">
-                        {turn.s_estado === 'EN_ESPERA' && (
-                          <button
-                            onClick={() => handleMarkAsAttended(turn)}
-                            className="action-button attended"
-                            title="Marcar como atendido"
-                          >
-                            ✓
-                          </button>
-                        )}
-                        {turn.s_estado === 'EN_ESPERA' && (
-                          <button
-                            onClick={() => handleMarkAsNoShow(turn)}
-                            className="action-button no-show"
-                            title="Marcar como no presente"
-                          >
-                            ✗
-                          </button>
-                        )}
-                        {turn.s_estado !== 'CANCELADO' && turn.s_estado !== 'ATENDIDO' && (
-                          <button
-                            onClick={() => handleCancelTurn(turn)}
-                            className="action-button cancel"
-                            title="Cancelar turno"
-                          >
-                            🗑️
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleEdit(turn)}
-                          className="action-button edit"
-                          title="Editar observaciones"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          onClick={() => handleDelete(turn)}
-                          className="action-button delete"
-                          title="Eliminar turno"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {turns.length === 0 && (
-              <div className="empty-state">
-                <p>No hay turnos registrados para los filtros seleccionados</p>
+      <div className="page-content-wrapper">
+        {/* Contenido principal */}
+        <main className="page-main">
+          <div className="page-container">
+            {error && (
+              <div className="error-banner">
+                <span>❌ {error}</span>
+                <button onClick={() => setError(null)}>✕</button>
               </div>
             )}
-          </div>
-        </div>
-      </main>
 
-      {/* Modal para crear/editar */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>
-                {editingTurn ? 'Editar Turno' : 'Nuevo Turno'}
-              </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="close-button"
-              >
-                ✕
+            {/* Filtros */}
+            <div className="filters-section">
+              <div className="filter-group">
+                <label>Fecha:</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="filter-input"
+                />
+              </div>
+              <div className="filter-group">
+                <label>Estado:</label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="todos">Todos los estados</option>
+                  {turnStatuses.map(status => (
+                    <option key={status.value} value={status.value}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="filter-group">
+                <label>Área:</label>
+                <select
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="todas">Todas las áreas</option>
+                  {areas.map(area => (
+                    <option key={area.uk_area} value={area.uk_area}>
+                      {area.s_nombre_area}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Barra de acciones */}
+            <div className="actions-bar">
+              <button onClick={handleAddNew} className="add-button">
+                + Nuevo Turno
+              </button>
+              <button onClick={loadTurns} className="refresh-button">
+                🔄 Actualizar
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-group">
-                <label>Consultorio *</label>
-                <select
-                  name="uk_consultorio"
-                  value={formData.uk_consultorio}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Seleccionar consultorio</option>
-                  {consultorios.map(consultorio => (
-                    <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
-                      Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
-                    </option>
+            {/* Tabla de turnos */}
+            <div className="turns-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th># Turno</th>
+                    <th>Paciente</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Estado</th>
+                    <th>Consultorio</th>
+                    <th>Área</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {turns.map(turn => (
+                    <tr key={turn.uk_turno}>
+                      <td className="turn-number">#{turn.i_numero_turno}</td>
+                      <td>{getPatientName(turn.uk_paciente)}</td>
+                      <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
+                      <td>{turn.t_hora}</td>
+                      <td>
+                        <span
+                          className="status-badge"
+                          style={{ backgroundColor: getStatusColor(turn.s_estado) }}
+                        >
+                          {getStatusLabel(turn.s_estado)}
+                        </span>
+                      </td>
+                      <td>{getConsultorioInfo(turn.uk_consultorio)}</td>
+                      <td>{getAreaInfo(turn.uk_consultorio)}</td>
+                      <td className="actions-cell">
+                        <select
+                          value={turn.s_estado}
+                          onChange={(e) => handleStatusChange(turn, e.target.value)}
+                          className="status-select"
+                        >
+                          {turnStatuses.map(status => (
+                            <option key={status.value} value={status.value}>
+                              {status.label}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="action-buttons">
+                          {turn.s_estado === 'EN_ESPERA' && (
+                            <button
+                              onClick={() => handleMarkAsAttended(turn)}
+                              className="action-button attended"
+                              title="Marcar como atendido"
+                            >
+                              ✓
+                            </button>
+                          )}
+                          {turn.s_estado === 'EN_ESPERA' && (
+                            <button
+                              onClick={() => handleMarkAsNoShow(turn)}
+                              className="action-button no-show"
+                              title="Marcar como no presente"
+                            >
+                              ✗
+                            </button>
+                          )}
+                          {turn.s_estado !== 'CANCELADO' && turn.s_estado !== 'ATENDIDO' && (
+                            <button
+                              onClick={() => handleCancelTurn(turn)}
+                              className="action-button cancel"
+                              title="Cancelar turno"
+                            >
+                              🗑️
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleEdit(turn)}
+                            className="action-button edit"
+                            title="Editar observaciones"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDelete(turn)}
+                            className="action-button delete"
+                            title="Eliminar turno"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   ))}
-                </select>
-              </div>
+                </tbody>
+              </table>
 
-              <div className="form-group">
-                <label>Paciente (opcional)</label>
-                <select
-                  name="uk_paciente"
-                  value={formData.uk_paciente}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Sin paciente</option>
-                  {patients.map(patient => (
-                    <option key={patient.uk_paciente} value={patient.uk_paciente}>
-                      {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Observaciones</label>
-                <textarea
-                  name="s_observaciones"
-                  value={formData.s_observaciones}
-                  onChange={handleInputChange}
-                  rows="3"
-                  placeholder="Observaciones adicionales..."
-                />
-              </div>
-
-              <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className="primary">
-                  {editingTurn ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
+              {turns.length === 0 && (
+                <div className="empty-state">
+                  <p>No hay turnos registrados para los filtros seleccionados</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        </main>
 
-      <style>{`
+        {/* Modal para crear/editar */}
+        {showModal && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <div className="modal-header">
+                <h2>
+                  {editingTurn ? 'Editar Turno' : 'Nuevo Turno'}
+                </h2>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="close-button"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="modal-form">
+                <div className="form-group">
+                  <label>Consultorio *</label>
+                  <select
+                    name="uk_consultorio"
+                    value={formData.uk_consultorio}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Seleccionar consultorio</option>
+                    {consultorios.map(consultorio => (
+                      <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
+                        Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Paciente (opcional)</label>
+                  <select
+                    name="uk_paciente"
+                    value={formData.uk_paciente}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Sin paciente</option>
+                    {patients.map(patient => (
+                      <option key={patient.uk_paciente} value={patient.uk_paciente}>
+                        {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Observaciones</label>
+                  <textarea
+                    name="s_observaciones"
+                    value={formData.s_observaciones}
+                    onChange={handleInputChange}
+                    rows="3"
+                    placeholder="Observaciones adicionales..."
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button type="button" onClick={() => setShowModal(false)}>
+                    Cancelar
+                  </button>
+                  <button type="submit" className="primary">
+                    {editingTurn ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <style>{`
         .turn-manager-page {
           min-height: 100vh;
           background: #f8fafc;
@@ -1009,6 +1010,7 @@ const TurnManager = () => {
           }
         }
       `}</style>
+      </div>
     </div>
   );
 };

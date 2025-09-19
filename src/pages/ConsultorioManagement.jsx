@@ -5,6 +5,7 @@ import AdminHeader from '../components/Common/AdminHeader';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
+import '../styles/AdminPages.css';
 
 const ConsultorioManagement = () => {
   const { user, logout } = useAuth();
@@ -314,285 +315,286 @@ const ConsultorioManagement = () => {
   return (
     <div className="consultorio-management">
       <AdminHeader />
+      <div className="page-content-wrapper">
 
-      {error && (
-        <div className="error-banner">
-          <span>⚠️ {error}</span>
-          <button onClick={loadData} className="retry-btn">
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      <main className="management-content">
-        <div className="content-header">
-          <div className="stats-container">
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-hospital"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{areas.length}</h3>
-                <p>Áreas Médicas</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-door-open"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{consultorios.length}</h3>
-                <p>Total Consultorios</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-check-circle"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{areas.filter(a => a.ck_estado === 'ACTIVO').length}</h3>
-                <p>Áreas Activas</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-times-circle"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{areas.filter(a => a.ck_estado === 'INACTIVO').length}</h3>
-                <p>Áreas Inactivas</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Barra de búsqueda y acciones */}
-        <div className="search-and-actions">
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Buscar áreas..."
-              value={searchTerm}
-              onChange={handleSearch}
-              className="search-input"
-            />
-            <i className="fas fa-search search-icon"></i>
-          </div>
-          <div className="actions-bar">
-            <button onClick={handleAddArea} className="btn primary">
-              <i className="fas fa-plus"></i>
-              Añadir Área
+        {error && (
+          <div className="error-banner">
+            <span>⚠️ {error}</span>
+            <button onClick={loadData} className="retry-btn">
+              Reintentar
             </button>
-            <button onClick={loadData} className="btn secondary">
-              <i className="fas fa-sync-alt"></i>
-              Actualizar
-            </button>
-          </div>
-        </div>
-
-        {/* Paleta de colores de demostración - solo se muestra si hay menos de 8 áreas */}
-        {areas.length < 8 && (
-          <div className="color-palette-demo">
-            <h3>Paleta de Colores para Áreas Médicas</h3>
-            <p className="palette-description">
-              Las primeras 8 áreas tendrán colores únicos asignados automáticamente:
-            </p>
-            <div className="palette-grid">
-              {areaColorPalette.map((palette, index) => {
-                const areaNames = ['Medicina General', 'Pediatría', 'Cardiología', 'Dermatología', 'Ginecología', 'Oftalmología', 'Ortopedia', 'Psiquiatría'];
-                return (
-                  <div key={index} className="palette-item" style={{ background: palette.gradient }}>
-                    <span className="palette-number">{index + 1}</span>
-                    <span className="palette-name">{areaNames[index]}</span>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         )}
 
-        <div className="areas-grid">
-          {filteredAreas.map((area) => {
-            const areaConsultorios = getConsultoriosByArea(area.uk_area);
-            const { icono, color, gradient } = getAreaUI(area.s_nombre_area);
-
-            return (
-              <div key={area.uk_area} className="area-card">
-                <div className="area-header" style={{ background: gradient }}>
-                  <div className="area-icon">
-                    <i className={icono}></i>
-                  </div>
-                  <div className="area-info">
-                    <h2>{area.s_nombre_area}</h2>
-                    <p>{areaConsultorios.length} consultorios</p>
-                    <span className={`status-badge ${area.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
-                      {RECORD_STATUS_LABELS[area.ck_estado]}
-                    </span>
-                  </div>
-                  <div className="area-tools">
-                    <button
-                      className="btn small"
-                      onClick={() => handleEditArea(area)}
-                      title="Editar área"
-                    >
-                      <i className="fas fa-edit"></i>
-                    </button>
-                    <button
-                      className="btn danger small"
-                      onClick={() => handleDeleteArea(area)}
-                      title="Eliminar área"
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </div>
+        <main className="management-content">
+          <div className="content-header">
+            <div className="stats-container">
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-hospital"></i>
                 </div>
-
-                <div className="consultorios-list">
-                  {areaConsultorios.map((consultorio) => (
-                    <div key={consultorio.uk_consultorio} className="consultorio-item">
-                      <div className="consultorio-info">
-                        <div className="consultorio-number">
-                          <i className="fas fa-door-open"></i>
-                          <span>Consultorio {consultorio.i_numero_consultorio}</span>
-                        </div>
-                        <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
-                          {RECORD_STATUS_LABELS[consultorio.ck_estado]}
-                        </span>
-                      </div>
-                      <div className="consultorio-actions">
-                        <button
-                          className="btn small"
-                          onClick={() => handleEditConsultorio(consultorio)}
-                          title="Editar consultorio"
-                        >
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button
-                          className="btn danger small"
-                          onClick={() => handleDeleteConsultorio(consultorio)}
-                          title="Eliminar consultorio"
-                        >
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="consultorio-add-container">
-                    <button
-                      className="btn primary"
-                      onClick={() => handleAddConsultorio(area.uk_area)}
-                    >
-                      <i className="fas fa-plus"></i>
-                      Añadir Consultorio
-                    </button>
-                  </div>
+                <div className="stat-info">
+                  <h3>{areas.length}</h3>
+                  <p>Áreas Médicas</p>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        {filteredAreas.length === 0 && (
-          <div className="empty-state">
-            <i className="fas fa-hospital"></i>
-            <p>{searchTerm ? 'No se encontraron áreas' : 'No hay áreas registradas'}</p>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-door-open"></i>
+                </div>
+                <div className="stat-info">
+                  <h3>{consultorios.length}</h3>
+                  <p>Total Consultorios</p>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-check-circle"></i>
+                </div>
+                <div className="stat-info">
+                  <h3>{areas.filter(a => a.ck_estado === 'ACTIVO').length}</h3>
+                  <p>Áreas Activas</p>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-times-circle"></i>
+                </div>
+                <div className="stat-info">
+                  <h3>{areas.filter(a => a.ck_estado === 'INACTIVO').length}</h3>
+                  <p>Áreas Inactivas</p>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </main>
 
-      {/* Modal para crear/editar área */}
-      {showAreaForm && (
-        <div className="modal-overlay" onClick={() => setShowAreaForm(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{editingArea ? 'Editar Área' : 'Nueva Área Médica'}</h3>
-              <button className="btn small" onClick={() => setShowAreaForm(false)}>
-                <i className="fas fa-times"></i>
+          {/* Barra de búsqueda y acciones */}
+          <div className="search-and-actions">
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Buscar áreas..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="search-input"
+              />
+              <i className="fas fa-search search-icon"></i>
+            </div>
+            <div className="actions-bar">
+              <button onClick={handleAddArea} className="btn primary">
+                <i className="fas fa-plus"></i>
+                Añadir Área
+              </button>
+              <button onClick={loadData} className="btn secondary">
+                <i className="fas fa-sync-alt"></i>
+                Actualizar
               </button>
             </div>
-            <form onSubmit={handleSubmitArea} className="modal-body">
-              <div className="form-group">
-                <label>Nombre del Área *</label>
-                <input
-                  type="text"
-                  name="s_nombre_area"
-                  value={formData.s_nombre_area}
-                  onChange={handleInputChange}
-                  placeholder="Ej: Medicina General"
-                  required
-                  maxLength={100}
-                />
-              </div>
-              <div className="modal-actions">
-                <button type="button" className="btn" onClick={() => setShowAreaForm(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn primary">
-                  <i className="fas fa-check"></i>
-                  {editingArea ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
 
-      {/* Modal para crear/editar consultorio */}
-      {Object.entries(showConsultorioForm).map(([areaId, isOpen]) => {
-        if (!isOpen) return null;
+          {/* Paleta de colores de demostración - solo se muestra si hay menos de 8 áreas */}
+          {areas.length < 8 && (
+            <div className="color-palette-demo">
+              <h3>Paleta de Colores para Áreas Médicas</h3>
+              <p className="palette-description">
+                Las primeras 8 áreas tendrán colores únicos asignados automáticamente:
+              </p>
+              <div className="palette-grid">
+                {areaColorPalette.map((palette, index) => {
+                  const areaNames = ['Medicina General', 'Pediatría', 'Cardiología', 'Dermatología', 'Ginecología', 'Oftalmología', 'Ortopedia', 'Psiquiatría'];
+                  return (
+                    <div key={index} className="palette-item" style={{ background: palette.gradient }}>
+                      <span className="palette-number">{index + 1}</span>
+                      <span className="palette-name">{areaNames[index]}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
-        const area = areas.find(a => a.uk_area === areaId);
-        if (!area) return null;
+          <div className="areas-grid">
+            {filteredAreas.map((area) => {
+              const areaConsultorios = getConsultoriosByArea(area.uk_area);
+              const { icono, color, gradient } = getAreaUI(area.s_nombre_area);
 
-        return (
-          <div key={areaId} className="modal-overlay" onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}>
+              return (
+                <div key={area.uk_area} className="area-card">
+                  <div className="area-header" style={{ background: gradient }}>
+                    <div className="area-icon">
+                      <i className={icono}></i>
+                    </div>
+                    <div className="area-info">
+                      <h2>{area.s_nombre_area}</h2>
+                      <p>{areaConsultorios.length} consultorios</p>
+                      <span className={`status-badge ${area.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
+                        {RECORD_STATUS_LABELS[area.ck_estado]}
+                      </span>
+                    </div>
+                    <div className="area-tools">
+                      <button
+                        className="btn small"
+                        onClick={() => handleEditArea(area)}
+                        title="Editar área"
+                      >
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button
+                        className="btn danger small"
+                        onClick={() => handleDeleteArea(area)}
+                        title="Eliminar área"
+                      >
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="consultorios-list">
+                    {areaConsultorios.map((consultorio) => (
+                      <div key={consultorio.uk_consultorio} className="consultorio-item">
+                        <div className="consultorio-info">
+                          <div className="consultorio-number">
+                            <i className="fas fa-door-open"></i>
+                            <span>Consultorio {consultorio.i_numero_consultorio}</span>
+                          </div>
+                          <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
+                            {RECORD_STATUS_LABELS[consultorio.ck_estado]}
+                          </span>
+                        </div>
+                        <div className="consultorio-actions">
+                          <button
+                            className="btn small"
+                            onClick={() => handleEditConsultorio(consultorio)}
+                            title="Editar consultorio"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            className="btn danger small"
+                            onClick={() => handleDeleteConsultorio(consultorio)}
+                            title="Eliminar consultorio"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="consultorio-add-container">
+                      <button
+                        className="btn primary"
+                        onClick={() => handleAddConsultorio(area.uk_area)}
+                      >
+                        <i className="fas fa-plus"></i>
+                        Añadir Consultorio
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {filteredAreas.length === 0 && (
+            <div className="empty-state">
+              <i className="fas fa-hospital"></i>
+              <p>{searchTerm ? 'No se encontraron áreas' : 'No hay áreas registradas'}</p>
+            </div>
+          )}
+        </main>
+
+        {/* Modal para crear/editar área */}
+        {showAreaForm && (
+          <div className="modal-overlay" onClick={() => setShowAreaForm(false)}>
             <div className="modal-card" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h3>
-                  {editingConsultorio ? 'Editar Consultorio' : 'Nuevo Consultorio'} · {area.s_nombre_area}
-                </h3>
-                <button
-                  className="btn small"
-                  onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
-                >
+                <h3>{editingArea ? 'Editar Área' : 'Nueva Área Médica'}</h3>
+                <button className="btn small" onClick={() => setShowAreaForm(false)}>
                   <i className="fas fa-times"></i>
                 </button>
               </div>
-              <form onSubmit={handleSubmitConsultorio} className="modal-body">
+              <form onSubmit={handleSubmitArea} className="modal-body">
                 <div className="form-group">
-                  <label>Número de Consultorio *</label>
+                  <label>Nombre del Área *</label>
                   <input
-                    type="number"
-                    name="i_numero_consultorio"
-                    value={formData.i_numero_consultorio}
+                    type="text"
+                    name="s_nombre_area"
+                    value={formData.s_nombre_area}
                     onChange={handleInputChange}
-                    placeholder="Ej: 1"
+                    placeholder="Ej: Medicina General"
                     required
-                    min="1"
-                    max="999"
+                    maxLength={100}
                   />
                 </div>
                 <div className="modal-actions">
-                  <button
-                    type="button"
-                    className="btn"
-                    onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
-                  >
+                  <button type="button" className="btn" onClick={() => setShowAreaForm(false)}>
                     Cancelar
                   </button>
                   <button type="submit" className="btn primary">
                     <i className="fas fa-check"></i>
-                    {editingConsultorio ? 'Actualizar' : 'Crear'}
+                    {editingArea ? 'Actualizar' : 'Crear'}
                   </button>
                 </div>
               </form>
             </div>
           </div>
-        );
-      })}
+        )}
 
-      <style>{`
+        {/* Modal para crear/editar consultorio */}
+        {Object.entries(showConsultorioForm).map(([areaId, isOpen]) => {
+          if (!isOpen) return null;
+
+          const area = areas.find(a => a.uk_area === areaId);
+          if (!area) return null;
+
+          return (
+            <div key={areaId} className="modal-overlay" onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}>
+              <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>
+                    {editingConsultorio ? 'Editar Consultorio' : 'Nuevo Consultorio'} · {area.s_nombre_area}
+                  </h3>
+                  <button
+                    className="btn small"
+                    onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+                <form onSubmit={handleSubmitConsultorio} className="modal-body">
+                  <div className="form-group">
+                    <label>Número de Consultorio *</label>
+                    <input
+                      type="number"
+                      name="i_numero_consultorio"
+                      value={formData.i_numero_consultorio}
+                      onChange={handleInputChange}
+                      placeholder="Ej: 1"
+                      required
+                      min="1"
+                      max="999"
+                    />
+                  </div>
+                  <div className="modal-actions">
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
+                    >
+                      Cancelar
+                    </button>
+                    <button type="submit" className="btn primary">
+                      <i className="fas fa-check"></i>
+                      {editingConsultorio ? 'Actualizar' : 'Crear'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          );
+        })}
+
+        <style>{`
         .consultorio-management {
           min-height: 100vh;
           background: #f8fafc;
@@ -1231,6 +1233,7 @@ const ConsultorioManagement = () => {
           }
         }
       `}</style>
+      </div>
     </div>
   );
 };

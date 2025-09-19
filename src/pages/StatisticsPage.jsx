@@ -9,6 +9,7 @@ import areaService from '../services/areaService';
 import adminService from '../services/adminService';
 import { TURN_STATUS_LABELS, RECORD_STATUS_LABELS } from '../utils/constants';
 import { formatDate, formatDateTime } from '../utils/helpers';
+import '../styles/AdminPages.css';
 
 const StatisticsPage = () => {
   const { user, logout } = useAuth();
@@ -175,202 +176,203 @@ const StatisticsPage = () => {
   return (
     <div className="statistics-page">
       <AdminHeader />
+      <div className="page-content-wrapper">
 
-      {error && (
-        <div className="error-banner">
-          <span>⚠️ {error}</span>
-          <button onClick={refreshData} className="retry-btn">
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      <main className="management-content">
-        {/* Filtros de fecha */}
-        <div className="filters-section">
-          <div className="date-range-filters">
-            <div className="filter-group">
-              <label>Fecha Inicio</label>
-              <input
-                type="date"
-                name="start"
-                value={dateRange.start}
-                onChange={handleDateRangeChange}
-                className="filter-input"
-              />
-            </div>
-            <div className="filter-group">
-              <label>Fecha Fin</label>
-              <input
-                type="date"
-                name="end"
-                value={dateRange.end}
-                onChange={handleDateRangeChange}
-                className="filter-input"
-              />
-            </div>
-            <button onClick={refreshData} className="btn primary">
-              <i className="fas fa-sync-alt"></i>
-              Actualizar
+        {error && (
+          <div className="error-banner">
+            <span>⚠️ {error}</span>
+            <button onClick={refreshData} className="retry-btn">
+              Reintentar
             </button>
           </div>
-        </div>
+        )}
 
-        {/* Estadísticas generales */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-calendar-check"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.turns.total}</h3>
-              <p>Total Turnos</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-calendar-day"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.turns.today}</h3>
-              <p>Turnos Hoy</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-users"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.patients.total}</h3>
-              <p>Total Pacientes</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-hospital"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.consultorios.total}</h3>
-              <p>Total Consultorios</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-building"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.areas.total}</h3>
-              <p>Total Áreas</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-user-shield"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.admins.total}</h3>
-              <p>Total Administradores</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Gráficos y tablas */}
-        <div className="charts-section">
-          <div className="chart-card">
-            <h3>Turnos por Estado</h3>
-            <div className="chart-content">
-              {Object.entries(stats.turns.byStatus).map(([status, count]) => (
-                <div key={status} className="chart-bar">
-                  <div className="bar-label">{status}</div>
-                  <div className="bar-container">
-                    <div
-                      className="bar-fill"
-                      style={{ width: `${(count / stats.turns.total) * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="bar-value">{count}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="chart-card">
-            <h3>Consultorios por Área</h3>
-            <div className="chart-content">
-              {Object.entries(stats.consultorios.byArea).map(([area, count]) => (
-                <div key={area} className="chart-bar">
-                  <div className="bar-label">{area}</div>
-                  <div className="bar-container">
-                    <div
-                      className="bar-fill"
-                      style={{ width: `${(count / stats.consultorios.total) * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="bar-value">{count}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="chart-card">
-            <h3>Administradores por Tipo</h3>
-            <div className="chart-content">
-              {Object.entries(stats.admins.byType).map(([type, count]) => (
-                <div key={type} className="chart-bar">
-                  <div className="bar-label">{type}</div>
-                  <div className="bar-container">
-                    <div
-                      className="bar-fill"
-                      style={{ width: `${(count / stats.admins.total) * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="bar-value">{count}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Tabla de turnos recientes */}
-        <div className="recent-turns-section">
-          <h3>Turnos Recientes</h3>
-          <div className="turns-table">
-            <table>
-              <thead>
-                <tr>
-                  <th># Turno</th>
-                  <th>Consultorio</th>
-                  <th>Estado</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentTurns.map(turn => (
-                  <tr key={turn.uk_turno}>
-                    <td>#{turn.i_numero_turno}</td>
-                    <td>Consultorio {turn.i_numero_consultorio}</td>
-                    <td>
-                      <span className={`status-badge ${turn.s_estado.toLowerCase().replace('_', '-')}`}>
-                        {TURN_STATUS_LABELS[turn.s_estado] || turn.s_estado}
-                      </span>
-                    </td>
-                    <td>{formatDate(turn.d_fecha)}</td>
-                    <td>{turn.t_hora}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {recentTurns.length === 0 && (
-              <div className="empty-state">
-                <p>No hay turnos en el rango de fechas seleccionado</p>
+        <main className="management-content">
+          {/* Filtros de fecha */}
+          <div className="filters-section">
+            <div className="date-range-filters">
+              <div className="filter-group">
+                <label>Fecha Inicio</label>
+                <input
+                  type="date"
+                  name="start"
+                  value={dateRange.start}
+                  onChange={handleDateRangeChange}
+                  className="filter-input"
+                />
               </div>
-            )}
+              <div className="filter-group">
+                <label>Fecha Fin</label>
+                <input
+                  type="date"
+                  name="end"
+                  value={dateRange.end}
+                  onChange={handleDateRangeChange}
+                  className="filter-input"
+                />
+              </div>
+              <button onClick={refreshData} className="btn primary">
+                <i className="fas fa-sync-alt"></i>
+                Actualizar
+              </button>
+            </div>
           </div>
-        </div>
-      </main>
 
-      <style>{`
+          {/* Estadísticas generales */}
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-calendar-check"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.turns.total}</h3>
+                <p>Total Turnos</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-calendar-day"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.turns.today}</h3>
+                <p>Turnos Hoy</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-users"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.patients.total}</h3>
+                <p>Total Pacientes</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-hospital"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.consultorios.total}</h3>
+                <p>Total Consultorios</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-building"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.areas.total}</h3>
+                <p>Total Áreas</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-user-shield"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.admins.total}</h3>
+                <p>Total Administradores</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Gráficos y tablas */}
+          <div className="charts-section">
+            <div className="chart-card">
+              <h3>Turnos por Estado</h3>
+              <div className="chart-content">
+                {Object.entries(stats.turns.byStatus).map(([status, count]) => (
+                  <div key={status} className="chart-bar">
+                    <div className="bar-label">{status}</div>
+                    <div className="bar-container">
+                      <div
+                        className="bar-fill"
+                        style={{ width: `${(count / stats.turns.total) * 100}%` }}
+                      ></div>
+                    </div>
+                    <div className="bar-value">{count}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="chart-card">
+              <h3>Consultorios por Área</h3>
+              <div className="chart-content">
+                {Object.entries(stats.consultorios.byArea).map(([area, count]) => (
+                  <div key={area} className="chart-bar">
+                    <div className="bar-label">{area}</div>
+                    <div className="bar-container">
+                      <div
+                        className="bar-fill"
+                        style={{ width: `${(count / stats.consultorios.total) * 100}%` }}
+                      ></div>
+                    </div>
+                    <div className="bar-value">{count}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="chart-card">
+              <h3>Administradores por Tipo</h3>
+              <div className="chart-content">
+                {Object.entries(stats.admins.byType).map(([type, count]) => (
+                  <div key={type} className="chart-bar">
+                    <div className="bar-label">{type}</div>
+                    <div className="bar-container">
+                      <div
+                        className="bar-fill"
+                        style={{ width: `${(count / stats.admins.total) * 100}%` }}
+                      ></div>
+                    </div>
+                    <div className="bar-value">{count}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Tabla de turnos recientes */}
+          <div className="recent-turns-section">
+            <h3>Turnos Recientes</h3>
+            <div className="turns-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th># Turno</th>
+                    <th>Consultorio</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentTurns.map(turn => (
+                    <tr key={turn.uk_turno}>
+                      <td>#{turn.i_numero_turno}</td>
+                      <td>Consultorio {turn.i_numero_consultorio}</td>
+                      <td>
+                        <span className={`status-badge ${turn.s_estado.toLowerCase().replace('_', '-')}`}>
+                          {TURN_STATUS_LABELS[turn.s_estado] || turn.s_estado}
+                        </span>
+                      </td>
+                      <td>{formatDate(turn.d_fecha)}</td>
+                      <td>{turn.t_hora}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {recentTurns.length === 0 && (
+                <div className="empty-state">
+                  <p>No hay turnos en el rango de fechas seleccionado</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </main>
+
+        <style>{`
         .statistics-page {
           min-height: 100vh;
           background: #f8fafc;
@@ -830,6 +832,7 @@ const StatisticsPage = () => {
           }
         }
       `}</style>
+      </div>
     </div>
   );
 };

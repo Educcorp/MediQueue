@@ -177,8 +177,8 @@ export const AuthProvider = ({ children }) => {
         clearError,
         isAuthenticated: isAuthenticated(),
         getCurrentUser,
-        isSuperAdmin: isSuperAdmin(),
-        isSupervisorOrAdmin: isSupervisorOrAdmin()
+        isSuperAdmin,
+        isSupervisorOrAdmin
     };
 
     return (

@@ -94,217 +94,266 @@ const AdminDashboard = () => {
   return (
     <div className="admin-dashboard">
       <AdminHeader />
+      <div className="dashboard-content-wrapper">
 
-      {error && (
-        <div className="error-banner">
-          <span>⚠️ {error}</span>
-          <button onClick={refreshData} className="retry-btn">
-            Reintentar
-          </button>
-        </div>
-      )}
+        {error && (
+          <div className="error-banner">
+            <span>⚠️ {error}</span>
+            <button onClick={refreshData} className="retry-btn">
+              Reintentar
+            </button>
+          </div>
+        )}
 
-      <main className="dashboard-content">
-        {/* Estadísticas generales */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="mdi mdi-calendar-clock"></i>
+        <main className="dashboard-content">
+          {/* Estadísticas generales */}
+          <div className="stats-grid">
+            <div className="stat-card primary">
+              <div className="stat-icon">
+                <i className="mdi mdi-calendar-clock"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.totalTurns}</h3>
+                <p>Total Turnos</p>
+                <div className="stat-trend">
+                  <i className="mdi mdi-trending-up"></i>
+                  <span>+12% este mes</span>
+                </div>
+              </div>
             </div>
-            <div className="stat-content">
-              <h3>{stats.totalTurns}</h3>
-              <p>Total Turnos</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="mdi mdi-clock-outline"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.activeTurns}</h3>
-              <p>Turnos Activos</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="mdi mdi-account-group"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.totalPatients}</h3>
-              <p>Pacientes</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="mdi mdi-hospital-building"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.totalConsultorios}</h3>
-              <p>Consultorios</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="mdi mdi-domain"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.totalAreas}</h3>
-              <p>Áreas</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="mdi mdi-account-supervisor"></i>
-            </div>
-            <div className="stat-content">
-              <h3>{stats.totalAdmins}</h3>
-              <p>Administradores</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Tarjetas de gestión */}
-        <div className="dashboard-cards">
-          <div className="dashboard-card">
-            <div className="card-header">
-              <i className="mdi mdi-calendar-clock"></i>
-              <h2>Gestionar Turnos</h2>
-            </div>
-            <p>Administrar el sistema de turnos médicos</p>
-            <div className="card-stats">
-              <span className="stat-item">
+            <div className="stat-card success">
+              <div className="stat-icon">
                 <i className="mdi mdi-clock-outline"></i>
-                {stats.activeTurns} activos
-              </span>
-              <span className="stat-item">
-                <i className="mdi mdi-calendar-today"></i>
-                {stats.todayTurns} hoy
-              </span>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.activeTurns}</h3>
+                <p>Turnos Activos</p>
+                <div className="stat-trend">
+                  <i className="mdi mdi-trending-up"></i>
+                  <span>En tiempo real</span>
+                </div>
+              </div>
             </div>
-            <Link to="/admin/turns" className="dashboard-link">
-              <i className="fas fa-arrow-right"></i>
-              Ver Turnos
-            </Link>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <i className="mdi mdi-account-group"></i>
-              <h2>Gestionar Pacientes</h2>
+            <div className="stat-card info">
+              <div className="stat-icon">
+                <i className="mdi mdi-account-group"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.totalPatients}</h3>
+                <p>Pacientes</p>
+                <div className="stat-trend">
+                  <i className="mdi mdi-trending-up"></i>
+                  <span>+8% este mes</span>
+                </div>
+              </div>
             </div>
-            <p>Administrar información de pacientes</p>
-            <div className="card-stats">
-              <span className="stat-item">
-                <i className="mdi mdi-account"></i>
-                {stats.totalPatients} registrados
-              </span>
+            <div className="stat-card warning">
+              <div className="stat-icon">
+                <i className="mdi mdi-hospital-building"></i>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.totalConsultorios}</h3>
+                <p>Consultorios</p>
+                <div className="stat-trend">
+                  <i className="mdi mdi-check-circle"></i>
+                  <span>Disponibles</span>
+                </div>
+              </div>
             </div>
-            <Link to="/admin/patients" className="dashboard-link">
-              <i className="fas fa-arrow-right"></i>
-              Ver Pacientes
-            </Link>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <i className="mdi mdi-hospital-building"></i>
-              <h2>Consultorios</h2>
-            </div>
-            <p>Gestión de consultorios y áreas médicas</p>
-            <div className="card-stats">
-              <span className="stat-item">
-                <i className="mdi mdi-hospital"></i>
-                {stats.totalConsultorios} consultorios
-              </span>
-              <span className="stat-item">
+            <div className="stat-card secondary">
+              <div className="stat-icon">
                 <i className="mdi mdi-domain"></i>
-                {stats.totalAreas} áreas
-              </span>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.totalAreas}</h3>
+                <p>Áreas</p>
+                <div className="stat-trend">
+                  <i className="mdi mdi-check-circle"></i>
+                  <span>Configuradas</span>
+                </div>
+              </div>
             </div>
-            <Link to="/admin/consultorios" className="dashboard-link">
-              <i className="fas fa-arrow-right"></i>
-              Ver Consultorios
-            </Link>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <i className="fas fa-users-cog"></i>
-              <h2>Gestionar Usuarios</h2>
-            </div>
-            <p>Crear, editar y eliminar usuarios administradores</p>
-            <div className="card-stats">
-              <span className="stat-item">
+            <div className="stat-card danger">
+              <div className="stat-icon">
                 <i className="mdi mdi-account-supervisor"></i>
-                {stats.totalAdmins} administradores
-              </span>
-            </div>
-            <Link to="/admin/users" className="dashboard-link">
-              <i className="fas fa-arrow-right"></i>
-              Ver Usuarios
-            </Link>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <i className="fas fa-chart-line"></i>
-              <h2>Estadísticas</h2>
-            </div>
-            <p>Reportes y análisis del sistema de turnos</p>
-            <div className="card-stats">
-              <span className="stat-item">
-                <i className="mdi mdi-check-circle"></i>
-                {stats.completedTurns} atendidos
-              </span>
-            </div>
-            <Link to="/admin/statistics" className="dashboard-link">
-              <i className="fas fa-arrow-right"></i>
-              Ver Estadísticas
-            </Link>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <i className="fas fa-cog"></i>
-              <h2>Configuración</h2>
-            </div>
-            <p>Configuración del sistema y preferencias</p>
-            <div className="card-stats">
-              <span className="stat-item">
-                <i className="mdi mdi-settings"></i>
-                Sistema
-              </span>
-            </div>
-            <Link to="/admin/settings" className="dashboard-link">
-              <i className="fas fa-arrow-right"></i>
-              Configurar
-            </Link>
-          </div>
-        </div>
-
-        {/* Información adicional */}
-        <div className="dashboard-info">
-          <div className="info-card">
-            <h3>
-              <i className="fas fa-info-circle"></i>
-              Información del Sistema
-            </h3>
-            <div className="info-content">
-              <p>
-                <strong>Versión:</strong> 2.0.0
-              </p>
-              <p>
-                <strong>Última actualización:</strong> {new Date().toLocaleDateString('es-ES')}
-              </p>
-              <p>
-                <strong>Estado:</strong> <span className="status-active">Activo</span>
-              </p>
+              </div>
+              <div className="stat-content">
+                <h3>{stats.totalAdmins}</h3>
+                <p>Administradores</p>
+                <div className="stat-trend">
+                  <i className="mdi mdi-shield-check"></i>
+                  <span>Activos</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </main>
 
-      <style>{`
+          {/* Tarjetas de gestión */}
+          <div className="dashboard-cards">
+            <div className="dashboard-card turns-card">
+              <div className="card-header">
+                <div className="card-icon">
+                  <i className="mdi mdi-calendar-clock"></i>
+                </div>
+                <div className="card-title">
+                  <h2>Gestionar Turnos</h2>
+                  <p>Administrar el sistema de turnos médicos</p>
+                </div>
+              </div>
+              <div className="card-stats">
+                <div className="stat-item">
+                  <i className="mdi mdi-clock-outline"></i>
+                  <span>{stats.activeTurns} activos</span>
+                </div>
+                <div className="stat-item">
+                  <i className="mdi mdi-calendar-today"></i>
+                  <span>{stats.todayTurns} hoy</span>
+                </div>
+              </div>
+              <Link to="/admin/turns" className="dashboard-link">
+                <i className="fas fa-arrow-right"></i>
+                Ver Turnos
+              </Link>
+            </div>
+
+            <div className="dashboard-card patients-card">
+              <div className="card-header">
+                <div className="card-icon">
+                  <i className="mdi mdi-account-group"></i>
+                </div>
+                <div className="card-title">
+                  <h2>Gestionar Pacientes</h2>
+                  <p>Administrar información de pacientes</p>
+                </div>
+              </div>
+              <div className="card-stats">
+                <div className="stat-item">
+                  <i className="mdi mdi-account"></i>
+                  <span>{stats.totalPatients} registrados</span>
+                </div>
+              </div>
+              <Link to="/admin/patients" className="dashboard-link">
+                <i className="fas fa-arrow-right"></i>
+                Ver Pacientes
+              </Link>
+            </div>
+
+            <div className="dashboard-card consultorios-card">
+              <div className="card-header">
+                <div className="card-icon">
+                  <i className="mdi mdi-hospital-building"></i>
+                </div>
+                <div className="card-title">
+                  <h2>Consultorios</h2>
+                  <p>Gestión de consultorios y áreas médicas</p>
+                </div>
+              </div>
+              <div className="card-stats">
+                <div className="stat-item">
+                  <i className="mdi mdi-hospital"></i>
+                  <span>{stats.totalConsultorios} consultorios</span>
+                </div>
+                <div className="stat-item">
+                  <i className="mdi mdi-domain"></i>
+                  <span>{stats.totalAreas} áreas</span>
+                </div>
+              </div>
+              <Link to="/admin/consultorios" className="dashboard-link">
+                <i className="fas fa-arrow-right"></i>
+                Ver Consultorios
+              </Link>
+            </div>
+
+            <div className="dashboard-card users-card">
+              <div className="card-header">
+                <div className="card-icon">
+                  <i className="fas fa-users-cog"></i>
+                </div>
+                <div className="card-title">
+                  <h2>Gestionar Usuarios</h2>
+                  <p>Crear, editar y eliminar usuarios administradores</p>
+                </div>
+              </div>
+              <div className="card-stats">
+                <div className="stat-item">
+                  <i className="mdi mdi-account-supervisor"></i>
+                  <span>{stats.totalAdmins} administradores</span>
+                </div>
+              </div>
+              <Link to="/admin/users" className="dashboard-link">
+                <i className="fas fa-arrow-right"></i>
+                Ver Usuarios
+              </Link>
+            </div>
+
+            <div className="dashboard-card statistics-card">
+              <div className="card-header">
+                <div className="card-icon">
+                  <i className="fas fa-chart-line"></i>
+                </div>
+                <div className="card-title">
+                  <h2>Estadísticas</h2>
+                  <p>Reportes y análisis del sistema de turnos</p>
+                </div>
+              </div>
+              <div className="card-stats">
+                <div className="stat-item">
+                  <i className="mdi mdi-check-circle"></i>
+                  <span>{stats.completedTurns} atendidos</span>
+                </div>
+              </div>
+              <Link to="/admin/statistics" className="dashboard-link">
+                <i className="fas fa-arrow-right"></i>
+                Ver Estadísticas
+              </Link>
+            </div>
+
+            <div className="dashboard-card settings-card">
+              <div className="card-header">
+                <div className="card-icon">
+                  <i className="fas fa-cog"></i>
+                </div>
+                <div className="card-title">
+                  <h2>Configuración</h2>
+                  <p>Configuración del sistema y preferencias</p>
+                </div>
+              </div>
+              <div className="card-stats">
+                <div className="stat-item">
+                  <i className="mdi mdi-settings"></i>
+                  <span>Sistema</span>
+                </div>
+              </div>
+              <Link to="/admin/settings" className="dashboard-link">
+                <i className="fas fa-arrow-right"></i>
+                Configurar
+              </Link>
+            </div>
+          </div>
+
+          {/* Información adicional */}
+          <div className="dashboard-info">
+            <div className="info-card">
+              <h3>
+                <i className="fas fa-info-circle"></i>
+                Información del Sistema
+              </h3>
+              <div className="info-content">
+                <p>
+                  <strong>Versión:</strong> 2.0.0
+                </p>
+                <p>
+                  <strong>Última actualización:</strong> {new Date().toLocaleDateString('es-ES')}
+                </p>
+                <p>
+                  <strong>Estado:</strong> <span className="status-active">Activo</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <style>{`
         .admin-dashboard.loading {
           min-height: 100vh;
           display: flex;
@@ -519,6 +568,7 @@ const AdminDashboard = () => {
           }
         }
       `}</style>
+      </div>
     </div>
   );
 };

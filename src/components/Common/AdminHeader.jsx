@@ -23,107 +23,81 @@ const AdminHeader = () => {
         {
             path: '/admin/dashboard',
             label: 'Dashboard',
-            icon: 'fas fa-tachometer-alt',
             permission: 'supervisor'
         },
         {
             path: '/admin/turns',
             label: 'Turnos',
-            icon: 'fas fa-calendar-check',
             permission: 'supervisor'
         },
         {
             path: '/admin/patients',
             label: 'Pacientes',
-            icon: 'fas fa-user-injured',
             permission: 'supervisor'
         },
         {
             path: '/admin/consultorios',
             label: 'Consultorios',
-            icon: 'fas fa-hospital',
             permission: 'supervisor'
         },
         {
             path: '/admin/users',
             label: 'Usuarios',
-            icon: 'fas fa-users-cog',
             permission: 'admin'
         },
         {
             path: '/admin/statistics',
             label: 'Estadísticas',
-            icon: 'fas fa-chart-line',
             permission: 'supervisor'
         },
         {
             path: '/admin/settings',
             label: 'Configuración',
-            icon: 'fas fa-cog',
             permission: 'admin'
         }
     ];
 
     return (
-        <header className="admin-header">
-            <div className="header-container">
-                {/* Logo y título */}
-                <div className="header-left">
-                    <div className="header-logo-section">
-                        <div className="header-logo-container">
-                            <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="header-logo-image" />
-                            <div className="header-logo-text-group">
-                                <span className="header-logo-text">Medi</span>
-                                <span className="header-logo-text2">Queue</span>
-                            </div>
-                        </div>
-                        <div className="header-subtitle">
-                            <h1>Panel de Administración</h1>
-                            <p>Sistema de Gestión Médica</p>
-                        </div>
-                    </div>
+        <div className="transparent-header">
+            <div className="header-content">
+                <div className="logo-section">
+                    <img
+                        src="/images/mediqueue_logo.png"
+                        alt="MediQueue Logo"
+                        className="header-logo"
+                    />
+                    <span className="logo-text">MediQueue®</span>
                 </div>
 
-                {/* Navegación */}
-                <nav className="header-navigation">
-                    <ul className="nav-list">
-                        {navigationItems.map((item) => {
-                            if (!canAccess(item.path)) return null;
+                <div className="header-nav">
+                    {navigationItems.map((item) => {
+                        if (!canAccess(item.path)) return null;
 
-                            return (
-                                <li key={item.path} className="nav-item">
-                                    <button
-                                        onClick={() => navigate(item.path)}
-                                        className={`nav-link ${isActiveRoute(item.path) ? 'active' : ''}`}
-                                        title={item.label}
-                                    >
-                                        <i className={item.icon}></i>
-                                        <span className="nav-label">{item.label}</span>
-                                    </button>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </nav>
+                        return (
+                            <div
+                                key={item.path}
+                                className={`nav-item ${isActiveRoute(item.path) ? 'active' : ''}`}
+                                onClick={() => navigate(item.path)}
+                            >
+                                {item.label}
+                            </div>
+                        );
+                    })}
+                </div>
 
-                {/* Información del usuario y acciones */}
                 <div className="header-right">
-                    <div className="admin-info">
-                        <span className="admin-name">
-                            <i className="fas fa-user-shield"></i>
-                            {user?.s_nombre || 'Administrador'}
-                        </span>
-                        <span className="admin-role">
-                            {user?.tipo_usuario === 1 ? 'Administrador' : 'Supervisor'}
+                    <div className="user-info">
+                        <span className="user-name">{user?.s_nombre || 'Administrador'}</span>
+                        <span className="user-role">
+                            {user?.tipo_usuario === 1 ? 'Admin' : 'Supervisor'}
                         </span>
                     </div>
-                    <button onClick={handleLogout} className="logout-btn">
-                        <i className="fas fa-sign-out-alt"></i>
-                        <span className="logout-text">Cerrar Sesión</span>
-                    </button>
+                    <div className="logout-btn" onClick={handleLogout}>
+                        Cerrar Sesión
+                    </div>
                 </div>
             </div>
-        </header>
+        </div>
     );
 };
 

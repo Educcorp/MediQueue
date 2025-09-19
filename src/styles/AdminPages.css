@@ -1,0 +1,14 @@
+/* Common styles for admin pages with fixed header */
+.page-content-wrapper {
+    margin-top: 80px;
+    padding: 40px;
+    min-height: calc(100vh - 80px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .page-content-wrapper {
+        margin-top: 70px;
+        padding: 20px;
+    }
+}

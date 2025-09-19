@@ -5,6 +5,7 @@ import AdminHeader from '../components/Common/AdminHeader';
 import patientService from '../services/patientService';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
 import { formatDate, calculateAge, formatPhone } from '../utils/helpers';
+import '../styles/AdminPages.css';
 
 const PatientManagement = () => {
   const { user, logout } = useAuth();
@@ -172,263 +173,264 @@ const PatientManagement = () => {
   return (
     <div className="patient-management">
       <AdminHeader />
+      <div className="page-content-wrapper">
 
-      {error && (
-        <div className="error-banner">
-          <span>⚠️ {error}</span>
-          <button onClick={loadPatients} className="retry-btn">
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      <main className="management-content">
-        <div className="content-header">
-          <div className="stats-container">
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-users"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{patients.length}</h3>
-                <p>Total Pacientes</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-user-check"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{patients.filter(p => p.ck_estado === 'ACTIVO').length}</h3>
-                <p>Pacientes Activos</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-user-times"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{patients.filter(p => p.ck_estado === 'INACTIVO').length}</h3>
-                <p>Pacientes Inactivos</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-envelope"></i>
-              </div>
-              <div className="stat-info">
-                <h3>{patients.filter(p => p.s_email).length}</h3>
-                <p>Con Email</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Barra de búsqueda y filtros */}
-        <div className="search-and-filters">
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Buscar pacientes..."
-              value={searchTerm}
-              onChange={handleSearch}
-              className="search-input"
-            />
-            <i className="fas fa-search search-icon"></i>
-          </div>
-          <div className="filters">
-            <select
-              value={statusFilter}
-              onChange={handleStatusFilter}
-              className="filter-select"
-            >
-              <option value="todos">Todos los estados</option>
-              <option value="ACTIVO">Activos</option>
-              <option value="INACTIVO">Inactivos</option>
-            </select>
-          </div>
-          <div className="actions-bar">
-            <button onClick={handleAddNew} className="btn primary">
-              <i className="fas fa-plus"></i>
-              Nuevo Paciente
-            </button>
-            <button onClick={loadPatients} className="btn secondary">
-              <i className="fas fa-sync-alt"></i>
-              Actualizar
+        {error && (
+          <div className="error-banner">
+            <span>⚠️ {error}</span>
+            <button onClick={loadPatients} className="retry-btn">
+              Reintentar
             </button>
           </div>
-        </div>
+        )}
 
-        <div className="patients-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Edad</th>
-                <th>Estado</th>
-                <th>Fecha Registro</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPatients.map(patient => (
-                <tr key={patient.uk_paciente}>
-                  <td>
-                    <div className="patient-name">
-                      <strong>{patient.s_nombre} {patient.s_apellido}</strong>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="phone-number">
-                      {formatPhone(patient.c_telefono)}
-                    </span>
-                  </td>
-                  <td>
-                    {patient.s_email ? (
-                      <span className="email">{patient.s_email}</span>
-                    ) : (
-                      <span className="no-email">No registrado</span>
-                    )}
-                  </td>
-                  <td>
-                    {patient.d_fecha_nacimiento ? (
-                      <span className="age">{calculateAge(patient.d_fecha_nacimiento)} años</span>
-                    ) : (
-                      <span className="no-age">No registrado</span>
-                    )}
-                  </td>
-                  <td>
-                    <span className={`status-badge ${patient.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
-                      {RECORD_STATUS_LABELS[patient.ck_estado]}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="registration-date">
-                      {formatDate(patient.d_fecha_creacion)}
-                    </span>
-                  </td>
-                  <td className="actions-cell">
-                    <button
-                      onClick={() => handleEdit(patient)}
-                      className="edit-button"
-                      title="Editar paciente"
-                    >
-                      <i className="fas fa-edit"></i>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(patient)}
-                      className="delete-button"
-                      title="Eliminar paciente"
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {filteredPatients.length === 0 && (
-            <div className="empty-state">
-              <i className="fas fa-users"></i>
-              <p>{searchTerm || statusFilter !== 'todos' ? 'No se encontraron pacientes' : 'No hay pacientes registrados'}</p>
+        <main className="management-content">
+          <div className="content-header">
+            <div className="stats-container">
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-users"></i>
+                </div>
+                <div className="stat-info">
+                  <h3>{patients.length}</h3>
+                  <p>Total Pacientes</p>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-user-check"></i>
+                </div>
+                <div className="stat-info">
+                  <h3>{patients.filter(p => p.ck_estado === 'ACTIVO').length}</h3>
+                  <p>Pacientes Activos</p>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-user-times"></i>
+                </div>
+                <div className="stat-info">
+                  <h3>{patients.filter(p => p.ck_estado === 'INACTIVO').length}</h3>
+                  <p>Pacientes Inactivos</p>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-envelope"></i>
+                </div>
+                <div className="stat-info">
+                  <h3>{patients.filter(p => p.s_email).length}</h3>
+                  <p>Con Email</p>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      </main>
+          </div>
 
-      {/* Modal para crear/editar paciente */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{editingPatient ? 'Editar Paciente' : 'Nuevo Paciente'}</h3>
-              <button className="btn small" onClick={() => setShowModal(false)}>
-                <i className="fas fa-times"></i>
+          {/* Barra de búsqueda y filtros */}
+          <div className="search-and-filters">
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Buscar pacientes..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="search-input"
+              />
+              <i className="fas fa-search search-icon"></i>
+            </div>
+            <div className="filters">
+              <select
+                value={statusFilter}
+                onChange={handleStatusFilter}
+                className="filter-select"
+              >
+                <option value="todos">Todos los estados</option>
+                <option value="ACTIVO">Activos</option>
+                <option value="INACTIVO">Inactivos</option>
+              </select>
+            </div>
+            <div className="actions-bar">
+              <button onClick={handleAddNew} className="btn primary">
+                <i className="fas fa-plus"></i>
+                Nuevo Paciente
+              </button>
+              <button onClick={loadPatients} className="btn secondary">
+                <i className="fas fa-sync-alt"></i>
+                Actualizar
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="modal-body">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Nombre *</label>
-                  <input
-                    type="text"
-                    name="s_nombre"
-                    value={formData.s_nombre}
-                    onChange={handleInputChange}
-                    placeholder="Nombre del paciente"
-                    required
-                    maxLength={50}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Apellido *</label>
-                  <input
-                    type="text"
-                    name="s_apellido"
-                    value={formData.s_apellido}
-                    onChange={handleInputChange}
-                    placeholder="Apellido del paciente"
-                    required
-                    maxLength={50}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Teléfono *</label>
-                  <input
-                    type="tel"
-                    name="c_telefono"
-                    value={formData.c_telefono}
-                    onChange={handleInputChange}
-                    placeholder="+57 300 123 4567"
-                    required
-                    maxLength={15}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="s_email"
-                    value={formData.s_email}
-                    onChange={handleInputChange}
-                    placeholder="email@ejemplo.com"
-                    maxLength={100}
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Fecha de Nacimiento</label>
-                <input
-                  type="date"
-                  name="d_fecha_nacimiento"
-                  value={formData.d_fecha_nacimiento}
-                  onChange={handleInputChange}
-                  max={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="btn" onClick={() => setShowModal(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className="btn primary">
-                  <i className="fas fa-check"></i>
-                  {editingPatient ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
 
-      <style>{`
+          <div className="patients-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Edad</th>
+                  <th>Estado</th>
+                  <th>Fecha Registro</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPatients.map(patient => (
+                  <tr key={patient.uk_paciente}>
+                    <td>
+                      <div className="patient-name">
+                        <strong>{patient.s_nombre} {patient.s_apellido}</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="phone-number">
+                        {formatPhone(patient.c_telefono)}
+                      </span>
+                    </td>
+                    <td>
+                      {patient.s_email ? (
+                        <span className="email">{patient.s_email}</span>
+                      ) : (
+                        <span className="no-email">No registrado</span>
+                      )}
+                    </td>
+                    <td>
+                      {patient.d_fecha_nacimiento ? (
+                        <span className="age">{calculateAge(patient.d_fecha_nacimiento)} años</span>
+                      ) : (
+                        <span className="no-age">No registrado</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`status-badge ${patient.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
+                        {RECORD_STATUS_LABELS[patient.ck_estado]}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="registration-date">
+                        {formatDate(patient.d_fecha_creacion)}
+                      </span>
+                    </td>
+                    <td className="actions-cell">
+                      <button
+                        onClick={() => handleEdit(patient)}
+                        className="edit-button"
+                        title="Editar paciente"
+                      >
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(patient)}
+                        className="delete-button"
+                        title="Eliminar paciente"
+                      >
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filteredPatients.length === 0 && (
+              <div className="empty-state">
+                <i className="fas fa-users"></i>
+                <p>{searchTerm || statusFilter !== 'todos' ? 'No se encontraron pacientes' : 'No hay pacientes registrados'}</p>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Modal para crear/editar paciente */}
+        {showModal && (
+          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>{editingPatient ? 'Editar Paciente' : 'Nuevo Paciente'}</h3>
+                <button className="btn small" onClick={() => setShowModal(false)}>
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className="modal-body">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Nombre *</label>
+                    <input
+                      type="text"
+                      name="s_nombre"
+                      value={formData.s_nombre}
+                      onChange={handleInputChange}
+                      placeholder="Nombre del paciente"
+                      required
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Apellido *</label>
+                    <input
+                      type="text"
+                      name="s_apellido"
+                      value={formData.s_apellido}
+                      onChange={handleInputChange}
+                      placeholder="Apellido del paciente"
+                      required
+                      maxLength={50}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Teléfono *</label>
+                    <input
+                      type="tel"
+                      name="c_telefono"
+                      value={formData.c_telefono}
+                      onChange={handleInputChange}
+                      placeholder="+57 300 123 4567"
+                      required
+                      maxLength={15}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      name="s_email"
+                      value={formData.s_email}
+                      onChange={handleInputChange}
+                      placeholder="email@ejemplo.com"
+                      maxLength={100}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Fecha de Nacimiento</label>
+                  <input
+                    type="date"
+                    name="d_fecha_nacimiento"
+                    value={formData.d_fecha_nacimiento}
+                    onChange={handleInputChange}
+                    max={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+
+                <div className="modal-actions">
+                  <button type="button" className="btn" onClick={() => setShowModal(false)}>
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn primary">
+                    <i className="fas fa-check"></i>
+                    {editingPatient ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <style>{`
         .patient-management {
           min-height: 100vh;
           background: #f8fafc;
@@ -1031,6 +1033,7 @@ const PatientManagement = () => {
           }
         }
       `}</style>
+      </div>
     </div>
   );
 };
