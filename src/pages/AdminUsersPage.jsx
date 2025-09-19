@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AdminHeader from '../components/Common/AdminHeader';
 import adminService from '../services/adminService';
 import { TURN_STATUS_LABELS, USER_TYPE_LABELS } from '../utils/constants';
 
@@ -207,23 +208,7 @@ const AdminUsersPage = () => {
 
   return (
     <div className="admin-users-page">
-      {/* Header */}
-      <header className="page-header">
-        <div className="header-content">
-          <div className="header-left">
-            <button onClick={() => navigate('/admin/dashboard')} className="back-button">
-              ← Volver al Dashboard
-            </button>
-            <h1>👥 Gestión de Administradores</h1>
-          </div>
-          <div className="header-right">
-            <span className="user-info">👤 {user?.s_nombre}</span>
-            <button onClick={handleLogout} className="logout-button">
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader />
 
       {/* Contenido principal */}
       <main className="page-main">

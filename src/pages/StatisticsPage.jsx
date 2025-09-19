@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AdminHeader from '../components/Common/AdminHeader';
 import turnService from '../services/turnService';
 import patientService from '../services/patientService';
 import consultorioService from '../services/consultorioService';
@@ -10,396 +11,366 @@ import { TURN_STATUS_LABELS, RECORD_STATUS_LABELS } from '../utils/constants';
 import { formatDate, formatDateTime } from '../utils/helpers';
 
 const StatisticsPage = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [stats, setStats] = useState({
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    turns: {
+      total: 0,
+      byStatus: {},
+      today: 0,
+      thisWeek: 0,
+      thisMonth: 0
+    },
+    patients: {
+      total: 0,
+      active: 0,
+      withEmail: 0,
+      newThisMonth: 0
+    },
+    consultorios: {
+      total: 0,
+      active: 0,
+      byArea: {}
+    },
+    areas: {
+      total: 0,
+      active: 0
+    },
+    admins: {
+      total: 0,
+      byType: {}
+    }
+  });
+  const [dateRange, setDateRange] = useState({
+    start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
+    end: new Date().toISOString().split('T')[0]
+  });
+  const [recentTurns, setRecentTurns] = useState([]);
+
+  useEffect(() => {
+    loadStatistics();
+  }, []);
+
+  const loadStatistics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [
+        turnsStats,
+        patientsData,
+        consultoriosData,
+        areasData,
+        adminsData,
+        todayTurns,
+        recentTurnsData
+      ] = await Promise.all([
+        turnService.getTurnStatistics().catch(() => null),
+        patientService.getAllPatients().catch(() => []),
+        consultorioService.getAll().catch(() => []),
+        areaService.getAll().catch(() => []),
+        adminService.getAllAdmins().catch(() => []),
+        turnService.getTurnsByDate(new Date().toISOString().split('T')[0]).catch(() => []),
+        turnService.getTurnsByDateRange(dateRange.start, dateRange.end).catch(() => [])
+      ]);
+
+      // Procesar estadísticas de turnos
+      const turnsByStatus = {};
+      Object.values(TURN_STATUS_LABELS).forEach(status => {
+        turnsByStatus[status] = 0;
+      });
+
+      if (turnsStats) {
+        Object.entries(turnsStats).forEach(([key, value]) => {
+          if (key.includes('turnos_')) {
+            const status = key.replace('turnos_', '').toUpperCase();
+            if (TURN_STATUS_LABELS[status]) {
+              turnsByStatus[TURN_STATUS_LABELS[status]] = value || 0;
+            }
+          }
+        });
+      }
+
+      // Procesar estadísticas de consultorios por área
+      const consultoriosByArea = {};
+      areasData.forEach(area => {
+        consultoriosByArea[area.s_nombre_area] = consultoriosData.filter(c => c.uk_area === area.uk_area).length;
+      });
+
+      // Procesar estadísticas de administradores por tipo
+      const adminsByType = {};
+      adminsData.forEach(admin => {
+        const type = admin.tipo_usuario === 1 ? 'Administrador' : 'Supervisor';
+        adminsByType[type] = (adminsByType[type] || 0) + 1;
+      });
+
+      setStats({
         turns: {
-            total: 0,
-            byStatus: {},
-            today: 0,
-            thisWeek: 0,
-            thisMonth: 0
+          total: turnsStats?.total_turnos || 0,
+          byStatus: turnsByStatus,
+          today: todayTurns.length,
+          thisWeek: 0, // Se puede calcular con más datos
+          thisMonth: 0 // Se puede calcular con más datos
         },
         patients: {
-            total: 0,
-            active: 0,
-            withEmail: 0,
-            newThisMonth: 0
+          total: patientsData.length,
+          active: patientsData.filter(p => p.ck_estado === 'ACTIVO').length,
+          withEmail: patientsData.filter(p => p.s_email).length,
+          newThisMonth: 0 // Se puede calcular con más datos
         },
         consultorios: {
-            total: 0,
-            active: 0,
-            byArea: {}
+          total: consultoriosData.length,
+          active: consultoriosData.filter(c => c.ck_estado === 'ACTIVO').length,
+          byArea: consultoriosByArea
         },
         areas: {
-            total: 0,
-            active: 0
+          total: areasData.length,
+          active: areasData.filter(a => a.ck_estado === 'ACTIVO').length
         },
         admins: {
-            total: 0,
-            byType: {}
+          total: adminsData.length,
+          byType: adminsByType
         }
-    });
-    const [dateRange, setDateRange] = useState({
-        start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
-        end: new Date().toISOString().split('T')[0]
-    });
-    const [recentTurns, setRecentTurns] = useState([]);
+      });
 
-    useEffect(() => {
-        loadStatistics();
-    }, []);
-
-    const loadStatistics = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const [
-                turnsStats,
-                patientsData,
-                consultoriosData,
-                areasData,
-                adminsData,
-                todayTurns,
-                recentTurnsData
-            ] = await Promise.all([
-                turnService.getTurnStatistics().catch(() => null),
-                patientService.getAllPatients().catch(() => []),
-                consultorioService.getAll().catch(() => []),
-                areaService.getAll().catch(() => []),
-                adminService.getAllAdmins().catch(() => []),
-                turnService.getTurnsByDate(new Date().toISOString().split('T')[0]).catch(() => []),
-                turnService.getTurnsByDateRange(dateRange.start, dateRange.end).catch(() => [])
-            ]);
-
-            // Procesar estadísticas de turnos
-            const turnsByStatus = {};
-            Object.values(TURN_STATUS_LABELS).forEach(status => {
-                turnsByStatus[status] = 0;
-            });
-
-            if (turnsStats) {
-                Object.entries(turnsStats).forEach(([key, value]) => {
-                    if (key.includes('turnos_')) {
-                        const status = key.replace('turnos_', '').toUpperCase();
-                        if (TURN_STATUS_LABELS[status]) {
-                            turnsByStatus[TURN_STATUS_LABELS[status]] = value || 0;
-                        }
-                    }
-                });
-            }
-
-            // Procesar estadísticas de consultorios por área
-            const consultoriosByArea = {};
-            areasData.forEach(area => {
-                consultoriosByArea[area.s_nombre_area] = consultoriosData.filter(c => c.uk_area === area.uk_area).length;
-            });
-
-            // Procesar estadísticas de administradores por tipo
-            const adminsByType = {};
-            adminsData.forEach(admin => {
-                const type = admin.tipo_usuario === 1 ? 'Administrador' : 'Supervisor';
-                adminsByType[type] = (adminsByType[type] || 0) + 1;
-            });
-
-            setStats({
-                turns: {
-                    total: turnsStats?.total_turnos || 0,
-                    byStatus: turnsByStatus,
-                    today: todayTurns.length,
-                    thisWeek: 0, // Se puede calcular con más datos
-                    thisMonth: 0 // Se puede calcular con más datos
-                },
-                patients: {
-                    total: patientsData.length,
-                    active: patientsData.filter(p => p.ck_estado === 'ACTIVO').length,
-                    withEmail: patientsData.filter(p => p.s_email).length,
-                    newThisMonth: 0 // Se puede calcular con más datos
-                },
-                consultorios: {
-                    total: consultoriosData.length,
-                    active: consultoriosData.filter(c => c.ck_estado === 'ACTIVO').length,
-                    byArea: consultoriosByArea
-                },
-                areas: {
-                    total: areasData.length,
-                    active: areasData.filter(a => a.ck_estado === 'ACTIVO').length
-                },
-                admins: {
-                    total: adminsData.length,
-                    byType: adminsByType
-                }
-            });
-
-            setRecentTurns(recentTurnsData.slice(0, 10));
-        } catch (error) {
-            console.error('Error cargando estadísticas:', error);
-            setError('Error cargando estadísticas');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/admin');
-    };
-
-    const handleDateRangeChange = (e) => {
-        const { name, value } = e.target;
-        setDateRange(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const refreshData = () => {
-        loadStatistics();
-    };
-
-    if (loading) {
-        return (
-            <div className="statistics-page loading">
-                <div className="loading-container">
-                    <div className="loading-spinner"></div>
-                    <p>Cargando estadísticas...</p>
-                </div>
-            </div>
-        );
+      setRecentTurns(recentTurnsData.slice(0, 10));
+    } catch (error) {
+      console.error('Error cargando estadísticas:', error);
+      setError('Error cargando estadísticas');
+    } finally {
+      setLoading(false);
     }
+  };
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin');
+  };
+
+  const handleDateRangeChange = (e) => {
+    const { name, value } = e.target;
+    setDateRange(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const refreshData = () => {
+    loadStatistics();
+  };
+
+  if (loading) {
     return (
-        <div className="statistics-page">
-            <header className="management-header">
-                <div className="header-left">
-                    <div className="header-logo-section">
-                        <div className="header-logo-container">
-                            <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="header-logo-image" />
-                            <div className="header-logo-text-group">
-                                <span className="header-logo-text">Medi</span>
-                                <span className="header-logo-text2">Queue</span>
-                            </div>
-                        </div>
-                        <div className="header-subtitle">
-                            <h1>Estadísticas del Sistema</h1>
-                            <p>Análisis y reportes del sistema de turnos</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="header-right">
-                    <button onClick={() => navigate('/admin/dashboard')} className="back-btn">
-                        <i className="fas fa-arrow-left"></i>
-                        Volver al Dashboard
-                    </button>
-                    <span className="admin-name">
-                        <i className="fas fa-user-shield"></i>
-                        {user?.s_nombre || 'Administrador'}
-                    </span>
-                    <button onClick={handleLogout} className="logout-btn">
-                        <i className="fas fa-sign-out-alt"></i>
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </header>
+      <div className="statistics-page loading">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Cargando estadísticas...</p>
+        </div>
+      </div>
+    );
+  }
 
-            {error && (
-                <div className="error-banner">
-                    <span>⚠️ {error}</span>
-                    <button onClick={refreshData} className="retry-btn">
-                        Reintentar
-                    </button>
+  return (
+    <div className="statistics-page">
+      <AdminHeader />
+
+      {error && (
+        <div className="error-banner">
+          <span>⚠️ {error}</span>
+          <button onClick={refreshData} className="retry-btn">
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      <main className="management-content">
+        {/* Filtros de fecha */}
+        <div className="filters-section">
+          <div className="date-range-filters">
+            <div className="filter-group">
+              <label>Fecha Inicio</label>
+              <input
+                type="date"
+                name="start"
+                value={dateRange.start}
+                onChange={handleDateRangeChange}
+                className="filter-input"
+              />
+            </div>
+            <div className="filter-group">
+              <label>Fecha Fin</label>
+              <input
+                type="date"
+                name="end"
+                value={dateRange.end}
+                onChange={handleDateRangeChange}
+                className="filter-input"
+              />
+            </div>
+            <button onClick={refreshData} className="btn primary">
+              <i className="fas fa-sync-alt"></i>
+              Actualizar
+            </button>
+          </div>
+        </div>
+
+        {/* Estadísticas generales */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon">
+              <i className="fas fa-calendar-check"></i>
+            </div>
+            <div className="stat-content">
+              <h3>{stats.turns.total}</h3>
+              <p>Total Turnos</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <i className="fas fa-calendar-day"></i>
+            </div>
+            <div className="stat-content">
+              <h3>{stats.turns.today}</h3>
+              <p>Turnos Hoy</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <i className="fas fa-users"></i>
+            </div>
+            <div className="stat-content">
+              <h3>{stats.patients.total}</h3>
+              <p>Total Pacientes</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <i className="fas fa-hospital"></i>
+            </div>
+            <div className="stat-content">
+              <h3>{stats.consultorios.total}</h3>
+              <p>Total Consultorios</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <i className="fas fa-building"></i>
+            </div>
+            <div className="stat-content">
+              <h3>{stats.areas.total}</h3>
+              <p>Total Áreas</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <i className="fas fa-user-shield"></i>
+            </div>
+            <div className="stat-content">
+              <h3>{stats.admins.total}</h3>
+              <p>Total Administradores</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Gráficos y tablas */}
+        <div className="charts-section">
+          <div className="chart-card">
+            <h3>Turnos por Estado</h3>
+            <div className="chart-content">
+              {Object.entries(stats.turns.byStatus).map(([status, count]) => (
+                <div key={status} className="chart-bar">
+                  <div className="bar-label">{status}</div>
+                  <div className="bar-container">
+                    <div
+                      className="bar-fill"
+                      style={{ width: `${(count / stats.turns.total) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="bar-value">{count}</div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="chart-card">
+            <h3>Consultorios por Área</h3>
+            <div className="chart-content">
+              {Object.entries(stats.consultorios.byArea).map(([area, count]) => (
+                <div key={area} className="chart-bar">
+                  <div className="bar-label">{area}</div>
+                  <div className="bar-container">
+                    <div
+                      className="bar-fill"
+                      style={{ width: `${(count / stats.consultorios.total) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="bar-value">{count}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="chart-card">
+            <h3>Administradores por Tipo</h3>
+            <div className="chart-content">
+              {Object.entries(stats.admins.byType).map(([type, count]) => (
+                <div key={type} className="chart-bar">
+                  <div className="bar-label">{type}</div>
+                  <div className="bar-container">
+                    <div
+                      className="bar-fill"
+                      style={{ width: `${(count / stats.admins.total) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="bar-value">{count}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Tabla de turnos recientes */}
+        <div className="recent-turns-section">
+          <h3>Turnos Recientes</h3>
+          <div className="turns-table">
+            <table>
+              <thead>
+                <tr>
+                  <th># Turno</th>
+                  <th>Consultorio</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentTurns.map(turn => (
+                  <tr key={turn.uk_turno}>
+                    <td>#{turn.i_numero_turno}</td>
+                    <td>Consultorio {turn.i_numero_consultorio}</td>
+                    <td>
+                      <span className={`status-badge ${turn.s_estado.toLowerCase().replace('_', '-')}`}>
+                        {TURN_STATUS_LABELS[turn.s_estado] || turn.s_estado}
+                      </span>
+                    </td>
+                    <td>{formatDate(turn.d_fecha)}</td>
+                    <td>{turn.t_hora}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {recentTurns.length === 0 && (
+              <div className="empty-state">
+                <p>No hay turnos en el rango de fechas seleccionado</p>
+              </div>
             )}
+          </div>
+        </div>
+      </main>
 
-            <main className="management-content">
-                {/* Filtros de fecha */}
-                <div className="filters-section">
-                    <div className="date-range-filters">
-                        <div className="filter-group">
-                            <label>Fecha Inicio</label>
-                            <input
-                                type="date"
-                                name="start"
-                                value={dateRange.start}
-                                onChange={handleDateRangeChange}
-                                className="filter-input"
-                            />
-                        </div>
-                        <div className="filter-group">
-                            <label>Fecha Fin</label>
-                            <input
-                                type="date"
-                                name="end"
-                                value={dateRange.end}
-                                onChange={handleDateRangeChange}
-                                className="filter-input"
-                            />
-                        </div>
-                        <button onClick={refreshData} className="btn primary">
-                            <i className="fas fa-sync-alt"></i>
-                            Actualizar
-                        </button>
-                    </div>
-                </div>
-
-                {/* Estadísticas generales */}
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <div className="stat-icon">
-                            <i className="fas fa-calendar-check"></i>
-                        </div>
-                        <div className="stat-content">
-                            <h3>{stats.turns.total}</h3>
-                            <p>Total Turnos</p>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">
-                            <i className="fas fa-calendar-day"></i>
-                        </div>
-                        <div className="stat-content">
-                            <h3>{stats.turns.today}</h3>
-                            <p>Turnos Hoy</p>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">
-                            <i className="fas fa-users"></i>
-                        </div>
-                        <div className="stat-content">
-                            <h3>{stats.patients.total}</h3>
-                            <p>Total Pacientes</p>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">
-                            <i className="fas fa-hospital"></i>
-                        </div>
-                        <div className="stat-content">
-                            <h3>{stats.consultorios.total}</h3>
-                            <p>Total Consultorios</p>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">
-                            <i className="fas fa-building"></i>
-                        </div>
-                        <div className="stat-content">
-                            <h3>{stats.areas.total}</h3>
-                            <p>Total Áreas</p>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">
-                            <i className="fas fa-user-shield"></i>
-                        </div>
-                        <div className="stat-content">
-                            <h3>{stats.admins.total}</h3>
-                            <p>Total Administradores</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Gráficos y tablas */}
-                <div className="charts-section">
-                    <div className="chart-card">
-                        <h3>Turnos por Estado</h3>
-                        <div className="chart-content">
-                            {Object.entries(stats.turns.byStatus).map(([status, count]) => (
-                                <div key={status} className="chart-bar">
-                                    <div className="bar-label">{status}</div>
-                                    <div className="bar-container">
-                                        <div
-                                            className="bar-fill"
-                                            style={{ width: `${(count / stats.turns.total) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                    <div className="bar-value">{count}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="chart-card">
-                        <h3>Consultorios por Área</h3>
-                        <div className="chart-content">
-                            {Object.entries(stats.consultorios.byArea).map(([area, count]) => (
-                                <div key={area} className="chart-bar">
-                                    <div className="bar-label">{area}</div>
-                                    <div className="bar-container">
-                                        <div
-                                            className="bar-fill"
-                                            style={{ width: `${(count / stats.consultorios.total) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                    <div className="bar-value">{count}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="chart-card">
-                        <h3>Administradores por Tipo</h3>
-                        <div className="chart-content">
-                            {Object.entries(stats.admins.byType).map(([type, count]) => (
-                                <div key={type} className="chart-bar">
-                                    <div className="bar-label">{type}</div>
-                                    <div className="bar-container">
-                                        <div
-                                            className="bar-fill"
-                                            style={{ width: `${(count / stats.admins.total) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                    <div className="bar-value">{count}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tabla de turnos recientes */}
-                <div className="recent-turns-section">
-                    <h3>Turnos Recientes</h3>
-                    <div className="turns-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th># Turno</th>
-                                    <th>Consultorio</th>
-                                    <th>Estado</th>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {recentTurns.map(turn => (
-                                    <tr key={turn.uk_turno}>
-                                        <td>#{turn.i_numero_turno}</td>
-                                        <td>Consultorio {turn.i_numero_consultorio}</td>
-                                        <td>
-                                            <span className={`status-badge ${turn.s_estado.toLowerCase().replace('_', '-')}`}>
-                                                {TURN_STATUS_LABELS[turn.s_estado] || turn.s_estado}
-                                            </span>
-                                        </td>
-                                        <td>{formatDate(turn.d_fecha)}</td>
-                                        <td>{turn.t_hora}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {recentTurns.length === 0 && (
-                            <div className="empty-state">
-                                <p>No hay turnos en el rango de fechas seleccionado</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </main>
-
-            <style>{`
+      <style>{`
         .statistics-page {
           min-height: 100vh;
           background: #f8fafc;
@@ -859,8 +830,8 @@ const StatisticsPage = () => {
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default StatisticsPage;

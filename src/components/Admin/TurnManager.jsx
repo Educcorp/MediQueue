@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import AdminHeader from '../Common/AdminHeader';
 import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
@@ -283,23 +284,7 @@ const TurnManager = () => {
 
   return (
     <div className="turn-manager-page">
-      {/* Header */}
-      <header className="page-header">
-        <div className="header-content">
-          <div className="header-left">
-            <button onClick={() => navigate('/admin/dashboard')} className="back-button">
-              ← Volver al Dashboard
-            </button>
-            <h1>📋 Gestión de Turnos</h1>
-          </div>
-          <div className="header-right">
-            <span className="user-info">👤 {user?.s_nombre}</span>
-            <button onClick={handleLogout} className="logout-button">
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader />
 
       {/* Contenido principal */}
       <main className="page-main">

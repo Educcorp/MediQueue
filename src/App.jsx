@@ -5,7 +5,10 @@ import TakeTurn from './pages/TakeTurn'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminUsersPage from './pages/AdminUsersPage'
+import AdminSettingsPage from './pages/AdminSettingsPage'
 import ConsultorioManagement from './pages/ConsultorioManagement'
+import PatientManagement from './pages/PatientManagement'
+import StatisticsPage from './pages/StatisticsPage'
 import TurnManager from './components/Admin/TurnManager'
 import ProtectedRoute from './components/Common/ProtectedRoute'
 import './styles/App.css'
@@ -57,6 +60,36 @@ function App() {
           element={
             <ProtectedRoute>
               <ConsultorioManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta para gestión de pacientes */}
+        <Route
+          path="/admin/patients"
+          element={
+            <ProtectedRoute>
+              <PatientManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta para estadísticas */}
+        <Route
+          path="/admin/statistics"
+          element={
+            <ProtectedRoute>
+              <StatisticsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta para configuración */}
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute>
+              <AdminSettingsPage />
             </ProtectedRoute>
           }
         />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AdminHeader from '../components/Common/AdminHeader';
 import turnService from '../services/turnService';
 import patientService from '../services/patientService';
 import consultorioService from '../services/consultorioService';
@@ -92,41 +93,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <header className="dashboard-header">
-        <div className="header-left">
-          <div className="header-logo-section">
-            <div className="header-logo-container">
-              <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="header-logo-image" />
-              <div className="header-logo-text-group">
-                <span className="header-logo-text">Medi</span>
-                <span className="header-logo-text2">Queue</span>
-              </div>
-            </div>
-            <div className="header-subtitle">
-              <h1>Panel de Administración</h1>
-              <p>Sistema de Gestión Médica</p>
-            </div>
-          </div>
-        </div>
-        <div className="header-right">
-          <div className="admin-info">
-            <span className="admin-name">
-              <i className="fas fa-user-shield"></i>
-              {user?.s_nombre || 'Administrador'}
-            </span>
-            <span className="admin-role">
-              {user?.tipo_usuario === 1 ? 'Administrador' : 'Supervisor'}
-            </span>
-          </div>
-          <button onClick={refreshData} className="refresh-btn" title="Actualizar datos">
-            <i className="fas fa-sync-alt"></i>
-          </button>
-          <button onClick={handleLogout} className="logout-btn">
-            <i className="fas fa-sign-out-alt"></i>
-            Cerrar Sesión
-          </button>
-        </div>
-      </header>
+      <AdminHeader />
 
       {error && (
         <div className="error-banner">

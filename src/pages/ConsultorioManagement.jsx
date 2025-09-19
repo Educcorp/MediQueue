@@ -1,627 +1,598 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AdminHeader from '../components/Common/AdminHeader';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
 
 const ConsultorioManagement = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-    const [areas, setAreas] = useState([]);
-    const [consultorios, setConsultorios] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showAreaForm, setShowAreaForm] = useState(false);
-    const [showConsultorioForm, setShowConsultorioForm] = useState({});
-    const [editingArea, setEditingArea] = useState(null);
-    const [editingConsultorio, setEditingConsultorio] = useState(null);
-    const [formData, setFormData] = useState({
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [areas, setAreas] = useState([]);
+  const [consultorios, setConsultorios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showAreaForm, setShowAreaForm] = useState(false);
+  const [showConsultorioForm, setShowConsultorioForm] = useState({});
+  const [editingArea, setEditingArea] = useState(null);
+  const [editingConsultorio, setEditingConsultorio] = useState(null);
+  const [formData, setFormData] = useState({
+    s_nombre_area: '',
+    i_numero_consultorio: '',
+    uk_area: ''
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Paleta de colores para las primeras 8 áreas médicas
+  const areaColorPalette = [
+    { color: '#4CAF50', gradient: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)' }, // Verde - Medicina General
+    { color: '#2196F3', gradient: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)' }, // Azul - Pediatría
+    { color: '#FF9800', gradient: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)' }, // Naranja - Cardiología
+    { color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E63 0%, #C2185B 100%)' }, // Rosa - Dermatología
+    { color: '#9C27B0', gradient: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)' }, // Púrpura - Ginecología
+    { color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)' }, // Cian - Oftalmología
+    { color: '#795548', gradient: 'linear-gradient(135deg, #795548 0%, #5D4037 100%)' }, // Marrón - Ortopedia
+    { color: '#607D8B', gradient: 'linear-gradient(135deg, #607D8B 0%, #455A64 100%)' }  // Azul Gris - Psiquiatría
+  ];
+
+  // Mapa de iconos y colores por nombre de área
+  const areaUI = {
+    'Medicina General': { icono: 'fas fa-stethoscope', color: areaColorPalette[0].color, gradient: areaColorPalette[0].gradient },
+    'Pediatría': { icono: 'fas fa-baby', color: areaColorPalette[1].color, gradient: areaColorPalette[1].gradient },
+    'Cardiología': { icono: 'fas fa-heartbeat', color: areaColorPalette[2].color, gradient: areaColorPalette[2].gradient },
+    'Dermatología': { icono: 'fas fa-user-md', color: areaColorPalette[3].color, gradient: areaColorPalette[3].gradient },
+    'Ginecología': { icono: 'fas fa-female', color: areaColorPalette[4].color, gradient: areaColorPalette[4].gradient },
+    'Oftalmología': { icono: 'fas fa-eye', color: areaColorPalette[5].color, gradient: areaColorPalette[5].gradient },
+    'Ortopedia': { icono: 'fas fa-bone', color: areaColorPalette[6].color, gradient: areaColorPalette[6].gradient },
+    'Psiquiatría': { icono: 'fas fa-brain', color: areaColorPalette[7].color, gradient: areaColorPalette[7].gradient },
+    'Neurología': { icono: 'fas fa-brain', color: '#FF5722', gradient: 'linear-gradient(135deg, #FF5722 0%, #D84315 100%)' },
+    'Urología': { icono: 'fas fa-male', color: '#3F51B5', gradient: 'linear-gradient(135deg, #3F51B5 0%, #303F9F 100%)' },
+    'Endocrinología': { icono: 'fas fa-flask', color: '#8BC34A', gradient: 'linear-gradient(135deg, #8BC34A 0%, #689F38 100%)' },
+    'Gastroenterología': { icono: 'fas fa-stomach', color: '#FFC107', gradient: 'linear-gradient(135deg, #FFC107 0%, #FF8F00 100%)' }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [areasData, consultoriosData] = await Promise.all([
+        areaService.getAll().catch(err => {
+          console.warn('Error cargando áreas:', err);
+          return [];
+        }),
+        consultorioService.getAll().catch(err => {
+          console.warn('Error cargando consultorios:', err);
+          return [];
+        })
+      ]);
+
+      setAreas(areasData);
+      setConsultorios(consultoriosData);
+    } catch (error) {
+      console.error('Error cargando datos:', error);
+      setError('Error cargando datos del sistema');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin');
+  };
+
+  const handleAddArea = () => {
+    setEditingArea(null);
+    setFormData({
+      s_nombre_area: '',
+      i_numero_consultorio: '',
+      uk_area: ''
+    });
+    setShowAreaForm(true);
+  };
+
+  const handleEditArea = (area) => {
+    setEditingArea(area);
+    setFormData({
+      s_nombre_area: area.s_nombre_area,
+      i_numero_consultorio: '',
+      uk_area: area.uk_area
+    });
+    setShowAreaForm(true);
+  };
+
+  const handleAddConsultorio = (areaId) => {
+    setEditingConsultorio(null);
+    setFormData({
+      s_nombre_area: '',
+      i_numero_consultorio: '',
+      uk_area: areaId
+    });
+    setShowConsultorioForm(prev => ({ ...prev, [areaId]: true }));
+  };
+
+  const handleEditConsultorio = (consultorio) => {
+    setEditingConsultorio(consultorio);
+    setFormData({
+      s_nombre_area: '',
+      i_numero_consultorio: consultorio.i_numero_consultorio,
+      uk_area: consultorio.uk_area
+    });
+    setShowConsultorioForm(prev => ({ ...prev, [consultorio.uk_area]: true }));
+  };
+
+  const handleSubmitArea = async (e) => {
+    e.preventDefault();
+
+    if (!formData.s_nombre_area.trim()) {
+      alert('El nombre del área es requerido');
+      return;
+    }
+
+    try {
+      if (editingArea) {
+        await areaService.update(editingArea.uk_area, {
+          s_nombre_area: formData.s_nombre_area.trim()
+        });
+        alert('Área actualizada correctamente');
+      } else {
+        await areaService.create({
+          s_nombre_area: formData.s_nombre_area.trim()
+        });
+        alert('Área creada correctamente');
+      }
+
+      await loadData();
+      setShowAreaForm(false);
+      setFormData({
         s_nombre_area: '',
         i_numero_consultorio: '',
         uk_area: ''
-    });
-    const [searchTerm, setSearchTerm] = useState('');
+      });
+    } catch (error) {
+      let errorMessage = 'Error guardando área: ' + error.message;
 
-    // Paleta de colores para las primeras 8 áreas médicas
-    const areaColorPalette = [
-        { color: '#4CAF50', gradient: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)' }, // Verde - Medicina General
-        { color: '#2196F3', gradient: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)' }, // Azul - Pediatría
-        { color: '#FF9800', gradient: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)' }, // Naranja - Cardiología
-        { color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E63 0%, #C2185B 100%)' }, // Rosa - Dermatología
-        { color: '#9C27B0', gradient: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)' }, // Púrpura - Ginecología
-        { color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)' }, // Cian - Oftalmología
-        { color: '#795548', gradient: 'linear-gradient(135deg, #795548 0%, #5D4037 100%)' }, // Marrón - Ortopedia
-        { color: '#607D8B', gradient: 'linear-gradient(135deg, #607D8B 0%, #455A64 100%)' }  // Azul Gris - Psiquiatría
-    ];
+      // Manejar errores específicos
+      if (error.response?.status === 409) {
+        errorMessage = 'Ya existe un área con ese nombre. Por favor, elige otro nombre.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Error interno del servidor. Por favor, intenta nuevamente.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
 
-    // Mapa de iconos y colores por nombre de área
-    const areaUI = {
-        'Medicina General': { icono: 'fas fa-stethoscope', color: areaColorPalette[0].color, gradient: areaColorPalette[0].gradient },
-        'Pediatría': { icono: 'fas fa-baby', color: areaColorPalette[1].color, gradient: areaColorPalette[1].gradient },
-        'Cardiología': { icono: 'fas fa-heartbeat', color: areaColorPalette[2].color, gradient: areaColorPalette[2].gradient },
-        'Dermatología': { icono: 'fas fa-user-md', color: areaColorPalette[3].color, gradient: areaColorPalette[3].gradient },
-        'Ginecología': { icono: 'fas fa-female', color: areaColorPalette[4].color, gradient: areaColorPalette[4].gradient },
-        'Oftalmología': { icono: 'fas fa-eye', color: areaColorPalette[5].color, gradient: areaColorPalette[5].gradient },
-        'Ortopedia': { icono: 'fas fa-bone', color: areaColorPalette[6].color, gradient: areaColorPalette[6].gradient },
-        'Psiquiatría': { icono: 'fas fa-brain', color: areaColorPalette[7].color, gradient: areaColorPalette[7].gradient },
-        'Neurología': { icono: 'fas fa-brain', color: '#FF5722', gradient: 'linear-gradient(135deg, #FF5722 0%, #D84315 100%)' },
-        'Urología': { icono: 'fas fa-male', color: '#3F51B5', gradient: 'linear-gradient(135deg, #3F51B5 0%, #303F9F 100%)' },
-        'Endocrinología': { icono: 'fas fa-flask', color: '#8BC34A', gradient: 'linear-gradient(135deg, #8BC34A 0%, #689F38 100%)' },
-        'Gastroenterología': { icono: 'fas fa-stomach', color: '#FFC107', gradient: 'linear-gradient(135deg, #FFC107 0%, #FF8F00 100%)' }
-    };
+      alert(errorMessage);
+      console.error('Error guardando área:', error);
+    }
+  };
 
-    useEffect(() => {
-        loadData();
-    }, []);
+  const handleSubmitConsultorio = async (e) => {
+    e.preventDefault();
 
-    const loadData = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const [areasData, consultoriosData] = await Promise.all([
-                areaService.getAll().catch(err => {
-                    console.warn('Error cargando áreas:', err);
-                    return [];
-                }),
-                consultorioService.getAll().catch(err => {
-                    console.warn('Error cargando consultorios:', err);
-                    return [];
-                })
-            ]);
-
-            setAreas(areasData);
-            setConsultorios(consultoriosData);
-        } catch (error) {
-            console.error('Error cargando datos:', error);
-            setError('Error cargando datos del sistema');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/admin');
-    };
-
-    const handleAddArea = () => {
-        setEditingArea(null);
-        setFormData({
-            s_nombre_area: '',
-            i_numero_consultorio: '',
-            uk_area: ''
-        });
-        setShowAreaForm(true);
-    };
-
-    const handleEditArea = (area) => {
-        setEditingArea(area);
-        setFormData({
-            s_nombre_area: area.s_nombre_area,
-            i_numero_consultorio: '',
-            uk_area: area.uk_area
-        });
-        setShowAreaForm(true);
-    };
-
-    const handleAddConsultorio = (areaId) => {
-        setEditingConsultorio(null);
-        setFormData({
-            s_nombre_area: '',
-            i_numero_consultorio: '',
-            uk_area: areaId
-        });
-        setShowConsultorioForm(prev => ({ ...prev, [areaId]: true }));
-    };
-
-    const handleEditConsultorio = (consultorio) => {
-        setEditingConsultorio(consultorio);
-        setFormData({
-            s_nombre_area: '',
-            i_numero_consultorio: consultorio.i_numero_consultorio,
-            uk_area: consultorio.uk_area
-        });
-        setShowConsultorioForm(prev => ({ ...prev, [consultorio.uk_area]: true }));
-    };
-
-    const handleSubmitArea = async (e) => {
-        e.preventDefault();
-
-        if (!formData.s_nombre_area.trim()) {
-            alert('El nombre del área es requerido');
-            return;
-        }
-
-        try {
-            if (editingArea) {
-                await areaService.update(editingArea.uk_area, {
-                    s_nombre_area: formData.s_nombre_area.trim()
-                });
-                alert('Área actualizada correctamente');
-            } else {
-                await areaService.create({
-                    s_nombre_area: formData.s_nombre_area.trim()
-                });
-                alert('Área creada correctamente');
-            }
-
-            await loadData();
-            setShowAreaForm(false);
-            setFormData({
-                s_nombre_area: '',
-                i_numero_consultorio: '',
-                uk_area: ''
-            });
-        } catch (error) {
-            let errorMessage = 'Error guardando área: ' + error.message;
-
-            // Manejar errores específicos
-            if (error.response?.status === 409) {
-                errorMessage = 'Ya existe un área con ese nombre. Por favor, elige otro nombre.';
-            } else if (error.response?.status === 500) {
-                errorMessage = 'Error interno del servidor. Por favor, intenta nuevamente.';
-            } else if (error.response?.data?.message) {
-                errorMessage = error.response.data.message;
-            }
-
-            alert(errorMessage);
-            console.error('Error guardando área:', error);
-        }
-    };
-
-    const handleSubmitConsultorio = async (e) => {
-        e.preventDefault();
-
-        if (!formData.i_numero_consultorio || !formData.uk_area) {
-            alert('El número de consultorio y área son requeridos');
-            return;
-        }
-
-        try {
-            if (editingConsultorio) {
-                await consultorioService.update(editingConsultorio.uk_consultorio, {
-                    i_numero_consultorio: parseInt(formData.i_numero_consultorio),
-                    uk_area: formData.uk_area
-                });
-                alert('Consultorio actualizado correctamente');
-            } else {
-                await consultorioService.create({
-                    i_numero_consultorio: parseInt(formData.i_numero_consultorio),
-                    uk_area: formData.uk_area
-                });
-                alert('Consultorio creado correctamente');
-            }
-
-            await loadData();
-            setShowConsultorioForm(prev => ({ ...prev, [formData.uk_area]: false }));
-            setFormData({
-                s_nombre_area: '',
-                i_numero_consultorio: '',
-                uk_area: ''
-            });
-        } catch (error) {
-            let errorMessage = 'Error guardando consultorio: ' + error.message;
-
-            // Manejar errores específicos
-            if (error.response?.status === 409) {
-                errorMessage = 'Ya existe un consultorio con ese número en esta área. Por favor, elige otro número.';
-            } else if (error.response?.status === 500) {
-                errorMessage = 'Error interno del servidor. Por favor, intenta nuevamente.';
-            } else if (error.response?.data?.message) {
-                errorMessage = error.response.data.message;
-            }
-
-            alert(errorMessage);
-            console.error('Error guardando consultorio:', error);
-        }
-    };
-
-    const handleDeleteArea = async (area) => {
-        if (window.confirm(`¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`)) {
-            try {
-                await areaService.remove(area.uk_area);
-                await loadData();
-                alert('Área eliminada correctamente');
-            } catch (error) {
-                alert('Error eliminando área: ' + error.message);
-                console.error('Error eliminando área:', error);
-            }
-        }
-    };
-
-    const handleDeleteConsultorio = async (consultorio) => {
-        if (window.confirm(`¿Estás seguro de eliminar el consultorio ${consultorio.i_numero_consultorio}?`)) {
-            try {
-                await consultorioService.remove(consultorio.uk_consultorio);
-                await loadData();
-                alert('Consultorio eliminado correctamente');
-            } catch (error) {
-                alert('Error eliminando consultorio: ' + error.message);
-                console.error('Error eliminando consultorio:', error);
-            }
-        }
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-    };
-
-    // Filtrar áreas por término de búsqueda
-    const filteredAreas = areas.filter(area =>
-        area.s_nombre_area.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // Obtener consultorios por área
-    const getConsultoriosByArea = (areaId) => {
-        return consultorios.filter(c => c.uk_area === areaId);
-    };
-
-    const getAreaUI = (areaName) => {
-        // Si el área está en el mapa predefinido, usar esos datos
-        if (areaUI[areaName]) {
-            return areaUI[areaName];
-        }
-
-        // Para áreas no predefinidas, asignar colores de la paleta de manera cíclica
-        const areaNames = areas.map(area => area.s_nombre_area);
-        const areaIndex = areaNames.indexOf(areaName);
-
-        if (areaIndex >= 0 && areaIndex < areaColorPalette.length) {
-            // Usar colores de la paleta para las primeras 8 áreas
-            return {
-                icono: 'fas fa-hospital',
-                color: areaColorPalette[areaIndex].color,
-                gradient: areaColorPalette[areaIndex].gradient
-            };
-        }
-
-        // Para áreas adicionales, usar colores aleatorios pero consistentes
-        const fallbackColors = [
-            '#FF5722', '#3F51B5', '#8BC34A', '#FFC107', '#FF6F00',
-            '#E1BEE7', '#B2DFDB', '#C8E6C9', '#FFCDD2', '#F8BBD9'
-        ];
-
-        const colorIndex = areaIndex % fallbackColors.length;
-        return {
-            icono: 'fas fa-hospital',
-            color: fallbackColors[colorIndex],
-            gradient: `linear-gradient(135deg, ${fallbackColors[colorIndex]} 0%, ${fallbackColors[colorIndex]}CC 100%)`
-        };
-    };
-
-    if (loading) {
-        return (
-            <div className="consultorio-management loading">
-                <div className="loading-container">
-                    <div className="loading-spinner"></div>
-                    <p>Cargando consultorios...</p>
-                </div>
-            </div>
-        );
+    if (!formData.i_numero_consultorio || !formData.uk_area) {
+      alert('El número de consultorio y área son requeridos');
+      return;
     }
 
+    try {
+      if (editingConsultorio) {
+        await consultorioService.update(editingConsultorio.uk_consultorio, {
+          i_numero_consultorio: parseInt(formData.i_numero_consultorio),
+          uk_area: formData.uk_area
+        });
+        alert('Consultorio actualizado correctamente');
+      } else {
+        await consultorioService.create({
+          i_numero_consultorio: parseInt(formData.i_numero_consultorio),
+          uk_area: formData.uk_area
+        });
+        alert('Consultorio creado correctamente');
+      }
+
+      await loadData();
+      setShowConsultorioForm(prev => ({ ...prev, [formData.uk_area]: false }));
+      setFormData({
+        s_nombre_area: '',
+        i_numero_consultorio: '',
+        uk_area: ''
+      });
+    } catch (error) {
+      let errorMessage = 'Error guardando consultorio: ' + error.message;
+
+      // Manejar errores específicos
+      if (error.response?.status === 409) {
+        errorMessage = 'Ya existe un consultorio con ese número en esta área. Por favor, elige otro número.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Error interno del servidor. Por favor, intenta nuevamente.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
+      alert(errorMessage);
+      console.error('Error guardando consultorio:', error);
+    }
+  };
+
+  const handleDeleteArea = async (area) => {
+    if (window.confirm(`¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`)) {
+      try {
+        await areaService.remove(area.uk_area);
+        await loadData();
+        alert('Área eliminada correctamente');
+      } catch (error) {
+        alert('Error eliminando área: ' + error.message);
+        console.error('Error eliminando área:', error);
+      }
+    }
+  };
+
+  const handleDeleteConsultorio = async (consultorio) => {
+    if (window.confirm(`¿Estás seguro de eliminar el consultorio ${consultorio.i_numero_consultorio}?`)) {
+      try {
+        await consultorioService.remove(consultorio.uk_consultorio);
+        await loadData();
+        alert('Consultorio eliminado correctamente');
+      } catch (error) {
+        alert('Error eliminando consultorio: ' + error.message);
+        console.error('Error eliminando consultorio:', error);
+      }
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Filtrar áreas por término de búsqueda
+  const filteredAreas = areas.filter(area =>
+    area.s_nombre_area.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Obtener consultorios por área
+  const getConsultoriosByArea = (areaId) => {
+    return consultorios.filter(c => c.uk_area === areaId);
+  };
+
+  const getAreaUI = (areaName) => {
+    // Si el área está en el mapa predefinido, usar esos datos
+    if (areaUI[areaName]) {
+      return areaUI[areaName];
+    }
+
+    // Para áreas no predefinidas, asignar colores de la paleta de manera cíclica
+    const areaNames = areas.map(area => area.s_nombre_area);
+    const areaIndex = areaNames.indexOf(areaName);
+
+    if (areaIndex >= 0 && areaIndex < areaColorPalette.length) {
+      // Usar colores de la paleta para las primeras 8 áreas
+      return {
+        icono: 'fas fa-hospital',
+        color: areaColorPalette[areaIndex].color,
+        gradient: areaColorPalette[areaIndex].gradient
+      };
+    }
+
+    // Para áreas adicionales, usar colores aleatorios pero consistentes
+    const fallbackColors = [
+      '#FF5722', '#3F51B5', '#8BC34A', '#FFC107', '#FF6F00',
+      '#E1BEE7', '#B2DFDB', '#C8E6C9', '#FFCDD2', '#F8BBD9'
+    ];
+
+    const colorIndex = areaIndex % fallbackColors.length;
+    return {
+      icono: 'fas fa-hospital',
+      color: fallbackColors[colorIndex],
+      gradient: `linear-gradient(135deg, ${fallbackColors[colorIndex]} 0%, ${fallbackColors[colorIndex]}CC 100%)`
+    };
+  };
+
+  if (loading) {
     return (
-        <div className="consultorio-management">
-            <header className="management-header">
-                <div className="header-left">
-                    <div className="header-logo-section">
-                        <div className="header-logo-container">
-                            <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="header-logo-image" />
-                            <div className="header-logo-text-group">
-                                <span className="header-logo-text">Medi</span>
-                                <span className="header-logo-text2">Queue</span>
-                            </div>
-                        </div>
-                        <div className="header-subtitle">
-                            <h1>Gestión de Consultorios</h1>
-                            <p>Administración de consultorios y áreas médicas</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="header-right">
-                    <button onClick={() => navigate('/admin/dashboard')} className="back-btn">
-                        <i className="fas fa-arrow-left"></i>
-                        Volver al Dashboard
-                    </button>
-                    <span className="admin-name">
-                        <i className="fas fa-user-shield"></i>
-                        {user?.s_nombre || 'Administrador'}
-                    </span>
-                    <button onClick={handleLogout} className="logout-btn">
-                        <i className="fas fa-sign-out-alt"></i>
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </header>
+      <div className="consultorio-management loading">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Cargando consultorios...</p>
+        </div>
+      </div>
+    );
+  }
 
-            {error && (
-                <div className="error-banner">
-                    <span>⚠️ {error}</span>
-                    <button onClick={loadData} className="retry-btn">
-                        Reintentar
-                    </button>
-                </div>
-            )}
+  return (
+    <div className="consultorio-management">
+      <AdminHeader />
 
-            <main className="management-content">
-                <div className="content-header">
-                    <div className="stats-container">
-                        <div className="stat-card">
-                            <div className="stat-icon">
-                                <i className="fas fa-hospital"></i>
-                            </div>
-                            <div className="stat-info">
-                                <h3>{areas.length}</h3>
-                                <p>Áreas Médicas</p>
-                            </div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-icon">
-                                <i className="fas fa-door-open"></i>
-                            </div>
-                            <div className="stat-info">
-                                <h3>{consultorios.length}</h3>
-                                <p>Total Consultorios</p>
-                            </div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-icon">
-                                <i className="fas fa-check-circle"></i>
-                            </div>
-                            <div className="stat-info">
-                                <h3>{areas.filter(a => a.ck_estado === 'ACTIVO').length}</h3>
-                                <p>Áreas Activas</p>
-                            </div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-icon">
-                                <i className="fas fa-times-circle"></i>
-                            </div>
-                            <div className="stat-info">
-                                <h3>{areas.filter(a => a.ck_estado === 'INACTIVO').length}</h3>
-                                <p>Áreas Inactivas</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      {error && (
+        <div className="error-banner">
+          <span>⚠️ {error}</span>
+          <button onClick={loadData} className="retry-btn">
+            Reintentar
+          </button>
+        </div>
+      )}
 
-                {/* Barra de búsqueda y acciones */}
-                <div className="search-and-actions">
-                    <div className="search-bar">
-                        <input
-                            type="text"
-                            placeholder="Buscar áreas..."
-                            value={searchTerm}
-                            onChange={handleSearch}
-                            className="search-input"
-                        />
-                        <i className="fas fa-search search-icon"></i>
-                    </div>
-                    <div className="actions-bar">
-                        <button onClick={handleAddArea} className="btn primary">
-                            <i className="fas fa-plus"></i>
-                            Añadir Área
-                        </button>
-                        <button onClick={loadData} className="btn secondary">
-                            <i className="fas fa-sync-alt"></i>
-                            Actualizar
-                        </button>
-                    </div>
-                </div>
+      <main className="management-content">
+        <div className="content-header">
+          <div className="stats-container">
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-hospital"></i>
+              </div>
+              <div className="stat-info">
+                <h3>{areas.length}</h3>
+                <p>Áreas Médicas</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-door-open"></i>
+              </div>
+              <div className="stat-info">
+                <h3>{consultorios.length}</h3>
+                <p>Total Consultorios</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-check-circle"></i>
+              </div>
+              <div className="stat-info">
+                <h3>{areas.filter(a => a.ck_estado === 'ACTIVO').length}</h3>
+                <p>Áreas Activas</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <i className="fas fa-times-circle"></i>
+              </div>
+              <div className="stat-info">
+                <h3>{areas.filter(a => a.ck_estado === 'INACTIVO').length}</h3>
+                <p>Áreas Inactivas</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {/* Paleta de colores de demostración - solo se muestra si hay menos de 8 áreas */}
-                {areas.length < 8 && (
-                    <div className="color-palette-demo">
-                        <h3>Paleta de Colores para Áreas Médicas</h3>
-                        <p className="palette-description">
-                            Las primeras 8 áreas tendrán colores únicos asignados automáticamente:
-                        </p>
-                        <div className="palette-grid">
-                            {areaColorPalette.map((palette, index) => {
-                                const areaNames = ['Medicina General', 'Pediatría', 'Cardiología', 'Dermatología', 'Ginecología', 'Oftalmología', 'Ortopedia', 'Psiquiatría'];
-                                return (
-                                    <div key={index} className="palette-item" style={{ background: palette.gradient }}>
-                                        <span className="palette-number">{index + 1}</span>
-                                        <span className="palette-name">{areaNames[index]}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
+        {/* Barra de búsqueda y acciones */}
+        <div className="search-and-actions">
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Buscar áreas..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="search-input"
+            />
+            <i className="fas fa-search search-icon"></i>
+          </div>
+          <div className="actions-bar">
+            <button onClick={handleAddArea} className="btn primary">
+              <i className="fas fa-plus"></i>
+              Añadir Área
+            </button>
+            <button onClick={loadData} className="btn secondary">
+              <i className="fas fa-sync-alt"></i>
+              Actualizar
+            </button>
+          </div>
+        </div>
 
-                <div className="areas-grid">
-                    {filteredAreas.map((area) => {
-                        const areaConsultorios = getConsultoriosByArea(area.uk_area);
-                        const { icono, color, gradient } = getAreaUI(area.s_nombre_area);
-
-                        return (
-                            <div key={area.uk_area} className="area-card">
-                                <div className="area-header" style={{ background: gradient }}>
-                                    <div className="area-icon">
-                                        <i className={icono}></i>
-                                    </div>
-                                    <div className="area-info">
-                                        <h2>{area.s_nombre_area}</h2>
-                                        <p>{areaConsultorios.length} consultorios</p>
-                                        <span className={`status-badge ${area.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
-                                            {RECORD_STATUS_LABELS[area.ck_estado]}
-                                        </span>
-                                    </div>
-                                    <div className="area-tools">
-                                        <button
-                                            className="btn small"
-                                            onClick={() => handleEditArea(area)}
-                                            title="Editar área"
-                                        >
-                                            <i className="fas fa-edit"></i>
-                                        </button>
-                                        <button
-                                            className="btn danger small"
-                                            onClick={() => handleDeleteArea(area)}
-                                            title="Eliminar área"
-                                        >
-                                            <i className="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="consultorios-list">
-                                    {areaConsultorios.map((consultorio) => (
-                                        <div key={consultorio.uk_consultorio} className="consultorio-item">
-                                            <div className="consultorio-info">
-                                                <div className="consultorio-number">
-                                                    <i className="fas fa-door-open"></i>
-                                                    <span>Consultorio {consultorio.i_numero_consultorio}</span>
-                                                </div>
-                                                <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
-                                                    {RECORD_STATUS_LABELS[consultorio.ck_estado]}
-                                                </span>
-                                            </div>
-                                            <div className="consultorio-actions">
-                                                <button
-                                                    className="btn small"
-                                                    onClick={() => handleEditConsultorio(consultorio)}
-                                                    title="Editar consultorio"
-                                                >
-                                                    <i className="fas fa-edit"></i>
-                                                </button>
-                                                <button
-                                                    className="btn danger small"
-                                                    onClick={() => handleDeleteConsultorio(consultorio)}
-                                                    title="Eliminar consultorio"
-                                                >
-                                                    <i className="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    <div className="consultorio-add-container">
-                                        <button
-                                            className="btn primary"
-                                            onClick={() => handleAddConsultorio(area.uk_area)}
-                                        >
-                                            <i className="fas fa-plus"></i>
-                                            Añadir Consultorio
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {filteredAreas.length === 0 && (
-                    <div className="empty-state">
-                        <i className="fas fa-hospital"></i>
-                        <p>{searchTerm ? 'No se encontraron áreas' : 'No hay áreas registradas'}</p>
-                    </div>
-                )}
-            </main>
-
-            {/* Modal para crear/editar área */}
-            {showAreaForm && (
-                <div className="modal-overlay" onClick={() => setShowAreaForm(false)}>
-                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>{editingArea ? 'Editar Área' : 'Nueva Área Médica'}</h3>
-                            <button className="btn small" onClick={() => setShowAreaForm(false)}>
-                                <i className="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmitArea} className="modal-body">
-                            <div className="form-group">
-                                <label>Nombre del Área *</label>
-                                <input
-                                    type="text"
-                                    name="s_nombre_area"
-                                    value={formData.s_nombre_area}
-                                    onChange={handleInputChange}
-                                    placeholder="Ej: Medicina General"
-                                    required
-                                    maxLength={100}
-                                />
-                            </div>
-                            <div className="modal-actions">
-                                <button type="button" className="btn" onClick={() => setShowAreaForm(false)}>
-                                    Cancelar
-                                </button>
-                                <button type="submit" className="btn primary">
-                                    <i className="fas fa-check"></i>
-                                    {editingArea ? 'Actualizar' : 'Crear'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal para crear/editar consultorio */}
-            {Object.entries(showConsultorioForm).map(([areaId, isOpen]) => {
-                if (!isOpen) return null;
-
-                const area = areas.find(a => a.uk_area === areaId);
-                if (!area) return null;
-
+        {/* Paleta de colores de demostración - solo se muestra si hay menos de 8 áreas */}
+        {areas.length < 8 && (
+          <div className="color-palette-demo">
+            <h3>Paleta de Colores para Áreas Médicas</h3>
+            <p className="palette-description">
+              Las primeras 8 áreas tendrán colores únicos asignados automáticamente:
+            </p>
+            <div className="palette-grid">
+              {areaColorPalette.map((palette, index) => {
+                const areaNames = ['Medicina General', 'Pediatría', 'Cardiología', 'Dermatología', 'Ginecología', 'Oftalmología', 'Ortopedia', 'Psiquiatría'];
                 return (
-                    <div key={areaId} className="modal-overlay" onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}>
-                        <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-                            <div className="modal-header">
-                                <h3>
-                                    {editingConsultorio ? 'Editar Consultorio' : 'Nuevo Consultorio'} · {area.s_nombre_area}
-                                </h3>
-                                <button
-                                    className="btn small"
-                                    onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
-                                >
-                                    <i className="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <form onSubmit={handleSubmitConsultorio} className="modal-body">
-                                <div className="form-group">
-                                    <label>Número de Consultorio *</label>
-                                    <input
-                                        type="number"
-                                        name="i_numero_consultorio"
-                                        value={formData.i_numero_consultorio}
-                                        onChange={handleInputChange}
-                                        placeholder="Ej: 1"
-                                        required
-                                        min="1"
-                                        max="999"
-                                    />
-                                </div>
-                                <div className="modal-actions">
-                                    <button
-                                        type="button"
-                                        className="btn"
-                                        onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button type="submit" className="btn primary">
-                                        <i className="fas fa-check"></i>
-                                        {editingConsultorio ? 'Actualizar' : 'Crear'}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                  <div key={index} className="palette-item" style={{ background: palette.gradient }}>
+                    <span className="palette-number">{index + 1}</span>
+                    <span className="palette-name">{areaNames[index]}</span>
+                  </div>
                 );
-            })}
+              })}
+            </div>
+          </div>
+        )}
 
-            <style>{`
+        <div className="areas-grid">
+          {filteredAreas.map((area) => {
+            const areaConsultorios = getConsultoriosByArea(area.uk_area);
+            const { icono, color, gradient } = getAreaUI(area.s_nombre_area);
+
+            return (
+              <div key={area.uk_area} className="area-card">
+                <div className="area-header" style={{ background: gradient }}>
+                  <div className="area-icon">
+                    <i className={icono}></i>
+                  </div>
+                  <div className="area-info">
+                    <h2>{area.s_nombre_area}</h2>
+                    <p>{areaConsultorios.length} consultorios</p>
+                    <span className={`status-badge ${area.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
+                      {RECORD_STATUS_LABELS[area.ck_estado]}
+                    </span>
+                  </div>
+                  <div className="area-tools">
+                    <button
+                      className="btn small"
+                      onClick={() => handleEditArea(area)}
+                      title="Editar área"
+                    >
+                      <i className="fas fa-edit"></i>
+                    </button>
+                    <button
+                      className="btn danger small"
+                      onClick={() => handleDeleteArea(area)}
+                      title="Eliminar área"
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="consultorios-list">
+                  {areaConsultorios.map((consultorio) => (
+                    <div key={consultorio.uk_consultorio} className="consultorio-item">
+                      <div className="consultorio-info">
+                        <div className="consultorio-number">
+                          <i className="fas fa-door-open"></i>
+                          <span>Consultorio {consultorio.i_numero_consultorio}</span>
+                        </div>
+                        <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
+                          {RECORD_STATUS_LABELS[consultorio.ck_estado]}
+                        </span>
+                      </div>
+                      <div className="consultorio-actions">
+                        <button
+                          className="btn small"
+                          onClick={() => handleEditConsultorio(consultorio)}
+                          title="Editar consultorio"
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
+                        <button
+                          className="btn danger small"
+                          onClick={() => handleDeleteConsultorio(consultorio)}
+                          title="Eliminar consultorio"
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="consultorio-add-container">
+                    <button
+                      className="btn primary"
+                      onClick={() => handleAddConsultorio(area.uk_area)}
+                    >
+                      <i className="fas fa-plus"></i>
+                      Añadir Consultorio
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {filteredAreas.length === 0 && (
+          <div className="empty-state">
+            <i className="fas fa-hospital"></i>
+            <p>{searchTerm ? 'No se encontraron áreas' : 'No hay áreas registradas'}</p>
+          </div>
+        )}
+      </main>
+
+      {/* Modal para crear/editar área */}
+      {showAreaForm && (
+        <div className="modal-overlay" onClick={() => setShowAreaForm(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{editingArea ? 'Editar Área' : 'Nueva Área Médica'}</h3>
+              <button className="btn small" onClick={() => setShowAreaForm(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <form onSubmit={handleSubmitArea} className="modal-body">
+              <div className="form-group">
+                <label>Nombre del Área *</label>
+                <input
+                  type="text"
+                  name="s_nombre_area"
+                  value={formData.s_nombre_area}
+                  onChange={handleInputChange}
+                  placeholder="Ej: Medicina General"
+                  required
+                  maxLength={100}
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn" onClick={() => setShowAreaForm(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn primary">
+                  <i className="fas fa-check"></i>
+                  {editingArea ? 'Actualizar' : 'Crear'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para crear/editar consultorio */}
+      {Object.entries(showConsultorioForm).map(([areaId, isOpen]) => {
+        if (!isOpen) return null;
+
+        const area = areas.find(a => a.uk_area === areaId);
+        if (!area) return null;
+
+        return (
+          <div key={areaId} className="modal-overlay" onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>
+                  {editingConsultorio ? 'Editar Consultorio' : 'Nuevo Consultorio'} · {area.s_nombre_area}
+                </h3>
+                <button
+                  className="btn small"
+                  onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+              <form onSubmit={handleSubmitConsultorio} className="modal-body">
+                <div className="form-group">
+                  <label>Número de Consultorio *</label>
+                  <input
+                    type="number"
+                    name="i_numero_consultorio"
+                    value={formData.i_numero_consultorio}
+                    onChange={handleInputChange}
+                    placeholder="Ej: 1"
+                    required
+                    min="1"
+                    max="999"
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => setShowConsultorioForm(prev => ({ ...prev, [areaId]: false }))}
+                  >
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn primary">
+                    <i className="fas fa-check"></i>
+                    {editingConsultorio ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      })}
+
+      <style>{`
         .consultorio-management {
           min-height: 100vh;
           background: #f8fafc;
@@ -1260,8 +1231,8 @@ const ConsultorioManagement = () => {
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default ConsultorioManagement;
