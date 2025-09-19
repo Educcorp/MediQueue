@@ -253,7 +253,7 @@ const TurnManager = () => {
   };
 
   const getPatientName = (uk_paciente) => {
-    if (!uk_paciente) return 'Sin paciente';
+    if (!uk_paciente) return 'Invitado';
     const patient = patients.find(p => p.uk_paciente === uk_paciente);
     return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Paciente no encontrado';
   };
