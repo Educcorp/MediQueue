@@ -331,7 +331,7 @@
 
 .input-icon {
     position: absolute;
-    left: 16px;
+    left: 14px;
     color: #6c757d;
     font-size: 16px;
     z-index: 2;
@@ -368,15 +368,20 @@
     opacity: 0.5;
 }
 
+/* Email input specific styling */
+.input-with-icon:has(.input-icon:not(.password-toggle-icon)) .form-input {
+    padding-left: 60px;
+}
+
 /* Password input specific styling */
 .input-with-icon:has(.password-toggle-icon) .form-input {
     padding-right: 50px;
-    padding-left: 50px;
+    padding-left: 60px;
 }
 
 .form-input {
     width: 100%;
-    padding: 18px 50px 18px 50px;
+    padding: 18px 50px 18px 60px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.15);
@@ -392,8 +397,6 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
     z-index: 1;
-    text-indent: 0;
-    padding-left: 50px;
 }
 
 .form-input:focus {

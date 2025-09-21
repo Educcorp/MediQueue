@@ -166,7 +166,7 @@ const AdminLogin = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Correo electrónico"
+                placeholder="Correo"
                 disabled={isLoading}
                 required
               />
