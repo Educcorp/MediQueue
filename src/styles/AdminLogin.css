@@ -331,18 +331,19 @@
 
 .input-icon {
     position: absolute;
-    left: 18px;
+    left: 16px;
     color: #6c757d;
     font-size: 16px;
     z-index: 2;
     transition: color 0.3s ease;
     top: 50%;
     transform: translateY(-50%);
+    pointer-events: none;
 }
 
 .password-toggle-icon {
     position: absolute;
-    right: 18px;
+    right: 16px;
     background: none;
     border: none;
     color: #6c757d;
@@ -370,6 +371,7 @@
 /* Password input specific styling */
 .input-with-icon:has(.password-toggle-icon) .form-input {
     padding-right: 50px;
+    padding-left: 50px;
 }
 
 .form-input {
@@ -390,6 +392,8 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
     z-index: 1;
+    text-indent: 0;
+    padding-left: 50px;
 }
 
 .form-input:focus {
