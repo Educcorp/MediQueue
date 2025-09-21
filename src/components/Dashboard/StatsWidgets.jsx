@@ -134,3 +134,4 @@ const StatsWidgets = ({ stats, loading }) => {
 };
 
 export default StatsWidgets;
+
