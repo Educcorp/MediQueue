@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AdminLogin.css';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    remember: false
+    password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [randomGif, setRandomGif] = useState('');
-  const [loginType, setLoginType] = useState('email'); // 'email' o 'usuario'
 
   // Referencias para animaciones
   const formRef = useRef(null);
@@ -25,7 +24,7 @@ const AdminLogin = () => {
     'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cjdqNTBzcDEyM3MzNW44NGFoaTYzdHIwemVhc3NpamxobGxucXBqdiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/fqgf6H21b2we0cu1he/giphy.gif'
   ];
 
-  const { login, loginByUsuario, isAuthenticated, error, clearError } = useAuth();
+  const { login, isAuthenticated, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   // Redirigir si ya está autenticado
@@ -70,12 +69,6 @@ const AdminLogin = () => {
     setShowPassword(!showPassword);
   };
 
-  const toggleLoginType = () => {
-    setLoginType(prev => prev === 'email' ? 'usuario' : 'email');
-    setFormData(prev => ({ ...prev, email: '' }));
-    setLocalError(null);
-    clearError();
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,29 +79,17 @@ const AdminLogin = () => {
       return;
     }
 
-    // Validar email o username según el tipo
-    if (loginType === 'email') {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        setLocalError('Por favor, ingrese un email válido');
-        return;
-      }
-    } else {
-      if (formData.email.length < 3) {
-        setLocalError('El usuario debe tener al menos 3 caracteres');
-        return;
-      }
+    // Validar email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setLocalError('Por favor, ingrese un email válido');
+      return;
     }
 
     setIsLoading(true);
     setLocalError(null);
 
     try {
-      let result;
-      if (loginType === 'email') {
-        result = await login(formData.email, formData.password, formData.remember);
-      } else {
-        result = await loginByUsuario(formData.email, formData.password, formData.remember);
-      }
+      const result = await login(formData.email, formData.password, false);
 
       if (result.success) {
         navigate('/admin/dashboard');
@@ -127,36 +108,6 @@ const AdminLogin = () => {
   return (
     <div className="elearning-login">
       <div className="background-image"></div>
-
-      {/* Transparent Header */}
-      <div className="transparent-header">
-        <div className="header-content">
-          <div className="logo-section">
-            <img
-              src="/images/mediqueue_logo.png"
-              alt="MediQueue Logo"
-              className="header-logo"
-            />
-            <span className="logo-text">MediQueue®</span>
-          </div>
-          <div className="header-nav">
-            <div className="nav-item">
-              Sistema <span className="dropdown-arrow">▼</span>
-            </div>
-            <div className="nav-item">
-              Soluciones Médicas <span className="dropdown-arrow">▼</span>
-            </div>
-            <div className="nav-item">Acerca de</div>
-            <div className="nav-item">Insights</div>
-            <div className="nav-item">Contacto</div>
-          </div>
-          <div className="header-right">
-            <div className="language-selector">ESP</div>
-            <div className="login-link">
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Left Content */}
       <div className="left-content">
@@ -196,23 +147,6 @@ const AdminLogin = () => {
           </div>
         </div>
 
-        {/* Login Type Toggle */}
-        <div className="login-type-toggle">
-          <button
-            type="button"
-            className={`toggle-btn ${loginType === 'email' ? 'active' : ''}`}
-            onClick={() => setLoginType('email')}
-          >
-            Email
-          </button>
-          <button
-            type="button"
-            className={`toggle-btn ${loginType === 'usuario' ? 'active' : ''}`}
-            onClick={() => setLoginType('usuario')}
-          >
-            Usuario
-          </button>
-        </div>
 
         {/* Error Message */}
         {currentError && (
@@ -224,49 +158,42 @@ const AdminLogin = () => {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <input
-              type="text"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="form-input"
-              placeholder={loginType === 'email' ? "Correo electrónico" : "Nombre de usuario"}
-              disabled={isLoading}
-              required
-            />
+            <div className="input-with-icon">
+              <FaEnvelope className="input-icon" />
+              <input
+                type="text"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="Correo electrónico"
+                disabled={isLoading}
+                required
+              />
+            </div>
           </div>
           <div className="form-group">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="Contraseña"
-              disabled={isLoading}
-              required
-            />
-            <button
-              type="button"
-              className="password-toggle"
-              onClick={togglePasswordVisibility}
-              disabled={isLoading}
-            >
-              {showPassword ? '👁️' : '👁️‍🗨️'}
-            </button>
-          </div>
-          <div className="form-group checkbox-group">
-            <label className="checkbox-label">
+            <div className="input-with-icon">
+              <FaLock className="input-icon" />
               <input
-                type="checkbox"
-                name="remember"
-                checked={formData.remember}
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
+                className="form-input"
+                placeholder="Contraseña"
                 disabled={isLoading}
+                required
               />
-              <span className="checkmark"></span>
-              Recordarme
-            </label>
+              <button
+                type="button"
+                className="password-toggle-icon"
+                onClick={togglePasswordVisibility}
+                disabled={isLoading}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
@@ -281,12 +208,6 @@ const AdminLogin = () => {
           </button>
         </form>
 
-        {/* Footer Links */}
-        <div className="login-footer">
-          <Link to="/" className="footer-link">
-            ← Volver al inicio
-          </Link>
-        </div>
       </div>
     </div>
   );

@@ -322,9 +322,59 @@
     overflow: hidden;
 }
 
+/* Input with icon container */
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 18px;
+    color: #6c757d;
+    font-size: 16px;
+    z-index: 2;
+    transition: color 0.3s ease;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 18px;
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 2;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.password-toggle-icon:hover {
+    color: #77b8ce;
+}
+
+.password-toggle-icon:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Password input specific styling */
+.input-with-icon:has(.password-toggle-icon) .form-input {
+    padding-right: 50px;
+}
+
 .form-input {
     width: 100%;
-    padding: 18px 16px;
+    padding: 18px 50px 18px 50px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.15);
@@ -350,6 +400,17 @@
         0 8px 25px rgba(119, 184, 206, 0.3),
         0 4px 15px rgba(0, 0, 0, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.form-input:focus+.input-icon,
+.input-with-icon:focus-within .input-icon {
+    color: #77b8ce;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.input-icon:hover {
+    color: #77b8ce;
+    transform: translateY(-50%) scale(1.05);
 }
 
 .form-input:hover:not(:focus) {
