@@ -4,6 +4,8 @@ import HomePage from './pages/HomePage'
 import TakeTurn from './pages/TakeTurn'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import ModernAdminDashboard from './pages/ModernAdminDashboard'
+import DashboardDemo from './components/Common/DashboardDemo'
 import AdminUsersPage from './pages/AdminUsersPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
 import ConsultorioManagement from './pages/ConsultorioManagement'
@@ -25,8 +27,17 @@ function App() {
 
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/demo" element={<DashboardDemo />} />
         <Route
           path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <ModernAdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard-classic"
           element={
             <ProtectedRoute>
               <AdminDashboard />
