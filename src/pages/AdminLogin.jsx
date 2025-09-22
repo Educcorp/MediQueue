@@ -147,6 +147,12 @@ const AdminLogin = () => {
           </div>
         </div>
 
+        {/* Welcome Messages */}
+        <div className="welcome-messages">
+          <h2 className="admin-title">Panel de Administración</h2>
+          <p className="welcome-text">El Sistema les da la Bienvenida</p>
+        </div>
+
 
         {/* Error Message */}
         {currentError && (
