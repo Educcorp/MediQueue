@@ -2,9 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --primary-medical: #77b8ce;
+    --primary-medical: #2f97d1;
     --secondary-medical: #6c757d;
-    --accent-medical: #0b84c9;
+    --accent-medical: #2f97d1;
     --success-color: #28a745;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
@@ -120,12 +120,12 @@
 .action-btn.primary {
     background: linear-gradient(135deg, var(--primary-medical), var(--accent-medical));
     color: white;
-    box-shadow: 0 4px 12px rgba(119, 184, 206, 0.3);
+    box-shadow: 0 4px 12px rgba(47, 151, 209, 0.3);
 }
 
 .action-btn.primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(119, 184, 206, 0.4);
+    box-shadow: 0 6px 16px rgba(47, 151, 209, 0.4);
 }
 
 .action-btn.secondary {
@@ -135,7 +135,7 @@
 }
 
 .action-btn.secondary:hover {
-    background: rgba(119, 184, 206, 0.1);
+    background: rgba(47, 151, 209, 0.1);
     border-color: var(--primary-medical);
     color: var(--primary-medical);
     transform: translateY(-1px);
@@ -207,7 +207,7 @@
     font-size: 20px;
     color: white;
     background: linear-gradient(135deg, var(--primary-medical), var(--accent-medical));
-    box-shadow: 0 4px 12px rgba(119, 184, 206, 0.3);
+    box-shadow: 0 4px 12px rgba(47, 151, 209, 0.3);
 }
 
 .stat-card.success .stat-icon {
@@ -367,7 +367,7 @@
 }
 
 .card-action:hover {
-    background: rgba(119, 184, 206, 0.2);
+    background: rgba(47, 151, 209, 0.2);
     color: var(--primary-medical);
     transform: translateY(-1px);
 }
@@ -404,7 +404,7 @@
 }
 
 .activity-item:hover {
-    background: rgba(119, 184, 206, 0.1);
+    background: rgba(47, 151, 209, 0.1);
     transform: translateX(4px);
 }
 

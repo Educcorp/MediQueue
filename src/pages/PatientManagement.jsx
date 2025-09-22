@@ -5,7 +5,29 @@ import AdminHeader from '../components/Common/AdminHeader';
 import patientService from '../services/patientService';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
 import { formatDate, calculateAge, formatPhone } from '../utils/helpers';
-import '../styles/AdminPages.css';
+import '../styles/UnifiedAdminPages.css';
+
+// React Icons
+import {
+  FaUsers,
+  FaUserCheck,
+  FaUserTimes,
+  FaEnvelope,
+  FaEdit,
+  FaTrash,
+  FaPlus,
+  FaSync,
+  FaSearch,
+  FaFilter,
+  FaUser,
+  FaPhone,
+  FaBirthdayCake,
+  FaCalendarAlt,
+  FaExclamationTriangle,
+  FaTimes,
+  FaCheck,
+  FaEye
+} from 'react-icons/fa';
 
 const PatientManagement = () => {
   const { user, logout } = useAuth();
@@ -42,11 +64,6 @@ const PatientManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/admin');
   };
 
   const handleAddNew = () => {
@@ -159,884 +176,470 @@ const PatientManagement = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Calcular estadísticas
+  const activePatients = patients.filter(p => p.ck_estado === 'ACTIVO').length;
+  const inactivePatients = patients.filter(p => p.ck_estado === 'INACTIVO').length;
+  const patientsWithEmail = patients.filter(p => p.s_email).length;
+
   if (loading) {
     return (
-      <div className="patient-management loading">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Cargando pacientes...</p>
+      <div className="admin-page-unified">
+        <AdminHeader />
+        <div className="loading-overlay">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Cargando pacientes...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="patient-management">
+    <div className="admin-page-unified">
       <AdminHeader />
-      <div className="page-content-wrapper">
+      
+      <div className="admin-container">
+        {/* Page Header */}
+        <div className="page-header">
+          <div className="page-header-icon">
+            <FaUsers />
+          </div>
+          <div className="page-header-content">
+            <h1 className="page-title">Gestión de Pacientes</h1>
+            <p className="page-subtitle">
+              Administra la base de datos de pacientes - {patients.length} registros encontrados
+            </p>
+          </div>
+          <div className="page-actions">
+            <button className="btn btn-secondary" onClick={loadPatients}>
+              <FaSync /> Actualizar
+            </button>
+            <button className="btn btn-primary" onClick={handleAddNew}>
+              <FaPlus /> Nuevo Paciente
+            </button>
+          </div>
+        </div>
 
+        {/* Error Message */}
         {error && (
-          <div className="error-banner">
-            <span>⚠️ {error}</span>
-            <button onClick={loadPatients} className="retry-btn">
-              Reintentar
+          <div className="error-message">
+            <FaExclamationTriangle />
+            <span>{error}</span>
+            <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+              <FaTimes />
             </button>
           </div>
         )}
 
-        <main className="management-content">
-          <div className="content-header">
-            <div className="stats-container">
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-users"></i>
-                </div>
-                <div className="stat-info">
-                  <h3>{patients.length}</h3>
-                  <p>Total Pacientes</p>
-                </div>
+        {/* Statistics Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--primary-medical), var(--accent-medical))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUsers />
               </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-user-check"></i>
-                </div>
-                <div className="stat-info">
-                  <h3>{patients.filter(p => p.ck_estado === 'ACTIVO').length}</h3>
-                  <p>Pacientes Activos</p>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-user-times"></i>
-                </div>
-                <div className="stat-info">
-                  <h3>{patients.filter(p => p.ck_estado === 'INACTIVO').length}</h3>
-                  <p>Pacientes Inactivos</p>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-envelope"></i>
-                </div>
-                <div className="stat-info">
-                  <h3>{patients.filter(p => p.s_email).length}</h3>
-                  <p>Con Email</p>
-                </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {patients.length}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Total Pacientes
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Barra de búsqueda y filtros */}
-          <div className="search-and-filters">
-            <div className="search-bar">
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--success-color), #20c997)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUserCheck />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {activePatients}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Pacientes Activos
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--danger-color), #c82333)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUserTimes />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {inactivePatients}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Pacientes Inactivos
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--info-color), var(--primary-medical))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaEnvelope />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {patientsWithEmail}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Con Email
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters Section */}
+        <div className="filters-section">
+          <div className="filter-group" style={{ flex: '1', maxWidth: '400px' }}>
+            <label>Buscar Pacientes</label>
+            <div style={{ position: 'relative' }}>
               <input
                 type="text"
-                placeholder="Buscar pacientes..."
+                placeholder="Buscar por nombre, teléfono o email..."
                 value={searchTerm}
                 onChange={handleSearch}
-                className="search-input"
+                className="form-control"
+                style={{ paddingLeft: '40px' }}
               />
-              <i className="fas fa-search search-icon"></i>
+              <FaSearch style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)'
+              }} />
             </div>
-            <div className="filters">
-              <select
-                value={statusFilter}
-                onChange={handleStatusFilter}
-                className="filter-select"
-              >
-                <option value="todos">Todos los estados</option>
-                <option value="ACTIVO">Activos</option>
-                <option value="INACTIVO">Inactivos</option>
-              </select>
-            </div>
-            <div className="actions-bar">
-              <button onClick={handleAddNew} className="btn primary">
-                <i className="fas fa-plus"></i>
-                Nuevo Paciente
+          </div>
+          <div className="filter-group">
+            <label>Estado</label>
+            <select
+              value={statusFilter}
+              onChange={handleStatusFilter}
+              className="form-control"
+            >
+              <option value="todos">Todos los estados</option>
+              <option value="ACTIVO">Activos</option>
+              <option value="INACTIVO">Inactivos</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <button className="btn btn-secondary">
+              <FaFilter /> Aplicar Filtros
+            </button>
+          </div>
+        </div>
+
+        {/* Patients Table */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FaUsers />
+              Lista de Pacientes
+            </h3>
+            <div className="card-actions">
+              <button className="card-action" title="Ver detalles">
+                <FaEye />
               </button>
-              <button onClick={loadPatients} className="btn secondary">
-                <i className="fas fa-sync-alt"></i>
-                Actualizar
+              <button className="card-action" title="Filtros">
+                <FaFilter />
               </button>
             </div>
           </div>
-
-          <div className="patients-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Teléfono</th>
-                  <th>Email</th>
-                  <th>Edad</th>
-                  <th>Estado</th>
-                  <th>Fecha Registro</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPatients.map(patient => (
-                  <tr key={patient.uk_paciente}>
-                    <td>
-                      <div className="patient-name">
-                        <strong>{patient.s_nombre} {patient.s_apellido}</strong>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="phone-number">
-                        {formatPhone(patient.c_telefono)}
-                      </span>
-                    </td>
-                    <td>
-                      {patient.s_email ? (
-                        <span className="email">{patient.s_email}</span>
-                      ) : (
-                        <span className="no-email">No registrado</span>
-                      )}
-                    </td>
-                    <td>
-                      {patient.d_fecha_nacimiento ? (
-                        <span className="age">{calculateAge(patient.d_fecha_nacimiento)} años</span>
-                      ) : (
-                        <span className="no-age">No registrado</span>
-                      )}
-                    </td>
-                    <td>
-                      <span className={`status-badge ${patient.ck_estado === 'ACTIVO' ? 'active' : 'inactive'}`}>
-                        {RECORD_STATUS_LABELS[patient.ck_estado]}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="registration-date">
-                        {formatDate(patient.d_fecha_creacion)}
-                      </span>
-                    </td>
-                    <td className="actions-cell">
-                      <button
-                        onClick={() => handleEdit(patient)}
-                        className="edit-button"
-                        title="Editar paciente"
-                      >
-                        <i className="fas fa-edit"></i>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(patient)}
-                        className="delete-button"
-                        title="Eliminar paciente"
-                      >
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {filteredPatients.length === 0 && (
+          
+          <div className="card-content" style={{ padding: 0 }}>
+            {filteredPatients.length === 0 ? (
               <div className="empty-state">
-                <i className="fas fa-users"></i>
-                <p>{searchTerm || statusFilter !== 'todos' ? 'No se encontraron pacientes' : 'No hay pacientes registrados'}</p>
+                <FaUsers />
+                <h3>No hay pacientes registrados</h3>
+                <p>
+                  {searchTerm || statusFilter !== 'todos' 
+                    ? 'No se encontraron pacientes con los filtros aplicados' 
+                    : 'No hay pacientes registrados en el sistema'}
+                </p>
+                <button className="btn btn-primary" onClick={handleAddNew}>
+                  <FaPlus /> Registrar Primer Paciente
+                </button>
+              </div>
+            ) : (
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Teléfono</th>
+                      <th>Email</th>
+                      <th>Edad</th>
+                      <th>Estado</th>
+                      <th>Fecha Registro</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPatients.map(patient => (
+                      <tr key={patient.uk_paciente}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                            <strong>{patient.s_nombre} {patient.s_apellido}</strong>
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <FaPhone style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                            <span style={{ fontFamily: 'monospace' }}>
+                              {formatPhone(patient.c_telefono)}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          {patient.s_email ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
+                              <span style={{ color: 'var(--primary-medical)' }}>{patient.s_email}</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No registrado</span>
+                          )}
+                        </td>
+                        <td>
+                          {patient.d_fecha_nacimiento ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <FaBirthdayCake style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                              <span>{calculateAge(patient.d_fecha_nacimiento)} años</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No registrado</span>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`status-badge ${patient.ck_estado === 'ACTIVO' ? 'success' : 'secondary'}`}>
+                            {RECORD_STATUS_LABELS[patient.ck_estado] || patient.ck_estado}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <FaCalendarAlt style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                            <span style={{ fontSize: '14px' }}>
+                              {formatDate(patient.d_fecha_creacion)}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              onClick={() => handleEdit(patient)}
+                              className="btn btn-secondary"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Editar paciente"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(patient)}
+                              className="btn btn-danger"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Eliminar paciente"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
-        </main>
+        </div>
+      </div>
 
-        {/* Modal para crear/editar paciente */}
-        {showModal && (
-          <div className="modal-overlay" onClick={() => setShowModal(false)}>
-            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>{editingPatient ? 'Editar Paciente' : 'Nuevo Paciente'}</h3>
-                <button className="btn small" onClick={() => setShowModal(false)}>
-                  <i className="fas fa-times"></i>
-                </button>
-              </div>
-              <form onSubmit={handleSubmit} className="modal-body">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Nombre *</label>
-                    <input
-                      type="text"
-                      name="s_nombre"
-                      value={formData.s_nombre}
-                      onChange={handleInputChange}
-                      placeholder="Nombre del paciente"
-                      required
-                      maxLength={50}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Apellido *</label>
-                    <input
-                      type="text"
-                      name="s_apellido"
-                      value={formData.s_apellido}
-                      onChange={handleInputChange}
-                      placeholder="Apellido del paciente"
-                      required
-                      maxLength={50}
-                    />
-                  </div>
-                </div>
+      {/* Modal para crear/editar paciente */}
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'hidden',
+            boxShadow: 'var(--shadow-xl)'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
+                {editingPatient ? 'Editar Paciente' : 'Nuevo Paciente'}
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  padding: '4px'
+                }}
+              >
+                <FaTimes />
+              </button>
+            </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Teléfono *</label>
-                    <input
-                      type="tel"
-                      name="c_telefono"
-                      value={formData.c_telefono}
-                      onChange={handleInputChange}
-                      placeholder="+57 300 123 4567"
-                      required
-                      maxLength={15}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      name="s_email"
-                      value={formData.s_email}
-                      onChange={handleInputChange}
-                      placeholder="email@ejemplo.com"
-                      maxLength={100}
-                    />
-                  </div>
-                </div>
-
+            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+              <div className="form-row">
                 <div className="form-group">
-                  <label>Fecha de Nacimiento</label>
+                  <label>Nombre *</label>
                   <input
-                    type="date"
-                    name="d_fecha_nacimiento"
-                    value={formData.d_fecha_nacimiento}
+                    type="text"
+                    name="s_nombre"
+                    value={formData.s_nombre}
                     onChange={handleInputChange}
-                    max={new Date().toISOString().split('T')[0]}
+                    placeholder="Nombre del paciente"
+                    className="form-control"
+                    required
+                    maxLength={50}
                   />
                 </div>
-
-                <div className="modal-actions">
-                  <button type="button" className="btn" onClick={() => setShowModal(false)}>
-                    Cancelar
-                  </button>
-                  <button type="submit" className="btn primary">
-                    <i className="fas fa-check"></i>
-                    {editingPatient ? 'Actualizar' : 'Crear'}
-                  </button>
+                <div className="form-group">
+                  <label>Apellido *</label>
+                  <input
+                    type="text"
+                    name="s_apellido"
+                    value={formData.s_apellido}
+                    onChange={handleInputChange}
+                    placeholder="Apellido del paciente"
+                    className="form-control"
+                    required
+                    maxLength={50}
+                  />
                 </div>
-              </form>
-            </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Teléfono *</label>
+                  <input
+                    type="tel"
+                    name="c_telefono"
+                    value={formData.c_telefono}
+                    onChange={handleInputChange}
+                    placeholder="+57 300 123 4567"
+                    className="form-control"
+                    required
+                    maxLength={15}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="s_email"
+                    value={formData.s_email}
+                    onChange={handleInputChange}
+                    placeholder="email@ejemplo.com"
+                    className="form-control"
+                    maxLength={100}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Fecha de Nacimiento</label>
+                <input
+                  type="date"
+                  name="d_fecha_nacimiento"
+                  value={formData.d_fecha_nacimiento}
+                  onChange={handleInputChange}
+                  className="form-control"
+                  max={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
+                  Cancelar
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  <FaCheck />
+                  {editingPatient ? 'Actualizar' : 'Crear'}
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-
-        <style>{`
-        .patient-management {
-          min-height: 100vh;
-          background: #f8fafc;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .patient-management.loading {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .loading-container {
-          text-align: center;
-          color: #718096;
-        }
-
-        .loading-spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #e2e8f0;
-          border-top: 4px solid #667eea;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 20px auto;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .error-banner {
-          background: #fed7d7;
-          color: #c53030;
-          padding: 15px 20px;
-          margin: 20px;
-          border-radius: 8px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          box-shadow: 0 2px 10px rgba(197, 48, 48, 0.1);
-        }
-
-        .retry-btn {
-          background: #c53030;
-          color: white;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.3s ease;
-        }
-
-        .retry-btn:hover {
-          background: #9c2626;
-          transform: translateY(-1px);
-        }
-
-        .management-header {
-          background: white;
-          border-bottom: 1px solid #e2e8f0;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-          padding: 20px;
-        }
-
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .header-logo-section {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .header-logo-container {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .header-logo-image {
-          width: 40px;
-          height: 40px;
-          object-fit: contain;
-        }
-
-        .header-logo-text-group {
-          display: flex;
-          align-items: baseline;
-        }
-
-        .header-logo-text {
-          font-size: 1.5em;
-          font-weight: 700;
-          color: #2d3748;
-        }
-
-        .header-logo-text2 {
-          font-size: 1.5em;
-          font-weight: 700;
-          color: #667eea;
-        }
-
-        .header-subtitle h1 {
-          margin: 0;
-          color: #2d3748;
-          font-size: 1.8em;
-        }
-
-        .header-subtitle p {
-          margin: 5px 0 0 0;
-          color: #718096;
-        }
-
-        .header-right {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .back-btn {
-          background: #f1f5f9;
-          border: 1px solid #cbd5e0;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          color: #4a5568;
-          text-decoration: none;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .back-btn:hover {
-          background: #e2e8f0;
-        }
-
-        .admin-name {
-          color: #4a5568;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .logout-btn {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .logout-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 5px 15px rgba(197, 48, 48, 0.3);
-        }
-
-        .management-content {
-          padding: 40px 20px;
-        }
-
-        .content-header {
-          margin-bottom: 30px;
-        }
-
-        .stats-container {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 20px;
-        }
-
-        .stat-card {
-          background: white;
-          border-radius: 12px;
-          padding: 20px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        .stat-icon {
-          width: 50px;
-          height: 50px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5em;
-          color: white;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .stat-info h3 {
-          margin: 0;
-          font-size: 2em;
-          font-weight: 700;
-          color: #2d3748;
-        }
-
-        .stat-info p {
-          margin: 0;
-          color: #718096;
-          font-weight: 500;
-        }
-
-        .search-and-filters {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 30px;
-          gap: 20px;
-        }
-
-        .search-bar {
-          position: relative;
-          flex: 1;
-          max-width: 400px;
-        }
-
-        .search-input {
-          width: 100%;
-          padding: 12px 16px 12px 40px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .search-icon {
-          position: absolute;
-          left: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #a0aec0;
-        }
-
-        .filters {
-          display: flex;
-          gap: 15px;
-        }
-
-        .filter-select {
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-          background: white;
-        }
-
-        .filter-select:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .actions-bar {
-          display: flex;
-          gap: 15px;
-        }
-
-        .btn {
-          padding: 12px 20px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          text-decoration: none;
-        }
-
-        .btn.primary {
-          background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-          color: white;
-        }
-
-        .btn.primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
-        }
-
-        .btn.secondary {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
-          color: #4a5568;
-        }
-
-        .btn.secondary:hover {
-          background: #edf2f7;
-        }
-
-        .btn.small {
-          padding: 8px 12px;
-          font-size: 0.9em;
-        }
-
-        .patients-table {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          overflow: hidden;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th {
-          background: #f7fafc;
-          padding: 15px 20px;
-          text-align: left;
-          font-weight: 600;
-          color: #4a5568;
-          border-bottom: 1px solid #e2e8f0;
-        }
-
-        td {
-          padding: 15px 20px;
-          border-bottom: 1px solid #f1f5f9;
-        }
-
-        tr:hover {
-          background: #f8fafc;
-        }
-
-        .patient-name {
-          font-weight: 600;
-          color: #2d3748;
-        }
-
-        .phone-number {
-          font-family: monospace;
-          color: #4a5568;
-        }
-
-        .email {
-          color: #667eea;
-        }
-
-        .no-email, .no-age {
-          color: #a0aec0;
-          font-style: italic;
-        }
-
-        .age {
-          color: #4a5568;
-          font-weight: 500;
-        }
-
-        .status-badge {
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.8em;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-
-        .status-badge.active {
-          background: #c6f6d5;
-          color: #22543d;
-        }
-
-        .status-badge.inactive {
-          background: #fed7d7;
-          color: #742a2a;
-        }
-
-        .registration-date {
-          color: #718096;
-          font-size: 0.9em;
-        }
-
-        .actions-cell {
-          display: flex;
-          gap: 8px;
-        }
-
-        .edit-button {
-          background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-          color: white;
-          border: none;
-          padding: 8px 12px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.9em;
-          transition: all 0.3s ease;
-        }
-
-        .edit-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
-        }
-
-        .delete-button {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 8px 12px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.9em;
-          transition: all 0.3s ease;
-        }
-
-        .delete-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(197, 48, 48, 0.3);
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 60px 20px;
-          color: #718096;
-        }
-
-        .empty-state i {
-          font-size: 3em;
-          margin-bottom: 20px;
-          opacity: 0.5;
-        }
-
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-
-        .modal-card {
-          background: white;
-          border-radius: 12px;
-          width: 90%;
-          max-width: 600px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-          padding: 20px;
-          border-bottom: 1px solid #e2e8f0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .modal-header h3 {
-          margin: 0;
-          color: #2d3748;
-        }
-
-        .modal-body {
-          padding: 20px;
-        }
-
-        .form-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 20px;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .form-group label {
-          font-weight: 600;
-          color: #4a5568;
-        }
-
-        .form-group input {
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .modal-actions {
-          display: flex;
-          gap: 15px;
-          justify-content: flex-end;
-          margin-top: 30px;
-        }
-
-        .modal-actions button {
-          padding: 12px 24px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .modal-actions button[type="button"] {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
-          color: #4a5568;
-        }
-
-        .modal-actions button[type="button"]:hover {
-          background: #edf2f7;
-        }
-
-        .modal-actions button.primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-        }
-
-        .modal-actions button.primary:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        @media (max-width: 768px) {
-          .header-left {
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-          }
-
-          .header-right {
-            flex-direction: column;
-            gap: 10px;
-          }
-
-          .search-and-filters {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .actions-bar {
-            justify-content: center;
-          }
-
-          .patients-table {
-            overflow-x: auto;
-          }
-
-          .actions-cell {
-            flex-direction: column;
-            gap: 5px;
-          }
-
-          .form-row {
-            grid-template-columns: 1fr;
-            gap: 15px;
-          }
-
-          .modal-card {
-            width: 95%;
-            margin: 10px;
-          }
-
-          .modal-actions {
-            flex-direction: column;
-          }
-        }
-      `}</style>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default PatientManagement;
-

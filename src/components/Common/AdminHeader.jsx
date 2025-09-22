@@ -164,8 +164,8 @@ const AdminHeader = () => {
         <>
             {/* Header */}
             <header style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                color: '#fff',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                color: '#4a5568',
                 padding: '12px 40px',
                 position: 'fixed',
                 top: 0,
@@ -200,7 +200,7 @@ const AdminHeader = () => {
                             position: 'absolute',
                             width: `${Math.random() * 4 + 2}px`,
                             height: `${Math.random() * 4 + 2}px`,
-                            backgroundColor: ['rgba(119, 184, 206, 0.2)', 'rgba(11, 132, 201, 0.2)', 'rgba(255, 255, 255, 0.1)', 'rgba(119, 184, 206, 0.1)'][Math.floor(Math.random() * 4)],
+                            backgroundColor: ['rgba(47, 151, 209, 0.15)', 'rgba(47, 151, 209, 0.1)', 'rgba(74, 85, 104, 0.1)', 'rgba(47, 151, 209, 0.05)'][Math.floor(Math.random() * 4)],
                             borderRadius: '50%',
                             left: `${Math.random() * 100}%`,
                             top: `${Math.random() * 100}%`,
@@ -218,7 +218,7 @@ const AdminHeader = () => {
                     left: 0,
                     width: '100%',
                     height: '2px',
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(119, 184, 206, 0.3) 50%, transparent 100%)',
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(47, 151, 209, 0.3) 50%, transparent 100%)',
                     opacity: isScrolled ? 1 : 0,
                     transition: 'opacity 0.5s ease',
                     zIndex: 1,
@@ -265,14 +265,14 @@ const AdminHeader = () => {
                             }}
                         />
                         <span style={{
-                            color: 'white',
-                            fontSize: '24px',
+                            color: '#4a5568',
+                            fontSize: '28px',
                             fontWeight: 600,
                             letterSpacing: '-0.5px',
                             marginLeft: '130px',
                             textShadow: hoveredItem === 'logo'
-                                ? '0 0 8px rgba(119, 184, 206, 0.5)'
-                                : '0 2px 4px rgba(0, 0, 0, 0.3)',
+                                ? '0 0 8px rgba(47, 151, 209, 0.5)'
+                                : '0 1px 2px rgba(0, 0, 0, 0.1)',
                             transform: hoveredItem === 'logo' ? 'translateY(-2px)' : 'translateY(0)',
                             transition: 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)',
                         }}>MediQueue®</span>
@@ -294,23 +294,23 @@ const AdminHeader = () => {
                                 <div
                                     key={item.path}
                                     style={{
-                                        color: isActiveRoute(item.path) ? '#77b8ce' : 'rgba(255, 255, 255, 0.85)',
+                                        color: isActiveRoute(item.path) ? '#2f97d1' : '#4a5568',
                                         textDecoration: 'none',
                                         fontWeight: isActiveRoute(item.path) ? 600 : 500,
-                                        fontSize: '14px',
+                                        fontSize: '16px',
                                         position: 'relative',
-                                        padding: '10px 18px',
+                                        padding: '12px 20px',
                                         borderRadius: '8px',
                                         transition: 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '8px',
+                                        gap: '10px',
                                         background: isActiveRoute(item.path)
-                                            ? 'rgba(255, 255, 255, 0.15)'
+                                            ? 'rgba(47, 151, 209, 0.1)'
                                             : 'transparent',
                                         overflow: 'hidden',
                                         cursor: 'pointer',
-                                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                                        textShadow: 'none',
                                     }}
                                     onMouseEnter={() => setHoveredItem(`nav-${index}`)}
                                     onMouseLeave={() => setHoveredItem(null)}
@@ -318,7 +318,7 @@ const AdminHeader = () => {
                                 >
                                     <span style={{
                                         marginRight: '8px',
-                                        color: isActiveRoute(item.path) ? '#77b8ce' : 'rgba(255, 255, 255, 0.7)',
+                                        color: isActiveRoute(item.path) ? '#2f97d1' : '#6b7280',
                                         transform: hoveredItem === `nav-${index}` ? 'scale(1.2) translateY(-1px)' : 'scale(1)',
                                         transition: 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)',
                                     }}>
@@ -340,7 +340,7 @@ const AdminHeader = () => {
                                                 left: 0,
                                                 width: '100%',
                                                 height: '100%',
-                                                background: 'rgba(119, 184, 206, 0.1)',
+                                                background: 'rgba(47, 151, 209, 0.1)',
                                                 zIndex: -1,
                                                 transform: 'translateY(100%)',
                                                 animation: 'mediqueueSlideUp 0.4s forwards cubic-bezier(0.25, 0.8, 0.25, 1)',
@@ -351,7 +351,7 @@ const AdminHeader = () => {
                                                 height: '2px',
                                                 bottom: '0',
                                                 left: '0',
-                                                background: 'linear-gradient(90deg, transparent 0%, rgba(119, 184, 206, 0.5) 50%, transparent 100%)',
+                                                background: 'linear-gradient(90deg, transparent 0%, rgba(47, 151, 209, 0.5) 50%, transparent 100%)',
                                                 animation: 'mediqueueFadeIn 0.3s forwards',
                                             }}></span>
                                         </>
@@ -376,16 +376,16 @@ const AdminHeader = () => {
                                 width: '45px',
                                 height: '45px',
                                 borderRadius: '50%',
-                                backgroundColor: 'rgba(119, 184, 206, 0.2)',
+                                backgroundColor: 'rgba(47, 151, 209, 0.1)',
                                 overflow: 'hidden',
-                                boxShadow: '0 4px 15px rgba(119, 184, 206, 0.3)',
-                                border: '2px solid rgba(255, 255, 255, 0.3)',
+                                boxShadow: '0 4px 15px rgba(47, 151, 209, 0.2)',
+                                border: '2px solid rgba(47, 151, 209, 0.3)',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                color: 'white',
+                                color: '#2f97d1',
                                 fontSize: '20px',
                                 transform: hoveredItem === 'profile' ? 'translateY(-3px) scale(1.05)' : 'translateY(0) scale(1)',
                                 ...(isMenuOpen ? { animation: 'mediqueuePulse 2s infinite' } : {})
@@ -450,7 +450,7 @@ const AdminHeader = () => {
                                 <div style={{
                                     fontSize: '16px',
                                     fontWeight: 600,
-                                    color: '#77b8ce',
+                                    color: '#2f97d1',
                                     marginBottom: '4px',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
                                 }}>{user?.s_nombre || 'Administrador'}</div>
@@ -458,7 +458,7 @@ const AdminHeader = () => {
                                     fontSize: '14px',
                                     color: 'rgba(255, 255, 255, 0.7)',
                                     marginBottom: '12px',
-                                    background: 'rgba(119, 184, 206, 0.2)',
+                                    background: 'rgba(47, 151, 209, 0.2)',
                                     padding: '4px 12px',
                                     borderRadius: '100px',
                                     display: 'inline-block',
@@ -493,9 +493,9 @@ const AdminHeader = () => {
                                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                             borderRadius: '8px',
                                             margin: '4px 0',
-                                            backgroundColor: hoveredItem === `menu-${index}` ? 'rgba(119, 184, 206, 0.2)' : 'transparent',
+                                            backgroundColor: hoveredItem === `menu-${index}` ? 'rgba(47, 151, 209, 0.2)' : 'transparent',
                                             transform: hoveredItem === `menu-${index}` ? 'translateX(5px)' : 'translateX(0)',
-                                            boxShadow: hoveredItem === `menu-${index}` ? '0 0 15px rgba(119, 184, 206, 0.1)' : 'none',
+                                            boxShadow: hoveredItem === `menu-${index}` ? '0 0 15px rgba(47, 151, 209, 0.1)' : 'none',
                                         }}
                                         onMouseEnter={() => setHoveredItem(`menu-${index}`)}
                                         onMouseLeave={() => setHoveredItem(null)}
@@ -507,7 +507,7 @@ const AdminHeader = () => {
                                         <span style={{
                                             marginRight: '12px',
                                             fontSize: '16px',
-                                            color: '#77b8ce',
+                                            color: '#2f97d1',
                                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                         }}>
                                             {item.icon}
@@ -596,7 +596,7 @@ const AdminHeader = () => {
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div style={{
-                        background: 'linear-gradient(135deg, rgba(119, 184, 206, 0.8) 0%, rgba(11, 132, 201, 0.8) 100%)',
+                        background: 'linear-gradient(135deg, rgba(47, 151, 209, 0.8) 0%, rgba(47, 151, 209, 0.9) 100%)',
                         color: 'white',
                         padding: '20px 24px',
                         display: 'flex',
@@ -686,7 +686,7 @@ const AdminHeader = () => {
                 transform: 'translateX(-50%)',
                 minWidth: '300px',
                 maxWidth: '90%',
-                backgroundColor: 'rgba(119, 184, 206, 0.9)',
+                backgroundColor: 'rgba(47, 151, 209, 0.9)',
                 color: 'white',
                 padding: '16px 24px',
                 borderRadius: '12px',
@@ -789,13 +789,13 @@ const AdminHeader = () => {
                     
                     @keyframes mediqueuePulse {
                         0% {
-                            box-shadow: 0 0 0 0 rgba(119, 184, 206, 0.5);
+                            box-shadow: 0 0 0 0 rgba(47, 151, 209, 0.5);
                         }
                         70% {
-                            box-shadow: 0 0 0 10px rgba(119, 184, 206, 0);
+                            box-shadow: 0 0 0 10px rgba(47, 151, 209, 0);
                         }
                         100% {
-                            box-shadow: 0 0 0 0 rgba(119, 184, 206, 0);
+                            box-shadow: 0 0 0 0 rgba(47, 151, 209, 0);
                         }
                     }
                     

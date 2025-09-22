@@ -6,7 +6,26 @@ import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
 import areaService from '../../services/areaService';
-import '../../styles/AdminPages.css';
+import '../../styles/UnifiedAdminPages.css';
+
+// React Icons
+import {
+  FaCalendarCheck,
+  FaUsers,
+  FaClock,
+  FaEdit,
+  FaTrash,
+  FaCheck,
+  FaTimes,
+  FaExclamationTriangle,
+  FaEye,
+  FaFilter,
+  FaPlus,
+  FaSync,
+  FaUser,
+  FaHospital,
+  FaClipboardList
+} from 'react-icons/fa';
 
 const TurnManager = () => {
   const [turns, setTurns] = useState([]);
@@ -31,11 +50,11 @@ const TurnManager = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'EN_ESPERA', label: 'En espera', color: '#4299e1' },
-    { value: 'LLAMANDO', label: 'Llamando', color: '#805ad5' },
-    { value: 'ATENDIDO', label: 'Atendido', color: '#48bb78' },
-    { value: 'CANCELADO', label: 'Cancelado', color: '#e53e3e' },
-    { value: 'NO_PRESENTE', label: 'No presente', color: '#a0aec0' }
+    { value: 'EN_ESPERA', label: 'En espera', color: 'info' },
+    { value: 'LLAMANDO', label: 'Llamando', color: 'warning' },
+    { value: 'ATENDIDO', label: 'Atendido', color: 'success' },
+    { value: 'CANCELADO', label: 'Cancelado', color: 'danger' },
+    { value: 'NO_PRESENTE', label: 'No presente', color: 'secondary' }
   ];
 
   // Cargar datos al montar el componente
@@ -101,11 +120,6 @@ const TurnManager = () => {
       console.error('Error cargando turnos:', error);
       setTurns([]);
     }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/admin');
   };
 
   const handleAddNew = () => {
@@ -244,14 +258,14 @@ const TurnManager = () => {
     }));
   };
 
-  const getStatusColor = (status) => {
-    const statusObj = turnStatuses.find(s => s.value === status);
-    return statusObj ? statusObj.color : '#718096';
-  };
-
   const getStatusLabel = (status) => {
     const statusObj = turnStatuses.find(s => s.value === status);
     return statusObj ? statusObj.label : status;
+  };
+
+  const getStatusColor = (status) => {
+    const statusObj = turnStatuses.find(s => s.value === status);
+    return statusObj ? statusObj.color : 'secondary';
   };
 
   const getPatientName = (uk_paciente) => {
@@ -274,259 +288,346 @@ const TurnManager = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Cargando turnos...</p>
+      <div className="admin-page-unified">
+        <AdminHeader />
+        <div className="loading-overlay">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Cargando turnos...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="admin-page">
+    <div className="admin-page-unified">
       <AdminHeader />
-      <div className="page-content-wrapper">
-        {/* Contenido principal */}
-        <main className="page-main">
-          <div className="page-container">
-            {error && (
-              <div className="error-banner">
-                <span>❌ {error}</span>
-                <button onClick={() => setError(null)}>✕</button>
-              </div>
-            )}
-
-            {/* Filtros */}
-            <div className="filters-section">
-              <div className="filter-group">
-                <label>Fecha:</label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="filter-input"
-                />
-              </div>
-              <div className="filter-group">
-                <label>Estado:</label>
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="todos">Todos los estados</option>
-                  {turnStatuses.map(status => (
-                    <option key={status.value} value={status.value}>
-                      {status.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="filter-group">
-                <label>Área:</label>
-                <select
-                  value={selectedArea}
-                  onChange={(e) => setSelectedArea(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="todas">Todas las áreas</option>
-                  {areas.map(area => (
-                    <option key={area.uk_area} value={area.uk_area}>
-                      {area.s_nombre_area}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Barra de acciones */}
-            <div className="actions-bar">
-              <button onClick={handleAddNew} className="add-button">
-                + Nuevo Turno
-              </button>
-              <button onClick={loadTurns} className="refresh-button">
-                🔄 Actualizar
-              </button>
-            </div>
-
-            {/* Tabla de turnos */}
-            <div className="turns-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th># Turno</th>
-                    <th>Paciente</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Estado</th>
-                    <th>Consultorio</th>
-                    <th>Área</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {turns.map(turn => (
-                    <tr key={turn.uk_turno}>
-                      <td className="turn-number">#{turn.i_numero_turno}</td>
-                      <td>{getPatientName(turn.uk_paciente)}</td>
-                      <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
-                      <td>{turn.t_hora}</td>
-                      <td>
-                        <span
-                          className="status-badge"
-                          style={{ backgroundColor: getStatusColor(turn.s_estado) }}
-                        >
-                          {getStatusLabel(turn.s_estado)}
-                        </span>
-                      </td>
-                      <td>{getConsultorioInfo(turn.uk_consultorio)}</td>
-                      <td>{getAreaInfo(turn.uk_consultorio)}</td>
-                      <td className="actions-cell">
-                        <select
-                          value={turn.s_estado}
-                          onChange={(e) => handleStatusChange(turn, e.target.value)}
-                          className="status-select"
-                        >
-                          {turnStatuses.map(status => (
-                            <option key={status.value} value={status.value}>
-                              {status.label}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="action-buttons">
-                          {turn.s_estado === 'EN_ESPERA' && (
-                            <button
-                              onClick={() => handleMarkAsAttended(turn)}
-                              className="action-button attended"
-                              title="Marcar como atendido"
-                            >
-                              ✓
-                            </button>
-                          )}
-                          {turn.s_estado === 'EN_ESPERA' && (
-                            <button
-                              onClick={() => handleMarkAsNoShow(turn)}
-                              className="action-button no-show"
-                              title="Marcar como no presente"
-                            >
-                              ✗
-                            </button>
-                          )}
-                          {turn.s_estado !== 'CANCELADO' && turn.s_estado !== 'ATENDIDO' && (
-                            <button
-                              onClick={() => handleCancelTurn(turn)}
-                              className="action-button cancel"
-                              title="Cancelar turno"
-                            >
-                              🗑️
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleEdit(turn)}
-                            className="action-button edit"
-                            title="Editar observaciones"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => handleDelete(turn)}
-                            className="action-button delete"
-                            title="Eliminar turno"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {turns.length === 0 && (
-                <div className="empty-state">
-                  <p>No hay turnos registrados para los filtros seleccionados</p>
-                </div>
-              )}
-            </div>
+      
+      <div className="admin-container">
+        {/* Page Header */}
+        <div className="page-header">
+          <div className="page-header-icon">
+            <FaCalendarCheck />
           </div>
-        </main>
+          <div className="page-header-content">
+            <h1 className="page-title">Gestión de Turnos</h1>
+            <p className="page-subtitle">
+              Administra los turnos médicos del sistema - {turns.length} turnos encontrados
+            </p>
+          </div>
+          <div className="page-actions">
+            <button className="btn btn-secondary" onClick={loadTurns}>
+              <FaSync /> Actualizar
+            </button>
+            <button className="btn btn-primary" onClick={handleAddNew}>
+              <FaPlus /> Nuevo Turno
+            </button>
+          </div>
+        </div>
 
-        {/* Modal para crear/editar */}
-        {showModal && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <div className="modal-header">
-                <h2>
-                  {editingTurn ? 'Editar Turno' : 'Nuevo Turno'}
-                </h2>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="close-button"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="modal-form">
-                <div className="form-group">
-                  <label>Consultorio *</label>
-                  <select
-                    name="uk_consultorio"
-                    value={formData.uk_consultorio}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Seleccionar consultorio</option>
-                    {consultorios.map(consultorio => (
-                      <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
-                        Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Paciente (opcional)</label>
-                  <select
-                    name="uk_paciente"
-                    value={formData.uk_paciente}
-                    onChange={handleInputChange}
-                  >
-                    <option value="">Sin paciente</option>
-                    {patients.map(patient => (
-                      <option key={patient.uk_paciente} value={patient.uk_paciente}>
-                        {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Observaciones</label>
-                  <textarea
-                    name="s_observaciones"
-                    value={formData.s_observaciones}
-                    onChange={handleInputChange}
-                    rows="3"
-                    placeholder="Observaciones adicionales..."
-                  />
-                </div>
-
-                <div className="form-actions">
-                  <button type="button" onClick={() => setShowModal(false)}>
-                    Cancelar
-                  </button>
-                  <button type="submit" className="primary">
-                    {editingTurn ? 'Actualizar' : 'Crear'}
-                  </button>
-                </div>
-              </form>
-            </div>
+        {/* Error Message */}
+        {error && (
+          <div className="error-message">
+            <FaExclamationTriangle />
+            <span>{error}</span>
+            <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+              <FaTimes />
+            </button>
           </div>
         )}
 
+        {/* Filters Section */}
+        <div className="filters-section">
+          <div className="filter-group">
+            <label>Fecha</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="form-control"
+            />
+          </div>
+          <div className="filter-group">
+            <label>Estado</label>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="form-control"
+            >
+              <option value="todos">Todos los estados</option>
+              {turnStatuses.map(status => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>Área</label>
+            <select
+              value={selectedArea}
+              onChange={(e) => setSelectedArea(e.target.value)}
+              className="form-control"
+            >
+              <option value="todas">Todas las áreas</option>
+              {areas.map(area => (
+                <option key={area.uk_area} value={area.uk_area}>
+                  {area.s_nombre_area}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <button className="btn btn-secondary">
+              <FaFilter /> Aplicar Filtros
+            </button>
+          </div>
+        </div>
+
+        {/* Turns Table */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FaClipboardList />
+              Lista de Turnos
+            </h3>
+            <div className="card-actions">
+              <button className="card-action" title="Ver detalles">
+                <FaEye />
+              </button>
+              <button className="card-action" title="Filtros">
+                <FaFilter />
+              </button>
+            </div>
+          </div>
+          
+          <div className="card-content" style={{ padding: 0 }}>
+            {turns.length === 0 ? (
+              <div className="empty-state">
+                <FaCalendarCheck />
+                <h3>No hay turnos registrados</h3>
+                <p>No se encontraron turnos para los filtros seleccionados</p>
+                <button className="btn btn-primary" onClick={handleAddNew}>
+                  <FaPlus /> Crear Primer Turno
+                </button>
+              </div>
+            ) : (
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th># Turno</th>
+                      <th>Paciente</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Estado</th>
+                      <th>Consultorio</th>
+                      <th>Área</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {turns.map(turn => (
+                      <tr key={turn.uk_turno}>
+                        <td>
+                          <strong>#{turn.i_numero_turno}</strong>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                            {getPatientName(turn.uk_paciente)}
+                          </div>
+                        </td>
+                        <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <FaClock style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                            {turn.t_hora}
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`status-badge ${getStatusColor(turn.s_estado)}`}>
+                            {getStatusLabel(turn.s_estado)}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FaHospital style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                            {getConsultorioInfo(turn.uk_consultorio)}
+                          </div>
+                        </td>
+                        <td>{getAreaInfo(turn.uk_consultorio)}</td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            {turn.s_estado === 'EN_ESPERA' && (
+                              <>
+                                <button
+                                  onClick={() => handleMarkAsAttended(turn)}
+                                  className="btn btn-success"
+                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  title="Marcar como atendido"
+                                >
+                                  <FaCheck />
+                                </button>
+                                <button
+                                  onClick={() => handleMarkAsNoShow(turn)}
+                                  className="btn btn-secondary"
+                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  title="Marcar como no presente"
+                                >
+                                  <FaTimes />
+                                </button>
+                              </>
+                            )}
+                            {turn.s_estado !== 'CANCELADO' && turn.s_estado !== 'ATENDIDO' && (
+                              <button
+                                onClick={() => handleCancelTurn(turn)}
+                                className="btn btn-secondary"
+                                style={{ padding: '4px 8px', fontSize: '12px' }}
+                                title="Cancelar turno"
+                              >
+                                <FaTimes />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleEdit(turn)}
+                              className="btn btn-secondary"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Editar observaciones"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(turn)}
+                              className="btn btn-danger"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Eliminar turno"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Modal para crear/editar */}
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'hidden',
+            boxShadow: 'var(--shadow-xl)'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
+                {editingTurn ? 'Editar Turno' : 'Nuevo Turno'}
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  padding: '4px'
+                }}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+              <div className="form-group">
+                <label>Consultorio *</label>
+                <select
+                  name="uk_consultorio"
+                  value={formData.uk_consultorio}
+                  onChange={handleInputChange}
+                  className="form-control"
+                  required
+                >
+                  <option value="">Seleccionar consultorio</option>
+                  {consultorios.map(consultorio => (
+                    <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
+                      Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Paciente (opcional)</label>
+                <select
+                  name="uk_paciente"
+                  value={formData.uk_paciente}
+                  onChange={handleInputChange}
+                  className="form-control"
+                >
+                  <option value="">Sin paciente asignado</option>
+                  {patients.map(patient => (
+                    <option key={patient.uk_paciente} value={patient.uk_paciente}>
+                      {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Observaciones</label>
+                <textarea
+                  name="s_observaciones"
+                  value={formData.s_observaciones}
+                  onChange={handleInputChange}
+                  rows="3"
+                  className="form-control"
+                  placeholder="Observaciones adicionales..."
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
+                  Cancelar
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  {editingTurn ? 'Actualizar' : 'Crear'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
