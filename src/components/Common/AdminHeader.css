@@ -22,6 +22,8 @@
     align-items: center;
     overflow: visible;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    /* Ensure consistent positioning */
+    box-sizing: border-box;
 }
 
 .header-content {
@@ -29,6 +31,9 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    /* Ensure consistent layout */
+    min-height: 56px;
+    box-sizing: border-box;
 }
 
 .logo-section {
@@ -36,6 +41,9 @@
     align-items: center;
     gap: 8px;
     position: relative;
+    /* Ensure consistent positioning */
+    flex-shrink: 0;
+    min-width: 200px;
 }
 
 .header-logo {
@@ -63,6 +71,10 @@
     display: flex;
     gap: 32px;
     align-items: center;
+    /* Ensure consistent positioning */
+    flex: 1;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .nav-item {
@@ -97,6 +109,10 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    /* Ensure consistent positioning */
+    flex-shrink: 0;
+    min-width: 200px;
+    justify-content: flex-end;
 }
 
 .user-info {
