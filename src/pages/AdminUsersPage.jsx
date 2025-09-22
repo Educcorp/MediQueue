@@ -127,8 +127,17 @@ const AdminUsersPage = () => {
       return;
     }
 
-    if (!editingAdmin && !formData.s_password) {
+    // Validación de contraseña (debe coincidir con la del backend: min 6, 1 minúscula, 1 mayúscula y 1 número)
+    const passwordProvided = !!formData.s_password && formData.s_password.length > 0;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+    if (!editingAdmin && !passwordProvided) {
       alert('La contraseña es requerida para crear un nuevo administrador');
+      return;
+    }
+
+    if (passwordProvided && !passwordRegex.test(formData.s_password)) {
+      alert('La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número');
       return;
     }
 
@@ -138,11 +147,16 @@ const AdminUsersPage = () => {
         s_apellido: formData.s_apellido.trim(),
         s_email: formData.s_email.trim(),
         s_usuario: formData.s_usuario.trim(),
-        c_telefono: formData.c_telefono.trim() || null,
         tipo_usuario: parseInt(formData.tipo_usuario)
       };
 
-      if (formData.s_password) {
+      // Solo incluir teléfono si viene no vacío para evitar errores de validación (trim sobre null)
+      const telefonoTrimmed = (formData.c_telefono || '').trim();
+      if (telefonoTrimmed) {
+        adminData.c_telefono = telefonoTrimmed;
+      }
+
+      if (passwordProvided) {
         adminData.s_password = formData.s_password;
       }
 
@@ -168,7 +182,16 @@ const AdminUsersPage = () => {
     } catch (error) {
       let errorMessage = 'Error guardando administrador';
       if (error.response && error.response.data) {
-        errorMessage += ': ' + error.response.data.message;
+        const data = error.response.data;
+        if (data.message) {
+          errorMessage += ': ' + data.message;
+        }
+        if (Array.isArray(data.errors) && data.errors.length > 0) {
+          const detail = data.errors
+            .map(err => (err.field ? `${err.field}: ${err.message}` : err.message))
+            .join('; ');
+          errorMessage += `\nDetalles: ${detail}`;
+        }
       } else {
         errorMessage += ': ' + error.message;
       }
