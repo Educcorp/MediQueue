@@ -198,7 +198,7 @@ const PatientManagement = () => {
   return (
     <div className="admin-page-unified">
       <AdminHeader />
-      
+
       <div className="admin-container">
         {/* Page Header */}
         <div className="page-header">
@@ -396,15 +396,15 @@ const PatientManagement = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="card-content" style={{ padding: 0 }}>
             {filteredPatients.length === 0 ? (
               <div className="empty-state">
                 <FaUsers />
                 <h3>No hay pacientes registrados</h3>
                 <p>
-                  {searchTerm || statusFilter !== 'todos' 
-                    ? 'No se encontraron pacientes con los filtros aplicados' 
+                  {searchTerm || statusFilter !== 'todos'
+                    ? 'No se encontraron pacientes con los filtros aplicados'
                     : 'No hay pacientes registrados en el sistema'}
                 </p>
                 <button className="btn btn-primary" onClick={handleAddNew}>

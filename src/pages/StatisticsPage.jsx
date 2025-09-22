@@ -206,7 +206,7 @@ const StatisticsPage = () => {
   return (
     <div className="admin-page-unified">
       <AdminHeader />
-      
+
       <div className="admin-container">
         {/* Page Header */}
         <div className="page-header">
@@ -473,8 +473,8 @@ const StatisticsPage = () => {
             </div>
             <div className="card-content">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ 
-                  padding: '16px', 
+                <div style={{
+                  padding: '16px',
                   background: 'rgba(var(--primary-medical-rgb, 47, 151, 209), 0.1)',
                   borderRadius: 'var(--border-radius-sm)',
                   border: '1px solid rgba(var(--primary-medical-rgb, 47, 151, 209), 0.2)'
@@ -491,8 +491,8 @@ const StatisticsPage = () => {
                   </div>
                 </div>
 
-                <div style={{ 
-                  padding: '16px', 
+                <div style={{
+                  padding: '16px',
                   background: 'rgba(var(--success-color-rgb, 40, 167, 69), 0.1)',
                   borderRadius: 'var(--border-radius-sm)',
                   border: '1px solid rgba(var(--success-color-rgb, 40, 167, 69), 0.2)'
@@ -509,8 +509,8 @@ const StatisticsPage = () => {
                   </div>
                 </div>
 
-                <div style={{ 
-                  padding: '16px', 
+                <div style={{
+                  padding: '16px',
                   background: 'rgba(var(--info-color-rgb, 23, 162, 184), 0.1)',
                   borderRadius: 'var(--border-radius-sm)',
                   border: '1px solid rgba(var(--info-color-rgb, 23, 162, 184), 0.2)'
@@ -596,11 +596,10 @@ const StatisticsPage = () => {
                         </td>
                         <td>{formatDate(turn.d_fecha)}</td>
                         <td>
-                          <span className={`status-badge ${
-                            turn.s_estado === 'ATENDIDO' ? 'success' :
-                            turn.s_estado === 'EN_ESPERA' ? 'info' :
-                            turn.s_estado === 'CANCELADO' ? 'danger' : 'warning'
-                          }`}>
+                          <span className={`status-badge ${turn.s_estado === 'ATENDIDO' ? 'success' :
+                              turn.s_estado === 'EN_ESPERA' ? 'info' :
+                                turn.s_estado === 'CANCELADO' ? 'danger' : 'warning'
+                            }`}>
                             {TURN_STATUS_LABELS?.[turn.s_estado] || turn.s_estado}
                           </span>
                         </td>

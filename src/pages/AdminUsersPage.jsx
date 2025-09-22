@@ -219,7 +219,7 @@ const AdminUsersPage = () => {
   return (
     <div className="admin-page-unified">
       <AdminHeader />
-      
+
       <div className="admin-container">
         {/* Page Header */}
         <div className="page-header">
@@ -379,15 +379,15 @@ const AdminUsersPage = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="card-content" style={{ padding: 0 }}>
             {filteredAdmins.length === 0 ? (
               <div className="empty-state">
                 <FaUsersCog />
                 <h3>No hay usuarios registrados</h3>
                 <p>
-                  {searchTerm 
-                    ? 'No se encontraron usuarios con los filtros aplicados' 
+                  {searchTerm
+                    ? 'No se encontraron usuarios con los filtros aplicados'
                     : 'No hay usuarios administrativos en el sistema'}
                 </p>
                 <button className="btn btn-primary" onClick={handleAddNew}>
@@ -416,7 +416,7 @@ const AdminUsersPage = () => {
                             <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
                             <strong>{admin.s_usuario}</strong>
                             {admin.uk_administrador === user?.uk_administrador && (
-                              <span style={{ 
+                              <span style={{
                                 backgroundColor: 'var(--primary-medical)',
                                 color: 'white',
                                 padding: '2px 6px',

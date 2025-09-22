@@ -2,8 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
-import '../styles/AdminSettingsPage.css';
-import '../styles/AdminPages.css';
+import '../styles/UnifiedAdminPages.css';
+
+// React Icons
+import {
+    FaCog,
+    FaCogs,
+    FaClock,
+    FaBell,
+    FaTools,
+    FaSave,
+    FaSync,
+    FaExclamationTriangle,
+    FaTimes,
+    FaCheck,
+    FaToggleOn,
+    FaToggleOff,
+    FaEnvelope,
+    FaSms,
+    FaMobile,
+    FaCalendarAlt,
+    FaHourglassHalf,
+    FaWrench,
+    FaDatabase,
+    FaShieldAlt,
+    FaEye,
+    FaChartLine,
+    FaUsersCog
+} from 'react-icons/fa';
 
 const AdminSettingsPage = () => {
     const { user, logout } = useAuth();
@@ -11,30 +37,50 @@ const AdminSettingsPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const [activeTab, setActiveTab] = useState('general');
     const [settings, setSettings] = useState({
-        systemName: 'MediQueue',
-        systemVersion: '1.0.0',
-        maxTurnsPerDay: 100,
-        turnDuration: 30,
-        workingHours: {
-            start: '08:00',
-            end: '18:00'
+        general: {
+            systemName: 'MediQueue',
+            systemVersion: '1.0.0',
+            timezone: 'America/Bogota',
+            language: 'es',
+            dateFormat: 'DD/MM/YYYY'
+        },
+        operations: {
+            maxTurnsPerDay: 100,
+            turnDuration: 30,
+            workingHours: {
+                start: '08:00',
+                end: '18:00'
+            },
+            maxAdvanceDays: 30,
+            allowCancellation: true,
+            cancellationDeadline: 60 // minutos antes
         },
         notifications: {
             email: true,
             sms: false,
-            push: true
+            push: true,
+            reminders: {
+                enabled: true,
+                beforeHours: 24
+            },
+            adminAlerts: true
         },
         maintenance: {
             enabled: false,
-            message: 'Sistema en mantenimiento'
+            message: 'Sistema en mantenimiento programado. Regrese más tarde.',
+            scheduledTime: '',
+            estimatedDuration: 60
+        },
+        security: {
+            sessionTimeout: 120, // minutos
+            passwordMinLength: 8,
+            requireSpecialChars: true,
+            maxLoginAttempts: 3,
+            lockoutDuration: 15 // minutos
         }
     });
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/admin');
-    };
 
     const handleSave = async () => {
         try {
@@ -56,262 +102,586 @@ const AdminSettingsPage = () => {
 
     const handleReset = () => {
         setSettings({
-            systemName: 'MediQueue',
-            systemVersion: '1.0.0',
-            maxTurnsPerDay: 100,
-            turnDuration: 30,
-            workingHours: {
-                start: '08:00',
-                end: '18:00'
+            general: {
+                systemName: 'MediQueue',
+                systemVersion: '1.0.0',
+                timezone: 'America/Bogota',
+                language: 'es',
+                dateFormat: 'DD/MM/YYYY'
+            },
+            operations: {
+                maxTurnsPerDay: 100,
+                turnDuration: 30,
+                workingHours: {
+                    start: '08:00',
+                    end: '18:00'
+                },
+                maxAdvanceDays: 30,
+                allowCancellation: true,
+                cancellationDeadline: 60
             },
             notifications: {
                 email: true,
                 sms: false,
-                push: true
+                push: true,
+                reminders: {
+                    enabled: true,
+                    beforeHours: 24
+                },
+                adminAlerts: true
             },
             maintenance: {
                 enabled: false,
-                message: 'Sistema en mantenimiento'
+                message: 'Sistema en mantenimiento programado. Regrese más tarde.',
+                scheduledTime: '',
+                estimatedDuration: 60
+            },
+            security: {
+                sessionTimeout: 120,
+                passwordMinLength: 8,
+                requireSpecialChars: true,
+                maxLoginAttempts: 3,
+                lockoutDuration: 15
             }
         });
     };
 
+    const handleInputChange = (section, field, value) => {
+        if (field.includes('.')) {
+            const [parent, child] = field.split('.');
+            setSettings(prev => ({
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [parent]: {
+                        ...prev[section][parent],
+                        [child]: value
+                    }
+                }
+            }));
+        } else {
+            setSettings(prev => ({
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [field]: value
+                }
+            }));
+        }
+    };
+
+    const toggleBoolean = (section, field) => {
+        const currentValue = field.includes('.')
+            ? settings[section][field.split('.')[0]][field.split('.')[1]]
+            : settings[section][field];
+        handleInputChange(section, field, !currentValue);
+    };
+
+    const tabs = [
+        { id: 'general', label: 'General', icon: FaCog },
+        { id: 'operations', label: 'Operaciones', icon: FaClock },
+        { id: 'notifications', label: 'Notificaciones', icon: FaBell },
+        { id: 'maintenance', label: 'Mantenimiento', icon: FaTools },
+        { id: 'security', label: 'Seguridad', icon: FaShieldAlt }
+    ];
+
     if (loading) {
         return (
-            <div className="admin-settings-page loading">
+            <div className="admin-page-unified">
                 <AdminHeader />
-                <div className="loading-container">
-                    <div className="loading-spinner"></div>
-                    <p>Guardando configuración...</p>
+                <div className="loading-overlay">
+                    <div className="loading-spinner">
+                        <div className="spinner"></div>
+                        <p>Guardando configuración...</p>
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="admin-settings-page">
+        <div className="admin-page-unified">
             <AdminHeader />
-            <div className="page-content-wrapper">
 
+            <div className="admin-container">
+                {/* Page Header */}
+                <div className="page-header">
+                    <div className="page-header-icon">
+                        <FaCog />
+                    </div>
+                    <div className="page-header-content">
+                        <h1 className="page-title">Configuración del Sistema</h1>
+                        <p className="page-subtitle">
+                            Administra la configuración general y parámetros operacionales
+                        </p>
+                    </div>
+                    <div className="page-actions">
+                        <button className="btn btn-secondary" onClick={handleReset}>
+                            <FaSync /> Restaurar
+                        </button>
+                        <button className="btn btn-primary" onClick={handleSave}>
+                            <FaSave /> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+
+                {/* Messages */}
                 {error && (
-                    <div className="error-banner">
-                        <span>⚠️ {error}</span>
-                        <button onClick={() => setError(null)} className="retry-btn">
-                            ✕
+                    <div className="error-message">
+                        <FaExclamationTriangle />
+                        <span>{error}</span>
+                        <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+                            <FaTimes />
                         </button>
                     </div>
                 )}
 
                 {success && (
-                    <div className="success-banner">
-                        <span>✅ {success}</span>
-                        <button onClick={() => setSuccess(null)} className="close-btn">
-                            ✕
+                    <div className="success-message">
+                        <FaCheck />
+                        <span>{success}</span>
+                        <button onClick={() => setSuccess(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+                            <FaTimes />
                         </button>
                     </div>
                 )}
 
-                <main className="settings-content">
-                    <div className="settings-container">
-                        <div className="page-header">
-                            <h1>⚙️ Configuración del Sistema</h1>
-                            <p>Gestiona la configuración general del sistema de turnos</p>
-                        </div>
+                {/* Tabs Navigation */}
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', overflowX: 'auto' }}>
+                    {tabs.map(tab => {
+                        const IconComponent = tab.icon;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`btn ${activeTab === tab.id ? 'btn-primary' : 'btn-secondary'}`}
+                                style={{
+                                    minWidth: 'auto',
+                                    whiteSpace: 'nowrap',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px'
+                                }}
+                            >
+                                <IconComponent />
+                                {tab.label}
+                            </button>
+                        );
+                    })}
+                </div>
 
-                        <div className="settings-grid">
-                            {/* Configuración General */}
-                            <div className="settings-section">
-                                <div className="section-header">
-                                    <h2>📋 Configuración General</h2>
-                                    <p>Configuración básica del sistema</p>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="systemName">Nombre del Sistema</label>
-                                    <input
-                                        type="text"
-                                        id="systemName"
-                                        value={settings.systemName}
-                                        onChange={(e) => setSettings({ ...settings, systemName: e.target.value })}
-                                        className="form-input"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="systemVersion">Versión del Sistema</label>
-                                    <input
-                                        type="text"
-                                        id="systemVersion"
-                                        value={settings.systemVersion}
-                                        onChange={(e) => setSettings({ ...settings, systemVersion: e.target.value })}
-                                        className="form-input"
-                                        disabled
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Configuración de Turnos */}
-                            <div className="settings-section">
-                                <div className="section-header">
-                                    <h2>🕐 Configuración de Turnos</h2>
-                                    <p>Parámetros relacionados con los turnos</p>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="maxTurnsPerDay">Máximo de Turnos por Día</label>
-                                    <input
-                                        type="number"
-                                        id="maxTurnsPerDay"
-                                        value={settings.maxTurnsPerDay}
-                                        onChange={(e) => setSettings({ ...settings, maxTurnsPerDay: parseInt(e.target.value) })}
-                                        className="form-input"
-                                        min="1"
-                                        max="1000"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="turnDuration">Duración de Turnos (minutos)</label>
-                                    <input
-                                        type="number"
-                                        id="turnDuration"
-                                        value={settings.turnDuration}
-                                        onChange={(e) => setSettings({ ...settings, turnDuration: parseInt(e.target.value) })}
-                                        className="form-input"
-                                        min="5"
-                                        max="120"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Horarios de Trabajo */}
-                            <div className="settings-section">
-                                <div className="section-header">
-                                    <h2>⏰ Horarios de Trabajo</h2>
-                                    <p>Define los horarios de atención del sistema</p>
-                                </div>
-                                <div className="form-row">
+                {/* Tab Content */}
+                <div className="content-card">
+                    <div className="card-content">
+                        {/* General Settings */}
+                        {activeTab === 'general' && (
+                            <div>
+                                <h3 style={{ marginTop: 0, marginBottom: '24px', color: 'var(--text-primary)' }}>
+                                    Configuración General del Sistema
+                                </h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                                     <div className="form-group">
-                                        <label htmlFor="startTime">Hora de Inicio</label>
+                                        <label>Nombre del Sistema</label>
                                         <input
-                                            type="time"
-                                            id="startTime"
-                                            value={settings.workingHours.start}
-                                            onChange={(e) => setSettings({
-                                                ...settings,
-                                                workingHours: { ...settings.workingHours, start: e.target.value }
-                                            })}
-                                            className="form-input"
+                                            type="text"
+                                            value={settings.general.systemName}
+                                            onChange={(e) => handleInputChange('general', 'systemName', e.target.value)}
+                                            className="form-control"
+                                            placeholder="Nombre del sistema"
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="endTime">Hora de Fin</label>
+                                        <label>Versión</label>
                                         <input
-                                            type="time"
-                                            id="endTime"
-                                            value={settings.workingHours.end}
-                                            onChange={(e) => setSettings({
-                                                ...settings,
-                                                workingHours: { ...settings.workingHours, end: e.target.value }
-                                            })}
-                                            className="form-input"
+                                            type="text"
+                                            value={settings.general.systemVersion}
+                                            onChange={(e) => handleInputChange('general', 'systemVersion', e.target.value)}
+                                            className="form-control"
+                                            placeholder="Versión del sistema"
                                         />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Zona Horaria</label>
+                                        <select
+                                            value={settings.general.timezone}
+                                            onChange={(e) => handleInputChange('general', 'timezone', e.target.value)}
+                                            className="form-control"
+                                        >
+                                            <option value="America/Bogota">Colombia (GMT-5)</option>
+                                            <option value="America/Mexico_City">México (GMT-6)</option>
+                                            <option value="America/Argentina/Buenos_Aires">Argentina (GMT-3)</option>
+                                            <option value="America/Lima">Perú (GMT-5)</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Idioma</label>
+                                        <select
+                                            value={settings.general.language}
+                                            onChange={(e) => handleInputChange('general', 'language', e.target.value)}
+                                            className="form-control"
+                                        >
+                                            <option value="es">Español</option>
+                                            <option value="en">English</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
+                        )}
 
-                            {/* Notificaciones */}
-                            <div className="settings-section">
-                                <div className="section-header">
-                                    <h2>🔔 Configuración de Notificaciones</h2>
-                                    <p>Gestiona los tipos de notificaciones del sistema</p>
-                                </div>
-                                <div className="checkbox-group">
-                                    <label className="checkbox-label">
+                        {/* Operations Settings */}
+                        {activeTab === 'operations' && (
+                            <div>
+                                <h3 style={{ marginTop: 0, marginBottom: '24px', color: 'var(--text-primary)' }}>
+                                    Configuración Operacional
+                                </h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                                    <div className="form-group">
+                                        <label>Máximo Turnos por Día</label>
                                         <input
-                                            type="checkbox"
-                                            checked={settings.notifications.email}
-                                            onChange={(e) => setSettings({
-                                                ...settings,
-                                                notifications: { ...settings.notifications, email: e.target.checked }
-                                            })}
-                                            className="checkbox-input"
+                                            type="number"
+                                            value={settings.operations.maxTurnsPerDay}
+                                            onChange={(e) => handleInputChange('operations', 'maxTurnsPerDay', parseInt(e.target.value))}
+                                            className="form-control"
+                                            min="1"
+                                            max="500"
                                         />
-                                        <span className="checkbox-text">Notificaciones por Email</span>
-                                    </label>
-                                    <label className="checkbox-label">
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Duración del Turno (minutos)</label>
                                         <input
-                                            type="checkbox"
-                                            checked={settings.notifications.sms}
-                                            onChange={(e) => setSettings({
-                                                ...settings,
-                                                notifications: { ...settings.notifications, sms: e.target.checked }
-                                            })}
-                                            className="checkbox-input"
+                                            type="number"
+                                            value={settings.operations.turnDuration}
+                                            onChange={(e) => handleInputChange('operations', 'turnDuration', parseInt(e.target.value))}
+                                            className="form-control"
+                                            min="5"
+                                            max="120"
                                         />
-                                        <span className="checkbox-text">Notificaciones por SMS</span>
-                                    </label>
-                                    <label className="checkbox-label">
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Hora de Inicio</label>
                                         <input
-                                            type="checkbox"
-                                            checked={settings.notifications.push}
-                                            onChange={(e) => setSettings({
-                                                ...settings,
-                                                notifications: { ...settings.notifications, push: e.target.checked }
-                                            })}
-                                            className="checkbox-input"
+                                            type="time"
+                                            value={settings.operations.workingHours.start}
+                                            onChange={(e) => handleInputChange('operations', 'workingHours.start', e.target.value)}
+                                            className="form-control"
                                         />
-                                        <span className="checkbox-text">Notificaciones Push</span>
-                                    </label>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Hora de Finalización</label>
+                                        <input
+                                            type="time"
+                                            value={settings.operations.workingHours.end}
+                                            onChange={(e) => handleInputChange('operations', 'workingHours.end', e.target.value)}
+                                            className="form-control"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Días Máximos de Anticipación</label>
+                                        <input
+                                            type="number"
+                                            value={settings.operations.maxAdvanceDays}
+                                            onChange={(e) => handleInputChange('operations', 'maxAdvanceDays', parseInt(e.target.value))}
+                                            className="form-control"
+                                            min="1"
+                                            max="365"
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleBoolean('operations', 'allowCancellation')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+                                            >
+                                                {settings.operations.allowCancellation ?
+                                                    <FaToggleOn style={{ color: 'var(--primary-medical)' }} /> :
+                                                    <FaToggleOff style={{ color: 'var(--text-muted)' }} />
+                                                }
+                                            </button>
+                                            <label style={{ margin: 0, cursor: 'pointer' }} onClick={() => toggleBoolean('operations', 'allowCancellation')}>
+                                                Permitir Cancelaciones
+                                            </label>
+                                        </div>
+                                        {settings.operations.allowCancellation && (
+                                            <div className="form-group">
+                                                <label>Límite de Cancelación (minutos antes)</label>
+                                                <input
+                                                    type="number"
+                                                    value={settings.operations.cancellationDeadline}
+                                                    onChange={(e) => handleInputChange('operations', 'cancellationDeadline', parseInt(e.target.value))}
+                                                    className="form-control"
+                                                    min="0"
+                                                    max="1440"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
+                        )}
 
-                            {/* Modo Mantenimiento */}
-                            <div className="settings-section">
-                                <div className="section-header">
-                                    <h2>🔧 Modo Mantenimiento</h2>
-                                    <p>Configura el modo de mantenimiento del sistema</p>
-                                </div>
-                                <div className="checkbox-group">
-                                    <label className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            checked={settings.maintenance.enabled}
-                                            onChange={(e) => setSettings({
-                                                ...settings,
-                                                maintenance: { ...settings.maintenance, enabled: e.target.checked }
-                                            })}
-                                            className="checkbox-input"
-                                        />
-                                        <span className="checkbox-text">Activar Modo Mantenimiento</span>
-                                    </label>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="maintenanceMessage">Mensaje de Mantenimiento</label>
-                                    <textarea
-                                        id="maintenanceMessage"
-                                        value={settings.maintenance.message}
-                                        onChange={(e) => setSettings({
-                                            ...settings,
-                                            maintenance: { ...settings.maintenance, message: e.target.value }
-                                        })}
-                                        className="form-textarea"
-                                        rows="3"
-                                        disabled={!settings.maintenance.enabled}
-                                    />
+                        {/* Notifications Settings */}
+                        {activeTab === 'notifications' && (
+                            <div>
+                                <h3 style={{ marginTop: 0, marginBottom: '24px', color: 'var(--text-primary)' }}>
+                                    Configuración de Notificaciones
+                                </h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+                                        <div style={{
+                                            padding: '20px',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: 'var(--border-radius-sm)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '16px'
+                                        }}>
+                                            <FaEnvelope style={{ fontSize: '24px', color: 'var(--primary-medical)' }} />
+                                            <div style={{ flex: 1 }}>
+                                                <h4 style={{ margin: 0, marginBottom: '4px' }}>Email</h4>
+                                                <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>Notificaciones por correo</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleBoolean('notifications', 'email')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+                                            >
+                                                {settings.notifications.email ?
+                                                    <FaToggleOn style={{ color: 'var(--success-color)' }} /> :
+                                                    <FaToggleOff style={{ color: 'var(--text-muted)' }} />
+                                                }
+                                            </button>
+                                        </div>
+
+                                        <div style={{
+                                            padding: '20px',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: 'var(--border-radius-sm)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '16px'
+                                        }}>
+                                            <FaSms style={{ fontSize: '24px', color: 'var(--warning-color)' }} />
+                                            <div style={{ flex: 1 }}>
+                                                <h4 style={{ margin: 0, marginBottom: '4px' }}>SMS</h4>
+                                                <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>Mensajes de texto</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleBoolean('notifications', 'sms')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+                                            >
+                                                {settings.notifications.sms ?
+                                                    <FaToggleOn style={{ color: 'var(--success-color)' }} /> :
+                                                    <FaToggleOff style={{ color: 'var(--text-muted)' }} />
+                                                }
+                                            </button>
+                                        </div>
+
+                                        <div style={{
+                                            padding: '20px',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: 'var(--border-radius-sm)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '16px'
+                                        }}>
+                                            <FaMobile style={{ fontSize: '24px', color: 'var(--info-color)' }} />
+                                            <div style={{ flex: 1 }}>
+                                                <h4 style={{ margin: 0, marginBottom: '4px' }}>Push</h4>
+                                                <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>Notificaciones push</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleBoolean('notifications', 'push')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+                                            >
+                                                {settings.notifications.push ?
+                                                    <FaToggleOn style={{ color: 'var(--success-color)' }} /> :
+                                                    <FaToggleOff style={{ color: 'var(--text-muted)' }} />
+                                                }
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleBoolean('notifications', 'reminders.enabled')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+                                            >
+                                                {settings.notifications.reminders.enabled ?
+                                                    <FaToggleOn style={{ color: 'var(--primary-medical)' }} /> :
+                                                    <FaToggleOff style={{ color: 'var(--text-muted)' }} />
+                                                }
+                                            </button>
+                                            <label style={{ margin: 0, cursor: 'pointer' }} onClick={() => toggleBoolean('notifications', 'reminders.enabled')}>
+                                                Recordatorios Automáticos
+                                            </label>
+                                        </div>
+                                        {settings.notifications.reminders.enabled && (
+                                            <div className="form-group">
+                                                <label>Horas Antes del Turno</label>
+                                                <input
+                                                    type="number"
+                                                    value={settings.notifications.reminders.beforeHours}
+                                                    onChange={(e) => handleInputChange('notifications', 'reminders.beforeHours', parseInt(e.target.value))}
+                                                    className="form-control"
+                                                    min="1"
+                                                    max="72"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Botones de Acción */}
-                        <div className="settings-actions">
-                            <button onClick={handleReset} className="btn btn-secondary">
-                                <i className="fas fa-undo"></i>
-                                Restaurar Valores
-                            </button>
-                            <button onClick={handleSave} className="btn btn-primary" disabled={loading}>
-                                <i className="fas fa-save"></i>
-                                {loading ? 'Guardando...' : 'Guardar Configuración'}
-                            </button>
-                        </div>
+                        {/* Maintenance Settings */}
+                        {activeTab === 'maintenance' && (
+                            <div>
+                                <h3 style={{ marginTop: 0, marginBottom: '24px', color: 'var(--text-primary)' }}>
+                                    Configuración de Mantenimiento
+                                </h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                    <div style={{
+                                        padding: '20px',
+                                        border: `2px solid ${settings.maintenance.enabled ? 'var(--warning-color)' : 'var(--border-color)'}`,
+                                        borderRadius: 'var(--border-radius)',
+                                        background: settings.maintenance.enabled ? 'rgba(255, 193, 7, 0.1)' : 'transparent'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                                            <FaWrench style={{ fontSize: '24px', color: settings.maintenance.enabled ? 'var(--warning-color)' : 'var(--text-muted)' }} />
+                                            <div style={{ flex: 1 }}>
+                                                <h4 style={{ margin: 0, marginBottom: '4px' }}>Modo Mantenimiento</h4>
+                                                <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>
+                                                    {settings.maintenance.enabled ? 'Sistema actualmente en mantenimiento' : 'Sistema operativo normal'}
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleBoolean('maintenance', 'enabled')}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '32px' }}
+                                            >
+                                                {settings.maintenance.enabled ?
+                                                    <FaToggleOn style={{ color: 'var(--warning-color)' }} /> :
+                                                    <FaToggleOff style={{ color: 'var(--text-muted)' }} />
+                                                }
+                                            </button>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Mensaje de Mantenimiento</label>
+                                            <textarea
+                                                value={settings.maintenance.message}
+                                                onChange={(e) => handleInputChange('maintenance', 'message', e.target.value)}
+                                                className="form-control"
+                                                rows="3"
+                                                placeholder="Mensaje que verán los usuarios durante el mantenimiento"
+                                            />
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Fecha y Hora Programada</label>
+                                                <input
+                                                    type="datetime-local"
+                                                    value={settings.maintenance.scheduledTime}
+                                                    onChange={(e) => handleInputChange('maintenance', 'scheduledTime', e.target.value)}
+                                                    className="form-control"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Duración Estimada (minutos)</label>
+                                                <input
+                                                    type="number"
+                                                    value={settings.maintenance.estimatedDuration}
+                                                    onChange={(e) => handleInputChange('maintenance', 'estimatedDuration', parseInt(e.target.value))}
+                                                    className="form-control"
+                                                    min="5"
+                                                    max="480"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Security Settings */}
+                        {activeTab === 'security' && (
+                            <div>
+                                <h3 style={{ marginTop: 0, marginBottom: '24px', color: 'var(--text-primary)' }}>
+                                    Configuración de Seguridad
+                                </h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                                    <div className="form-group">
+                                        <label>Tiempo de Sesión (minutos)</label>
+                                        <input
+                                            type="number"
+                                            value={settings.security.sessionTimeout}
+                                            onChange={(e) => handleInputChange('security', 'sessionTimeout', parseInt(e.target.value))}
+                                            className="form-control"
+                                            min="15"
+                                            max="480"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Longitud Mínima de Contraseña</label>
+                                        <input
+                                            type="number"
+                                            value={settings.security.passwordMinLength}
+                                            onChange={(e) => handleInputChange('security', 'passwordMinLength', parseInt(e.target.value))}
+                                            className="form-control"
+                                            min="6"
+                                            max="20"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Máximo Intentos de Login</label>
+                                        <input
+                                            type="number"
+                                            value={settings.security.maxLoginAttempts}
+                                            onChange={(e) => handleInputChange('security', 'maxLoginAttempts', parseInt(e.target.value))}
+                                            className="form-control"
+                                            min="3"
+                                            max="10"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Duración de Bloqueo (minutos)</label>
+                                        <input
+                                            type="number"
+                                            value={settings.security.lockoutDuration}
+                                            onChange={(e) => handleInputChange('security', 'lockoutDuration', parseInt(e.target.value))}
+                                            className="form-control"
+                                            min="5"
+                                            max="60"
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: '24px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleBoolean('security', 'requireSpecialChars')}
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+                                        >
+                                            {settings.security.requireSpecialChars ?
+                                                <FaToggleOn style={{ color: 'var(--primary-medical)' }} /> :
+                                                <FaToggleOff style={{ color: 'var(--text-muted)' }} />
+                                            }
+                                        </button>
+                                        <label style={{ margin: 0, cursor: 'pointer' }} onClick={() => toggleBoolean('security', 'requireSpecialChars')}>
+                                            Requerir Caracteres Especiales en Contraseñas
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                </main>
+                </div>
             </div>
         </div>
     );

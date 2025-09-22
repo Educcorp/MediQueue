@@ -303,7 +303,7 @@ const TurnManager = () => {
   return (
     <div className="admin-page-unified">
       <AdminHeader />
-      
+
       <div className="admin-container">
         {/* Page Header */}
         <div className="page-header">
@@ -401,7 +401,7 @@ const TurnManager = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="card-content" style={{ padding: 0 }}>
             {turns.length === 0 ? (
               <div className="empty-state">

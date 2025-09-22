@@ -282,7 +282,7 @@ const ConsultorioManagement = () => {
   return (
     <div className="admin-page-unified">
       <AdminHeader />
-      
+
       <div className="admin-container">
         {/* Page Header */}
         <div className="page-header">
@@ -442,7 +442,7 @@ const ConsultorioManagement = () => {
 
               return (
                 <div key={area.uk_area} className="content-card">
-                  <div className="card-header" style={{ 
+                  <div className="card-header" style={{
                     background: `linear-gradient(135deg, ${areaIcon.color}20, ${areaIcon.color}10)`,
                     borderBottom: `1px solid ${areaIcon.color}30`
                   }}>
@@ -469,15 +469,15 @@ const ConsultorioManagement = () => {
                       </div>
                     </div>
                     <div className="card-actions">
-                      <button 
-                        className="card-action" 
+                      <button
+                        className="card-action"
                         onClick={() => handleEditArea(area)}
                         title="Editar área"
                       >
                         <FaEdit />
                       </button>
-                      <button 
-                        className="card-action" 
+                      <button
+                        className="card-action"
                         onClick={() => handleDeleteArea(area)}
                         title="Eliminar área"
                         style={{ color: 'var(--danger-color)' }}
@@ -486,7 +486,7 @@ const ConsultorioManagement = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="card-content">
                     {/* Consultorios List */}
                     {areaConsultorios.length === 0 ? (
@@ -540,7 +540,7 @@ const ConsultorioManagement = () => {
 
                     {/* Add Consultorio Button */}
                     <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                      <button 
+                      <button
                         className="btn btn-secondary"
                         onClick={() => handleAddConsultorio(area)}
                         style={{ width: '100%' }}
