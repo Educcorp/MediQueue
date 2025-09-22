@@ -9,7 +9,34 @@ import areaService from '../services/areaService';
 import adminService from '../services/adminService';
 import { TURN_STATUS_LABELS, RECORD_STATUS_LABELS } from '../utils/constants';
 import { formatDate, formatDateTime } from '../utils/helpers';
-import '../styles/AdminPages.css';
+import '../styles/UnifiedAdminPages.css';
+
+// React Icons
+import {
+  FaChartLine,
+  FaCalendarCheck,
+  FaCalendarDay,
+  FaUsers,
+  FaHospital,
+  FaBuilding,
+  FaUserShield,
+  FaSync,
+  FaDownload,
+  FaFilter,
+  FaEye,
+  FaExclamationTriangle,
+  FaTimes,
+  FaArrowUp,
+  FaArrowDown,
+  FaClock,
+  FaUserCheck,
+  FaEnvelope,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaUserMd,
+  FaChartPie,
+  FaChartBar
+} from 'react-icons/fa';
 
 const StatisticsPage = () => {
   const { user, logout } = useAuth();
@@ -74,12 +101,12 @@ const StatisticsPage = () => {
         areaService.getAll().catch(() => []),
         adminService.getAllAdmins().catch(() => []),
         turnService.getTurnsByDate(new Date().toISOString().split('T')[0]).catch(() => []),
-        turnService.getTurnsByDateRange(dateRange.start, dateRange.end).catch(() => [])
+        turnService.getTurnsByDateRange?.(dateRange.start, dateRange.end).catch(() => []) || []
       ]);
 
       // Procesar estadísticas de turnos
       const turnsByStatus = {};
-      Object.values(TURN_STATUS_LABELS).forEach(status => {
+      Object.values(TURN_STATUS_LABELS || {}).forEach(status => {
         turnsByStatus[status] = 0;
       });
 
@@ -87,7 +114,7 @@ const StatisticsPage = () => {
         Object.entries(turnsStats).forEach(([key, value]) => {
           if (key.includes('turnos_')) {
             const status = key.replace('turnos_', '').toUpperCase();
-            if (TURN_STATUS_LABELS[status]) {
+            if (TURN_STATUS_LABELS && TURN_STATUS_LABELS[status]) {
               turnsByStatus[TURN_STATUS_LABELS[status]] = value || 0;
             }
           }
@@ -145,11 +172,6 @@ const StatisticsPage = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/admin');
-  };
-
   const handleDateRangeChange = (e) => {
     const { name, value } = e.target;
     setDateRange(prev => ({
@@ -162,680 +184,438 @@ const StatisticsPage = () => {
     loadStatistics();
   };
 
+  const exportData = () => {
+    // Implementar exportación de datos
+    alert('Función de exportación pendiente de implementar');
+  };
+
   if (loading) {
     return (
-      <div className="statistics-page loading">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Cargando estadísticas...</p>
+      <div className="admin-page-unified">
+        <AdminHeader />
+        <div className="loading-overlay">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Cargando estadísticas...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="statistics-page">
+    <div className="admin-page-unified">
       <AdminHeader />
-      <div className="page-content-wrapper">
+      
+      <div className="admin-container">
+        {/* Page Header */}
+        <div className="page-header">
+          <div className="page-header-icon">
+            <FaChartLine />
+          </div>
+          <div className="page-header-content">
+            <h1 className="page-title">Estadísticas del Sistema</h1>
+            <p className="page-subtitle">
+              Análisis y métricas generales del sistema MediQueue
+            </p>
+          </div>
+          <div className="page-actions">
+            <button className="btn btn-secondary" onClick={exportData}>
+              <FaDownload /> Exportar
+            </button>
+            <button className="btn btn-primary" onClick={refreshData}>
+              <FaSync /> Actualizar
+            </button>
+          </div>
+        </div>
 
+        {/* Error Message */}
         {error && (
-          <div className="error-banner">
-            <span>⚠️ {error}</span>
-            <button onClick={refreshData} className="retry-btn">
-              Reintentar
+          <div className="error-message">
+            <FaExclamationTriangle />
+            <span>{error}</span>
+            <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+              <FaTimes />
             </button>
           </div>
         )}
 
-        <main className="management-content">
-          {/* Filtros de fecha */}
-          <div className="filters-section">
-            <div className="date-range-filters">
-              <div className="filter-group">
-                <label>Fecha Inicio</label>
-                <input
-                  type="date"
-                  name="start"
-                  value={dateRange.start}
-                  onChange={handleDateRangeChange}
-                  className="filter-input"
-                />
-              </div>
-              <div className="filter-group">
-                <label>Fecha Fin</label>
-                <input
-                  type="date"
-                  name="end"
-                  value={dateRange.end}
-                  onChange={handleDateRangeChange}
-                  className="filter-input"
-                />
-              </div>
-              <button onClick={refreshData} className="btn primary">
-                <i className="fas fa-sync-alt"></i>
-                Actualizar
-              </button>
-            </div>
+        {/* Date Range Filters */}
+        <div className="filters-section">
+          <div className="filter-group">
+            <label>Fecha Inicio</label>
+            <input
+              type="date"
+              name="start"
+              value={dateRange.start}
+              onChange={handleDateRangeChange}
+              className="form-control"
+            />
           </div>
+          <div className="filter-group">
+            <label>Fecha Fin</label>
+            <input
+              type="date"
+              name="end"
+              value={dateRange.end}
+              onChange={handleDateRangeChange}
+              className="form-control"
+            />
+          </div>
+          <div className="filter-group">
+            <button className="btn btn-secondary" onClick={refreshData}>
+              <FaFilter /> Aplicar Filtros
+            </button>
+          </div>
+        </div>
 
-          {/* Estadísticas generales */}
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-calendar-check"></i>
+        {/* Main Statistics Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--primary-medical), var(--accent-medical))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaCalendarCheck />
               </div>
-              <div className="stat-content">
-                <h3>{stats.turns.total}</h3>
-                <p>Total Turnos</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-calendar-day"></i>
-              </div>
-              <div className="stat-content">
-                <h3>{stats.turns.today}</h3>
-                <p>Turnos Hoy</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-users"></i>
-              </div>
-              <div className="stat-content">
-                <h3>{stats.patients.total}</h3>
-                <p>Total Pacientes</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-hospital"></i>
-              </div>
-              <div className="stat-content">
-                <h3>{stats.consultorios.total}</h3>
-                <p>Total Consultorios</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-building"></i>
-              </div>
-              <div className="stat-content">
-                <h3>{stats.areas.total}</h3>
-                <p>Total Áreas</p>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <i className="fas fa-user-shield"></i>
-              </div>
-              <div className="stat-content">
-                <h3>{stats.admins.total}</h3>
-                <p>Total Administradores</p>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {stats.turns.total}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Total Turnos
+                </p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
+                  Hoy: {stats.turns.today}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Gráficos y tablas */}
-          <div className="charts-section">
-            <div className="chart-card">
-              <h3>Turnos por Estado</h3>
-              <div className="chart-content">
-                {Object.entries(stats.turns.byStatus).map(([status, count]) => (
-                  <div key={status} className="chart-bar">
-                    <div className="bar-label">{status}</div>
-                    <div className="bar-container">
-                      <div
-                        className="bar-fill"
-                        style={{ width: `${(count / stats.turns.total) * 100}%` }}
-                      ></div>
-                    </div>
-                    <div className="bar-value">{count}</div>
-                  </div>
-                ))}
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--success-color), #20c997)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUsers />
               </div>
-            </div>
-
-            <div className="chart-card">
-              <h3>Consultorios por Área</h3>
-              <div className="chart-content">
-                {Object.entries(stats.consultorios.byArea).map(([area, count]) => (
-                  <div key={area} className="chart-bar">
-                    <div className="bar-label">{area}</div>
-                    <div className="bar-container">
-                      <div
-                        className="bar-fill"
-                        style={{ width: `${(count / stats.consultorios.total) * 100}%` }}
-                      ></div>
-                    </div>
-                    <div className="bar-value">{count}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="chart-card">
-              <h3>Administradores por Tipo</h3>
-              <div className="chart-content">
-                {Object.entries(stats.admins.byType).map(([type, count]) => (
-                  <div key={type} className="chart-bar">
-                    <div className="bar-label">{type}</div>
-                    <div className="bar-container">
-                      <div
-                        className="bar-fill"
-                        style={{ width: `${(count / stats.admins.total) * 100}%` }}
-                      ></div>
-                    </div>
-                    <div className="bar-value">{count}</div>
-                  </div>
-                ))}
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {stats.patients.total}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Total Pacientes
+                </p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
+                  Activos: {stats.patients.active}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Tabla de turnos recientes */}
-          <div className="recent-turns-section">
-            <h3>Turnos Recientes</h3>
-            <div className="turns-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th># Turno</th>
-                    <th>Consultorio</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentTurns.map(turn => (
-                    <tr key={turn.uk_turno}>
-                      <td>#{turn.i_numero_turno}</td>
-                      <td>Consultorio {turn.i_numero_consultorio}</td>
-                      <td>
-                        <span className={`status-badge ${turn.s_estado.toLowerCase().replace('_', '-')}`}>
-                          {TURN_STATUS_LABELS[turn.s_estado] || turn.s_estado}
-                        </span>
-                      </td>
-                      <td>{formatDate(turn.d_fecha)}</td>
-                      <td>{turn.t_hora}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {recentTurns.length === 0 && (
-                <div className="empty-state">
-                  <p>No hay turnos en el rango de fechas seleccionado</p>
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--info-color), var(--primary-medical))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaHospital />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {stats.consultorios.total}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Consultorios
+                </p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
+                  Activos: {stats.consultorios.active}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--warning-color), #fd7e14)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUserShield />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {stats.admins.total}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Administradores
+                </p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
+                  {Object.entries(stats.admins.byType).map(([type, count]) => `${type}: ${count}`).join(', ')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '32px' }}>
+          {/* Turns by Status Chart */}
+          <div className="content-card">
+            <div className="card-header">
+              <h3 className="card-title">
+                <FaChartPie />
+                Turnos por Estado
+              </h3>
+              <div className="card-actions">
+                <button className="card-action" title="Ver gráfico">
+                  <FaEye />
+                </button>
+              </div>
+            </div>
+            <div className="card-content">
+              {Object.keys(stats.turns.byStatus).length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                    const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
+                    const colors = {
+                      'En espera': 'var(--info-color)',
+                      'Llamando': 'var(--warning-color)',
+                      'Atendido': 'var(--success-color)',
+                      'Cancelado': 'var(--danger-color)',
+                      'No presente': 'var(--secondary-medical)'
+                    };
+                    const color = colors[status] || 'var(--primary-medical)';
+
+                    return (
+                      <div key={status} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{
+                          width: '12px',
+                          height: '12px',
+                          borderRadius: '50%',
+                          backgroundColor: color
+                        }}></div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                              {status}
+                            </span>
+                            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+                              {count} ({percentage}%)
+                            </span>
+                          </div>
+                          <div style={{
+                            width: '100%',
+                            height: '6px',
+                            backgroundColor: 'var(--border-color)',
+                            borderRadius: '3px',
+                            overflow: 'hidden'
+                          }}>
+                            <div style={{
+                              width: `${percentage}%`,
+                              height: '100%',
+                              backgroundColor: color,
+                              transition: 'width 0.3s ease'
+                            }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="empty-state" style={{ padding: '40px 20px' }}>
+                  <FaChartPie />
+                  <h3>Sin datos de turnos</h3>
+                  <p>No hay información de turnos para mostrar</p>
                 </div>
               )}
             </div>
           </div>
-        </main>
 
-        <style>{`
-        .statistics-page {
-          min-height: 100vh;
-          background: #f8fafc;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .statistics-page.loading {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .loading-container {
-          text-align: center;
-          color: #718096;
-        }
-
-        .loading-spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #e2e8f0;
-          border-top: 4px solid #667eea;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 20px auto;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .error-banner {
-          background: #fed7d7;
-          color: #c53030;
-          padding: 15px 20px;
-          margin: 20px;
-          border-radius: 8px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          box-shadow: 0 2px 10px rgba(197, 48, 48, 0.1);
-        }
-
-        .retry-btn {
-          background: #c53030;
-          color: white;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.3s ease;
-        }
-
-        .retry-btn:hover {
-          background: #9c2626;
-          transform: translateY(-1px);
-        }
-
-        .management-header {
-          background: white;
-          border-bottom: 1px solid #e2e8f0;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-          padding: 20px;
-        }
-
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .header-logo-section {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .header-logo-container {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .header-logo-image {
-          width: 40px;
-          height: 40px;
-          object-fit: contain;
-        }
-
-        .header-logo-text-group {
-          display: flex;
-          align-items: baseline;
-        }
-
-        .header-logo-text {
-          font-size: 1.5em;
-          font-weight: 700;
-          color: #2d3748;
-        }
-
-        .header-logo-text2 {
-          font-size: 1.5em;
-          font-weight: 700;
-          color: #667eea;
-        }
-
-        .header-subtitle h1 {
-          margin: 0;
-          color: #2d3748;
-          font-size: 1.8em;
-        }
-
-        .header-subtitle p {
-          margin: 5px 0 0 0;
-          color: #718096;
-        }
-
-        .header-right {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .back-btn {
-          background: #f1f5f9;
-          border: 1px solid #cbd5e0;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          color: #4a5568;
-          text-decoration: none;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .back-btn:hover {
-          background: #e2e8f0;
-        }
-
-        .admin-name {
-          color: #4a5568;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .logout-btn {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .logout-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 5px 15px rgba(197, 48, 48, 0.3);
-        }
-
-        .management-content {
-          padding: 40px 20px;
-        }
-
-        .filters-section {
-          background: white;
-          border-radius: 12px;
-          padding: 20px;
-          margin-bottom: 30px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .date-range-filters {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .filter-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .filter-group label {
-          font-weight: 600;
-          color: #4a5568;
-        }
-
-        .filter-input {
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-        }
-
-        .filter-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-          padding: 12px 20px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          text-decoration: none;
-        }
-
-        .btn.primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-        }
-
-        .btn.primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 20px;
-          margin-bottom: 30px;
-        }
-
-        .stat-card {
-          background: white;
-          border-radius: 12px;
-          padding: 20px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        .stat-icon {
-          width: 50px;
-          height: 50px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5em;
-          color: white;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .stat-content h3 {
-          margin: 0;
-          font-size: 2em;
-          font-weight: 700;
-          color: #2d3748;
-        }
-
-        .stat-content p {
-          margin: 0;
-          color: #718096;
-          font-weight: 500;
-        }
-
-        .charts-section {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-          gap: 20px;
-          margin-bottom: 30px;
-        }
-
-        .chart-card {
-          background: white;
-          border-radius: 12px;
-          padding: 20px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .chart-card h3 {
-          margin: 0 0 20px 0;
-          color: #2d3748;
-          font-size: 1.2em;
-        }
-
-        .chart-content {
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-        }
-
-        .chart-bar {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .bar-label {
-          min-width: 120px;
-          font-weight: 500;
-          color: #4a5568;
-        }
-
-        .bar-container {
-          flex: 1;
-          height: 20px;
-          background: #e2e8f0;
-          border-radius: 10px;
-          overflow: hidden;
-        }
-
-        .bar-fill {
-          height: 100%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 10px;
-          transition: width 0.3s ease;
-        }
-
-        .bar-value {
-          min-width: 30px;
-          text-align: right;
-          font-weight: 600;
-          color: #2d3748;
-        }
-
-        .recent-turns-section {
-          background: white;
-          border-radius: 12px;
-          padding: 20px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .recent-turns-section h3 {
-          margin: 0 0 20px 0;
-          color: #2d3748;
-          font-size: 1.2em;
-        }
-
-        .turns-table {
-          overflow-x: auto;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th {
-          background: #f7fafc;
-          padding: 15px 20px;
-          text-align: left;
-          font-weight: 600;
-          color: #4a5568;
-          border-bottom: 1px solid #e2e8f0;
-        }
-
-        td {
-          padding: 15px 20px;
-          border-bottom: 1px solid #f1f5f9;
-        }
-
-        tr:hover {
-          background: #f8fafc;
-        }
-
-        .status-badge {
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.8em;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-
-        .status-badge.en-espera {
-          background: #bee3f8;
-          color: #2a4365;
-        }
-
-        .status-badge.llamando {
-          background: #e9d8fd;
-          color: #553c9a;
-        }
-
-        .status-badge.atendido {
-          background: #c6f6d5;
-          color: #22543d;
-        }
-
-        .status-badge.cancelado {
-          background: #fed7d7;
-          color: #742a2a;
-        }
-
-        .status-badge.no-presente {
-          background: #f7fafc;
-          color: #4a5568;
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 40px 20px;
-          color: #718096;
-        }
-
-        @media (max-width: 768px) {
-          .header-left {
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-          }
-
-          .header-right {
-            flex-direction: column;
-            gap: 10px;
-          }
-
-          .date-range-filters {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .charts-section {
-            grid-template-columns: 1fr;
-          }
-
-          .chart-bar {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 8px;
-          }
-
-          .bar-label {
-            min-width: auto;
-          }
-
-          .bar-value {
-            text-align: left;
-          }
-        }
-      `}</style>
+          {/* Quick Stats */}
+          <div className="content-card">
+            <div className="card-header">
+              <h3 className="card-title">
+                <FaChartBar />
+                Resumen Rápido
+              </h3>
+            </div>
+            <div className="card-content">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ 
+                  padding: '16px', 
+                  background: 'rgba(var(--primary-medical-rgb, 47, 151, 209), 0.1)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  border: '1px solid rgba(var(--primary-medical-rgb, 47, 151, 209), 0.2)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '14px' }} />
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Pacientes con Email</span>
+                  </div>
+                  <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--primary-medical)' }}>
+                    {stats.patients.withEmail}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {stats.patients.total > 0 ? ((stats.patients.withEmail / stats.patients.total) * 100).toFixed(1) : 0}% del total
+                  </div>
+                </div>
+
+                <div style={{ 
+                  padding: '16px', 
+                  background: 'rgba(var(--success-color-rgb, 40, 167, 69), 0.1)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  border: '1px solid rgba(var(--success-color-rgb, 40, 167, 69), 0.2)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <FaBuilding style={{ color: 'var(--success-color)', fontSize: '14px' }} />
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Áreas Médicas</span>
+                  </div>
+                  <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--success-color)' }}>
+                    {stats.areas.total}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {stats.areas.active} activas
+                  </div>
+                </div>
+
+                <div style={{ 
+                  padding: '16px', 
+                  background: 'rgba(var(--info-color-rgb, 23, 162, 184), 0.1)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  border: '1px solid rgba(var(--info-color-rgb, 23, 162, 184), 0.2)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <FaCalendarDay style={{ color: 'var(--info-color)', fontSize: '14px' }} />
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Turnos Hoy</span>
+                  </div>
+                  <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--info-color)' }}>
+                    {stats.turns.today}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Consultorios by Area */}
+        {Object.keys(stats.consultorios.byArea).length > 0 && (
+          <div className="content-card">
+            <div className="card-header">
+              <h3 className="card-title">
+                <FaHospital />
+                Consultorios por Área Médica
+              </h3>
+            </div>
+            <div className="card-content">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                {Object.entries(stats.consultorios.byArea).map(([area, count]) => (
+                  <div key={area} style={{
+                    padding: '16px',
+                    background: 'rgba(255, 255, 255, 0.5)',
+                    borderRadius: 'var(--border-radius-sm)',
+                    border: '1px solid var(--border-color)',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--primary-medical)', marginBottom: '4px' }}>
+                      {count}
+                    </div>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                      {area}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Turns */}
+        {recentTurns.length > 0 && (
+          <div className="content-card">
+            <div className="card-header">
+              <h3 className="card-title">
+                <FaClock />
+                Actividad Reciente
+              </h3>
+              <div className="card-actions">
+                <button className="card-action" title="Ver todos">
+                  <FaEye />
+                </button>
+              </div>
+            </div>
+            <div className="card-content" style={{ padding: 0 }}>
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th># Turno</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Paciente</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentTurns.map(turn => (
+                      <tr key={turn.uk_turno}>
+                        <td>
+                          <strong>#{turn.i_numero_turno}</strong>
+                        </td>
+                        <td>{formatDate(turn.d_fecha)}</td>
+                        <td>
+                          <span className={`status-badge ${
+                            turn.s_estado === 'ATENDIDO' ? 'success' :
+                            turn.s_estado === 'EN_ESPERA' ? 'info' :
+                            turn.s_estado === 'CANCELADO' ? 'danger' : 'warning'
+                          }`}>
+                            {TURN_STATUS_LABELS?.[turn.s_estado] || turn.s_estado}
+                          </span>
+                        </td>
+                        <td>{turn.paciente_nombre || 'Invitado'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default StatisticsPage;
-
