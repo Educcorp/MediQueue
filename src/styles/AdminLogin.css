@@ -523,6 +523,10 @@
     color: #77b8ce;
 }
 
+.input-with-icon:focus-within .password-toggle-icon {
+    color: #0b84c9  !important;
+}
+
 .password-toggle-icon:disabled {
     cursor: not-allowed;
     opacity: 0.5;
@@ -573,8 +577,8 @@
 
 .form-input:focus+.input-icon,
 .input-with-icon:focus-within .input-icon {
-    color: #6c757d !important;
-    transform: translateY(-50%) scale(1.02);
+    color: #0b84c9 !important;
+    transform: translateY(-50%) scale(1.05);
 }
 
 .input-icon:hover {
