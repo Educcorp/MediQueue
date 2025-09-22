@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import LoadingScreen from '../components/Common/LoadingScreen';
 import '../styles/AdminLogin.css';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -104,6 +105,16 @@ const AdminLogin = () => {
   };
 
   const currentError = localError || error;
+
+  // Mostrar pantalla de carga minimalista durante la autenticación
+  if (isLoading) {
+    return (
+      <LoadingScreen
+        message="Autenticando usuario"
+        showProgress={false}
+      />
+    );
+  }
 
   return (
     <div className="elearning-login">
