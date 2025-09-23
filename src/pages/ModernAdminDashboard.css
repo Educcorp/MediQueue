@@ -41,22 +41,24 @@
     --danger-color: #ef4444;
     --info-color: #38bdf8;
 
-    --bg-main: #0f172a;
-    --bg-white: #0b1220;
-    --bg-glass: rgba(13, 23, 42, 0.75);
-    --bg-card: rgba(15, 23, 42, 0.8);
+    --bg-main: #071327;
+    /* blue-night */
+    --bg-white: #050b16;
+    /* near black with blue tint */
+    --bg-glass: rgba(7, 19, 39, 0.78);
+    --bg-card: rgba(7, 19, 39, 0.86);
 
-    --text-primary: #e5e7eb;
+    --text-primary: #e6edf3;
     --text-secondary: #cbd5e1;
     --text-muted: #94a3b8;
 
-    --border-light: rgba(148, 163, 184, 0.15);
-    --border-color: #1f2937;
+    --border-light: rgba(148, 163, 184, 0.12);
+    --border-color: #0f1b2f;
 
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.65);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.45);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.65);
+    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.7);
 }
 
 /* Main Dashboard Layout */
@@ -515,7 +517,7 @@
 }
 
 .quick-action-item:hover {
-    background: rgba(47, 151, 209, 0.12);
+    background: rgba(47, 151, 209, 0.14);
     border-color: var(--primary-medical);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
