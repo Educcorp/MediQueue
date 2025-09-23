@@ -72,3 +72,23 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-dark);
 }
+
+/* Global form element styles for dark mode */
+[data-theme="dark"] input:not([class]),
+[data-theme="dark"] select:not([class]),
+[data-theme="dark"] textarea:not([class]),
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] input[type="search"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"] {
+  background: var(--color-white) !important;
+  color: var(--color-dark) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] button:not([class]) {
+  background: var(--color-white);
+  color: var(--color-dark);
+  border-color: var(--color-border);
+}

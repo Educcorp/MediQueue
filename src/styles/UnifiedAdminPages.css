@@ -374,7 +374,7 @@
     border-radius: var(--border-radius-sm);
     font-size: 14px;
     transition: all 0.3s ease;
-    background: white;
+    background: var(--bg-main, white);
     color: var(--text-primary);
 }
 

@@ -154,8 +154,12 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: #10b981;
+    color: var(--text-secondary, #10b981);
     font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: var(--bg-main, transparent);
+    border: 1px solid var(--border-light, transparent);
 }
 
 .stat-trend svg {

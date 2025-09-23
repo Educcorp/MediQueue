@@ -87,3 +87,37 @@
     --breakpoint-widescreen: 1200px;
 }
 
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+    --color-light-blue: #0a1222;
+    --color-light-pink: #040814;
+    --color-medium-blue: #77b8ce;
+    --color-dark-gray: #ffffff;
+    --color-coral: #ea5d4b;
+
+    --color-white: #08111d;
+    --color-black: #ffffff;
+
+    --color-success: #34d399;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #38bdf8;
+
+    --background-light: #08111d;
+    --background-medium: #0a1222;
+    --background-dark: #77b8ce;
+
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-light: #e2e8f0;
+    --text-white: #08111d;
+
+    --border-light: rgba(13, 24, 41, 0.5);
+    --border-medium: #0d1829;
+    --border-strong: #77b8ce;
+
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.65);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.9);
+}

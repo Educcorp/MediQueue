@@ -1,4 +1,19 @@
 /* Stats Widgets Component Styles */
+
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+    --bg-main: #0a1222;
+    --bg-card: rgba(8, 17, 29, 0.92);
+    --bg-glass: rgba(8, 17, 29, 0.85);
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-muted: #e2e8f0;
+    --border-color: #0d1829;
+    --border-light: rgba(13, 24, 41, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+}
+
 .stats-widgets-section {
     margin: 40px 0;
 }
@@ -17,11 +32,11 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: #6b7280;
-    background: #f8fafc;
+    color: var(--text-secondary, #6b7280);
+    background: var(--bg-glass, #f8fafc);
     padding: 8px 16px;
     border-radius: 20px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-light, #e2e8f0);
 }
 
 .last-update svg {
@@ -46,11 +61,11 @@
 }
 
 .stats-widget {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: var(--bg-card, linear-gradient(135deg, #ffffff 0%, #f8fafc 100%));
     border-radius: 20px;
     padding: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -58,7 +73,7 @@
 
 .stats-widget:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.15));
 }
 
 .stats-widget::before {
@@ -128,8 +143,9 @@
     font-weight: 600;
     padding: 6px 12px;
     border-radius: 20px;
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+    background: var(--bg-main, rgba(16, 185, 129, 0.1));
+    color: var(--text-secondary, #10b981);
+    border: 1px solid var(--border-light, transparent);
 }
 
 .widget-trend svg {
@@ -143,7 +159,7 @@
 .widget-value {
     font-size: 36px;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--text-primary, #1f2937);
     margin: 0 0 8px 0;
     line-height: 1;
 }
@@ -151,13 +167,13 @@
 .widget-title {
     font-size: 16px;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary, #374151);
     margin: 0 0 4px 0;
 }
 
 .widget-subtitle {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary, #6b7280);
     margin: 0;
 }
 

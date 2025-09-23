@@ -139,9 +139,11 @@
 .search-input {
     width: 100%;
     padding: 12px 16px 12px 40px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 8px;
     font-size: 1em;
+    background: var(--bg-main, white);
+    color: var(--text-primary, inherit);
     transition: all 0.3s ease;
 }
 
@@ -149,6 +151,7 @@
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: var(--bg-white, white);
 }
 
 .search-icon {
@@ -183,18 +186,18 @@
 }
 
 .refresh-button {
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-glass, #f7fafc);
+    border: 1px solid var(--border-light, #e2e8f0);
     padding: 12px 24px;
     border-radius: 8px;
     cursor: pointer;
-    color: #4a5568;
+    color: var(--text-secondary, #4a5568);
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .refresh-button:hover {
-    background: #edf2f7;
+    background: var(--bg-card, #edf2f7);
 }
 
 /* Table styles */
@@ -233,17 +236,18 @@ tr:hover {
 
 .turn-number {
     font-weight: 600;
-    color: #667eea;
+    color: var(--text-primary, #667eea);
 }
 
 .admin-name {
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-primary, #2d3748);
 }
 
 .username-badge {
-    background: #e2e8f0;
-    color: #4a5568;
+    background: var(--bg-glass, #e2e8f0);
+    color: var(--text-secondary, #4a5568);
+    border: 1px solid var(--border-light, transparent);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.8em;
@@ -416,11 +420,12 @@ tr:hover {
 }
 
 .modal {
-    background: white;
+    background: var(--bg-card, white);
+    border: 1px solid var(--border-color, transparent);
     border-radius: 12px;
     width: 90%;
     max-width: 600px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-lg, 0 20px 60px rgba(0, 0, 0, 0.3));
 }
 
 .modal-header {
@@ -433,7 +438,7 @@ tr:hover {
 
 .modal-header h2 {
     margin: 0;
-    color: #2d3748;
+    color: var(--text-primary, #2d3748);
 }
 
 .close-button {
@@ -453,8 +458,8 @@ tr:hover {
 }
 
 .close-button:hover {
-    background: #f1f5f9;
-    color: #4a5568;
+    background: var(--bg-glass, #f1f5f9);
+    color: var(--text-secondary, #4a5568);
 }
 
 .modal-form {
@@ -477,16 +482,18 @@ tr:hover {
 
 .form-group label {
     font-weight: 600;
-    color: #4a5568;
+    color: var(--text-primary, #4a5568);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
     padding: 12px 16px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 8px;
     font-size: 1em;
+    background: var(--bg-main, white);
+    color: var(--text-primary, inherit);
     transition: all 0.3s ease;
 }
 
@@ -514,13 +521,13 @@ tr:hover {
 }
 
 .form-actions button[type="button"] {
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    color: #4a5568;
+    background: var(--bg-glass, #f7fafc);
+    border: 1px solid var(--border-light, #e2e8f0);
+    color: var(--text-secondary, #4a5568);
 }
 
 .form-actions button[type="button"]:hover {
-    background: #edf2f7;
+    background: var(--bg-card, #edf2f7);
 }
 
 .form-actions button.primary {
@@ -540,12 +547,12 @@ tr:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f8fafc;
+    background: var(--bg-main, #f8fafc);
 }
 
 .loading-spinner {
     text-align: center;
-    color: #718096;
+    color: var(--text-secondary, #718096);
 }
 
 .spinner {
