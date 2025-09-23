@@ -1,9 +1,23 @@
 /* AdminDashboard Styles - Professional Medical Design */
 @import './theme.css';
 
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+    --bg-main: #0a1222;
+    --bg-card: rgba(8, 17, 29, 0.92);
+    --bg-glass: rgba(8, 17, 29, 0.85);
+    --text-primary: #f0f4f8;
+    --text-secondary: #d1d8e0;
+    --text-muted: #a8b5c2;
+    --border-color: #0d1829;
+    --border-light: rgba(13, 24, 41, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+}
+
 .admin-dashboard {
     min-height: 100vh;
-    background: linear-gradient(135deg, #d8f0f4 0%, #77b8ce 100%);
+    background: var(--bg-main, linear-gradient(135deg, #d8f0f4 0%, #77b8ce 100%));
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -21,11 +35,11 @@
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: var(--bg-card, linear-gradient(135deg, #ffffff 0%, #f8fafc 100%));
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -33,7 +47,7 @@
 
 .stat-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.12));
 }
 
 .stat-card.primary {
@@ -99,14 +113,14 @@
 .stat-content h3 {
     font-size: 32px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-primary, #1f2937);
     margin: 0 0 8px 0;
     line-height: 1;
 }
 
 .stat-content p {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary, #6b7280);
     margin: 0 0 12px 0;
     font-weight: 500;
 }
@@ -301,13 +315,11 @@
 
 /* Dashboard Cards */
 .dashboard-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(216, 240, 244, 0.4) 100%);
+    background: var(--bg-card, linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(216, 240, 244, 0.4) 100%));
     border-radius: 20px;
     padding: 40px 32px;
-    box-shadow:
-        0 20px 40px rgba(84, 78, 82, 0.1),
-        0 8px 24px rgba(84, 78, 82, 0.05);
-    border: 1px solid rgba(119, 184, 206, 0.2);
+    box-shadow: var(--shadow-lg, 0 20px 40px rgba(84, 78, 82, 0.1), 0 8px 24px rgba(84, 78, 82, 0.05));
+    border: 1px solid var(--border-color, rgba(119, 184, 206, 0.2));
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -337,10 +349,8 @@
 
 .dashboard-card:hover {
     transform: translateY(-6px);
-    box-shadow:
-        0 28px 56px rgba(84, 78, 82, 0.15),
-        0 12px 32px rgba(84, 78, 82, 0.08);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(216, 240, 244, 0.5) 100%);
+    box-shadow: var(--shadow-lg, 0 28px 56px rgba(84, 78, 82, 0.15), 0 12px 32px rgba(84, 78, 82, 0.08));
+    background: var(--bg-card, linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(216, 240, 244, 0.5) 100%));
 }
 
 .card-header {
@@ -365,7 +375,7 @@
 .card-header h2 {
     font-size: 22px;
     font-weight: 700;
-    color: #544e52;
+    color: var(--text-primary, #544e52);
     margin: 0;
     text-shadow: 0 1px 3px rgba(84, 78, 82, 0.1);
     letter-spacing: -0.3px;
@@ -373,7 +383,7 @@
 
 .dashboard-card p {
     font-size: 16px;
-    color: #77b8ce;
+    color: var(--text-secondary, #77b8ce);
     line-height: 1.6;
     margin: 0 0 28px 0;
     font-weight: 400;
@@ -579,12 +589,12 @@
     margin-top: 40px;
 }
 
-.dashboard-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+.dashboard-cards .dashboard-card {
+    background: var(--bg-card, linear-gradient(135deg, #ffffff 0%, #f8fafc 100%));
     border-radius: 20px;
     padding: 28px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -651,14 +661,14 @@
 .card-title h2 {
     font-size: 20px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-primary, #1f2937);
     margin: 0 0 8px 0;
     line-height: 1.2;
 }
 
 .card-title p {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary, #6b7280);
     margin: 0;
     line-height: 1.4;
 }
@@ -675,16 +685,16 @@
     align-items: center;
     gap: 10px;
     font-size: 14px;
-    color: #4b5563;
-    background: #f8fafc;
+    color: var(--text-secondary, #4b5563);
+    background: var(--bg-glass, #f8fafc);
     padding: 10px 14px;
     border-radius: 10px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-light, #e2e8f0);
     font-weight: 500;
 }
 
 .stat-item i {
-    color: #6b7280;
+    color: var(--text-muted, #6b7280);
     font-size: 16px;
     width: 20px;
     text-align: center;

@@ -20,19 +20,21 @@
 
 /* Dark theme overrides */
 [data-theme="dark"] {
-  --color-primary: #071327;
-  /* deep blue-night start */
-  --color-secondary: #050b16;
-  /* blue-black end */
+  --color-primary: #0a1222;
+  /* deep blue-night background */
+  --color-secondary: #040814;
+  /* almost black with blue tint */
   --color-accent: #77b8ce;
   /* keep brand accent */
-  --color-dark: #e6edf3;
-  /* very light gray-blue text */
+  --color-dark: #f0f4f8;
+  /* brighter text for better readability */
   --color-accent-red: #ea5d4b;
-  --color-white: #0a1222;
-  --color-light-gray: #0a1222;
-  --color-border: #0f1b2f;
-  --color-shadow: rgba(0, 0, 0, 0.6);
+  --color-white: #08111d;
+  /* very dark blue-black for panels */
+  --color-light-gray: #08111d;
+  --color-border: #0d1829;
+  /* darker blue-night border, almost black */
+  --color-shadow: rgba(0, 0, 0, 0.8);
 }
 
 * {
