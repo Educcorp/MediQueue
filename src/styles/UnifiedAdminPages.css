@@ -32,6 +32,34 @@
     --border-radius-lg: 20px;
 }
 
+/* Dark mode variables aligned to brand */
+[data-theme="dark"] {
+    --primary-medical: #77b8ce;
+    --secondary-medical: #9aa4ae;
+    --accent-medical: #2f97d1;
+    --success-color: #34d399;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #38bdf8;
+
+    --bg-main: #0f172a;
+    --bg-white: #0b1220;
+    --bg-glass: rgba(13, 23, 42, 0.75);
+    --bg-card: rgba(15, 23, 42, 0.8);
+
+    --text-primary: #e5e7eb;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+
+    --border-light: rgba(148, 163, 184, 0.15);
+    --border-color: #1f2937;
+
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.65);
+}
+
 /* Main Layout */
 .admin-page-unified {
     min-height: 100vh;
@@ -250,7 +278,7 @@
 
 /* Tables */
 .data-table {
-    background: white;
+    background: var(--bg-card);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-md);
     overflow: hidden;
@@ -262,7 +290,7 @@
 }
 
 .data-table th {
-    background: #f8f9fa;
+    background: rgba(148, 163, 184, 0.08);
     padding: 16px 20px;
     text-align: left;
     font-weight: 600;
@@ -278,7 +306,7 @@
 }
 
 .data-table tbody tr:hover {
-    background: rgba(47, 151, 209, 0.05);
+    background: rgba(47, 151, 209, 0.08);
 }
 
 .data-table tbody tr:last-child td {

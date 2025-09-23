@@ -12,7 +12,9 @@ import {
     FaSignOutAlt,
     FaCog,
     FaUserCog,
-    FaExclamationTriangle
+    FaExclamationTriangle,
+    FaSun,
+    FaMoon
 } from 'react-icons/fa';
 
 const AdminHeader = () => {
@@ -30,6 +32,7 @@ const AdminHeader = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [confirmLogout, setConfirmLogout] = useState(false);
     const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+    const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
 
     // Detectar scroll para efectos del header
     useEffect(() => {
@@ -57,6 +60,15 @@ const AdminHeader = () => {
             return () => clearTimeout(timer);
         }
     }, [notification.show]);
+
+    // Aplicar tema en raiz y persistir
+    useEffect(() => {
+        const root = document.documentElement;
+        root.setAttribute('data-theme', theme);
+        localStorage.setItem('mq-theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
 
     // Función para mostrar notificación
     const showNotification = (message, type = 'success') => {
@@ -370,6 +382,44 @@ const AdminHeader = () => {
                         minWidth: '150px',
                         justifyContent: 'flex-end',
                     }}>
+                        {/* iOS-style theme toggle */}
+                        <button
+                            aria-label="Cambiar tema"
+                            title={theme === 'dark' ? 'Modo oscuro' : 'Modo claro'}
+                            onClick={toggleTheme}
+                            style={{
+                                position: 'relative',
+                                width: '70px',
+                                height: '34px',
+                                borderRadius: '999px',
+                                border: '1px solid rgba(47, 151, 209, 0.3)',
+                                background: theme === 'dark' ? 'linear-gradient(135deg, #0f172a, #111827)' : 'linear-gradient(135deg, #e6f5f9, #f3f8fb)',
+                                boxShadow: theme === 'dark' ? 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.3)' : 'inset 0 0 0 1px rgba(47,151,209,0.06), 0 6px 18px rgba(47,151,209,0.2)',
+                                cursor: 'pointer',
+                                padding: 0,
+                                outline: 'none'
+                            }}
+                        >
+                            <span style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: theme === 'dark' ? '36px' : '6px',
+                                transform: 'translateY(-50%)',
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '50%',
+                                background: theme === 'dark' ? 'linear-gradient(135deg, #1f2937, #0b1220)' : 'linear-gradient(135deg, #ffffff, #e8f3f7)',
+                                boxShadow: theme === 'dark' ? '0 4px 10px rgba(0,0,0,0.4)' : '0 4px 10px rgba(47,151,209,0.25)',
+                                transition: 'left 0.25s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: theme === 'dark' ? '#eab308' : '#0ea5e9'
+                            }}>
+                                {theme === 'dark' ? <FaMoon /> : <FaSun />}
+                            </span>
+                        </button>
+
                         <div
                             data-profile-button
                             style={{
