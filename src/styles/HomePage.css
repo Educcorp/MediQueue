@@ -1,9 +1,23 @@
 /* HomePage Styles - Professional Medical Design */
 @import './theme.css';
 
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+  --bg-main: #0a1222;
+  --bg-card: rgba(8, 17, 29, 0.92);
+  --bg-glass: rgba(8, 17, 29, 0.85);
+  --text-primary: #ffffff;
+  --text-secondary: #f8fafc;
+  --text-muted: #e2e8f0;
+  --border-color: #0d1829;
+  --border-light: rgba(13, 24, 41, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+}
+
 .main-outer-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #d8f0f4 0%, #77b8ce 100%);
+  background: var(--bg-main, linear-gradient(135deg, #d8f0f4 0%, #77b8ce 100%));
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
 }
@@ -116,13 +130,11 @@
 
 /* Main Turn Display */
 .main-turn {
-  background: linear-gradient(135deg, rgba(216, 240, 244, 0.4) 0%, rgba(255, 255, 255, 0.9) 100%);
+  background: var(--bg-card, linear-gradient(135deg, rgba(216, 240, 244, 0.4) 0%, rgba(255, 255, 255, 0.9) 100%));
   border-radius: 24px;
   padding: 48px;
-  box-shadow:
-    0 20px 40px rgba(84, 78, 82, 0.15),
-    0 8px 24px rgba(84, 78, 82, 0.1);
-  border: 1px solid rgba(119, 184, 206, 0.2);
+  box-shadow: var(--shadow-lg, 0 20px 40px rgba(84, 78, 82, 0.15), 0 8px 24px rgba(84, 78, 82, 0.1));
+  border: 1px solid var(--border-color, rgba(119, 184, 206, 0.2));
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(20px);
@@ -195,11 +207,11 @@
 .turn-id-big {
   font-size: 120px;
   font-weight: 800;
-  color: #544e52;
+  color: var(--text-primary, #544e52);
   margin: 24px 0;
   text-shadow: 0 4px 12px rgba(84, 78, 82, 0.2);
   line-height: 1;
-  background: linear-gradient(135deg, #544e52 0%, #77b8ce 100%);
+  background: linear-gradient(135deg, var(--text-primary, #544e52) 0%, #77b8ce 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -226,7 +238,7 @@
 .main-loading,
 .main-no-turn {
   font-size: 24px;
-  color: #77b8ce;
+  color: var(--text-secondary, #77b8ce);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -258,13 +270,11 @@
 
 /* Sidebar */
 .sidebar {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(216, 240, 244, 0.3) 100%);
+  background: var(--bg-card, linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(216, 240, 244, 0.3) 100%));
   border-radius: 20px;
   padding: 32px;
-  box-shadow:
-    0 16px 32px rgba(84, 78, 82, 0.12),
-    0 6px 16px rgba(84, 78, 82, 0.08);
-  border: 1px solid rgba(119, 184, 206, 0.15);
+  box-shadow: var(--shadow-lg, 0 16px 32px rgba(84, 78, 82, 0.12), 0 6px 16px rgba(84, 78, 82, 0.08));
+  border: 1px solid var(--border-color, rgba(119, 184, 206, 0.15));
   backdrop-filter: blur(15px);
   max-height: 600px;
   overflow: hidden;
@@ -275,14 +285,14 @@
 .sidebar-title {
   font-size: 20px;
   font-weight: 700;
-  color: #544e52;
+  color: var(--text-primary, #544e52);
   margin-bottom: 24px;
   display: flex;
   align-items: center;
   gap: 12px;
   text-shadow: 0 1px 3px rgba(84, 78, 82, 0.1);
   padding-bottom: 16px;
-  border-bottom: 2px solid rgba(119, 184, 206, 0.2);
+  border-bottom: 2px solid var(--border-light, rgba(119, 184, 206, 0.2));
 }
 
 .sidebar-title i {
@@ -312,7 +322,7 @@
 }
 
 .sidebar-turn {
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--bg-glass, rgba(255, 255, 255, 0.6));
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
@@ -320,14 +330,14 @@
   justify-content: space-between;
   align-items: center;
   transition: all 0.3s ease;
-  border: 1px solid rgba(119, 184, 206, 0.1);
-  box-shadow: 0 4px 12px rgba(84, 78, 82, 0.08);
+  border: 1px solid var(--border-light, rgba(119, 184, 206, 0.1));
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(84, 78, 82, 0.08));
 }
 
 .sidebar-turn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(84, 78, 82, 0.15);
-  background: rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(84, 78, 82, 0.15));
+  background: var(--bg-card, rgba(255, 255, 255, 0.8));
 }
 
 .turn-info {
@@ -338,19 +348,19 @@
 
 .turn-id {
   font-weight: 700;
-  color: #544e52;
+  color: var(--text-primary, #544e52);
   font-size: 16px;
 }
 
 .turn-patient {
   font-weight: 600;
-  color: #77b8ce;
+  color: var(--text-secondary, #77b8ce);
   font-size: 14px;
 }
 
 .turn-room {
   font-size: 13px;
-  color: #77b8ce;
+  color: var(--text-secondary, #77b8ce);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -386,7 +396,7 @@
 .sidebar-loading,
 .sidebar-empty {
   text-align: center;
-  color: #77b8ce;
+  color: var(--text-secondary, #77b8ce);
   font-size: 16px;
   padding: 40px 20px;
   display: flex;

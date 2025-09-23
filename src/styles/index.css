@@ -26,8 +26,8 @@
   /* almost black with blue tint */
   --color-accent: #77b8ce;
   /* keep brand accent */
-  --color-dark: #f0f4f8;
-  /* brighter text for better readability */
+  --color-dark: #ffffff;
+  /* white text for maximum readability */
   --color-accent-red: #ea5d4b;
   --color-white: #08111d;
   /* very dark blue-black for panels */

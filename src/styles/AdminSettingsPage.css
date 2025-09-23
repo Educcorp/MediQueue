@@ -5,9 +5,9 @@
     --bg-main: #0a1222;
     --bg-card: rgba(8, 17, 29, 0.92);
     --bg-glass: rgba(8, 17, 29, 0.85);
-    --text-primary: #f0f4f8;
-    --text-secondary: #d1d8e0;
-    --text-muted: #a8b5c2;
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-muted: #e2e8f0;
     --border-color: #0d1829;
     --border-light: rgba(13, 24, 41, 0.5);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
