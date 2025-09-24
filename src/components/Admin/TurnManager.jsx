@@ -36,7 +36,7 @@ const TurnManager = () => {
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
   const isDarkMode = theme === 'dark';
@@ -49,7 +49,7 @@ const TurnManager = () => {
         setTheme(currentTheme);
       }
     });
-    
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme']
@@ -248,19 +248,14 @@ const TurnManager = () => {
         alert('Turno actualizado correctamente');
       } else {
         // Crear nuevo turno
-        if (formData.uk_paciente) {
-          await turnService.createTurnWithPaciente({
-            uk_consultorio: formData.uk_consultorio,
-            uk_paciente: formData.uk_paciente,
-            s_observaciones: formData.s_observaciones
-          });
-        } else {
-          await turnService.createTurn({
-            uk_consultorio: formData.uk_consultorio,
-            s_observaciones: formData.s_observaciones
-          });
-        }
-        alert('Turno creado correctamente');
+        // Para asignar un paciente ya existente, usar el endpoint estándar /turnos
+        // con uk_consultorio y opcionalmente uk_paciente.
+        const payload = {
+          uk_consultorio: formData.uk_consultorio,
+          s_observaciones: formData.s_observaciones,
+          ...(formData.uk_paciente ? { uk_paciente: formData.uk_paciente } : {})
+        };
+        await turnService.createTurn(payload);
       }
 
       await loadTurns();
@@ -651,7 +646,7 @@ const TurnManager = () => {
           </div>
         </div>
       )}
-      
+
       <AdminFooter isDarkMode={isDarkMode} />
     </div>
   );
