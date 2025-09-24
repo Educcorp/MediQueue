@@ -1,0 +1,658 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { FaPaperPlane, FaTimes, FaRobot, FaUser, FaStethoscope, FaSpinner, FaHeart, FaUserMd } from 'react-icons/fa';
+import { BsChatDots, BsArrowUp, BsQuestionCircle, BsLightbulb } from 'react-icons/bs';
+import { MdSend, MdClose, MdLocalHospital } from 'react-icons/md';
+
+const API_URL = 'https://educstation-backend-production.up.railway.app/api/chatbot/message';
+
+const Chatbot = () => {
+    const [open, setOpen] = useState(false);
+    const [messages, setMessages] = useState([
+        { sender: 'bot', text: '¡Hola! Soy el asistente virtual de MediQueue. ¿En qué puedo ayudarte con tus consultas médicas o turnos hoy?' }
+    ]);
+    const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [typing, setTyping] = useState(false);
+    const [minimized, setMinimized] = useState(false);
+    const [showPromo, setShowPromo] = useState(false);
+    const [promoAnimation, setPromoAnimation] = useState('');
+    const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
+    const promoTimeoutRef = useRef(null);
+
+    // Paleta de colores médica de MediQueue
+    const colors = {
+        primary: '#77b8ce',      // Azul médico principal
+        primaryLight: '#a8d1e0', // Azul claro
+        primaryDark: '#5a9bb0',  // Azul oscuro
+        secondary: '#6c757d',    // Gris médico
+        accent: '#28a745',       // Verde médico (salud)
+        white: '#ffffff',
+        background: '#f8f9fa',
+        textPrimary: '#2c3e50',
+        textSecondary: '#6c757d',
+        gray100: '#f8f9fa',
+        gray200: '#e9ecef',
+        gray300: '#dee2e6',
+        gray400: '#ced4da',
+        gray600: '#6c757d',
+        gray700: '#495057',
+        success: '#28a745',
+        danger: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8'
+    };
+
+    // Mostrar mensaje promocional después de unos segundos si el chat está cerrado
+    useEffect(() => {
+        if (!open && !sessionStorage.getItem('mediqueueChatbotHelpDismissed')) {
+            // Mostrar mensaje promocional después de un tiempo
+            promoTimeoutRef.current = setTimeout(() => {
+                setShowPromo(true);
+                setPromoAnimation('slideIn');
+            }, 3000); // Mostrar después de 3 segundos
+
+            // Ocultar mensaje promocional después de un tiempo si el usuario no interactúa
+            const hideTimeout = setTimeout(() => {
+                if (showPromo) {
+                    handleClosePromo();
+                }
+            }, 15000); // Ocultar después de 15 segundos si no hay interacción
+
+            return () => {
+                clearTimeout(promoTimeoutRef.current);
+                clearTimeout(hideTimeout);
+            };
+        } else {
+            // Si el chat se abre, ocultar el mensaje promocional
+            if (showPromo) {
+                handleClosePromo();
+            }
+        }
+    }, [open, showPromo]);
+
+    // Cerrar el mensaje promocional con animación
+    const handleClosePromo = () => {
+        sessionStorage.setItem('mediqueueChatbotHelpDismissed', 'true');
+        setPromoAnimation('slideOut');
+        setTimeout(() => {
+            setShowPromo(false);
+            setPromoAnimation('');
+        }, 300); // Duración de la animación
+    };
+
+    // Abrir el chat desde el mensaje promocional
+    const handleOpenChatFromPromo = () => {
+        sessionStorage.setItem('mediqueueChatbotHelpDismissed', 'true');
+        handleClosePromo();
+        setOpen(true);
+    };
+
+    useEffect(() => {
+        if (open && messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Enfocar el input cuando se abre el chat
+        if (open && inputRef.current && !minimized) {
+            inputRef.current.focus();
+        }
+    }, [messages, open, minimized]);
+
+    const sendMessage = async (e) => {
+        e.preventDefault();
+        if (!input.trim()) return;
+        const userMessage = { sender: 'user', text: input };
+        setMessages((msgs) => [...msgs, userMessage]);
+        setInput('');
+        setLoading(true);
+        setTyping(true);
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: `Contexto médico de MediQueue: ${input}. Responde con información médica general y orientación sobre turnos médicos.`
+                })
+            });
+            const data = await res.json();
+
+            // Simular efecto de escritura
+            setTimeout(() => {
+                setTyping(false);
+                setMessages((msgs) => [
+                    ...msgs,
+                    { sender: 'bot', text: data.response || 'No he podido responderte en este momento. Te recomiendo consultar con un profesional médico para información específica.' }
+                ]);
+            }, 500);
+        } catch (err) {
+            setTyping(false);
+            setMessages((msgs) => [
+                ...msgs,
+                { sender: 'bot', text: 'Ha ocurrido un error. Para consultas médicas urgentes, contacta directamente con tu centro de salud.' }
+            ]);
+        }
+        setLoading(false);
+    };
+
+    const toggleMinimize = () => {
+        setMinimized(!minimized);
+    };
+
+    // Estilos en línea adaptados a la temática médica de MediQueue
+    const styles = {
+        container: {
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            fontFamily: "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+        },
+        toggle: {
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
+            color: colors.white,
+            border: 'none',
+            borderRadius: '50%',
+            width: 60,
+            height: 60,
+            fontSize: '1.5rem',
+            boxShadow: '0 4px 15px rgba(119, 184, 206, 0.3)',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: 'translateZ(0)',
+        },
+        toggleIcon: {
+            fontSize: '1.5rem',
+            transition: 'transform 0.3s ease',
+            animation: 'pulse 2s infinite'
+        },
+        promoMessage: {
+            position: 'absolute',
+            bottom: 75,
+            right: 10,
+            background: colors.white,
+            color: colors.textPrimary,
+            padding: '12px 16px',
+            borderRadius: 15,
+            boxShadow: '0 4px 15px rgba(119, 184, 206, 0.15)',
+            maxWidth: 220,
+            fontSize: '0.9rem',
+            border: `1px solid ${colors.primary}`,
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            cursor: 'pointer',
+            transform: promoAnimation === 'slideOut'
+                ? 'translateX(100%) scale(0.9)'
+                : promoAnimation === 'slideIn'
+                    ? 'translateX(0) scale(1)'
+                    : 'translateX(100%) scale(0.9)',
+            opacity: promoAnimation === 'slideOut' ? 0 : 1,
+            transformOrigin: 'bottom right'
+        },
+        promoHeader: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontWeight: 600,
+            color: colors.primary
+        },
+        promoIcon: {
+            color: colors.accent,
+            fontSize: '1.1rem',
+            animation: 'bounce 2s infinite'
+        },
+        promoClose: {
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            background: 'transparent',
+            border: 'none',
+            color: colors.gray400,
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            padding: '2px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            width: '18px',
+            height: '18px',
+            transition: 'all 0.2s ease',
+            zIndex: 10,
+        },
+        promoTip: {
+            marginTop: '4px',
+            fontSize: '0.8rem',
+            color: colors.gray600,
+            fontStyle: 'italic',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+        },
+        window: {
+            width: 360,
+            height: minimized ? 60 : 500,
+            background: colors.white,
+            borderRadius: 20,
+            boxShadow: '0 8px 30px rgba(119, 184, 206, 0.12), 0 2px 8px rgba(119, 184, 206, 0.06)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            transition: 'all 0.3s ease-in-out',
+            border: `1px solid ${colors.primary}`
+        },
+        header: {
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
+            color: colors.white,
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: `1px solid ${colors.primaryLight}`,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+        },
+        headerTitle: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+        },
+        headerIcon: {
+            fontSize: '1.2rem',
+        },
+        headerControls: {
+            display: 'flex',
+            gap: '10px',
+        },
+        controlButton: {
+            background: 'rgba(255,255,255,0.2)',
+            border: 'none',
+            borderRadius: '50%',
+            width: 28,
+            height: 28,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'background 0.2s',
+            color: colors.white,
+        },
+        messages: {
+            flex: 1,
+            padding: 16,
+            overflowY: 'auto',
+            background: colors.background,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+            transition: 'all 0.2s ease',
+            opacity: minimized ? 0 : 1,
+            maxHeight: minimized ? 0 : '100%',
+        },
+        message: {
+            maxWidth: '85%',
+            padding: '10px 14px',
+            borderRadius: 18,
+            fontSize: '0.95rem',
+            lineHeight: 1.5,
+            wordBreak: 'break-word',
+            position: 'relative',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            transition: 'all 0.2s ease',
+            animation: 'fadeIn 0.3s ease',
+        },
+        user: {
+            alignSelf: 'flex-end',
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
+            color: colors.white,
+            borderBottomRightRadius: 5,
+        },
+        bot: {
+            alignSelf: 'flex-start',
+            background: `linear-gradient(135deg, ${colors.gray100} 0%, ${colors.gray200} 100%)`,
+            color: colors.textPrimary,
+            borderBottomLeftRadius: 5,
+        },
+        messageIcon: {
+            position: 'absolute',
+            top: -15,
+            left: -8,
+            background: colors.gray100,
+            borderRadius: '50%',
+            padding: 5,
+            fontSize: '0.8rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            color: colors.primary,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 24,
+            height: 24,
+        },
+        userIcon: {
+            left: 'auto',
+            right: -5,
+            background: colors.primary,
+            color: colors.white,
+        },
+        typingIndicator: {
+            alignSelf: 'flex-start',
+            background: colors.gray200,
+            borderRadius: 18,
+            padding: '8px 16px',
+            color: colors.textPrimary,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: '0.9rem',
+            animation: 'fadeIn 0.3s ease',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+        },
+        dot: {
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            background: colors.primary,
+            opacity: 0.7,
+        },
+        dot1: {
+            animation: 'bounce 1.4s infinite ease-in-out',
+            animationDelay: '0s',
+        },
+        dot2: {
+            animation: 'bounce 1.4s infinite ease-in-out',
+            animationDelay: '0.2s',
+        },
+        dot3: {
+            animation: 'bounce 1.4s infinite ease-in-out',
+            animationDelay: '0.4s',
+        },
+        inputArea: {
+            display: 'flex',
+            padding: '12px 16px',
+            background: colors.gray100,
+            borderTop: `1px solid ${colors.gray200}`,
+            transition: 'all 0.2s ease',
+            opacity: minimized ? 0 : 1,
+            maxHeight: minimized ? 0 : 60,
+            overflow: 'hidden',
+        },
+        inputWrapper: {
+            flex: 1,
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            background: colors.white,
+            borderRadius: 30,
+            border: `1px solid ${colors.gray200}`,
+            transition: 'all 0.2s ease',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        },
+        input: {
+            flex: 1,
+            border: 'none',
+            borderRadius: 30,
+            padding: '10px 14px',
+            fontSize: '0.95rem',
+            outline: 'none',
+            background: 'transparent',
+            color: colors.textPrimary,
+        },
+        sendBtn: {
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
+            color: colors.white,
+            border: 'none',
+            borderRadius: '50%',
+            width: 36,
+            height: 36,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease',
+            opacity: loading || !input.trim() ? 0.7 : 1,
+            marginLeft: 8,
+            boxShadow: '0 2px 5px rgba(119, 184, 206, 0.2)',
+            transform: loading || !input.trim() ? 'scale(0.95)' : 'scale(1)',
+        },
+        sendIcon: {
+            fontSize: '1rem',
+        },
+        spinner: {
+            animation: 'spin 1s linear infinite',
+        }
+    };
+
+    // Aplicar estilos CSS para animaciones
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.innerHTML = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes floatUpDown {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      .mediqueue-chatbot-toggle-icon {
+        animation: pulse 2s infinite;
+      }
+      .mediqueue-chatbot-message {
+        animation: fadeIn 0.3s ease;
+      }
+      .mediqueue-chatbot-dot-1 {
+        animation: bounce 1.4s infinite ease-in-out;
+        animation-delay: 0s;
+      }
+      .mediqueue-chatbot-dot-2 {
+        animation: bounce 1.4s infinite ease-in-out;
+        animation-delay: 0.2s;
+      }
+      .mediqueue-chatbot-dot-3 {
+        animation: bounce 1.4s infinite ease-in-out;
+        animation-delay: 0.4s;
+      }
+      .mediqueue-chatbot-spinner {
+        animation: spin 1s linear infinite;
+      }
+      .mediqueue-chatbot-promo-icon {
+        animation: floatUpDown 2s infinite ease-in-out;
+      }
+      .mediqueue-chatbot-toggle:hover {
+        transform: scale(1.05) translateZ(0);
+        box-shadow: 0 6px 20px rgba(119, 184, 206, 0.4);
+      }
+    `;
+        document.head.appendChild(style);
+
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
+
+    return (
+        <div style={styles.container}>
+            {open ? (
+                <div style={styles.window}>
+                    <div style={styles.header}>
+                        <div style={styles.headerTitle}>
+                            <MdLocalHospital style={styles.headerIcon} />
+                            <span>Asistente MediQueue</span>
+                        </div>
+                        <div style={styles.headerControls}>
+                            <button
+                                onClick={toggleMinimize}
+                                style={styles.controlButton}
+                                title={minimized ? "Expandir" : "Minimizar"}
+                            >
+                                <BsArrowUp style={{ transform: minimized ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />
+                            </button>
+                            <button
+                                onClick={() => setOpen(false)}
+                                style={styles.controlButton}
+                                title="Cerrar"
+                            >
+                                <MdClose />
+                            </button>
+                        </div>
+                    </div>
+
+                    {!minimized && (
+                        <div style={styles.messages}>
+                            {messages.map((msg, idx) => (
+                                <div
+                                    key={idx}
+                                    className="mediqueue-chatbot-message"
+                                    style={{
+                                        ...styles.message,
+                                        ...(msg.sender === 'user' ? styles.user : styles.bot)
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            ...styles.messageIcon,
+                                            ...(msg.sender === 'user' ? styles.userIcon : {})
+                                        }}
+                                    >
+                                        {msg.sender === 'user' ? <FaUser /> : <FaUserMd />}
+                                    </div>
+                                    {msg.text}
+                                </div>
+                            ))}
+
+                            {typing && (
+                                <div style={styles.typingIndicator}>
+                                    <span>Escribiendo</span>
+                                    <div className="mediqueue-chatbot-dot-1" style={{ ...styles.dot, ...styles.dot1 }}></div>
+                                    <div className="mediqueue-chatbot-dot-2" style={{ ...styles.dot, ...styles.dot2 }}></div>
+                                    <div className="mediqueue-chatbot-dot-3" style={{ ...styles.dot, ...styles.dot3 }}></div>
+                                </div>
+                            )}
+
+                            <div ref={messagesEndRef} />
+                        </div>
+                    )}
+
+                    {!minimized && (
+                        <form style={styles.inputArea} onSubmit={sendMessage}>
+                            <div style={styles.inputWrapper}>
+                                <input
+                                    type="text"
+                                    value={input}
+                                    onChange={e => setInput(e.target.value)}
+                                    placeholder="Pregúntame sobre turnos, especialidades médicas o salud..."
+                                    disabled={loading}
+                                    style={styles.input}
+                                    ref={inputRef}
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading || !input.trim()}
+                                style={styles.sendBtn}
+                                title="Enviar mensaje"
+                            >
+                                {loading ?
+                                    <FaSpinner className="mediqueue-chatbot-spinner" style={styles.sendIcon} /> :
+                                    <MdSend style={styles.sendIcon} />
+                                }
+                            </button>
+                        </form>
+                    )}
+                </div>
+            ) : (
+                <>
+                    {/* Mensaje promocional médico */}
+                    {showPromo && (
+                        <div style={styles.promoMessage} className="mediqueue-chatbot-promo" onClick={(e) => e.target === e.currentTarget && handleOpenChatFromPromo()}>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleClosePromo();
+                                }}
+                                style={styles.promoClose}
+                                title="Cerrar mensaje"
+                            >
+                                <MdClose />
+                            </button>
+                            <div style={styles.promoHeader}>
+                                <FaHeart className="mediqueue-chatbot-promo-icon" style={styles.promoIcon} />
+                                <span>¿Necesitas ayuda médica?</span>
+                            </div>
+                            <p>¡Hola! Soy tu asistente virtual de MediQueue. Puedo ayudarte con información médica general y gestión de turnos.</p>
+                            <div style={{
+                                marginTop: '8px',
+                                display: 'flex',
+                                justifyContent: 'center'
+                            }}>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleOpenChatFromPromo();
+                                    }}
+                                    style={{
+                                        background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
+                                        color: colors.white,
+                                        border: 'none',
+                                        padding: '8px 12px',
+                                        borderRadius: '20px',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        boxShadow: '0 2px 8px rgba(119, 184, 206, 0.2)',
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '6px'
+                                    }}
+                                >
+                                    <BsChatDots size={14} />
+                                    Consultar ahora
+                                </button>
+                            </div>
+                            <div style={styles.promoTip}>
+                                <FaStethoscope size={12} />
+                                <span>Información médica 24/7</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <button
+                        className="mediqueue-chatbot-toggle"
+                        style={styles.toggle}
+                        onClick={() => setOpen(true)}
+                        title="Abrir asistente médico MediQueue"
+                    >
+                        <FaStethoscope className="mediqueue-chatbot-toggle-icon" style={styles.toggleIcon} />
+                    </button>
+                </>
+            )}
+        </div>
+    );
+};
+
+export default Chatbot;
