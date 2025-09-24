@@ -477,20 +477,26 @@
     backdrop-filter: blur(4px);
 }
 
+/* COMENTADO: Causaba spinners duplicados
 .loading-spinner {
     text-align: center;
     color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    transform: none !important;
 }
 
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid var(--border-color);
-    border-top: 4px solid var(--primary-medical);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 16px auto;
+.loading-spinner p,
+.loading-spinner span {
+    transform: none !important;
+    animation: none !important;
+    margin: 0;
 }
+*/
+
+/* Spinner styles now handled globally in index.css */
 
 @keyframes spin {
     0% {

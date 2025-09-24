@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import turnService from '../services/turnService';
@@ -152,12 +152,39 @@ const AdminDashboardEnhanced = () => {
 
     if (loading) {
         return (
-            <div className="admin-dashboard loading">
+            <div className="admin-dashboard">
                 <AdminHeader />
-                <div className="loading-container">
-                    <div className="loading-spinner"></div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                }}>
+                  <div style={{
+                    textAlign: 'center',
+                    color: '#718096'
+                  }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      border: '4px solid #e2e8f0',
+                      borderTop: '4px solid #77b8ce',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                      margin: '0 auto 20px auto'
+                    }}></div>
                     <p>Cargando dashboard...</p>
+                  </div>
                 </div>
+                <style>
+                  {`
+                    @keyframes spin {
+                      0% { transform: rotate(0deg); }
+                      100% { transform: rotate(360deg); }
+                    }
+                  `}
+                </style>
             </div>
         );
     }

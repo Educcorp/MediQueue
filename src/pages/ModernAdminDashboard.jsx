@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
-import LoadingScreen from '../components/Common/LoadingScreen';
+import AdminFooter from '../components/Common/AdminFooter';
+import TestSpinner from '../components/Common/TestSpinner';
 import turnService from '../services/turnService';
 import patientService from '../services/patientService';
 import consultorioService from '../services/consultorioService';
@@ -53,6 +54,35 @@ const ModernAdminDashboard = () => {
         avgWaitTime: 15
     });
 
+    // Detectar tema actual
+    const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
+    const isDarkMode = theme === 'dark';
+
+    // Escuchar cambios de tema
+    useEffect(() => {
+        const handleThemeChange = () => {
+            const currentTheme = localStorage.getItem('mq-theme') || 'light';
+            setTheme(currentTheme);
+        };
+
+        // Verificar cambios directos en el atributo data-theme
+        const observer = new MutationObserver(() => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            if (currentTheme !== theme) {
+                setTheme(currentTheme);
+            }
+        });
+        
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [theme]);
+
     useEffect(() => {
         loadDashboardData();
     }, []);
@@ -98,7 +128,7 @@ const ModernAdminDashboard = () => {
     };
 
     if (loading) {
-        return <LoadingScreen message="Cargando dashboard médico" showProgress={true} />;
+        return <TestSpinner message="Cargando dashboard..." />;
     }
 
     const statCards = [
@@ -354,6 +384,8 @@ const ModernAdminDashboard = () => {
                     </div>
                 </div>
             </div>
+            
+            <AdminFooter isDarkMode={isDarkMode} />
         </div>
     );
 };

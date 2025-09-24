@@ -524,21 +524,6 @@ tr:hover {
     background: #f8fafc;
 }
 
-.loading-spinner {
-    text-align: center;
-    color: #718096;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e2e8f0;
-    border-top: 4px solid #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px auto;
-}
-
 @keyframes spin {
     0% {
         transform: rotate(0deg);

@@ -7,6 +7,29 @@ const LoadingScreen = ({
 }) => {
     const [progress, setProgress] = useState(0);
     const [dots, setDots] = useState('');
+    
+    // Detectar tema actual
+    const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
+    const isDarkMode = theme === 'dark';
+
+    // Escuchar cambios de tema
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            if (currentTheme !== theme) {
+                setTheme(currentTheme);
+            }
+        });
+        
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [theme]);
 
     useEffect(() => {
         if (showProgress) {
@@ -32,7 +55,9 @@ const LoadingScreen = ({
     }, []);
 
     return (
-        <div className="minimal-loading-screen">
+        <div className="minimal-loading-screen" style={{
+            backgroundColor: isDarkMode ? '#1a202c' : 'inherit'
+        }}>
             <div className="minimal-loading-container">
                 {/* Logo médico simple */}
                 <div className="minimal-medical-icon">
@@ -47,8 +72,25 @@ const LoadingScreen = ({
 
                 {/* Spinner minimalista */}
                 <div className="minimal-spinner">
-                    <div className="spinner-circle"></div>
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        border: `4px solid ${isDarkMode ? '#2d3748' : '#e2e8f0'}`,
+                        borderTop: '4px solid #77b8ce',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        margin: '0 auto'
+                    }}></div>
                 </div>
+
+                <style>
+                    {`
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `}
+                </style>
 
                 {/* Mensaje */}
                 <div className="minimal-message">

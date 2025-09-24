@@ -192,14 +192,16 @@
     gap: 16px;
 }
 
+/* COMENTADO: Causaba spinners duplicados
 .widgets-loading .loading-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid #e2e8f0;
-    border-top: 3px solid #3b82f6;
+    border: 3px solid rgba(119, 184, 206, 0.3);
+    border-top: 3px solid #77b8ce;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
+*/
 
 .widgets-loading p {
     font-size: 14px;

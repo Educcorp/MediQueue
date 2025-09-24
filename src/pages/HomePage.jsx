@@ -134,8 +134,16 @@ const HomePage = () => {
             </div>
             {loading ? (
               <div className="main-loading">
-                <div className="loading-spinner"></div>
-                Cargando...
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '4px solid #e2e8f0',
+                  borderTop: '4px solid #77b8ce',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  margin: '0 auto 10px auto'
+                }}></div>
+                <span className="main-loading-text">Cargando...</span>
               </div>
             ) : nextTurn ? (
               <>
@@ -176,8 +184,16 @@ const HomePage = () => {
           <div className="sidebar-list">
             {loading ? (
               <div className="sidebar-loading">
-                <div className="loading-spinner"></div>
-                Cargando...
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '4px solid #e2e8f0',
+                  borderTop: '4px solid #77b8ce',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  margin: '0 auto 10px auto'
+                }}></div>
+                <span className="sidebar-loading-text">Cargando...</span>
               </div>
             ) : activeTurns.length > 0 ? (
               activeTurns.map((turn) => (
@@ -361,6 +377,11 @@ const HomePage = () => {
           border-bottom: 1px solid #e2e8f0;
           font-weight: 600;
           color: #4a5568;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>

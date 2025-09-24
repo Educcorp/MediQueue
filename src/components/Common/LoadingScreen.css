@@ -152,7 +152,7 @@
     }
 }
 
-.spinner-circle {
+.loading-screen-circle {
     width: 40px;
     height: 40px;
     border: 3px solid #77b8ce;
@@ -291,7 +291,7 @@
         height: 40px;
     }
 
-    .spinner-circle {
+    .loading-screen-circle {
         width: 36px;
         height: 36px;
         border-width: 2px;

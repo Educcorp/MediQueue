@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
+import AdminFooter from '../components/Common/AdminFooter';
+import TestSpinner from '../components/Common/TestSpinner';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
@@ -44,6 +46,30 @@ const ConsultorioManagement = () => {
   const [consultorios, setConsultorios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Detectar tema actual
+  const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
+  const isDarkMode = theme === 'dark';
+
+  // Escuchar cambios de tema
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      if (currentTheme !== theme) {
+        setTheme(currentTheme);
+      }
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [theme]);
+
   const [showAreaModal, setShowAreaModal] = useState(false);
   const [showConsultorioModal, setShowConsultorioModal] = useState(false);
   const [editingArea, setEditingArea] = useState(null);
@@ -77,12 +103,15 @@ const ConsultorioManagement = () => {
   };
 
   useEffect(() => {
-    loadData();
+    // Mostrar spinner brevemente para mejor UX
+    setLoading(true);
+    setTimeout(() => {
+      loadData();
+    }, 800);
   }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true);
       setError(null);
 
       const [areasData, consultoriosData] = await Promise.all([
@@ -102,7 +131,10 @@ const ConsultorioManagement = () => {
       console.error('Error cargando datos:', error);
       setError('Error cargando datos del sistema');
     } finally {
-      setLoading(false);
+      // Delay mínimo para transición suave del spinner
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
     }
   };
 
@@ -266,17 +298,7 @@ const ConsultorioManagement = () => {
   const totalAreas = areas.length;
 
   if (loading) {
-    return (
-      <div className="admin-page-unified">
-        <AdminHeader />
-        <div className="loading-overlay">
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-            <p>Cargando consultorios...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <TestSpinner message="Cargando consultorios..." />;
   }
 
   return (
@@ -710,6 +732,8 @@ const ConsultorioManagement = () => {
           </div>
         </div>
       )}
+      
+      <AdminFooter isDarkMode={isDarkMode} />
     </div>
   );
 };

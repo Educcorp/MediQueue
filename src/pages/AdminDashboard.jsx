@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
+import AdminFooter from '../components/Common/AdminFooter';
 import QuickActions from '../components/Dashboard/QuickActions';
 import StatsWidgets from '../components/Dashboard/StatsWidgets';
 import turnService from '../services/turnService';
@@ -121,10 +122,50 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="admin-dashboard loading">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Cargando dashboard...</p>
+      <div className="admin-dashboard">
+        <AdminHeader />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px 20px',
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+        }}>
+          <div style={{
+            textAlign: 'center',
+            color: '#718096'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '4px solid #e2e8f0',
+              borderTop: '4px solid #77b8ce',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 20px auto'
+            }}></div>
+            <p>Cargando dashboard...</p>
+          </div>
+        </div>
+        <style>
+          {`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}
+        </style>
+        
+        {/* FOOTER TEMPORAL TAMBIÉN EN LOADING */}
+        <div style={{
+          backgroundColor: '#ff0000',
+          color: 'white',
+          padding: '1rem',
+          textAlign: 'center',
+          fontSize: '20px',
+          fontWeight: 'bold'
+        }}>
+          🚨 FOOTER DE PRUEBA EN LOADING - ¿PUEDES VER ESTO? 🚨
         </div>
       </div>
     );
@@ -133,6 +174,21 @@ const AdminDashboard = () => {
   return (
     <div className="admin-dashboard">
       <AdminHeader />
+      
+      {/* FOOTER TEMPORAL - DEBERÍA SER VISIBLE AQUÍ */}
+      <div style={{
+        backgroundColor: '#ff0000',
+        color: 'white',
+        padding: '1rem',
+        textAlign: 'center',
+        fontSize: '20px',
+        fontWeight: 'bold',
+        zIndex: 9999,
+        position: 'relative'
+      }}>
+        🚨 FOOTER DE PRUEBA - ¿PUEDES VER ESTO? 🚨
+      </div>
+      
       <div className="dashboard-content-wrapper">
 
         {error && (
@@ -621,6 +677,18 @@ const AdminDashboard = () => {
           }
         }
       `}</style>
+      </div>
+      
+      {/* Footer temporal para prueba */}
+      <div style={{
+        backgroundColor: '#1a202c',
+        color: 'white',
+        padding: '2rem 0',
+        textAlign: 'center',
+        marginTop: '0'
+      }}>
+        <p style={{ margin: '0 0 0.5rem 0' }}>© 2024 MediQueue - Sistema de Gestión de Turnos Médicos</p>
+        <p style={{ margin: '0' }}>Desarrollado con ❤️ para mejorar la atención médica</p>
       </div>
     </div>
   );

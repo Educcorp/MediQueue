@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminHeader from '../Common/AdminHeader';
+import AdminFooter from '../Common/AdminFooter';
+import TestSpinner from '../Common/TestSpinner';
 import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
@@ -34,6 +36,30 @@ const TurnManager = () => {
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Detectar tema actual
+  const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
+  const isDarkMode = theme === 'dark';
+
+  // Escuchar cambios de tema
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      if (currentTheme !== theme) {
+        setTheme(currentTheme);
+      }
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [theme]);
+
   const [showModal, setShowModal] = useState(false);
   const [editingTurn, setEditingTurn] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -59,7 +85,11 @@ const TurnManager = () => {
 
   // Cargar datos al montar el componente
   useEffect(() => {
-    loadData();
+    // Mostrar spinner brevemente para mejor UX
+    setLoading(true);
+    setTimeout(() => {
+      loadData();
+    }, 800);
   }, []);
 
   // Cargar turnos cuando cambie la fecha, estado o área
@@ -69,7 +99,6 @@ const TurnManager = () => {
 
   const loadData = async () => {
     try {
-      setLoading(true);
       setError(null);
 
       // Cargar datos en paralelo
@@ -95,7 +124,10 @@ const TurnManager = () => {
       setError('Error cargando datos: ' + error.message);
       console.error('Error cargando datos:', error);
     } finally {
-      setLoading(false);
+      // Delay mínimo para transición suave del spinner
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
     }
   };
 
@@ -287,17 +319,7 @@ const TurnManager = () => {
   };
 
   if (loading) {
-    return (
-      <div className="admin-page-unified">
-        <AdminHeader />
-        <div className="loading-overlay">
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-            <p>Cargando turnos...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <TestSpinner message="Cargando turnos..." />;
   }
 
   return (
@@ -628,6 +650,8 @@ const TurnManager = () => {
           </div>
         </div>
       )}
+      
+      <AdminFooter isDarkMode={isDarkMode} />
     </div>
   );
 };

@@ -190,7 +190,16 @@ const TakeTurn = () => {
                 >
                   {loading ? (
                     <>
-                      <span className="loading-spinner"></span>
+                      <div style={{
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid #e2e8f0',
+                        borderTop: '2px solid #77b8ce',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        display: 'inline-block',
+                        marginRight: '8px'
+                      }}></div>
                       Generando Turno...
                     </>
                   ) : (
@@ -215,7 +224,16 @@ const TakeTurn = () => {
             >
               {loading ? (
                 <>
-                  <span className="loading-spinner"></span>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid #e2e8f0',
+                    borderTop: '2px solid #77b8ce',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    display: 'inline-block',
+                    marginRight: '8px'
+                  }}></div>
                   Cargando...
                 </>
               ) : (
@@ -345,6 +363,11 @@ const TakeTurn = () => {
             grid-template-columns: 1fr;
             gap: 10px;
           }
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>

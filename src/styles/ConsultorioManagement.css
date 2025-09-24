@@ -570,7 +570,9 @@
     text-align: center;
 }
 
-.loading-spinner {
+/* Comentado: Este CSS estaba causando spinners duplicados
+   El .loading-spinner ya tiene un .spinner interno que se maneja globalmente
+.consultorio-page .loading-spinner {
     width: 60px;
     height: 60px;
     border: 4px solid rgba(119, 184, 206, 0.3);
@@ -579,6 +581,7 @@
     animation: spin 1s linear infinite;
     margin-bottom: 20px;
 }
+*/
 
 @keyframes spin {
     0% {
