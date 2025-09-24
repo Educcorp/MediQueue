@@ -183,33 +183,52 @@ const ConsultorioManagement = () => {
 
   const handleDeleteArea = async (area) => {
     const consultoriosEnArea = consultorios.filter(c => c.uk_area === area.uk_area);
-    if (consultoriosEnArea.length > 0) {
-      alert(`No se puede eliminar el área "${area.s_nombre_area}" porque tiene ${consultoriosEnArea.length} consultorio(s) asociado(s).`);
-      return;
-    }
+    const mensaje = consultoriosEnArea.length > 0 
+      ? `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?\n\nEsto eliminará también ${consultoriosEnArea.length} consultorio(s) y todos los turnos asociados.`
+      : `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`;
 
-    if (window.confirm(`¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`)) {
+    if (window.confirm(mensaje)) {
       try {
         // Nota: el servicio expone "remove" para eliminación hard.
         await areaService.remove(area.uk_area);
         await loadData();
         alert('Área eliminada correctamente');
       } catch (error) {
-        alert('Error eliminando área: ' + error.message);
         console.error('Error eliminando área:', error);
+        
+        // Manejar diferentes tipos de errores
+        if (error.response?.status === 404) {
+          alert('El área no fue encontrada');
+        } else if (error.response?.status === 403) {
+          alert('No tienes permisos para eliminar esta área');
+        } else {
+          // Error genérico
+          const mensaje = error.response?.data?.message || error.message || 'Error desconocido al eliminar el área';
+          alert('Error eliminando área: ' + mensaje);
+        }
       }
     }
   };
 
   const handleDeleteConsultorio = async (consultorio) => {
-    if (window.confirm(`¿Estás seguro de eliminar el consultorio #${consultorio.i_numero_consultorio}?`)) {
+    if (window.confirm(`¿Estás seguro de eliminar el consultorio #${consultorio.i_numero_consultorio}?\n\nEsto eliminará también todos los turnos asociados a este consultorio.`)) {
       try {
-        await consultorioService.delete(consultorio.uk_consultorio);
+        await consultorioService.remove(consultorio.uk_consultorio);
         await loadData();
         alert('Consultorio eliminado correctamente');
       } catch (error) {
-        alert('Error eliminando consultorio: ' + error.message);
         console.error('Error eliminando consultorio:', error);
+        
+        // Manejar diferentes tipos de errores
+        if (error.response?.status === 404) {
+          alert('El consultorio no fue encontrado');
+        } else if (error.response?.status === 403) {
+          alert('No tienes permisos para eliminar este consultorio');
+        } else {
+          // Error genérico
+          const mensaje = error.response?.data?.message || error.message || 'Error desconocido al eliminar el consultorio';
+          alert('Error eliminando consultorio: ' + mensaje);
+        }
       }
     }
   };
