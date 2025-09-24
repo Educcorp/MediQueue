@@ -42,10 +42,10 @@ const CookieBanner = () => {
                         Política de Privacidad
                     </Link>
                 </div>
-                <button className="cookie-alert-close" onClick={handleClose} title="Cerrar">
-                    <FaTimes />
-                </button>
             </div>
+            <button className="cookie-alert-close" onClick={handleClose} title="Cerrar">
+                <FaTimes />
+            </button>
         </div>
     );
 };
