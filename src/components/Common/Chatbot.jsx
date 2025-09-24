@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { FaPaperPlane, FaTimes, FaRobot, FaUser, FaStethoscope, FaSpinner, FaHeart, FaUserMd } from 'react-icons/fa';
 import { BsChatDots, BsArrowUp, BsQuestionCircle, BsLightbulb } from 'react-icons/bs';
 import { MdSend, MdClose, MdLocalHospital } from 'react-icons/md';
@@ -6,6 +8,8 @@ import { MdSend, MdClose, MdLocalHospital } from 'react-icons/md';
 const API_URL = 'https://educstation-backend-production.up.railway.app/api/chatbot/message';
 
 const Chatbot = () => {
+    const location = useLocation();
+    const { user, isAuthenticated } = useAuth();
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState([
         { sender: 'bot', text: '¡Hola! Soy el asistente virtual de MediQueue. ¿En qué puedo ayudarte con tus consultas médicas o turnos hoy?' }
@@ -19,6 +23,26 @@ const Chatbot = () => {
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const promoTimeoutRef = useRef(null);
+
+    // Función para obtener contexto de la página actual
+    const getPageContext = () => {
+        const path = location.pathname;
+        const pageContexts = {
+            '/': 'Página principal - Información general sobre MediQueue y servicios médicos',
+            '/tomar-turno': 'Página de reserva de turnos - Ayuda con el proceso de tomar turnos médicos',
+            '/admin': 'Panel de administración - Gestión de usuarios y configuración del sistema',
+            '/admin/dashboard': 'Dashboard administrativo - Estadísticas y gestión de turnos',
+            '/admin/users': 'Gestión de usuarios - Administración de cuentas de administradores',
+            '/admin/turns': 'Gestión de turnos - Administración de citas médicas',
+            '/admin/consultorios': 'Gestión de consultorios - Configuración de espacios médicos',
+            '/admin/patients': 'Gestión de pacientes - Administración de información de pacientes',
+            '/admin/statistics': 'Estadísticas - Reportes y métricas del sistema',
+            '/admin/settings': 'Configuración - Ajustes del sistema MediQueue',
+            '/privacy': 'Política de privacidad - Información sobre protección de datos médicos'
+        };
+
+        return pageContexts[path] || 'Página general de MediQueue';
+    };
 
     // Paleta de colores médica de MediQueue
     const colors = {
@@ -108,12 +132,60 @@ const Chatbot = () => {
         setLoading(true);
         setTyping(true);
 
+        // Contexto detallado de MediQueue con información de página actual
+        const currentPageContext = getPageContext();
+        const mediQueueContext = `
+CONTEXTO COMPLETO DE MEDIQUEUE:
+
+MediQueue es un sistema de gestión de turnos médicos que incluye:
+
+🏥 ESPECIALIDADES MÉDICAS DISPONIBLES:
+- Medicina General
+- Cardiología  
+- Traumatología
+- Pediatría
+- Oftalmología
+- Nutrición
+
+📅 FUNCIONALIDADES DEL SISTEMA:
+- Reserva de turnos médicos online
+- Gestión de pacientes
+- Panel administrativo para médicos
+- Estadísticas de turnos
+- Notificaciones automáticas
+- Sistema de colas inteligente
+
+👥 USUARIOS DEL SISTEMA:
+- Pacientes: Pueden reservar turnos, ver su historial
+- Administradores: Gestionan turnos, pacientes, consultorios
+- Médicos: Acceden a su agenda y pacientes
+
+🔧 CARACTERÍSTICAS TÉCNICAS:
+- Interfaz moderna y responsive
+- Sistema de autenticación seguro
+- Dashboard administrativo completo
+- Gestión de múltiples consultorios
+- Reportes y estadísticas en tiempo real
+
+📍 CONTEXTO DE PÁGINA ACTUAL:
+El usuario está en: ${currentPageContext}
+
+👤 ESTADO DEL USUARIO:
+- Autenticado: ${isAuthenticated ? 'Sí' : 'No'}
+- Tipo de usuario: ${isAuthenticated ? (user?.role || 'Administrador') : 'Visitante'}
+- Nombre: ${isAuthenticated ? (user?.nombre || 'Usuario') : 'No autenticado'}
+
+PREGUNTA DEL USUARIO: ${input}
+
+INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contexto de la página actual para dar respuestas más específicas y útiles. Proporciona información útil sobre el sistema de turnos médicos, especialidades disponibles, y cómo usar la plataforma. Si la pregunta es sobre salud específica, orienta hacia consulta médica profesional.
+    `;
+
         try {
             const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: `Contexto médico de MediQueue: ${input}. Responde con información médica general y orientación sobre turnos médicos.`
+                    message: mediQueueContext
                 })
             });
             const data = await res.json();
