@@ -3,10 +3,24 @@
     box-sizing: border-box;
 }
 
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+    --bg-main: #0a1222;
+    --bg-card: rgba(8, 17, 29, 0.92);
+    --bg-glass: rgba(8, 17, 29, 0.85);
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-muted: #e2e8f0;
+    --border-color: #0d1829;
+    --border-light: rgba(13, 24, 41, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+}
+
 /* Ensure all admin pages have consistent body layout */
 .admin-page {
     min-height: 100vh;
-    background: #f8fafc;
+    background: var(--bg-main, #f8fafc);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 0;
     margin: 0;
@@ -67,11 +81,12 @@
 
 /* Filter and search styles */
 .filters-section {
-    background: white;
+    background: var(--bg-card, white);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md, 0 5px 20px rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--border-color, transparent);
     display: flex;
     gap: 20px;
     align-items: center;
@@ -85,16 +100,18 @@
 
 .filter-group label {
     font-weight: 600;
-    color: #4a5568;
+    color: var(--text-secondary, #4a5568);
     font-size: 0.9em;
 }
 
 .filter-input,
 .filter-select {
     padding: 8px 12px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 6px;
     font-size: 0.9em;
+    background: var(--bg-main, white);
+    color: var(--text-primary, inherit);
     transition: all 0.3s ease;
 }
 
@@ -122,9 +139,11 @@
 .search-input {
     width: 100%;
     padding: 12px 16px 12px 40px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 8px;
     font-size: 1em;
+    background: var(--bg-main, white);
+    color: var(--text-primary, inherit);
     transition: all 0.3s ease;
 }
 
@@ -132,6 +151,7 @@
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: var(--bg-white, white);
 }
 
 .search-icon {
@@ -166,26 +186,27 @@
 }
 
 .refresh-button {
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-glass, #f7fafc);
+    border: 1px solid var(--border-light, #e2e8f0);
     padding: 12px 24px;
     border-radius: 8px;
     cursor: pointer;
-    color: #4a5568;
+    color: var(--text-secondary, #4a5568);
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .refresh-button:hover {
-    background: #edf2f7;
+    background: var(--bg-card, #edf2f7);
 }
 
 /* Table styles */
 .turns-table,
 .admins-table {
-    background: white;
+    background: var(--bg-card, white);
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color, transparent);
+    box-shadow: var(--shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.1));
     overflow: hidden;
 }
 
@@ -195,36 +216,38 @@ table {
 }
 
 th {
-    background: #f7fafc;
+    background: var(--bg-glass, #f7fafc);
     padding: 15px 20px;
     text-align: left;
     font-weight: 600;
-    color: #4a5568;
-    border-bottom: 1px solid #e2e8f0;
+    color: var(--text-secondary, #4a5568);
+    border-bottom: 1px solid var(--border-light, #e2e8f0);
 }
 
 td {
     padding: 15px 20px;
-    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-primary, inherit);
+    border-bottom: 1px solid var(--border-light, #f1f5f9);
 }
 
 tr:hover {
-    background: #f8fafc;
+    background: var(--bg-glass, #f8fafc);
 }
 
 .turn-number {
     font-weight: 600;
-    color: #667eea;
+    color: var(--text-primary, #667eea);
 }
 
 .admin-name {
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-primary, #2d3748);
 }
 
 .username-badge {
-    background: #e2e8f0;
-    color: #4a5568;
+    background: var(--bg-glass, #e2e8f0);
+    color: var(--text-secondary, #4a5568);
+    border: 1px solid var(--border-light, transparent);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.8em;
@@ -397,11 +420,12 @@ tr:hover {
 }
 
 .modal {
-    background: white;
+    background: var(--bg-card, white);
+    border: 1px solid var(--border-color, transparent);
     border-radius: 12px;
     width: 90%;
     max-width: 600px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-lg, 0 20px 60px rgba(0, 0, 0, 0.3));
 }
 
 .modal-header {
@@ -414,7 +438,7 @@ tr:hover {
 
 .modal-header h2 {
     margin: 0;
-    color: #2d3748;
+    color: var(--text-primary, #2d3748);
 }
 
 .close-button {
@@ -434,8 +458,8 @@ tr:hover {
 }
 
 .close-button:hover {
-    background: #f1f5f9;
-    color: #4a5568;
+    background: var(--bg-glass, #f1f5f9);
+    color: var(--text-secondary, #4a5568);
 }
 
 .modal-form {
@@ -458,16 +482,18 @@ tr:hover {
 
 .form-group label {
     font-weight: 600;
-    color: #4a5568;
+    color: var(--text-primary, #4a5568);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
     padding: 12px 16px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 8px;
     font-size: 1em;
+    background: var(--bg-main, white);
+    color: var(--text-primary, inherit);
     transition: all 0.3s ease;
 }
 
@@ -495,13 +521,13 @@ tr:hover {
 }
 
 .form-actions button[type="button"] {
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    color: #4a5568;
+    background: var(--bg-glass, #f7fafc);
+    border: 1px solid var(--border-light, #e2e8f0);
+    color: var(--text-secondary, #4a5568);
 }
 
 .form-actions button[type="button"]:hover {
-    background: #edf2f7;
+    background: var(--bg-card, #edf2f7);
 }
 
 .form-actions button.primary {
@@ -521,7 +547,22 @@ tr:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f8fafc;
+    background: var(--bg-main, #f8fafc);
+}
+
+.loading-spinner {
+    text-align: center;
+    color: var(--text-secondary, #718096);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
 }
 
 @keyframes spin {

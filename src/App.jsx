@@ -13,6 +13,8 @@ import PatientManagement from './pages/PatientManagement'
 import StatisticsPage from './pages/StatisticsPage'
 import TurnManager from './components/Admin/TurnManager'
 import ProtectedRoute from './components/Common/ProtectedRoute'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import CookieBanner from './components/Common/CookieBanner'
 import './styles/App.css'
 
 function App() {
@@ -24,6 +26,10 @@ function App() {
 
         {/* Ruta para tomar turnos */}
         <Route path="/tomar-turno" element={<TakeTurn />} />
+
+        {/* Rutas públicas de privacidad y cookies */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLogin />} />
@@ -123,6 +129,9 @@ function App() {
           }
         />
       </Routes>
+
+      {/* Cookie Banner - Se muestra globalmente */}
+      <CookieBanner />
     </div>
   )
 }

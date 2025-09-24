@@ -41,28 +41,34 @@
     --danger-color: #ef4444;
     --info-color: #38bdf8;
 
-    --bg-main: #0f172a;
-    --bg-white: #0b1220;
-    --bg-glass: rgba(13, 23, 42, 0.75);
-    --bg-card: rgba(15, 23, 42, 0.8);
+    --bg-main: #0a1222;
+    /* deep blue-night background */
+    --bg-white: #08111d;
+    /* very dark blue-black for panels */
+    --bg-glass: rgba(8, 17, 29, 0.85);
+    --bg-card: rgba(8, 17, 29, 0.92);
 
-    --text-primary: #e5e7eb;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
+    --text-primary: #ffffff;
+    /* white text for maximum readability */
+    --text-secondary: #f8fafc;
+    /* almost white with subtle blue tint */
+    --text-muted: #e2e8f0;
+    /* very light gray for better visibility */
 
-    --border-light: rgba(148, 163, 184, 0.15);
-    --border-color: #1f2937;
+    --border-light: rgba(13, 24, 41, 0.5);
+    --border-color: #0d1829;
+    /* darker blue-night border, almost black */
 
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.65);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.65);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.9);
 }
 
 /* Main Dashboard Layout */
 .modern-dashboard {
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--bg-main) 0%, #e9ecef 100%);
+    background: var(--bg-main);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -515,7 +521,7 @@
 }
 
 .quick-action-item:hover {
-    background: rgba(47, 151, 209, 0.12);
+    background: rgba(47, 151, 209, 0.14);
     border-color: var(--primary-medical);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);

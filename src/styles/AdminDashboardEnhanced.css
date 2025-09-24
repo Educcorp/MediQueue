@@ -1,9 +1,23 @@
 /* Enhanced Admin Dashboard Styles with React Icons */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+    --bg-main: #0a1222;
+    --bg-card: rgba(8, 17, 29, 0.92);
+    --bg-glass: rgba(8, 17, 29, 0.85);
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-muted: #e2e8f0;
+    --border-color: #0d1829;
+    --border-light: rgba(13, 24, 41, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+}
+
 .admin-dashboard {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: var(--bg-main, #f8fafc);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -22,7 +36,7 @@
     gap: 12px;
     font-size: 24px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-primary, #1f2937);
     margin-bottom: 24px;
     margin-top: 40px;
 }
@@ -45,11 +59,11 @@
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: var(--bg-card, linear-gradient(135deg, #ffffff 0%, #f8fafc 100%));
     border-radius: 20px;
     padding: 28px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -57,7 +71,7 @@
 
 .stat-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.15));
 }
 
 .stat-card.primary {
@@ -123,14 +137,14 @@
 .stat-content h3 {
     font-size: 36px;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--text-primary, #1f2937);
     margin: 0 0 8px 0;
     line-height: 1;
 }
 
 .stat-content p {
     font-size: 16px;
-    color: #6b7280;
+    color: var(--text-secondary, #6b7280);
     margin: 0 0 12px 0;
     font-weight: 500;
 }
@@ -140,8 +154,12 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: #10b981;
+    color: var(--text-secondary, #10b981);
     font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: var(--bg-main, transparent);
+    border: 1px solid var(--border-light, transparent);
 }
 
 .stat-trend svg {
@@ -160,11 +178,11 @@
 }
 
 .quick-access-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: var(--bg-card, linear-gradient(135deg, #ffffff 0%, #f8fafc 100%));
     border-radius: 20px;
     padding: 28px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -177,7 +195,7 @@
 
 .quick-access-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.15));
     text-decoration: none;
     color: inherit;
 }
@@ -243,14 +261,14 @@
 .card-content h3 {
     font-size: 22px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-primary, #1f2937);
     margin: 0 0 8px 0;
     line-height: 1.2;
 }
 
 .card-content p {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary, #6b7280);
     margin: 0 0 16px 0;
     line-height: 1.4;
 }
@@ -266,23 +284,23 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: #4b5563;
-    background: #f8fafc;
+    color: var(--text-secondary, #4b5563);
+    background: var(--bg-glass, #f8fafc);
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-light, #e2e8f0);
     font-weight: 500;
 }
 
 .stat-item svg {
-    color: #6b7280;
+    color: var(--text-muted, #6b7280);
     font-size: 14px;
     width: 16px;
     text-align: center;
 }
 
 .card-arrow {
-    color: #6b7280;
+    color: var(--text-muted, #6b7280);
     font-size: 20px;
     transition: all 0.3s ease;
 }

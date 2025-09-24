@@ -1,4 +1,19 @@
 /* Quick Actions Component Styles */
+
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+    --bg-main: #0a1222;
+    --bg-card: rgba(8, 17, 29, 0.92);
+    --bg-glass: rgba(8, 17, 29, 0.85);
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-muted: #e2e8f0;
+    --border-color: #0d1829;
+    --border-light: rgba(13, 24, 41, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+}
+
 .quick-actions-section {
     margin: 40px 0;
 }
@@ -11,11 +26,11 @@
 }
 
 .quick-action-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: var(--bg-card, linear-gradient(135deg, #ffffff 0%, #f8fafc 100%));
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.06));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -29,7 +44,7 @@
 
 .quick-action-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.12));
     text-decoration: none;
     color: inherit;
 }
@@ -69,14 +84,14 @@
 .action-content h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary, #1f2937);
     margin: 0 0 6px 0;
     line-height: 1.2;
 }
 
 .action-content p {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary, #6b7280);
     margin: 0;
     line-height: 1.4;
 }

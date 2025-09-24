@@ -543,14 +543,15 @@ const PatientManagement = () => {
           backdropFilter: 'blur(4px)'
         }}>
           <div style={{
-            background: 'white',
+            background: 'var(--bg-white)',
             borderRadius: 'var(--border-radius)',
             padding: 0,
             maxWidth: '600px',
             width: '90%',
             maxHeight: '80vh',
             overflow: 'hidden',
-            boxShadow: 'var(--shadow-xl)'
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)'
           }}>
             <div style={{
               padding: '24px',
