@@ -14,7 +14,9 @@ import {
     FaUserCog,
     FaExclamationTriangle,
     FaSun,
-    FaMoon
+    FaMoon,
+    FaShieldAlt,
+    FaCookie
 } from 'react-icons/fa';
 
 const AdminHeader = () => {
@@ -152,6 +154,16 @@ const AdminHeader = () => {
             label: 'Configuración',
             permission: 'admin',
             icon: <FaCog />
+        }
+    ];
+
+    // Items públicos del panel lateral (no requieren permisos de admin)
+    const publicSidebarItems = [
+        {
+            path: '/privacy',
+            label: 'Privacidad y Cookies',
+            permission: 'public',
+            icon: <FaShieldAlt />
         }
     ];
 
@@ -550,6 +562,61 @@ const AdminHeader = () => {
                                             boxShadow: hoveredItem === `menu-${index}` ? (theme === 'dark' ? '0 0 15px rgba(0, 0, 0, 0.35)' : '0 0 15px rgba(47, 151, 209, 0.15)') : 'none',
                                         }}
                                         onMouseEnter={() => setHoveredItem(`menu-${index}`)}
+                                        onMouseLeave={() => setHoveredItem(null)}
+                                        onClick={() => {
+                                            navigate(item.path);
+                                            setIsMenuOpen(false);
+                                        }}
+                                    >
+                                        <span style={{
+                                            marginRight: '12px',
+                                            fontSize: '16px',
+                                            color: theme === 'dark' ? '#77b8ce' : '#2f97d1',
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        }}>
+                                            {item.icon}
+                                        </span>
+                                        {item.label}
+                                    </div>
+                                );
+                            })}
+
+                            <div style={{
+                                height: '1px',
+                                background: theme === 'dark' ? 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)' : 'linear-gradient(90deg, transparent 0%, rgba(148, 163, 184, 0.3) 50%, transparent 100%)',
+                                margin: '12px 0',
+                                width: '100%',
+                            }}></div>
+
+                            {/* Public Section */}
+                            <div style={{
+                                fontSize: '12px',
+                                fontWeight: 600,
+                                color: theme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(107, 114, 128, 0.8)',
+                                textTransform: 'uppercase',
+                                padding: '8px 16px',
+                                letterSpacing: '1px',
+                                marginTop: '8px',
+                            }}>Información Legal</div>
+                            {publicSidebarItems.map((item, index) => {
+                                return (
+                                    <div
+                                        key={item.path}
+                                        style={{
+                                            padding: '12px 16px',
+                                            color: theme === 'dark' ? 'rgba(230, 237, 243, 0.9)' : 'rgba(55, 65, 81, 0.9)',
+                                            textDecoration: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            borderRadius: '8px',
+                                            margin: '4px 0',
+                                            backgroundColor: hoveredItem === `public-${index}` ? (theme === 'dark' ? 'rgba(119, 184, 206, 0.16)' : 'rgba(47, 151, 209, 0.1)') : 'transparent',
+                                            transform: hoveredItem === `public-${index}` ? 'translateX(5px)' : 'translateX(0)',
+                                            boxShadow: hoveredItem === `public-${index}` ? (theme === 'dark' ? '0 0 15px rgba(0, 0, 0, 0.35)' : '0 0 15px rgba(47, 151, 209, 0.15)') : 'none',
+                                        }}
+                                        onMouseEnter={() => setHoveredItem(`public-${index}`)}
                                         onMouseLeave={() => setHoveredItem(null)}
                                         onClick={() => {
                                             navigate(item.path);
