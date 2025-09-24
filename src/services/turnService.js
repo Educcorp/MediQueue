@@ -57,6 +57,17 @@ const turnService = {
         }
     },
 
+    // Crear turno público con asignación automática de consultorio
+    async createTurnPublicoAuto(turnData) {
+        try {
+            const response = await api.post('/turnos/publico/auto', turnData);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error creando turno público automático:', error);
+            throw error;
+        }
+    },
+
     // Actualizar estado de turno
     async updateTurnStatus(uk_turno, s_estado) {
         try {
