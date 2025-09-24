@@ -482,18 +482,21 @@ const HomePage = () => {
           max-width: 1200px;
           margin: 0 auto;
         }
-        /* Tabs responsivas fijas (como pestañas de navegador) */
+        /* Tabs responsivas en UNA sola línea */
         .areas-tabs {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
+          display: flex;
+          flex-wrap: nowrap;
           gap: 12px;
           padding: 8px 4px 18px 4px;
+          width: 100%;
         }
         .area-tab {
           background: #ffffff;
           border: 2px solid #2d3748;
           border-radius: 12px;
           min-height: clamp(42px, calc(90px - (var(--areas-count,7) * 4px)), 90px);
+          flex: 1 1 0;
+          min-width: 0;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -503,7 +506,6 @@ const HomePage = () => {
           text-align: center;
         }
         .area-tab:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-        .area-tab.placeholder { opacity: 0.25; pointer-events: none; }
         .area-tab.skeleton { background: linear-gradient(90deg, #f2f2f2, #e9e9e9, #f2f2f2); background-size: 200% 100%; animation: shine 1.2s linear infinite; }
         .area-tab-text { font-weight: 600; color: #2d3748; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
         @keyframes shine { 0%{background-position: 200% 0} 100%{background-position: -200% 0} }
