@@ -27,8 +27,9 @@ function App() {
         {/* Ruta para tomar turnos */}
         <Route path="/tomar-turno" element={<TakeTurn />} />
 
-        {/* Ruta pública de privacidad y cookies unificada */}
+        {/* Rutas públicas de privacidad y cookies */}
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLogin />} />

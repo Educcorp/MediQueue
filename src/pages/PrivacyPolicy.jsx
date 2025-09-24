@@ -14,13 +14,13 @@ const PrivacyPolicy = () => {
                             <FaShieldAlt />
                         </div>
                         <div className="privacy-title-section">
-                            <h1>Política de Privacidad</h1>
+                            <h1>Política de Privacidad y Cookies</h1>
                             <p className="privacy-subtitle">
-                                Protegemos tu información personal con los más altos estándares de seguridad
+                                Información sobre el manejo de datos y cookies en MediQueue - Panel Administrativo
                             </p>
                             <div className="privacy-meta">
                                 <span className="privacy-date">Última actualización: {new Date().toLocaleDateString('es-ES')}</span>
-                                <span className="privacy-version">Versión 1.0</span>
+                                <span className="privacy-version">Versión 2.0 - Administración</span>
                             </div>
                         </div>
                     </div>
@@ -41,15 +41,18 @@ const PrivacyPolicy = () => {
                     {/* Introducción */}
                     <section className="privacy-section">
                         <div className="privacy-intro">
-                            <h2><FaShieldAlt /> Bienvenido a MediQueue</h2>
+                            <h2><FaShieldAlt /> MediQueue - Sistema Administrativo</h2>
                             <p>
-                                En MediQueue, valoramos y respetamos tu privacidad. Esta Política de Privacidad explica
-                                cómo recopilamos, utilizamos, almacenamos y protegemos tu información personal cuando
-                                utilizas nuestro sistema de gestión de turnos médicos.
+                                Esta política describe cómo MediQueue maneja la información en el contexto del sistema
+                                administrativo de gestión de turnos médicos. Como administrador del sistema, es importante
+                                comprender cómo se procesan y protegen los datos de los pacientes y usuarios del sistema.
                             </p>
                             <div className="privacy-highlight">
                                 <FaShieldAlt />
-                                <span>Tu privacidad es nuestra prioridad. Nos comprometemos a proteger tus datos personales.</span>
+                                <span>
+                                    Sistema de cookies automatizado: Todas las cookies necesarias se aceptan automáticamente
+                                    para garantizar el funcionamiento óptimo del panel administrativo.
+                                </span>
                             </div>
                         </div>
                     </section>
@@ -126,46 +129,28 @@ const PrivacyPolicy = () => {
                         <h2><FaCookie /> Uso de Cookies</h2>
 
                         <div className="privacy-card">
-                            <h3><FaCookie /> ¿Qué son las Cookies?</h3>
+                            <h3><FaCookie /> Política de Cookies</h3>
                             <p>
-                                Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando
-                                visitas nuestro sitio web. Nos ayudan a recordar tus preferencias y mejorar tu experiencia.
+                                MediQueue utiliza cookies para mejorar la funcionalidad del sitio web, proporcionar análisis de uso
+                                y garantizar una experiencia óptima para usuarios y administradores. Al acceder y navegar por nuestro
+                                sitio web, automáticamente aceptas el uso de todas nuestras cookies.
                             </p>
-                        </div>
 
-                        <div className="privacy-grid">
-                            <div className="privacy-card">
-                                <h3><FaLock /> Cookies Esenciales</h3>
-                                <p><strong>Necesarias para el funcionamiento básico:</strong></p>
-                                <ul>
-                                    <li>Sesión de usuario y autenticación</li>
-                                    <li>Preferencias de cookies</li>
-                                    <li>Seguridad y prevención de fraudes</li>
-                                </ul>
-                                <div className="cookie-status required">Siempre activas</div>
+                            <div className="privacy-highlight">
+                                <FaInfoCircle />
+                                <span>
+                                    <strong>Aceptación Automática:</strong> Al continuar navegando en MediQueue,
+                                    aceptas automáticamente el uso de todas nuestras cookies necesarias para el funcionamiento
+                                    del sistema de gestión médica.
+                                </span>
                             </div>
 
-                            <div className="privacy-card">
-                                <h3><FaChartBar /> Cookies Analíticas</h3>
-                                <p><strong>Para mejorar nuestros servicios:</strong></p>
-                                <ul>
-                                    <li>Análisis de uso del sitio web</li>
-                                    <li>Estadísticas de rendimiento</li>
-                                    <li>Identificación de problemas técnicos</li>
-                                </ul>
-                                <div className="cookie-status optional">Opcionales</div>
-                            </div>
-
-                            <div className="privacy-card">
-                                <h3><FaEye /> Cookies de Funcionalidad</h3>
-                                <p><strong>Para personalizar tu experiencia:</strong></p>
-                                <ul>
-                                    <li>Recordar tus preferencias</li>
-                                    <li>Configuraciones del idioma</li>
-                                    <li>Personalización de la interfaz</li>
-                                </ul>
-                                <div className="cookie-status optional">Opcionales</div>
-                            </div>
+                            <h4>Tipos de cookies utilizadas:</h4>
+                            <ul>
+                                <li><strong>Cookies esenciales:</strong> Necesarias para el funcionamiento básico, autenticación y seguridad</li>
+                                <li><strong>Cookies analíticas:</strong> Para análisis de uso y mejora del rendimiento del sistema</li>
+                                <li><strong>Cookies de funcionalidad:</strong> Para personalización y configuraciones de usuario</li>
+                            </ul>
                         </div>
                     </section>
 
