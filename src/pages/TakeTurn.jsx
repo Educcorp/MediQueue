@@ -127,6 +127,19 @@ const TakeTurn = () => {
     <div className="take-turn-container">
       <div className="take-turn-content">
 
+        {/* Encabezado inspirado en admin con estilo propio */}
+        <div className="take-turn-header">
+          <div className="header-card">
+            <div className="header-icon">
+              <i className="fas fa-ticket-alt"></i>
+            </div>
+            <div className="header-texts">
+              <h1 className="header-title">Tomar Turno</h1>
+              <p className="header-subtitle">Gestiona tu ingreso a la cola del consultorio elegido</p>
+            </div>
+          </div>
+        </div>
+
         {/* Formulario para tomar turno */}
         {showForm && (
           <div className="turn-form-card">
@@ -214,13 +227,15 @@ const TakeTurn = () => {
           </div>
         )}
 
-        {/* Botón principal para tomar turno */}
+        {/* Botón principal para tomar turno */
+        }
         {!showForm && (
           <div className="main-button-container">
             <button
               onClick={handleTakeTurn}
               className="main-take-turn-button"
               disabled={loading || consultorios.length === 0}
+              aria-busy={loading ? 'true' : 'false'}
             >
               {loading ? (
                 <>
@@ -270,106 +285,7 @@ const TakeTurn = () => {
         )}
       </div>
 
-      <style>{`
-        .patient-form {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 20px;
-          margin: 20px 0;
-        }
-
-        .patient-form h3 {
-          margin: 0 0 15px 0;
-          color: #4a5568;
-          font-size: 1.1em;
-          font-weight: 600;
-        }
-
-        .form-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 15px;
-          margin-bottom: 15px;
-        }
-
-        .form-row:last-child {
-          margin-bottom: 0;
-        }
-
-        .checkbox-label {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          cursor: pointer;
-          font-weight: 500;
-          color: #4a5568;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-          width: 18px;
-          height: 18px;
-          cursor: pointer;
-        }
-
-        .checkmark {
-          position: relative;
-          display: inline-block;
-          width: 18px;
-          height: 18px;
-          background: #f7fafc;
-          border: 2px solid #e2e8f0;
-          border-radius: 4px;
-          transition: all 0.3s ease;
-        }
-
-        .checkbox-label input[type="checkbox"]:checked + .checkmark {
-          background: #667eea;
-          border-color: #667eea;
-        }
-
-        .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
-          content: '✓';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          color: white;
-          font-size: 12px;
-          font-weight: bold;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-input::placeholder {
-          color: #a0aec0;
-        }
-
-        @media (max-width: 768px) {
-          .form-row {
-            grid-template-columns: 1fr;
-            gap: 10px;
-          }
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      
     </div>
   );
 };
