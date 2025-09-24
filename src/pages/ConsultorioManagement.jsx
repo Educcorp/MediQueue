@@ -241,6 +241,11 @@ const ConsultorioManagement = () => {
       return;
     }
 
+    if (formData.s_nombre_area.trim().length > 50) {
+      alert('El nombre del área no puede exceder los 50 caracteres');
+      return;
+    }
+
     try {
       if (editingArea) {
         await areaService.update(editingArea.uk_area, {
@@ -271,6 +276,12 @@ const ConsultorioManagement = () => {
       return;
     }
 
+    const numeroConsultorio = parseInt(formData.i_numero_consultorio);
+    if (numeroConsultorio < 1 || numeroConsultorio > 999) {
+      alert('El número del consultorio debe estar entre 1 y 999 (máximo 3 dígitos)');
+      return;
+    }
+
     try {
       if (editingConsultorio) {
         await consultorioService.update(editingConsultorio.uk_consultorio, {
@@ -296,6 +307,29 @@ const ConsultorioManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Validación específica para número de consultorio
+    if (name === 'i_numero_consultorio') {
+      // Solo permitir números y limitar a 3 dígitos
+      const numericValue = value.replace(/\D/g, '').slice(0, 3);
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }));
+      return;
+    }
+    
+    // Validación específica para nombre de área
+    if (name === 's_nombre_area') {
+      // Limitar a 50 caracteres
+      const trimmedValue = value.slice(0, 50);
+      setFormData(prev => ({
+        ...prev,
+        [name]: trimmedValue
+      }));
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -655,11 +689,19 @@ const ConsultorioManagement = () => {
                   name="s_nombre_area"
                   value={formData.s_nombre_area}
                   onChange={handleInputChange}
-                  placeholder="Ej: Medicina General, Pediatría, Cardiología..."
+                  placeholder="Ej: Medicina General, Pediatría..."
                   className="form-control"
                   required
-                  maxLength={100}
+                  maxLength={50}
                 />
+                <small style={{ 
+                  color: formData.s_nombre_area.length > 40 ? 'var(--warning)' : 'var(--text-muted)',
+                  fontSize: '12px',
+                  marginTop: '4px',
+                  display: 'block'
+                }}>
+                  {formData.s_nombre_area.length}/50 caracteres
+                </small>
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
@@ -729,15 +771,15 @@ const ConsultorioManagement = () => {
               <div className="form-group">
                 <label>Número del Consultorio *</label>
                 <input
-                  type="number"
+                  type="text"
                   name="i_numero_consultorio"
                   value={formData.i_numero_consultorio}
                   onChange={handleInputChange}
-                  placeholder="Ej: 101, 102, 103..."
+                  placeholder="Ej: 101, 102, 103... (máx. 3 dígitos)"
                   className="form-control"
                   required
-                  min="1"
-                  max="9999"
+                  maxLength="3"
+                  pattern="[0-9]{1,3}"
                 />
               </div>
 
