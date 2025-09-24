@@ -3,8 +3,6 @@ import authService from '../services/authService';
 
 const AuthContext = createContext();
 
-export { AuthContext };
-
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -22,9 +20,8 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                // Verificar tanto localStorage como sessionStorage
-                let token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
-                let savedUser = localStorage.getItem('auth_user') || sessionStorage.getItem('auth_user');
+                const token = localStorage.getItem('auth_token');
+                const savedUser = localStorage.getItem('auth_user');
 
                 if (token && savedUser) {
                     // Verificar que el token sea válido
@@ -32,13 +29,15 @@ export const AuthProvider = ({ children }) => {
                     if (isValid) {
                         setUser(JSON.parse(savedUser));
                     } else {
-                        // Token inválido, limpiar datos de ambos storages
-                        authService.clearAuthData();
+                        // Token inválido, limpiar datos
+                        localStorage.removeItem('auth_token');
+                        localStorage.removeItem('auth_user');
                     }
                 }
             } catch (error) {
                 console.error('Error verificando estado de autenticación:', error);
-                authService.clearAuthData();
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('auth_user');
             } finally {
                 setLoading(false);
             }
@@ -47,37 +46,18 @@ export const AuthProvider = ({ children }) => {
         checkAuthStatus();
     }, []);
 
-    // Función para iniciar sesión por email
-    const login = async (email, password, remember = false) => {
+    // Función para iniciar sesión
+    const login = async (email, password) => {
         try {
             setLoading(true);
             setError(null);
 
             const response = await authService.login(email, password);
 
-            // Guardar datos de autenticación
-            authService.saveAuthData(response, remember);
-            setUser(response.user);
-            return { success: true };
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Error al iniciar sesión';
-            setError(errorMessage);
-            return { success: false, message: errorMessage };
-        } finally {
-            setLoading(false);
-        }
-    };
+            // Guardar token y datos del usuario
+            localStorage.setItem('auth_token', response.token);
+            localStorage.setItem('auth_user', JSON.stringify(response.user));
 
-    // Función para iniciar sesión por nombre de usuario
-    const loginByUsuario = async (usuario, password, remember = false) => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const response = await authService.loginByUsuario(usuario, password);
-
-            // Guardar datos de autenticación
-            authService.saveAuthData(response, remember);
             setUser(response.user);
             return { success: true };
         } catch (error) {
@@ -96,8 +76,9 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
         } finally {
-            // Limpiar datos locales de ambos storages independientemente del resultado
-            authService.clearAuthData();
+            // Limpiar datos locales independientemente del resultado
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
             setUser(null);
         }
     };
@@ -105,38 +86,7 @@ export const AuthProvider = ({ children }) => {
     // Función para actualizar datos del usuario
     const updateUser = (updatedUser) => {
         setUser(updatedUser);
-        const remember = localStorage.getItem('auth_remember') === 'true';
-        const storage = remember ? localStorage : sessionStorage;
-        storage.setItem('auth_user', JSON.stringify(updatedUser));
-    };
-
-    // Función para cambiar contraseña
-    const changePassword = async (passwordActual, passwordNuevo) => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const response = await authService.changePassword(passwordActual, passwordNuevo);
-            return { success: true, data: response };
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Error al cambiar contraseña';
-            setError(errorMessage);
-            return { success: false, message: errorMessage };
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Función para obtener estadísticas del usuario
-    const getEstadisticas = async () => {
-        try {
-            const response = await authService.getEstadisticas();
-            return { success: true, data: response };
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Error al obtener estadísticas';
-            setError(errorMessage);
-            return { success: false, message: errorMessage };
-        }
+        localStorage.setItem('auth_user', JSON.stringify(updatedUser));
     };
 
     // Limpiar error
@@ -144,41 +94,15 @@ export const AuthProvider = ({ children }) => {
         setError(null);
     };
 
-    // Verificar si el usuario está autenticado
-    const isAuthenticated = () => {
-        return authService.isAuthenticated();
-    };
-
-    // Obtener usuario actual
-    const getCurrentUser = () => {
-        return authService.getCurrentUser();
-    };
-
-    // Verificar si es administrador principal
-    const isSuperAdmin = () => {
-        return authService.isSuperAdmin();
-    };
-
-    // Verificar si es supervisor o administrador
-    const isSupervisorOrAdmin = () => {
-        return authService.isSupervisorOrAdmin();
-    };
-
     const value = {
         user,
         loading,
         error,
         login,
-        loginByUsuario,
         logout,
         updateUser,
-        changePassword,
-        getEstadisticas,
         clearError,
-        isAuthenticated: isAuthenticated(),
-        getCurrentUser,
-        isSuperAdmin,
-        isSupervisorOrAdmin
+        isAuthenticated: !!user
     };
 
     return (

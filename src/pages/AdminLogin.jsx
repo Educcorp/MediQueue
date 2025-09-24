@@ -1,233 +1,276 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import LoadingScreen from '../components/Common/LoadingScreen';
-import '../styles/AdminLogin.css';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const AdminLogin = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [localError, setLocalError] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [randomGif, setRandomGif] = useState('');
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [localError, setLocalError] = useState(null);
 
-  // Referencias para animaciones
-  const formRef = useRef(null);
-  const buttonRef = useRef(null);
+    const { login, isAuthenticated, error, clearError } = useAuth();
+    const navigate = useNavigate();
 
-  // Array de GIFs médicos
-  const medicalGifs = [
-    'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ4YXRubHRwbHZvd3R1NDB4NjBhYmRmZ242M3BrZWQzNHE5Y2UzOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VewYsVXoAV4WVEhYuk/giphy.gif',
-    'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3cjdqNTBzcDEyM3MzNW44NGFoaTYzdHIwemVhc3NpamxobGxucXBqdiZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/fqgf6H21b2we0cu1he/giphy.gif'
-  ];
+    // Redirigir si ya está autenticado
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/admin/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
 
-  const { login, isAuthenticated, error, clearError } = useAuth();
-  const navigate = useNavigate();
+    // Limpiar errores cuando el componente se monta
+    useEffect(() => {
+        clearError();
+    }, [clearError]);
 
-  // Redirigir si ya está autenticado
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/admin/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        // Limpiar errores al escribir
+        setLocalError(null);
+        clearError();
+    };
 
-  // Limpiar errores cuando el componente se monta
-  useEffect(() => {
-    clearError();
-  }, [clearError]);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  // Animaciones de entrada y GIF aleatorio
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (formRef.current) {
-        formRef.current.classList.add('login-form-active');
-      }
-    }, 700);
+        // Validaciones básicas
+        if (!formData.email || !formData.password) {
+            setLocalError('Por favor, complete todos los campos');
+            return;
+        }
 
-    // Seleccionar GIF aleatorio al cargar
-    const randomIndex = Math.floor(Math.random() * medicalGifs.length);
-    setRandomGif(medicalGifs[randomIndex]);
+        if (!formData.email.includes('@')) {
+            setLocalError('Por favor, ingrese un email válido');
+            return;
+        }
 
-    return () => clearTimeout(timer);
-  }, []);
+        setIsLoading(true);
+        setLocalError(null);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    // Limpiar errores al escribir
-    setLocalError(null);
-    clearError();
-  };
+        try {
+            const result = await login(formData.email, formData.password);
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+            if (result.success) {
+                navigate('/admin/dashboard');
+            } else {
+                setLocalError(result.message || 'Error al iniciar sesión');
+            }
+        } catch (err) {
+            setLocalError('Error de conexión. Verifique que el servidor esté funcionando.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    const currentError = localError || error;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Validaciones mejoradas
-    if (!formData.email || !formData.password) {
-      setLocalError('Por favor, complete todos los campos');
-      return;
-    }
-
-    // Validar email
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setLocalError('Por favor, ingrese un email válido');
-      return;
-    }
-
-    setIsLoading(true);
-    setLocalError(null);
-
-    try {
-      const result = await login(formData.email, formData.password, false);
-
-      if (result.success) {
-        navigate('/admin/dashboard');
-      } else {
-        setLocalError(result.message || 'Error al iniciar sesión');
-      }
-    } catch (err) {
-      setLocalError('Error de conexión. Verifique que el servidor esté funcionando.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const currentError = localError || error;
-
-  // Mostrar pantalla de carga minimalista durante la autenticación
-  if (isLoading) {
     return (
-      <LoadingScreen
-        message="Autenticando usuario"
-        showProgress={false}
-      />
+        <div className="admin-login">
+            <div className="login-container">
+                <div className="login-card">
+                    <div className="login-header">
+                        <h1>🏥 MediQueue</h1>
+                        <h2>Panel de Administración</h2>
+                        <p>Ingrese sus credenciales para continuar</p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="login-form">
+                        <div className="form-group">
+                            <label htmlFor="email">Email:</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="administrador@mediqueue.com"
+                                disabled={isLoading}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="password">Contraseña:</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                disabled={isLoading}
+                                required
+                            />
+                        </div>
+
+                        {currentError && (
+                            <div className="error-message">
+                                <span>❌ {currentError}</span>
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="login-button"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                        </button>
+                    </form>
+
+                    <div className="login-footer">
+                        <p>Sistema Turnomático v1.0.0</p>
+                    </div>
+                </div>
+            </div>
+
+            <style jsx>{`
+        .admin-login {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+          width: 100%;
+          max-width: 400px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+
+        .login-card {
+          background: white;
+          border-radius: 12px;
+          padding: 40px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+          font-size: 2.2em;
+          margin: 0 0 10px 0;
+          color: #4a5568;
+        }
+
+        .login-header h2 {
+          font-size: 1.3em;
+          margin: 0 0 10px 0;
+          color: #2d3748;
+        }
+
+        .login-header p {
+          color: #718096;
+          margin: 0;
+          font-size: 0.9em;
+        }
+
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .form-group label {
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #4a5568;
+          font-size: 0.9em;
+        }
+
+        .form-group input {
+          padding: 12px 16px;
+          border: 2px solid #e2e8f0;
+          border-radius: 8px;
+          font-size: 1em;
+          transition: all 0.3s ease;
+          background: #f8fafc;
+        }
+
+        .form-group input:focus {
+          outline: none;
+          border-color: #667eea;
+          background: white;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input:disabled {
+          background-color: #f1f5f9;
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+
+        .error-message {
+          background: #fed7d7;
+          color: #c53030;
+          padding: 12px 16px;
+          border-radius: 8px;
+          border-left: 4px solid #e53e3e;
+          font-size: 0.9em;
+        }
+
+        .login-button {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 14px;
+          border: none;
+          border-radius: 8px;
+          font-size: 1em;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-top: 10px;
+        }
+
+        .login-button:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-button:disabled {
+          background: #a0aec0;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+
+        .login-footer {
+          margin-top: 30px;
+          text-align: center;
+          color: #718096;
+          font-size: 0.8em;
+        }
+
+        @media (max-width: 480px) {
+          .login-container {
+            padding: 10px;
+          }
+          
+          .login-card {
+            padding: 20px;
+          }
+        }
+      `}</style>
+        </div>
     );
-  }
-
-  return (
-    <div className="elearning-login">
-      <div className="background-image"></div>
-
-      {/* Left Content */}
-      <div className="left-content">
-        <div className="title-section">
-          <h1 className="main-title">MediQueue</h1>
-          <p className="subtitle">
-            Tu plataforma de gestión <br /> médica comienza aquí. <br />
-            Inicia sesión.
-            <br />
-          </p>
-        </div>
-        <div className="sidebar-menu">
-          <div className="menu-item">Certificados</div>
-          <div className="menu-item">Entrenamientos</div>
-          <div className="menu-item">Videos</div>
-          <div className="menu-item">Fotos</div>
-        </div>
-      </div>
-
-      {/* Login Card */}
-      <div className="login-card">
-        {/* Avatar with Random Medical GIF */}
-        <div className="avatar-container">
-          <div className="avatar">
-            {randomGif && (
-              <img
-                src={randomGif}
-                alt="Medical Animation"
-                style={{
-                  width: '110px',
-                  height: '110px',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Welcome Messages */}
-        <div className="welcome-messages">
-          <h2 className="admin-title">Panel de Administración</h2>
-          <p className="welcome-text">El Sistema les da la Bienvenida</p>
-        </div>
-
-
-        {/* Error Message */}
-        {currentError && (
-          <div className="error-message">
-            {currentError}
-          </div>
-        )}
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <div className="input-with-icon">
-              <FaEnvelope className="input-icon" />
-              <input
-                type="text"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="Correo"
-                disabled={isLoading}
-                required
-              />
-            </div>
-          </div>
-          <div className="form-group">
-            <div className="input-with-icon">
-              <FaLock className="input-icon" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="Contraseña"
-                disabled={isLoading}
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle-icon"
-                onClick={togglePasswordVisibility}
-                disabled={isLoading}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className={`signin-button ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            {isLoading ? 'Iniciando...' : 'Iniciar sesión'}
-          </button>
-        </form>
-
-      </div>
-    </div>
-  );
 };
 
 export default AdminLogin;
