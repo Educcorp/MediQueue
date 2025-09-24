@@ -46,7 +46,7 @@ const ConsultorioManagement = () => {
   const [consultorios, setConsultorios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
   const isDarkMode = theme === 'dark';
@@ -59,7 +59,7 @@ const ConsultorioManagement = () => {
         setTheme(currentTheme);
       }
     });
-    
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme']
@@ -190,7 +190,8 @@ const ConsultorioManagement = () => {
 
     if (window.confirm(`¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`)) {
       try {
-        await areaService.delete(area.uk_area);
+        // Nota: el servicio expone "remove" para eliminación hard.
+        await areaService.remove(area.uk_area);
         await loadData();
         alert('Área eliminada correctamente');
       } catch (error) {
@@ -734,7 +735,7 @@ const ConsultorioManagement = () => {
           </div>
         </div>
       )}
-      
+
       <AdminFooter isDarkMode={isDarkMode} />
     </div>
   );
