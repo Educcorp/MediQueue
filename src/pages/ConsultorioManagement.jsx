@@ -502,7 +502,7 @@ const ConsultorioManagement = () => {
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             padding: '12px',
-                            background: 'rgba(255, 255, 255, 0.5)',
+                            background: 'var(--bg-glass)',
                             borderRadius: 'var(--border-radius-sm)',
                             border: '1px solid var(--border-color)'
                           }}>
@@ -572,12 +572,13 @@ const ConsultorioManagement = () => {
           backdropFilter: 'blur(4px)'
         }}>
           <div style={{
-            background: 'white',
+            background: 'var(--bg-white)',
             borderRadius: 'var(--border-radius)',
             padding: 0,
             maxWidth: '500px',
             width: '90%',
-            boxShadow: 'var(--shadow-xl)'
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)'
           }}>
             <div style={{
               padding: '24px',
@@ -649,12 +650,13 @@ const ConsultorioManagement = () => {
           backdropFilter: 'blur(4px)'
         }}>
           <div style={{
-            background: 'white',
+            background: 'var(--bg-white)',
             borderRadius: 'var(--border-radius)',
             padding: 0,
             maxWidth: '500px',
             width: '90%',
-            boxShadow: 'var(--shadow-xl)'
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)'
           }}>
             <div style={{
               padding: '24px',
