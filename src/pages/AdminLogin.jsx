@@ -123,18 +123,21 @@ const AdminLogin = () => {
       {/* Left Content */}
       <div className="left-content">
         <div className="title-section">
-          <h1 className="main-title">MediQueue</h1>
+          <div className="main-title-wrapper">
+            <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="main-title-logo" />
+            <h1 className="main-title">MediQueue</h1>
+          </div>
           <p className="subtitle">
-            Tu plataforma de gestión <br /> médica comienza aquí. <br />
+            Tu plataforma de gestión de turnos comienza aquí. <br />
             Inicia sesión.
             <br />
           </p>
         </div>
         <div className="sidebar-menu">
-          <div className="menu-item">Certificados</div>
-          <div className="menu-item">Entrenamientos</div>
-          <div className="menu-item">Videos</div>
-          <div className="menu-item">Fotos</div>
+          <div className="menu-item">Gestionar Turnos</div>
+          <div className="menu-item">Gestión de consultorios</div>
+          <div className="menu-item">Gestión de pacientes</div>
+          <div className="menu-item">Gestión de estadísticas del sistema</div>
         </div>
       </div>
 
