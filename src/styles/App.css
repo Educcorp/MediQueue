@@ -1,3 +1,17 @@
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+  --bg-main: #0a1222;
+  --bg-card: rgba(8, 17, 29, 0.92);
+  --bg-glass: rgba(8, 17, 29, 0.85);
+  --text-primary: #ffffff;
+  --text-secondary: #f8fafc;
+  --text-muted: #e2e8f0;
+  --border-color: #0d1829;
+  --border-light: rgba(13, 24, 41, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+}
+
 .App {
   min-height: 100vh;
   display: flex;
@@ -13,8 +27,9 @@
 
 /* Header */
 .header {
-  background: var(--color-white);
-  box-shadow: 0 2px 10px var(--color-shadow);
+  background: var(--bg-card, var(--color-white));
+  box-shadow: var(--shadow-md, 0 2px 10px var(--color-shadow));
+  border: 1px solid var(--border-color, transparent);
   padding: 1rem 0;
   position: sticky;
   top: 0;
@@ -45,7 +60,7 @@
 }
 
 .nav-link {
-  color: var(--color-dark);
+  color: var(--text-primary, var(--color-dark));
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
@@ -76,11 +91,11 @@
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .nav {
     gap: 1rem;
   }
-  
+
   .container {
     padding: 0 15px;
   }

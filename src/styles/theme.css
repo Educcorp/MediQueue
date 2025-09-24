@@ -1,0 +1,123 @@
+/* MediQueue Theme Variables - Professional Medical Design */
+:root {
+    /* Primary Color Palette */
+    --color-light-blue: #d8f0f4;
+    --color-light-pink: #d7c0c6;
+    --color-medium-blue: #77b8ce;
+    --color-dark-gray: #544e52;
+    --color-coral: #ea5d4b;
+
+    /* Extended Colors */
+    --color-white: #ffffff;
+    --color-black: #000000;
+
+    /* Semantic Colors */
+    --color-success: #4caf50;
+    --color-warning: #ff9800;
+    --color-error: #ea5d4b;
+    --color-info: #77b8ce;
+
+    /* Background Variations */
+    --background-light: #f8fbfc;
+    --background-medium: #d8f0f4;
+    --background-dark: #77b8ce;
+
+    /* Text Variations */
+    --text-primary: #544e52;
+    --text-secondary: #77b8ce;
+    --text-light: #d7c0c6;
+    --text-white: #ffffff;
+
+    /* Border Colors */
+    --border-light: #d8f0f4;
+    --border-medium: #d7c0c6;
+    --border-strong: #77b8ce;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+    --spacing-xxxl: 64px;
+
+    /* Typography */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-xxl: 24px;
+    --font-size-xxxl: 32px;
+    --font-size-display: 48px;
+
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(84, 78, 82, 0.1);
+    --shadow-md: 0 4px 12px rgba(84, 78, 82, 0.15);
+    --shadow-lg: 0 8px 24px rgba(84, 78, 82, 0.2);
+    --shadow-xl: 0 16px 32px rgba(84, 78, 82, 0.25);
+    --shadow-inner: inset 0 2px 4px rgba(84, 78, 82, 0.05);
+
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-full: 50%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--color-medium-blue) 0%, var(--color-dark-gray) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--color-light-blue) 0%, var(--color-medium-blue) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--color-coral) 0%, #d94435 100%);
+    --gradient-background: linear-gradient(135deg, var(--color-light-blue) 0%, var(--color-medium-blue) 100%);
+    --gradient-card: linear-gradient(135deg, rgba(216, 240, 244, 0.3) 0%, rgba(255, 255, 255, 0.98) 100%);
+
+    /* Breakpoints */
+    --breakpoint-mobile: 480px;
+    --breakpoint-tablet: 768px;
+    --breakpoint-desktop: 1024px;
+    --breakpoint-widescreen: 1200px;
+}
+
+/* Dark theme variables for consistency */
+[data-theme="dark"] {
+    --color-light-blue: #0a1222;
+    --color-light-pink: #040814;
+    --color-medium-blue: #77b8ce;
+    --color-dark-gray: #ffffff;
+    --color-coral: #ea5d4b;
+
+    --color-white: #08111d;
+    --color-black: #ffffff;
+
+    --color-success: #34d399;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #38bdf8;
+
+    --background-light: #08111d;
+    --background-medium: #0a1222;
+    --background-dark: #77b8ce;
+
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-light: #e2e8f0;
+    --text-white: #08111d;
+
+    --border-light: rgba(13, 24, 41, 0.5);
+    --border-medium: #0d1829;
+    --border-strong: #77b8ce;
+
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.65);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.75);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.85);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.9);
+}

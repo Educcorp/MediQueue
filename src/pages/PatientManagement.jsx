@@ -2,119 +2,103 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
-import adminService from '../services/adminService';
-import { USER_TYPE_LABELS } from '../utils/constants';
+import patientService from '../services/patientService';
+import { RECORD_STATUS_LABELS } from '../utils/constants';
+import { formatDate, calculateAge, formatPhone } from '../utils/helpers';
 import '../styles/UnifiedAdminPages.css';
 
 // React Icons
 import {
-  FaUsersCog,
-  FaUserShield,
-  FaUser,
-  FaPlus,
-  FaSync,
+  FaUsers,
+  FaUserCheck,
+  FaUserTimes,
+  FaEnvelope,
   FaEdit,
   FaTrash,
+  FaPlus,
+  FaSync,
   FaSearch,
   FaFilter,
-  FaEye,
+  FaUser,
+  FaPhone,
+  FaBirthdayCake,
+  FaCalendarAlt,
   FaExclamationTriangle,
   FaTimes,
   FaCheck,
-  FaEnvelope,
-  FaPhone,
-  FaCalendarAlt,
-  FaLock,
-  FaUsers,
-  FaCrown,
-  FaEyeSlash,
-  FaKey
+  FaEye
 } from 'react-icons/fa';
 
-const AdminUsersPage = () => {
-  const [admins, setAdmins] = useState([]);
+const PatientManagement = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [editingAdmin, setEditingAdmin] = useState(null);
+  const [editingPatient, setEditingPatient] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('todos');
   const [formData, setFormData] = useState({
     s_nombre: '',
     s_apellido: '',
-    s_email: '',
-    s_usuario: '',
-    s_password: '',
     c_telefono: '',
-    tipo_usuario: 2
+    s_email: '',
+    d_fecha_nacimiento: ''
   });
 
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  // Cargar administradores al montar el componente
   useEffect(() => {
-    loadAdmins();
+    loadPatients();
   }, []);
 
-  const loadAdmins = async () => {
+  const loadPatients = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const administradores = await adminService.getAllAdmins();
-      setAdmins(administradores);
-
+      const patientsData = await patientService.getAllPatients();
+      setPatients(patientsData);
     } catch (error) {
-      setError('Error cargando administradores: ' + error.message);
-      console.error('Error cargando administradores:', error);
+      console.error('Error cargando pacientes:', error);
+      setError('Error cargando pacientes');
     } finally {
       setLoading(false);
     }
   };
 
   const handleAddNew = () => {
-    setEditingAdmin(null);
+    setEditingPatient(null);
     setFormData({
       s_nombre: '',
       s_apellido: '',
-      s_email: '',
-      s_usuario: '',
-      s_password: '',
       c_telefono: '',
-      tipo_usuario: 2
+      s_email: '',
+      d_fecha_nacimiento: ''
     });
     setShowModal(true);
   };
 
-  const handleEdit = (admin) => {
-    setEditingAdmin(admin);
+  const handleEdit = (patient) => {
+    setEditingPatient(patient);
     setFormData({
-      s_nombre: admin.s_nombre,
-      s_apellido: admin.s_apellido,
-      s_email: admin.s_email,
-      s_usuario: admin.s_usuario,
-      s_password: '',
-      c_telefono: admin.c_telefono || '',
-      tipo_usuario: admin.tipo_usuario
+      s_nombre: patient.s_nombre,
+      s_apellido: patient.s_apellido,
+      c_telefono: patient.c_telefono || '',
+      s_email: patient.s_email || '',
+      d_fecha_nacimiento: patient.d_fecha_nacimiento ? patient.d_fecha_nacimiento.split('T')[0] : ''
     });
     setShowModal(true);
   };
 
-  const handleDelete = async (admin) => {
-    if (admin.uk_administrador === user?.uk_administrador) {
-      alert('No puedes eliminar tu propia cuenta');
-      return;
-    }
-
-    if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.s_nombre} ${admin.s_apellido}"?`)) {
+  const handleDelete = async (patient) => {
+    if (window.confirm(`¿Estás seguro de eliminar al paciente "${patient.s_nombre} ${patient.s_apellido}"?`)) {
       try {
-        await adminService.deleteAdmin(admin.uk_administrador);
-        await loadAdmins();
-        alert('Administrador eliminado correctamente');
+        await patientService.deletePatient(patient.uk_paciente);
+        await loadPatients();
+        alert('Paciente eliminado correctamente');
       } catch (error) {
-        alert('Error eliminando administrador: ' + error.message);
-        console.error('Error eliminando administrador:', error);
+        alert('Error eliminando paciente: ' + error.message);
+        console.error('Error eliminando paciente:', error);
       }
     }
   };
@@ -122,81 +106,44 @@ const AdminUsersPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.s_nombre || !formData.s_apellido || !formData.s_email || !formData.s_usuario) {
-      alert('Por favor complete todos los campos requeridos');
-      return;
-    }
-
-    // Validación de contraseña (debe coincidir con la del backend: min 6, 1 minúscula, 1 mayúscula y 1 número)
-    const passwordProvided = !!formData.s_password && formData.s_password.length > 0;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-
-    if (!editingAdmin && !passwordProvided) {
-      alert('La contraseña es requerida para crear un nuevo administrador');
-      return;
-    }
-
-    if (passwordProvided && !passwordRegex.test(formData.s_password)) {
-      alert('La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número');
+    if (!formData.s_nombre || !formData.s_apellido || !formData.c_telefono) {
+      alert('Por favor complete los campos requeridos (nombre, apellido y teléfono)');
       return;
     }
 
     try {
-      const adminData = {
-        s_nombre: formData.s_nombre.trim(),
-        s_apellido: formData.s_apellido.trim(),
-        s_email: formData.s_email.trim(),
-        s_usuario: formData.s_usuario.trim(),
-        tipo_usuario: parseInt(formData.tipo_usuario)
-      };
-
-      // Solo incluir teléfono si viene no vacío para evitar errores de validación (trim sobre null)
-      const telefonoTrimmed = (formData.c_telefono || '').trim();
-      if (telefonoTrimmed) {
-        adminData.c_telefono = telefonoTrimmed;
-      }
-
-      if (passwordProvided) {
-        adminData.s_password = formData.s_password;
-      }
-
-      if (editingAdmin) {
-        await adminService.updateAdmin(editingAdmin.uk_administrador, adminData);
-        alert('Administrador actualizado correctamente');
+      if (editingPatient) {
+        await patientService.updatePatient(editingPatient.uk_paciente, {
+          s_nombre: formData.s_nombre.trim(),
+          s_apellido: formData.s_apellido.trim(),
+          c_telefono: formData.c_telefono.trim(),
+          s_email: formData.s_email.trim() || null,
+          d_fecha_nacimiento: formData.d_fecha_nacimiento || null
+        });
+        alert('Paciente actualizado correctamente');
       } else {
-        await adminService.createAdmin(adminData);
-        alert('Administrador creado correctamente');
+        await patientService.createPatient({
+          s_nombre: formData.s_nombre.trim(),
+          s_apellido: formData.s_apellido.trim(),
+          c_telefono: formData.c_telefono.trim(),
+          s_email: formData.s_email.trim() || null,
+          d_fecha_nacimiento: formData.d_fecha_nacimiento || null
+        });
+        alert('Paciente creado correctamente');
       }
 
-      await loadAdmins();
+      await loadPatients();
       setShowModal(false);
       setFormData({
         s_nombre: '',
         s_apellido: '',
-        s_email: '',
-        s_usuario: '',
-        s_password: '',
         c_telefono: '',
-        tipo_usuario: 2
+        s_email: '',
+        d_fecha_nacimiento: ''
       });
     } catch (error) {
-      let errorMessage = 'Error guardando administrador';
-      if (error.response && error.response.data) {
-        const data = error.response.data;
-        if (data.message) {
-          errorMessage += ': ' + data.message;
-        }
-        if (Array.isArray(data.errors) && data.errors.length > 0) {
-          const detail = data.errors
-            .map(err => (err.field ? `${err.field}: ${err.message}` : err.message))
-            .join('; ');
-          errorMessage += `\nDetalles: ${detail}`;
-        }
-      } else {
-        errorMessage += ': ' + error.message;
-      }
-      alert(errorMessage);
-      console.error('Error guardando administrador:', error);
+      alert('Error guardando paciente: ' + error.message);
+      console.error('Error guardando paciente:', error);
     }
   };
 
@@ -212,18 +159,27 @@ const AdminUsersPage = () => {
     setSearchTerm(e.target.value);
   };
 
-  // Filtrar administradores
-  const filteredAdmins = admins.filter(admin =>
-    admin.s_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.s_apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.s_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.s_usuario.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleStatusFilter = (e) => {
+    setStatusFilter(e.target.value);
+  };
+
+  // Filtrar pacientes
+  const filteredPatients = patients.filter(patient => {
+    const matchesSearch =
+      patient.s_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.s_apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.c_telefono.includes(searchTerm) ||
+      (patient.s_email && patient.s_email.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesStatus = statusFilter === 'todos' || patient.ck_estado === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   // Calcular estadísticas
-  const totalAdmins = admins.length;
-  const superAdmins = admins.filter(a => a.tipo_usuario === 1).length;
-  const supervisors = admins.filter(a => a.tipo_usuario === 2).length;
+  const activePatients = patients.filter(p => p.ck_estado === 'ACTIVO').length;
+  const inactivePatients = patients.filter(p => p.ck_estado === 'INACTIVO').length;
+  const patientsWithEmail = patients.filter(p => p.s_email).length;
 
   if (loading) {
     return (
@@ -232,7 +188,7 @@ const AdminUsersPage = () => {
         <div className="loading-overlay">
           <div className="loading-spinner">
             <div className="spinner"></div>
-            <p>Cargando usuarios...</p>
+            <p>Cargando pacientes...</p>
           </div>
         </div>
       </div>
@@ -247,20 +203,20 @@ const AdminUsersPage = () => {
         {/* Page Header */}
         <div className="page-header">
           <div className="page-header-icon">
-            <FaUsersCog />
+            <FaUsers />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Gestión de Usuarios</h1>
+            <h1 className="page-title">Gestión de Pacientes</h1>
             <p className="page-subtitle">
-              Administra los usuarios del sistema - {totalAdmins} administradores registrados
+              Administra la base de datos de pacientes - {patients.length} registros encontrados
             </p>
           </div>
           <div className="page-actions">
-            <button className="btn btn-secondary" onClick={loadAdmins}>
+            <button className="btn btn-secondary" onClick={loadPatients}>
               <FaSync /> Actualizar
             </button>
             <button className="btn btn-primary" onClick={handleAddNew}>
-              <FaPlus /> Nuevo Usuario
+              <FaPlus /> Nuevo Paciente
             </button>
           </div>
         </div>
@@ -295,36 +251,10 @@ const AdminUsersPage = () => {
               </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                  {totalAdmins}
+                  {patients.length}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Total Usuarios
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="content-card">
-            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: 'var(--border-radius-sm)',
-                background: 'linear-gradient(135deg, var(--warning-color), #fd7e14)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '20px'
-              }}>
-                <FaCrown />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                  {superAdmins}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Super Administradores
+                  Total Pacientes
                 </p>
               </div>
             </div>
@@ -343,28 +273,80 @@ const AdminUsersPage = () => {
                 color: 'white',
                 fontSize: '20px'
               }}>
-                <FaUserShield />
+                <FaUserCheck />
               </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                  {supervisors}
+                  {activePatients}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Supervisores
+                  Pacientes Activos
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--danger-color), #c82333)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUserTimes />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {inactivePatients}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Pacientes Inactivos
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--info-color), var(--primary-medical))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaEnvelope />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {patientsWithEmail}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Con Email
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Search Section */}
+        {/* Filters Section */}
         <div className="filters-section">
           <div className="filter-group" style={{ flex: '1', maxWidth: '400px' }}>
-            <label>Buscar Usuarios</label>
+            <label>Buscar Pacientes</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
-                placeholder="Buscar por nombre, email o usuario..."
+                placeholder="Buscar por nombre, teléfono o email..."
                 value={searchTerm}
                 onChange={handleSearch}
                 className="form-control"
@@ -380,18 +362,30 @@ const AdminUsersPage = () => {
             </div>
           </div>
           <div className="filter-group">
+            <label>Estado</label>
+            <select
+              value={statusFilter}
+              onChange={handleStatusFilter}
+              className="form-control"
+            >
+              <option value="todos">Todos los estados</option>
+              <option value="ACTIVO">Activos</option>
+              <option value="INACTIVO">Inactivos</option>
+            </select>
+          </div>
+          <div className="filter-group">
             <button className="btn btn-secondary">
               <FaFilter /> Aplicar Filtros
             </button>
           </div>
         </div>
 
-        {/* Users Table */}
+        {/* Patients Table */}
         <div className="content-card">
           <div className="card-header">
             <h3 className="card-title">
-              <FaUsersCog />
-              Lista de Usuarios Administrativos
+              <FaUsers />
+              Lista de Pacientes
             </h3>
             <div className="card-actions">
               <button className="card-action" title="Ver detalles">
@@ -404,17 +398,17 @@ const AdminUsersPage = () => {
           </div>
 
           <div className="card-content" style={{ padding: 0 }}>
-            {filteredAdmins.length === 0 ? (
+            {filteredPatients.length === 0 ? (
               <div className="empty-state">
-                <FaUsersCog />
-                <h3>No hay usuarios registrados</h3>
+                <FaUsers />
+                <h3>No hay pacientes registrados</h3>
                 <p>
-                  {searchTerm
-                    ? 'No se encontraron usuarios con los filtros aplicados'
-                    : 'No hay usuarios administrativos en el sistema'}
+                  {searchTerm || statusFilter !== 'todos'
+                    ? 'No se encontraron pacientes con los filtros aplicados'
+                    : 'No hay pacientes registrados en el sistema'}
                 </p>
                 <button className="btn btn-primary" onClick={handleAddNew}>
-                  <FaPlus /> Crear Primer Usuario
+                  <FaPlus /> Registrar Primer Paciente
                 </button>
               </div>
             ) : (
@@ -422,102 +416,83 @@ const AdminUsersPage = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Usuario</th>
-                      <th>Nombre Completo</th>
-                      <th>Email</th>
+                      <th>Nombre</th>
                       <th>Teléfono</th>
-                      <th>Tipo</th>
+                      <th>Email</th>
+                      <th>Edad</th>
+                      <th>Estado</th>
                       <th>Fecha Registro</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredAdmins.map(admin => (
-                      <tr key={admin.uk_administrador}>
+                    {filteredPatients.map(patient => (
+                      <tr key={patient.uk_paciente}>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
-                            <strong>{admin.s_usuario}</strong>
-                            {admin.uk_administrador === user?.uk_administrador && (
-                              <span style={{
-                                backgroundColor: 'var(--primary-medical)',
-                                color: 'white',
-                                padding: '2px 6px',
-                                borderRadius: '4px',
-                                fontSize: '10px',
-                                fontWeight: '600'
-                              }}>
-                                TÚ
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <div>
-                            <div style={{ fontWeight: '600' }}>
-                              {admin.s_nombre} {admin.s_apellido}
-                            </div>
+                            <strong>{patient.s_nombre} {patient.s_apellido}</strong>
                           </div>
                         </td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
-                            <span style={{ color: 'var(--primary-medical)' }}>{admin.s_email}</span>
+                            <FaPhone style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                            <span style={{ fontFamily: 'monospace' }}>
+                              {formatPhone(patient.c_telefono)}
+                            </span>
                           </div>
                         </td>
                         <td>
-                          {admin.c_telefono ? (
+                          {patient.s_email ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <FaPhone style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
-                              <span style={{ fontFamily: 'monospace' }}>{admin.c_telefono}</span>
+                              <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
+                              <span style={{ color: 'var(--primary-medical)' }}>{patient.s_email}</span>
                             </div>
                           ) : (
                             <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No registrado</span>
                           )}
                         </td>
                         <td>
-                          <span className={`status-badge ${admin.tipo_usuario === 1 ? 'warning' : 'success'}`}>
-                            {admin.tipo_usuario === 1 ? (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <FaCrown style={{ fontSize: '10px' }} />
-                                Admin
-                              </div>
-                            ) : (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <FaUserShield style={{ fontSize: '10px' }} />
-                                Supervisor
-                              </div>
-                            )}
+                          {patient.d_fecha_nacimiento ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <FaBirthdayCake style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                              <span>{calculateAge(patient.d_fecha_nacimiento)} años</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No registrado</span>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`status-badge ${patient.ck_estado === 'ACTIVO' ? 'success' : 'secondary'}`}>
+                            {RECORD_STATUS_LABELS[patient.ck_estado] || patient.ck_estado}
                           </span>
                         </td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <FaCalendarAlt style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
                             <span style={{ fontSize: '14px' }}>
-                              {admin.d_fecha_creacion ? new Date(admin.d_fecha_creacion).toLocaleDateString('es-ES') : 'No disponible'}
+                              {formatDate(patient.d_fecha_creacion)}
                             </span>
                           </div>
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: '4px' }}>
                             <button
-                              onClick={() => handleEdit(admin)}
+                              onClick={() => handleEdit(patient)}
                               className="btn btn-secondary"
                               style={{ padding: '4px 8px', fontSize: '12px' }}
-                              title="Editar usuario"
+                              title="Editar paciente"
                             >
                               <FaEdit />
                             </button>
-                            {admin.uk_administrador !== user?.uk_administrador && (
-                              <button
-                                onClick={() => handleDelete(admin)}
-                                className="btn btn-danger"
-                                style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title="Eliminar usuario"
-                              >
-                                <FaTrash />
-                              </button>
-                            )}
+                            <button
+                              onClick={() => handleDelete(patient)}
+                              className="btn btn-danger"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Eliminar paciente"
+                            >
+                              <FaTrash />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -530,7 +505,7 @@ const AdminUsersPage = () => {
         </div>
       </div>
 
-      {/* Modal para crear/editar usuario */}
+      {/* Modal para crear/editar paciente */}
       {showModal && (
         <div style={{
           position: 'fixed',
@@ -552,7 +527,7 @@ const AdminUsersPage = () => {
             maxWidth: '600px',
             width: '90%',
             maxHeight: '80vh',
-            overflow: 'auto',
+            overflow: 'hidden',
             boxShadow: 'var(--shadow-xl)',
             border: '1px solid var(--border-color)'
           }}>
@@ -564,7 +539,7 @@ const AdminUsersPage = () => {
               justifyContent: 'space-between'
             }}>
               <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-                {editingAdmin ? 'Editar Usuario' : 'Nuevo Usuario Administrativo'}
+                {editingPatient ? 'Editar Paciente' : 'Nuevo Paciente'}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -590,7 +565,7 @@ const AdminUsersPage = () => {
                     name="s_nombre"
                     value={formData.s_nombre}
                     onChange={handleInputChange}
-                    placeholder="Nombre"
+                    placeholder="Nombre del paciente"
                     className="form-control"
                     required
                     maxLength={50}
@@ -603,7 +578,7 @@ const AdminUsersPage = () => {
                     name="s_apellido"
                     value={formData.s_apellido}
                     onChange={handleInputChange}
-                    placeholder="Apellido"
+                    placeholder="Apellido del paciente"
                     className="form-control"
                     required
                     maxLength={50}
@@ -613,20 +588,7 @@ const AdminUsersPage = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Email *</label>
-                  <input
-                    type="email"
-                    name="s_email"
-                    value={formData.s_email}
-                    onChange={handleInputChange}
-                    placeholder="email@ejemplo.com"
-                    className="form-control"
-                    required
-                    maxLength={100}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Teléfono</label>
+                  <label>Teléfono *</label>
                   <input
                     type="tel"
                     name="c_telefono"
@@ -634,73 +596,34 @@ const AdminUsersPage = () => {
                     onChange={handleInputChange}
                     placeholder="+57 300 123 4567"
                     className="form-control"
+                    required
                     maxLength={15}
                   />
                 </div>
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
-                  <label>Usuario *</label>
+                  <label>Email</label>
                   <input
-                    type="text"
-                    name="s_usuario"
-                    value={formData.s_usuario}
+                    type="email"
+                    name="s_email"
+                    value={formData.s_email}
                     onChange={handleInputChange}
-                    placeholder="nombre_usuario"
+                    placeholder="email@ejemplo.com"
                     className="form-control"
-                    required
-                    maxLength={30}
+                    maxLength={100}
                   />
-                </div>
-                <div className="form-group">
-                  <label>Tipo de Usuario *</label>
-                  <select
-                    name="tipo_usuario"
-                    value={formData.tipo_usuario}
-                    onChange={handleInputChange}
-                    className="form-control"
-                    required
-                  >
-                    <option value={2}>Supervisor</option>
-                    <option value={1}>Super Administrador</option>
-                  </select>
                 </div>
               </div>
 
               <div className="form-group">
-                <label>
-                  {editingAdmin ? 'Nueva Contraseña (opcional)' : 'Contraseña *'}
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="s_password"
-                    value={formData.s_password}
-                    onChange={handleInputChange}
-                    placeholder={editingAdmin ? 'Dejar vacío para no cambiar' : 'Contraseña segura'}
-                    className="form-control"
-                    style={{ paddingRight: '40px' }}
-                    required={!editingAdmin}
-                    minLength={6}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: 'var(--text-muted)'
-                    }}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
+                <label>Fecha de Nacimiento</label>
+                <input
+                  type="date"
+                  name="d_fecha_nacimiento"
+                  value={formData.d_fecha_nacimiento}
+                  onChange={handleInputChange}
+                  className="form-control"
+                  max={new Date().toISOString().split('T')[0]}
+                />
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
@@ -709,7 +632,7 @@ const AdminUsersPage = () => {
                 </button>
                 <button type="submit" className="btn btn-primary">
                   <FaCheck />
-                  {editingAdmin ? 'Actualizar' : 'Crear'}
+                  {editingPatient ? 'Actualizar' : 'Crear'}
                 </button>
               </div>
             </form>
@@ -720,4 +643,4 @@ const AdminUsersPage = () => {
   );
 };
 
-export default AdminUsersPage;
+export default PatientManagement;
