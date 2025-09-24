@@ -454,9 +454,9 @@ const AdminHeader = () => {
                             position: 'absolute',
                             top: '65px',
                             right: '0',
-                            backgroundColor: theme === 'dark' ? 'rgba(5, 11, 22, 0.95)' : 'rgba(40, 40, 40, 0.9)',
-                            color: theme === 'dark' ? '#e6edf3' : '#fff',
-                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+                            backgroundColor: theme === 'dark' ? 'rgba(5, 11, 22, 0.95)' : 'rgba(248, 250, 252, 0.95)',
+                            color: theme === 'dark' ? '#e6edf3' : '#374151',
+                            boxShadow: theme === 'dark' ? '0 10px 30px rgba(0, 0, 0, 0.3)' : '0 10px 30px rgba(0, 0, 0, 0.15)',
                             borderRadius: '12px',
                             padding: '16px',
                             display: isMenuOpen ? 'block' : 'none',
@@ -465,17 +465,17 @@ const AdminHeader = () => {
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             backdropFilter: 'blur(15px)',
                             WebkitBackdropFilter: 'blur(15px)',
-                            border: theme === 'dark' ? '1px solid rgba(148, 163, 184, 0.12)' : '1px solid rgba(255, 255, 255, 0.1)',
+                            border: theme === 'dark' ? '1px solid rgba(148, 163, 184, 0.12)' : '1px solid rgba(148, 163, 184, 0.2)',
                             animation: isMenuOpen ? 'mediqueueFadeInDown 0.3s forwards' : 'none',
                             transformOrigin: 'top right',
                         }}>
                             {/* User Profile Section */}
                             <div style={{
                                 padding: '16px',
-                                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                                borderBottom: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(148, 163, 184, 0.2)',
                                 marginBottom: '12px',
                                 textAlign: 'center',
-                                background: theme === 'dark' ? 'linear-gradient(135deg, rgba(7, 19, 39, 0.6) 0%, rgba(15, 27, 47, 0.6) 100%)' : 'linear-gradient(135deg, rgba(119, 184, 206, 0.2) 0%, rgba(11, 132, 201, 0.2) 100%)',
+                                background: theme === 'dark' ? 'linear-gradient(135deg, rgba(7, 19, 39, 0.6) 0%, rgba(15, 27, 47, 0.6) 100%)' : 'linear-gradient(135deg, rgba(119, 184, 206, 0.1) 0%, rgba(47, 151, 209, 0.08) 100%)',
                                 borderRadius: '8px',
                                 backdropFilter: 'blur(5px)',
                                 WebkitBackdropFilter: 'blur(5px)',
@@ -485,17 +485,17 @@ const AdminHeader = () => {
                                     height: '60px',
                                     borderRadius: '50%',
                                     margin: '0 auto 12px auto',
-                                    border: theme === 'dark' ? '2px solid rgba(148, 163, 184, 0.2)' : '2px solid rgba(119, 184, 206, 0.4)',
+                                    border: theme === 'dark' ? '2px solid rgba(148, 163, 184, 0.2)' : '2px solid rgba(47, 151, 209, 0.3)',
                                     padding: '2px',
-                                    backgroundColor: theme === 'dark' ? 'rgba(7, 19, 39, 0.5)' : 'rgba(119, 184, 206, 0.1)',
+                                    backgroundColor: theme === 'dark' ? 'rgba(7, 19, 39, 0.5)' : 'rgba(47, 151, 209, 0.08)',
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     overflow: 'hidden',
-                                    boxShadow: '0 4px 15px rgba(119, 184, 206, 0.25)',
+                                    boxShadow: theme === 'dark' ? '0 4px 15px rgba(119, 184, 206, 0.25)' : '0 4px 15px rgba(47, 151, 209, 0.15)',
                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                     fontSize: '24px',
-                                    color: theme === 'dark' ? '#e6edf3' : 'white',
+                                    color: theme === 'dark' ? '#e6edf3' : '#2f97d1',
                                 }}>
                                     <FaUser />
                                 </div>
@@ -523,7 +523,7 @@ const AdminHeader = () => {
                             <div style={{
                                 fontSize: '12px',
                                 fontWeight: 600,
-                                color: 'rgba(255, 255, 255, 0.5)',
+                                color: theme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(107, 114, 128, 0.8)',
                                 textTransform: 'uppercase',
                                 padding: '8px 16px',
                                 letterSpacing: '1px',
@@ -537,7 +537,7 @@ const AdminHeader = () => {
                                         key={item.path}
                                         style={{
                                             padding: '12px 16px',
-                                            color: theme === 'dark' ? 'rgba(230, 237, 243, 0.9)' : 'rgba(255, 255, 255, 0.85)',
+                                            color: theme === 'dark' ? 'rgba(230, 237, 243, 0.9)' : 'rgba(55, 65, 81, 0.9)',
                                             textDecoration: 'none',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -545,9 +545,9 @@ const AdminHeader = () => {
                                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                             borderRadius: '8px',
                                             margin: '4px 0',
-                                            backgroundColor: hoveredItem === `menu-${index}` ? (theme === 'dark' ? 'rgba(119, 184, 206, 0.16)' : 'rgba(47, 151, 209, 0.2)') : 'transparent',
+                                            backgroundColor: hoveredItem === `menu-${index}` ? (theme === 'dark' ? 'rgba(119, 184, 206, 0.16)' : 'rgba(47, 151, 209, 0.1)') : 'transparent',
                                             transform: hoveredItem === `menu-${index}` ? 'translateX(5px)' : 'translateX(0)',
-                                            boxShadow: hoveredItem === `menu-${index}` ? (theme === 'dark' ? '0 0 15px rgba(0, 0, 0, 0.35)' : '0 0 15px rgba(47, 151, 209, 0.1)') : 'none',
+                                            boxShadow: hoveredItem === `menu-${index}` ? (theme === 'dark' ? '0 0 15px rgba(0, 0, 0, 0.35)' : '0 0 15px rgba(47, 151, 209, 0.15)') : 'none',
                                         }}
                                         onMouseEnter={() => setHoveredItem(`menu-${index}`)}
                                         onMouseLeave={() => setHoveredItem(null)}
@@ -571,7 +571,7 @@ const AdminHeader = () => {
 
                             <div style={{
                                 height: '1px',
-                                background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
+                                background: theme === 'dark' ? 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)' : 'linear-gradient(90deg, transparent 0%, rgba(148, 163, 184, 0.3) 50%, transparent 100%)',
                                 margin: '12px 0',
                                 width: '100%',
                             }}></div>
@@ -633,15 +633,15 @@ const AdminHeader = () => {
             }} onClick={cancelLogout}>
                 <div
                     style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(5, 11, 22, 0.95)' : 'rgba(40, 40, 40, 0.95)',
+                        backgroundColor: theme === 'dark' ? 'rgba(5, 11, 22, 0.95)' : 'rgba(255, 255, 255, 0.95)',
                         borderRadius: '16px',
-                        boxShadow: '0 15px 40px rgba(0, 0, 0, 0.4)',
+                        boxShadow: theme === 'dark' ? '0 15px 40px rgba(0, 0, 0, 0.4)' : '0 15px 40px rgba(0, 0, 0, 0.2)',
                         width: '90%',
                         maxWidth: '450px',
                         padding: 0,
                         overflow: 'hidden',
                         animation: 'mediqueueModalFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(148, 163, 184, 0.2)',
                         backdropFilter: 'blur(10px)',
                         WebkitBackdropFilter: 'blur(10px)',
                     }}
@@ -663,7 +663,7 @@ const AdminHeader = () => {
                         padding: '24px',
                         fontSize: '16px',
                         lineHeight: '1.6',
-                        color: theme === 'dark' ? 'rgba(230, 237, 243, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                        color: theme === 'dark' ? 'rgba(230, 237, 243, 0.9)' : 'rgba(55, 65, 81, 0.9)',
                         textAlign: 'center',
                     }}>
                         <p>¿Estás seguro de que deseas cerrar tu sesión en <strong>MediQueue</strong>?</p>
@@ -678,9 +678,9 @@ const AdminHeader = () => {
                         <button
                             style={{
                                 padding: '12px 24px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                color: 'white',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(148, 163, 184, 0.1)',
+                                color: theme === 'dark' ? 'white' : '#374151',
+                                border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(148, 163, 184, 0.3)',
                                 borderRadius: '12px',
                                 fontSize: '14px',
                                 fontWeight: 500,
@@ -692,10 +692,10 @@ const AdminHeader = () => {
                             }}
                             onClick={cancelLogout}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                                e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(148, 163, 184, 0.2)';
                             }}
                             onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                                e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(148, 163, 184, 0.1)';
                             }}
                         >
                             Cancelar
