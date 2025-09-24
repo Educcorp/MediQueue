@@ -44,6 +44,121 @@ const Chatbot = () => {
         return pageContexts[path] || 'Página general de MediQueue';
     };
 
+    // Función para generar respuestas locales inteligentes
+    const getLocalResponse = (question, pageContext, isAuth) => {
+        const lowerQuestion = question.toLowerCase();
+
+        // Respuestas sobre MediQueue
+        if (lowerQuestion.includes('mediqueue') || lowerQuestion.includes('que es') || lowerQuestion.includes('qué es')) {
+            return `MediQueue es un sistema moderno de gestión de turnos médicos que te permite:
+
+🏥 **Especialidades disponibles:**
+• Medicina General
+• Cardiología
+• Traumatología  
+• Pediatría
+• Oftalmología
+• Nutrición
+
+📅 **Funcionalidades principales:**
+• Reserva de turnos online 24/7
+• Gestión inteligente de colas
+• Notificaciones automáticas
+• Panel administrativo completo
+• Estadísticas en tiempo real
+
+${isAuth ? 'Como administrador, puedes gestionar turnos, pacientes y consultorios desde el dashboard.' : 'Para tomar un turno, ve a la sección "Tomar Turno" y selecciona tu especialidad.'}`;
+        }
+
+        // Respuestas sobre turnos
+        if (lowerQuestion.includes('turno') || lowerQuestion.includes('cita') || lowerQuestion.includes('reservar')) {
+            return `Para tomar un turno en MediQueue:
+
+1️⃣ **Selecciona tu especialidad** (Medicina General, Cardiología, etc.)
+2️⃣ **Elige fecha y horario** disponible
+3️⃣ **Completa tus datos** personales
+4️⃣ **Confirma tu turno** y recibe notificación
+
+${isAuth ? 'Como administrador, puedes gestionar todos los turnos desde el panel de administración.' : 'Ve a la página "Tomar Turno" para comenzar el proceso de reserva.'}`;
+        }
+
+        // Respuestas sobre especialidades
+        if (lowerQuestion.includes('especialidad') || lowerQuestion.includes('doctor') || lowerQuestion.includes('médico')) {
+            return `En MediQueue tenemos las siguientes especialidades médicas:
+
+🩺 **Medicina General** - Consultas de atención primaria
+❤️ **Cardiología** - Especialista en enfermedades del corazón
+🦴 **Traumatología** - Tratamiento de lesiones y fracturas
+👶 **Pediatría** - Atención médica infantil
+👁️ **Oftalmología** - Cuidado de la salud visual
+🥗 **Nutrición** - Asesoramiento nutricional
+
+Cada especialidad tiene horarios específicos y profesionales especializados.`;
+        }
+
+        // Respuestas sobre administración
+        if (lowerQuestion.includes('admin') || lowerQuestion.includes('administrar') || lowerQuestion.includes('dashboard')) {
+            if (isAuth) {
+                return `Como administrador de MediQueue, tienes acceso a:
+
+📊 **Dashboard** - Estadísticas y métricas en tiempo real
+👥 **Gestión de usuarios** - Administrar cuentas de administradores
+📅 **Gestión de turnos** - Administrar citas médicas
+🏥 **Consultorios** - Configurar espacios médicos
+👤 **Pacientes** - Administrar información de pacientes
+📈 **Estadísticas** - Reportes y métricas del sistema
+⚙️ **Configuración** - Ajustes del sistema
+
+Navega por el menú lateral para acceder a cada sección.`;
+            } else {
+                return `El panel de administración de MediQueue permite gestionar:
+
+• Turnos y citas médicas
+• Información de pacientes
+• Configuración de consultorios
+• Estadísticas del sistema
+• Usuarios administradores
+
+Para acceder, necesitas iniciar sesión como administrador.`;
+            }
+        }
+
+        // Respuestas sobre salud general
+        if (lowerQuestion.includes('salud') || lowerQuestion.includes('síntoma') || lowerQuestion.includes('enfermedad')) {
+            return `Para consultas de salud específicas, te recomiendo:
+
+🏥 **Consulta médica presencial** - Para diagnóstico y tratamiento
+📞 **Emergencias** - Llama al 911 en caso de urgencia
+💊 **Medicamentos** - Consulta con tu médico sobre medicación
+📋 **Historial médico** - Mantén un registro de tus consultas
+
+MediQueue te ayuda a gestionar tus turnos médicos, pero para diagnósticos específicos siempre consulta con un profesional médico.`;
+        }
+
+        // Respuestas sobre ayuda general
+        if (lowerQuestion.includes('ayuda') || lowerQuestion.includes('help') || lowerQuestion.includes('como usar')) {
+            return `¡Estoy aquí para ayudarte! Puedo asistirte con:
+
+🔍 **Información sobre MediQueue** - Funcionalidades y características
+📅 **Proceso de turnos** - Cómo reservar y gestionar citas
+🏥 **Especialidades médicas** - Información sobre cada área
+⚙️ **Panel administrativo** - ${isAuth ? 'Gestión completa del sistema' : 'Acceso para administradores'}
+📞 **Soporte técnico** - Resolución de problemas
+
+¿Hay algo específico en lo que pueda ayudarte?`;
+        }
+
+        // Respuesta por defecto
+        return `Gracias por tu consulta. Como asistente virtual de MediQueue, puedo ayudarte con:
+
+• Información sobre el sistema de turnos médicos
+• Especialidades disponibles
+• Proceso de reserva de citas
+• ${isAuth ? 'Gestión administrativa' : 'Orientación para pacientes'}
+
+¿Podrías ser más específico sobre lo que necesitas? Estoy aquí para ayudarte.`;
+    };
+
     // Paleta de colores médica de MediQueue
     const colors = {
         primary: '#77b8ce',      // Azul médico principal
@@ -188,6 +303,11 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
                     message: mediQueueContext
                 })
             });
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
             const data = await res.json();
 
             // Simular efecto de escritura
@@ -199,10 +319,15 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
                 ]);
             }, 500);
         } catch (err) {
+            console.log('Error de API, usando respuestas locales:', err.message);
+
+            // Respuestas locales inteligentes basadas en la pregunta
+            const localResponse = getLocalResponse(input, currentPageContext, isAuthenticated);
+
             setTyping(false);
             setMessages((msgs) => [
                 ...msgs,
-                { sender: 'bot', text: 'Ha ocurrido un error. Para consultas médicas urgentes, contacta directamente con tu centro de salud.' }
+                { sender: 'bot', text: localResponse }
             ]);
         }
         setLoading(false);
