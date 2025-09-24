@@ -100,6 +100,14 @@ const HomePage = () => {
             </div>
             <div className="brand-right">
               <button
+                onClick={() => navigate('/about')}
+                className="about-button"
+                title="Conoce nuestro equipo"
+              >
+                <i className="fas fa-users"></i>
+                Equipo
+              </button>
+              <button
                 onClick={handleRefresh}
                 className="refresh-button"
                 disabled={loading}
@@ -279,6 +287,31 @@ const HomePage = () => {
         .refresh-button:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+
+        .about-button {
+          background: linear-gradient(135deg, #77b8ce 0%, #544e52 100%);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-right: 12px;
+        }
+
+        .about-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(119, 184, 206, 0.3);
+        }
+
+        .brand-right {
+          display: flex;
+          align-items: center;
         }
 
         .sidebar-refresh {

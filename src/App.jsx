@@ -14,6 +14,7 @@ import StatisticsPage from './pages/StatisticsPage'
 import TurnManager from './components/Admin/TurnManager'
 import ProtectedRoute from './components/Common/ProtectedRoute'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import AboutPage from './pages/AboutPage'
 import CookieBanner from './components/Common/CookieBanner'
 import Chatbot from './components/Common/Chatbot'
 import './styles/App.css'
@@ -31,6 +32,8 @@ function App() {
         {/* Rutas públicas de privacidad y cookies */}
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/equipo" element={<AboutPage />} />
 
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLogin />} />

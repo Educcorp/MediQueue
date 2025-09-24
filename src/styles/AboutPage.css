@@ -1,0 +1,661 @@
+/* AboutPage.css - Medical Professional Design for MediQueue */
+
+/* Import theme variables */
+@import './theme.css';
+
+/* Main container */
+.about-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #d8f0f4 0%, #77b8ce 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Loading Animation */
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d8f0f4 0%, #77b8ce 100%);
+}
+
+.medical-loader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.pulse-ring {
+  border: 4px solid rgba(119, 184, 206, 0.3);
+  border-radius: 50%;
+  height: 80px;
+  width: 80px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulsering 1.25s cubic-bezier(0.455, 0.03, 0.515, 0.955) -0.4s infinite;
+}
+
+.medical-cross {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  animation: pulse 1s infinite;
+}
+
+.loading-text {
+  color: #544e52;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+@keyframes pulsering {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  80%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* Medical Header */
+.medical-header {
+  background: linear-gradient(135deg, #77b8ce 0%, #544e52 100%);
+  padding: 60px 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(84, 78, 82, 0.2);
+}
+
+.medical-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 3s infinite;
+}
+
+.medical-pattern {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  opacity: 0.1;
+  background-image: 
+    radial-gradient(circle, rgba(255,255,255,0.3) 2px, transparent 2px);
+  background-size: 30px 30px;
+}
+
+.medical-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-logo {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.logo-image {
+  width: 70px;
+  height: auto;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+.header-info {
+  flex: 1;
+}
+
+.main-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 16px 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.main-subtitle {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Content Container */
+.about-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Section Styling */
+.section-container {
+  padding: 80px 0;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #544e52;
+  text-align: center;
+  margin-bottom: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.title-icon {
+  font-size: 40px;
+}
+
+/* Mission Section */
+.mission-section {
+  background: rgba(255, 255, 255, 0.7);
+  margin: 60px 0;
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(84, 78, 82, 0.1);
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+.mission-card {
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.mission-card.primary {
+  background: linear-gradient(135deg, #77b8ce, #5a9bb0);
+  color: white;
+}
+
+.mission-card.secondary {
+  background: linear-gradient(135deg, #544e52, #403a3e);
+  color: white;
+}
+
+.mission-card.accent {
+  background: linear-gradient(135deg, #d8f0f4, #b8e6ef);
+  color: #544e52;
+}
+
+.mission-card h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.mission-card p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.mission-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(84, 78, 82, 0.2);
+}
+
+/* Team Section */
+.team-section {
+  padding: 80px 0;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.team-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(84, 78, 82, 0.1);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  border: 2px solid rgba(119, 184, 206, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.team-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 20px 60px rgba(84, 78, 82, 0.2);
+  border-color: rgba(119, 184, 206, 0.3);
+}
+
+.card-header {
+  position: relative;
+  height: 280px;
+  background: linear-gradient(135deg, #77b8ce, #5a9bb0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-image-container {
+  position: relative;
+}
+
+.member-image {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.team-card:hover .member-image {
+  transform: scale(1.05);
+  border-color: white;
+}
+
+.medical-badge {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(84, 78, 82, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-content {
+  padding: 32px;
+  text-align: center;
+}
+
+.member-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #544e52;
+  margin-bottom: 8px;
+}
+
+.member-role {
+  font-size: 16px;
+  color: #77b8ce;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.member-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.specialties-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.specialty-tag {
+  background: linear-gradient(135deg, #d8f0f4, #c0e8f0);
+  color: #544e52;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid rgba(119, 184, 206, 0.3);
+}
+
+.member-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.github-btn {
+  background: linear-gradient(135deg, #77b8ce, #5a9bb0);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(119, 184, 206, 0.3);
+}
+
+.github-btn:hover {
+  background: linear-gradient(135deg, #5a9bb0, #4a8799);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(119, 184, 206, 0.4);
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+/* Values Section */
+.values-section {
+  background: rgba(255, 255, 255, 0.6);
+  margin: 60px 0;
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+.value-card {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(119, 184, 206, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.value-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(84, 78, 82, 0.15);
+  border-color: rgba(119, 184, 206, 0.3);
+}
+
+.value-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.value-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #544e52;
+  margin-bottom: 16px;
+}
+
+.value-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Statistics Section */
+.stats-section {
+  padding: 80px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px 24px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(84, 78, 82, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(119, 184, 206, 0.1);
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(84, 78, 82, 0.2);
+  border-color: rgba(119, 184, 206, 0.3);
+}
+
+.stat-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: #77b8ce;
+  margin-bottom: 12px;
+}
+
+.stat-label {
+  font-size: 16px;
+  color: #544e52;
+  font-weight: 500;
+}
+
+/* Call to Action Section */
+.cta-section {
+  background: linear-gradient(135deg, #77b8ce, #544e52);
+  margin: 60px 0 0 0;
+  border-radius: 24px 24px 0 0;
+  color: white;
+  text-align: center;
+}
+
+.cta-content h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.cta-content p {
+  font-size: 18px;
+  margin-bottom: 32px;
+  opacity: 0.9;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta-btn {
+  padding: 16px 32px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.cta-btn.primary {
+  background: white;
+  color: #77b8ce;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.3);
+}
+
+.cta-btn.primary:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.4);
+}
+
+.cta-btn.secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.cta-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: white;
+  transform: translateY(-2px);
+}
+
+/* Footer */
+.about-footer {
+  background: #544e52;
+  color: white;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.footer-links {
+  margin-top: 20px;
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.footer-links button {
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  transition: all 0.3s ease;
+}
+
+.footer-links button:hover {
+  color: #77b8ce;
+  transform: translateY(-1px);
+}
+
+/* Animations */
+.animate-in {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideInUp 0.8s ease forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+.delay-6 { animation-delay: 0.6s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .medical-header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .main-title {
+    font-size: 32px;
+  }
+  
+  .main-subtitle {
+    font-size: 16px;
+  }
+  
+  .section-title {
+    font-size: 28px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .team-grid,
+  .mission-grid,
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .about-content {
+    padding: 0 16px;
+  }
+  
+  .section-container {
+    padding: 40px 0;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
