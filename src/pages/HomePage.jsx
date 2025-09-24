@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
+import areaService from '../services/areaService';
 import '../styles/HomePage.css';
 
 const HomePage = () => {
@@ -10,15 +11,41 @@ const HomePage = () => {
   const [error, setError] = useState(null);
   const [showHeader] = useState(true);
   const navigate = useNavigate();
+  const SHOW_TURNS_ON_HOME = false;
+  const [areas, setAreas] = useState([]);
+  const [areasLoading, setAreasLoading] = useState(true);
+  const [areasError, setAreasError] = useState('');
 
   // Cargar datos al montar el componente
   useEffect(() => {
+    if (!SHOW_TURNS_ON_HOME) {
+      return;
+    }
     loadTurnsData();
 
     // Configurar actualización automática cada 30 segundos
     const interval = setInterval(loadTurnsData, 30000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Cargar áreas para selección en homepage
+  useEffect(() => {
+    const loadAreas = async () => {
+      try {
+        setAreasLoading(true);
+        setAreasError('');
+        // Usar endpoint público para evitar 401
+        const data = await areaService.getBasics();
+        setAreas(data || []);
+      } catch (e) {
+        console.warn('Error cargando áreas:', e);
+        setAreasError('No se pudieron cargar las áreas');
+      } finally {
+        setAreasLoading(false);
+      }
+    };
+    loadAreas();
   }, []);
 
   const loadTurnsData = async () => {
@@ -131,110 +158,142 @@ const HomePage = () => {
         </div>
       )}
 
-      <div className="turns-homepage">
-        <div className="main-turn">
-          <div className="current-card">
-            <div className="current-header">
-              <span className="pill">
-                <i className="fas fa-arrow-right"></i>
-                Siguiente turno
-              </span>
-            </div>
-            {loading ? (
-              <div className="main-loading">
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  border: '4px solid #e2e8f0',
-                  borderTop: '4px solid #77b8ce',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto 10px auto'
-                }}></div>
-                <span className="main-loading-text">Cargando...</span>
-              </div>
-            ) : nextTurn ? (
-              <>
-                <div className="turn-id-big">{nextTurn.id}</div>
-                <div className="turn-room-big">
-                  <i className="mdi mdi-hospital-building"></i>
-                  Consultorio {nextTurn.consultorio}
-                </div>
-                {nextTurn.area && (
-                  <div className="turn-area-big">
-                    <i className="mdi mdi-domain"></i>
-                    {nextTurn.area}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="main-no-turn">
-                <i className="mdi mdi-calendar-clock"></i>
-                No hay turno siguiente
-              </div>
-            )}
-          </div>
+      {/* Pestañas de áreas siempre visibles */}
+      <div className="areas-section">
+        <div className="areas-tabs" style={{ ['--areas-count']: areas.length > 0 ? areas.length : 7 }}>
+          {areasLoading ? (
+            Array.from({ length: 7 }).map((_, idx) => (
+              <div key={`sk-${idx}`} className="area-tab skeleton"></div>
+            ))
+          ) : (
+            <>
+              {areas.map((area) => (
+                <button
+                  key={area.uk_area || area.id}
+                  className="area-tab"
+                  onClick={() => navigate(`/tomar-turno?area=${area.uk_area || area.id}`)}
+                  title={`Ver consultorios de ${area.s_nombre_area || area.nombre}`}
+                >
+                  <span className="area-tab-text">{area.s_nombre_area || area.nombre}</span>
+                </button>
+              ))}
+              {areas.length < 7 && Array.from({ length: 7 - areas.length }).map((_, idx) => (
+                <div key={`ph-${idx}`} className="area-tab placeholder"></div>
+              ))}
+            </>
+          )}
         </div>
-
-        <div className="sidebar">
-          <div className="sidebar-title">
-            <i className="fas fa-list-ul"></i>
-            Turnos Activos
-            <button
-              onClick={handleRefresh}
-              className="sidebar-refresh"
-              disabled={loading}
-              title="Actualizar lista"
-            >
-              <i className="fas fa-sync-alt"></i>
-            </button>
-          </div>
-          <div className="sidebar-list">
-            {loading ? (
-              <div className="sidebar-loading">
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  border: '4px solid #e2e8f0',
-                  borderTop: '4px solid #77b8ce',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto 10px auto'
-                }}></div>
-                <span className="sidebar-loading-text">Cargando...</span>
-              </div>
-            ) : activeTurns.length > 0 ? (
-              activeTurns.map((turn) => (
-                <div className="sidebar-turn" key={turn.id}>
-                  <div className="turn-info">
-                    <span className="turn-id">#{turn.id}</span>
-                    <span className="turn-room">
-                      <i className="mdi mdi-hospital-building"></i>
-                      Consultorio {turn.consultorio}
-                    </span>
-                    {turn.area && (
-                      <span className="turn-area">
-                        <i className="mdi mdi-domain"></i>
-                        {turn.area}
-                      </span>
-                    )}
-                  </div>
-                  <div className="turn-status">
-                    <span className={`status-badge ${getStatusClass(turn.estado)}`}>
-                      {getStatusLabel(turn.estado)}
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="sidebar-empty">
-                <i className="mdi mdi-calendar-remove"></i>
-                No hay turnos activos
-              </div>
-            )}
-          </div>
-        </div>
+        {areasError && !areasLoading && (
+          <div className="areas-empty">{areasError}</div>
+        )}
       </div>
+
+      {SHOW_TURNS_ON_HOME && (
+        <div className="turns-homepage">
+          <div className="main-turn">
+            <div className="current-card">
+              <div className="current-header">
+                <span className="pill">
+                  <i className="fas fa-arrow-right"></i>
+                  Siguiente turno
+                </span>
+              </div>
+              {loading ? (
+                <div className="main-loading">
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '4px solid #e2e8f0',
+                    borderTop: '4px solid #77b8ce',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto 10px auto'
+                  }}></div>
+                  <span className="main-loading-text">Cargando...</span>
+                </div>
+              ) : nextTurn ? (
+                <>
+                  <div className="turn-id-big">{nextTurn.id}</div>
+                  <div className="turn-room-big">
+                    <i className="mdi mdi-hospital-building"></i>
+                    Consultorio {nextTurn.consultorio}
+                  </div>
+                  {nextTurn.area && (
+                    <div className="turn-area-big">
+                      <i className="mdi mdi-domain"></i>
+                      {nextTurn.area}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="main-no-turn">
+                  <i className="mdi mdi-calendar-clock"></i>
+                  No hay turno siguiente
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="sidebar">
+            <div className="sidebar-title">
+              <i className="fas fa-list-ul"></i>
+              Turnos Activos
+              <button
+                onClick={handleRefresh}
+                className="sidebar-refresh"
+                disabled={loading}
+                title="Actualizar lista"
+              >
+                <i className="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div className="sidebar-list">
+              {loading ? (
+                <div className="sidebar-loading">
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '4px solid #e2e8f0',
+                    borderTop: '4px solid #77b8ce',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto 10px auto'
+                  }}></div>
+                  <span className="sidebar-loading-text">Cargando...</span>
+                </div>
+              ) : activeTurns.length > 0 ? (
+                activeTurns.map((turn) => (
+                  <div className="sidebar-turn" key={turn.id}>
+                    <div className="turn-info">
+                      <span className="turn-id">#{turn.id}</span>
+                      <span className="turn-room">
+                        <i className="mdi mdi-hospital-building"></i>
+                        Consultorio {turn.consultorio}
+                      </span>
+                      {turn.area && (
+                        <span className="turn-area">
+                          <i className="mdi mdi-domain"></i>
+                          {turn.area}
+                        </span>
+                      )}
+                    </div>
+                    <div className="turn-status">
+                      <span className={`status-badge ${getStatusClass(turn.estado)}`}>
+                        {getStatusLabel(turn.estado)}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="sidebar-empty">
+                  <i className="mdi mdi-calendar-remove"></i>
+                  No hay turnos activos
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .error-banner {
@@ -415,6 +474,45 @@ const HomePage = () => {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <style>{`
+        .areas-section {
+          padding: 20px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        /* Tabs responsivas fijas (como pestañas de navegador) */
+        .areas-tabs {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 12px;
+          padding: 8px 4px 18px 4px;
+        }
+        .area-tab {
+          background: #ffffff;
+          border: 2px solid #2d3748;
+          border-radius: 12px;
+          min-height: clamp(42px, calc(90px - (var(--areas-count,7) * 4px)), 90px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 10px;
+          cursor: pointer;
+          transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+          text-align: center;
+        }
+        .area-tab:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .area-tab.placeholder { opacity: 0.25; pointer-events: none; }
+        .area-tab.skeleton { background: linear-gradient(90deg, #f2f2f2, #e9e9e9, #f2f2f2); background-size: 200% 100%; animation: shine 1.2s linear infinite; }
+        .area-tab-text { font-weight: 600; color: #2d3748; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
+        @keyframes shine { 0%{background-position: 200% 0} 100%{background-position: -200% 0} }
+        .areas-loading, .areas-empty {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          color: #718096;
+          padding: 20px;
         }
       `}</style>
     </div>

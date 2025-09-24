@@ -15,11 +15,21 @@ const TakeTurn = () => {
   const [formData, setFormData] = useState({
     uk_consultorio: ''
   });
+  const [selectedArea, setSelectedArea] = useState(null);
   // Interfaz simplificada: no se solicitan datos de paciente
 
   // Cargar consultorios y áreas al montar el componente
   useEffect(() => {
     loadData();
+  }, []);
+
+  // Filtrar por área recibida por query param (?area=)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const qpArea = params.get('area');
+      setSelectedArea(qpArea);
+    } catch (_) { }
   }, []);
 
   const loadData = async () => {
@@ -153,7 +163,7 @@ const TakeTurn = () => {
                   required
                 >
                   <option value="">Selecciona un consultorio</option>
-                  {consultorios.map((consultorio) => {
+                  {(selectedArea ? consultorios.filter(c => c.uk_area === selectedArea) : consultorios).map((consultorio) => {
                     const info = getConsultorioInfo(consultorio);
                     return (
                       <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
