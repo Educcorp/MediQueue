@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
+import areaService from '../services/areaService';
+import consultorioService from '../services/consultorioService';
 import '../styles/HomePage.css';
+import '../styles/UnifiedAdminPages.css';
 
 const HomePage = () => {
   const [nextTurn, setNextTurn] = useState(null);
@@ -10,14 +13,74 @@ const HomePage = () => {
   const [error, setError] = useState(null);
   const [showHeader] = useState(true);
   const navigate = useNavigate();
+  const SHOW_TURNS_ON_HOME = false;
+  const [areas, setAreas] = useState([]);
+  const [areasLoading, setAreasLoading] = useState(true);
+  const [areasError, setAreasError] = useState('');
+  const [selectedArea, setSelectedArea] = useState(null);
+  const [consultoriosArea, setConsultoriosArea] = useState([]);
 
   // Cargar datos al montar el componente
   useEffect(() => {
+    if (!SHOW_TURNS_ON_HOME) {
+      return;
+    }
     loadTurnsData();
 
     // Configurar actualización automática cada 30 segundos
     const interval = setInterval(loadTurnsData, 30000);
 
+    return () => clearInterval(interval);
+  }, []);
+
+  // Cargar áreas para selección en homepage
+  useEffect(() => {
+    const loadAreas = async () => {
+      try {
+        setAreasLoading(true);
+        setAreasError('');
+        // Usar endpoint público para evitar 401
+        const data = await areaService.getBasics();
+        setAreas(data || []);
+        if ((data || []).length > 0) {
+          const firstId = data[0].uk_area || data[0].id;
+          setSelectedArea(firstId);
+        }
+      } catch (e) {
+        console.warn('Error cargando áreas:', e);
+        setAreasError('No se pudieron cargar las áreas');
+      } finally {
+        setAreasLoading(false);
+      }
+    };
+    loadAreas();
+  }, []);
+
+  // Cargar consultorios de la área seleccionada (público)
+  useEffect(() => {
+    const loadConsultoriosByArea = async () => {
+      if (!selectedArea) return;
+      try {
+        const data = await consultorioService.getBasicsByArea(selectedArea);
+        setConsultoriosArea(data || []);
+      } catch (e) {
+        console.warn('Error cargando consultorios por área:', e);
+        setConsultoriosArea([]);
+      }
+    };
+    loadConsultoriosByArea();
+  }, [selectedArea]);
+
+  // Cargar turnos públicos activos de forma periódica, independiente del layout clásico
+  useEffect(() => {
+    const loadPublicTurns = async () => {
+      try {
+        const data = await turnService.getActiveTurns();
+        setActiveTurns(data || []);
+      } catch (_) { }
+    };
+    loadPublicTurns();
+    const interval = setInterval(loadPublicTurns, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -84,35 +147,17 @@ const HomePage = () => {
     <div className="main-outer-container">
       {/* Barra de marca */}
       {showHeader && (
-        <div className="brand-bar">
-          <div className="brand-inner">
-            <div className="brand-left">
-              <div className="brand-logo">
-                <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="brand-logo-image" />
-              </div>
-              <div className="brand-title">
-                <span className="brand-name">MediQueue</span>
-                <span className="brand-tag">
-                  <i className="mdi mdi-clock-outline"></i>
-                  Tu turno, sin filas
-                </span>
+        <div className="admin-container" style={{ marginTop: 20 }}>
+          <div className="page-header">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div className="page-header-icon"><i className="mdi mdi-hospital-building"></i></div>
+              <div className="page-header-content">
+                <h1 className="page-title">MediQueue</h1>
+                <p className="page-subtitle">Tu turno, sin filas</p>
               </div>
             </div>
-            <div className="brand-right">
-              <button
-                onClick={() => navigate('/about')}
-                className="about-button"
-                title="Conoce nuestro equipo"
-              >
-                <i className="fas fa-users"></i>
-                Equipo
-              </button>
-              <button
-                onClick={handleRefresh}
-                className="refresh-button"
-                disabled={loading}
-                title="Actualizar información"
-              >
+            <div className="page-actions">
+              <button onClick={handleRefresh} className="btn btn-primary" disabled={loading} title="Actualizar información">
                 <i className="fas fa-sync-alt"></i>
                 {loading ? 'Actualizando...' : 'Actualizar'}
               </button>
@@ -131,110 +176,211 @@ const HomePage = () => {
         </div>
       )}
 
-      <div className="turns-homepage">
-        <div className="main-turn">
-          <div className="current-card">
-            <div className="current-header">
-              <span className="pill">
-                <i className="fas fa-arrow-right"></i>
-                Siguiente turno
-              </span>
-            </div>
-            {loading ? (
-              <div className="main-loading">
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  border: '4px solid #e2e8f0',
-                  borderTop: '4px solid #77b8ce',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto 10px auto'
-                }}></div>
-                <span className="main-loading-text">Cargando...</span>
-              </div>
-            ) : nextTurn ? (
-              <>
-                <div className="turn-id-big">{nextTurn.id}</div>
-                <div className="turn-room-big">
-                  <i className="mdi mdi-hospital-building"></i>
-                  Consultorio {nextTurn.consultorio}
-                </div>
-                {nextTurn.area && (
-                  <div className="turn-area-big">
-                    <i className="mdi mdi-domain"></i>
-                    {nextTurn.area}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="main-no-turn">
-                <i className="mdi mdi-calendar-clock"></i>
-                No hay turno siguiente
-              </div>
-            )}
-          </div>
+      {/* Pestañas de áreas siempre visibles */}
+      <div className="areas-section">
+        <div className="areas-tabs" style={{ '--areas-count': areas.length > 0 ? areas.length : 7 }}>
+          {areasLoading ? (
+            Array.from({ length: 7 }).map((_, idx) => (
+              <div key={`sk-${idx}`} className="area-tab skeleton"></div>
+            ))
+          ) : (
+            <>
+              {areas.map((area) => (
+                <button
+                  key={area.uk_area || area.id}
+                  className={`area-tab${(area.uk_area || area.id) === selectedArea ? ' active' : ''}`}
+                  onClick={() => setSelectedArea(area.uk_area || area.id)}
+                  title={`Ver consultorios de ${area.s_nombre_area || area.nombre}`}
+                >
+                  <span className="area-tab-text">{area.s_nombre_area || area.nombre}</span>
+                </button>
+              ))}
+            </>
+          )}
         </div>
-
-        <div className="sidebar">
-          <div className="sidebar-title">
-            <i className="fas fa-list-ul"></i>
-            Turnos Activos
-            <button
-              onClick={handleRefresh}
-              className="sidebar-refresh"
-              disabled={loading}
-              title="Actualizar lista"
-            >
-              <i className="fas fa-sync-alt"></i>
+        {selectedArea && (
+          <div style={{ marginTop: 10 }}>
+            <button className="btn btn-secondary" onClick={() => setSelectedArea(null)}>
+              <i className="mdi mdi-arrow-left"></i>
+              Volver
             </button>
           </div>
-          <div className="sidebar-list">
-            {loading ? (
-              <div className="sidebar-loading">
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  border: '4px solid #e2e8f0',
-                  borderTop: '4px solid #77b8ce',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto 10px auto'
-                }}></div>
-                <span className="sidebar-loading-text">Cargando...</span>
-              </div>
-            ) : activeTurns.length > 0 ? (
-              activeTurns.map((turn) => (
-                <div className="sidebar-turn" key={turn.id}>
-                  <div className="turn-info">
-                    <span className="turn-id">#{turn.id}</span>
-                    <span className="turn-room">
-                      <i className="mdi mdi-hospital-building"></i>
-                      Consultorio {turn.consultorio}
-                    </span>
-                    {turn.area && (
-                      <span className="turn-area">
-                        <i className="mdi mdi-domain"></i>
-                        {turn.area}
-                      </span>
+        )}
+        {areasError && !areasLoading && (<div className="areas-empty">{areasError}</div>)}
+      </div>
+
+      {/* Vista por área seleccionada: próximo turno y lista de turnos del área */}
+      {selectedArea && (
+        <div className="consultorios-section">
+          {(() => {
+            const areaObj = (areas || []).find(a => (a.uk_area || a.id) === selectedArea);
+            const areaName = areaObj?.s_nombre_area || areaObj?.nombre || '';
+            const turnsArea = (activeTurns || []).filter(t => (t.s_nombre_area || t.area) === areaName);
+
+            // determinar próximo turno del área: 1) LLAMANDO; 2) EN_ESPERA por número
+            const calling = turnsArea.filter(t => (t.s_estado || t.estado) === 'LLAMANDO');
+            const waiting = turnsArea.filter(t => (t.s_estado || t.estado) === 'EN_ESPERA');
+            const sortByNum = (a, b) => (a.i_numero_turno || a.id || 0) - (b.i_numero_turno || b.id || 0);
+            const nextForArea = (calling.sort(sortByNum)[0]) || (waiting.sort(sortByNum)[0]) || null;
+
+            return (
+              <div className="panels-grid" style={{ gridTemplateColumns: '2fr 1fr' }}>
+                <div className="content-card">
+                  <div className="card-header">
+                    <h3 className="card-title"><i className="mdi mdi-arrow-right-bold"></i> Siguiente turno — {areaName}</h3>
+                  </div>
+                  <div className="card-content">
+                    {!nextForArea ? (
+                      <div className="panel-empty">No hay turno siguiente</div>
+                    ) : (
+                      <div>
+                        <div className="turn-id-big">{nextForArea.i_numero_turno || nextForArea.id}</div>
+                        <div className="turn-room-big"><i className="mdi mdi-hospital-building"></i> Consultorio {nextForArea.i_numero_consultorio || nextForArea.consultorio}</div>
+                        <div className="turn-area-big"><i className="mdi mdi-domain"></i> {areaName}</div>
+                      </div>
                     )}
                   </div>
-                  <div className="turn-status">
-                    <span className={`status-badge ${getStatusClass(turn.estado)}`}>
-                      {getStatusLabel(turn.estado)}
-                    </span>
+                </div>
+
+                <div className="content-card">
+                  <div className="card-header">
+                    <h3 className="card-title"><i className="mdi mdi-format-list-bulleted"></i> Turnos activos</h3>
+                  </div>
+                  <div className="card-content">
+                    {turnsArea.length === 0 ? (
+                      <div className="panel-empty">No hay turnos activos</div>
+                    ) : (
+                      <div className="sidebar-list" style={{ padding: 0 }}>
+                        {turnsArea.sort(sortByNum).map((t, idx) => (
+                          <div className="sidebar-turn" key={idx}>
+                            <div className="turn-info">
+                              <span className="turn-id">#{t.i_numero_turno || t.id}</span>
+                              <span className="turn-room"><i className="mdi mdi-hospital-building"></i> Consultorio {t.i_numero_consultorio || t.consultorio}</span>
+                              <span className="turn-area"><i className="mdi mdi-domain"></i> {areaName}</span>
+                            </div>
+                            <div className="turn-status">
+                              <span className={`status-badge ${((t.s_estado || t.estado) === 'LLAMANDO') ? 'warning' : 'info'}`}>
+                                {t.s_estado || t.estado}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="sidebar-empty">
-                <i className="mdi mdi-calendar-remove"></i>
-                No hay turnos activos
               </div>
-            )}
+            );
+          })()}
+        </div>
+      )}
+
+      {SHOW_TURNS_ON_HOME && (
+        <div className="turns-homepage">
+          <div className="main-turn">
+            <div className="current-card">
+              <div className="current-header">
+                <span className="pill">
+                  <i className="fas fa-arrow-right"></i>
+                  Siguiente turno
+                </span>
+              </div>
+              {loading ? (
+                <div className="main-loading">
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '4px solid #e2e8f0',
+                    borderTop: '4px solid #77b8ce',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto 10px auto'
+                  }}></div>
+                  <span className="main-loading-text">Cargando...</span>
+                </div>
+              ) : nextTurn ? (
+                <>
+                  <div className="turn-id-big">{nextTurn.id}</div>
+                  <div className="turn-room-big">
+                    <i className="mdi mdi-hospital-building"></i>
+                    Consultorio {nextTurn.consultorio}
+                  </div>
+                  {nextTurn.area && (
+                    <div className="turn-area-big">
+                      <i className="mdi mdi-domain"></i>
+                      {nextTurn.area}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="main-no-turn">
+                  <i className="mdi mdi-calendar-clock"></i>
+                  No hay turno siguiente
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="sidebar">
+            <div className="sidebar-title">
+              <i className="fas fa-list-ul"></i>
+              Turnos Activos
+              <button
+                onClick={handleRefresh}
+                className="sidebar-refresh"
+                disabled={loading}
+                title="Actualizar lista"
+              >
+                <i className="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div className="sidebar-list">
+              {loading ? (
+                <div className="sidebar-loading">
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '4px solid #e2e8f0',
+                    borderTop: '4px solid #77b8ce',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto 10px auto'
+                  }}></div>
+                  <span className="sidebar-loading-text">Cargando...</span>
+                </div>
+              ) : activeTurns.length > 0 ? (
+                activeTurns.map((turn) => (
+                  <div className="sidebar-turn" key={turn.id}>
+                    <div className="turn-info">
+                      <span className="turn-id">#{turn.id}</span>
+                      <span className="turn-room">
+                        <i className="mdi mdi-hospital-building"></i>
+                        Consultorio {turn.consultorio}
+                      </span>
+                      {turn.area && (
+                        <span className="turn-area">
+                          <i className="mdi mdi-domain"></i>
+                          {turn.area}
+                        </span>
+                      )}
+                    </div>
+                    <div className="turn-status">
+                      <span className={`status-badge ${getStatusClass(turn.estado)}`}>
+                        {getStatusLabel(turn.estado)}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="sidebar-empty">
+                  <i className="mdi mdi-calendar-remove"></i>
+                  No hay turnos activos
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <style>{`
         .error-banner {
@@ -416,6 +562,59 @@ const HomePage = () => {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
+      `}</style>
+      <style>{`
+        .areas-section {
+          padding: 20px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        /* Tabs responsivas en UNA sola línea */
+        .areas-tabs {
+          display: flex;
+          flex-wrap: nowrap;
+          gap: 12px;
+          padding: 8px 4px 18px 4px;
+          width: 100%;
+        }
+        .area-tab {
+          background: #ffffff;
+          border: 2px solid #2d3748;
+          border-radius: 12px;
+          min-height: clamp(42px, calc(90px - (var(--areas-count,7) * 4px)), 90px);
+          flex: 1 1 0;
+          min-width: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 10px;
+          cursor: pointer;
+          transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+          text-align: center;
+        }
+        .area-tab.active { background: #f0f7fa; border-color: #256b80; }
+        .area-tab:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .area-tab.skeleton { background: linear-gradient(90deg, #f2f2f2, #e9e9e9, #f2f2f2); background-size: 200% 100%; animation: shine 1.2s linear infinite; }
+        .area-tab-text { font-weight: 600; color: #2d3748; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
+        @keyframes shine { 0%{background-position: 200% 0} 100%{background-position: -200% 0} }
+        .areas-loading, .areas-empty {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          color: #718096;
+          padding: 20px;
+        }
+
+        /* Paneles de consultorios */
+        .consultorios-section { max-width: 1200px; margin: 0 auto; padding: 8px 20px 28px 20px; }
+        .big-panel { border: 3px solid #1a202c; border-radius: 32px; min-height: 55vh; padding: 18px; background: #fff; }
+        .panels-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .small-panel { border: 3px solid #1a202c; border-radius: 28px; min-height: 42vh; padding: 16px; background: #fff; }
+        .panel-header { font-weight: 800; color: #1a202c; margin-bottom: 8px; }
+        .panel-body { height: 100%; display: flex; align-items: center; justify-content: center; }
+        .turns-list { list-style: none; padding: 0; margin: 0; width: 100%; }
+        .turn-item { padding: 10px 12px; border-bottom: 1px dashed #e2e8f0; font-weight: 700; color: #2d3748; }
+        .panel-empty { color: #718096; }
       `}</style>
     </div>
   );
