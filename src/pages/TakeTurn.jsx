@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
+import consultorioService from '../services/consultorioService';
 import '../styles/TakeTurn.css';
 
 // React Icons
@@ -33,6 +34,10 @@ const TakeTurn = () => {
   const [error, setError] = useState('');
   const [selectedArea, setSelectedArea] = useState(null);
   const [areas, setAreas] = useState([]);
+  const [consultorios, setConsultorios] = useState([]);
+  const [formData, setFormData] = useState({
+    uk_consultorio: ''
+  });
 
   // Mapa de iconos y colores por nombre de área médica
   const getAreaIcon = (areaName) => {
@@ -55,25 +60,27 @@ const TakeTurn = () => {
   };
 
   // Cargar áreas al montar el componente
-  const [formData, setFormData] = useState({
-    uk_consultorio: ''
-  });
-  const [selectedArea, setSelectedArea] = useState(null);
-  // Interfaz simplificada: no se solicitan datos de paciente
-
-  // Cargar consultorios y áreas al montar el componente
   useEffect(() => {
     loadAreas();
   }, []);
 
-  // Filtrar por área recibida por query param (?area=)
+  // Cargar consultorios cuando cambia el área seleccionada (o al inicio)
   useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const qpArea = params.get('area');
-      setSelectedArea(qpArea);
-    } catch (_) { }
-  }, []);
+    const loadConsultorios = async () => {
+      try {
+        let data = [];
+        if (selectedArea?.uk_area) {
+          data = await consultorioService.getBasicsByArea(selectedArea.uk_area).catch(() => []);
+        } else {
+          data = await consultorioService.getDisponibles().catch(() => []);
+        }
+        setConsultorios(Array.isArray(data) ? data : (data?.consultorios || []));
+      } catch (_) {
+        setConsultorios([]);
+      }
+    };
+    loadConsultorios();
+  }, [selectedArea]);
 
   const loadAreas = async () => {
     try {
@@ -93,6 +100,41 @@ const TakeTurn = () => {
     } catch (error) {
       console.error('Error cargando datos:', error);
       setError('Error al cargar los datos del sistema');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helpers y handlers para flujo manual
+  const getConsultorioInfo = (c) => {
+    if (!c) return { numero: '', area: '' };
+    return {
+      numero: c.i_numero_consultorio || c.numero || c.i_numero || c?.consultorio?.numero || '',
+      area: c.s_nombre_area || c?.area?.nombre || c.area || ''
+    };
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!formData.uk_consultorio) {
+      setError('Selecciona un consultorio');
+      return;
+    }
+    try {
+      setLoading(true);
+      const result = await turnService.createTurnPublico({ uk_consultorio: formData.uk_consultorio });
+      const numero = result?.i_numero_turno || result?.numero_turno || result?.id || 'N/A';
+      alert(`¡Turno generado exitosamente!\n\nTu número de turno es: ${numero}`);
+      navigate('/');
+    } catch (err) {
+      console.error('Error generando turno (manual):', err);
+      setError(err?.response?.data?.message || 'Error al generar el turno');
     } finally {
       setLoading(false);
     }
@@ -150,10 +192,10 @@ const TakeTurn = () => {
 
       // Mostrar mensaje de éxito con información del consultorio asignado
       const consultorioInfo = result.asignacion_automatica?.consultorio_asignado;
-      const mensaje = consultorioInfo 
+      const mensaje = consultorioInfo
         ? `¡Turno generado exitosamente!\n\nTu número de turno es: ${result.i_numero_turno}\nConsultorio asignado: #${consultorioInfo.numero} - ${consultorioInfo.area}\nTurnos en espera: ${consultorioInfo.turnos_en_espera}`
         : `¡Turno generado exitosamente! Tu número de turno es: ${result.i_numero_turno}`;
-      
+
       alert(mensaje);
 
       // Redirigir a la página principal
@@ -197,31 +239,6 @@ const TakeTurn = () => {
           </div>
         </div>
 
-            <form onSubmit={handleFormSubmit} className="turn-form">
-              <div className="form-group">
-                <label htmlFor="consultorio" className="form-label">
-                  <i className="mdi mdi-hospital-building"></i>
-                  Consultorio *
-                </label>
-                <select
-                  id="consultorio"
-                  name="uk_consultorio"
-                  value={formData.uk_consultorio}
-                  onChange={handleInputChange}
-                  className="form-select"
-                  required
-                >
-                  <option value="">Selecciona un consultorio</option>
-                  {(selectedArea ? consultorios.filter(c => c.uk_area === selectedArea) : consultorios).map((consultorio) => {
-                    const info = getConsultorioInfo(consultorio);
-                    return (
-                      <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
-                        Consultorio {info.numero} - {info.area}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
 
         {loading && (
           <div className="loading-container">
@@ -240,7 +257,7 @@ const TakeTurn = () => {
                   const IconComponent = areaIcon.icon;
                   return (
                     <>
-                      <div 
+                      <div
                         className="area-icon-large"
                         style={{
                           background: `linear-gradient(135deg, ${areaIcon.color}, ${areaIcon.color}dd)`
@@ -256,7 +273,7 @@ const TakeTurn = () => {
                   );
                 })()}
               </div>
-              
+
               <div className="confirmation-actions">
                 <button
                   onClick={handleTakeAreaTurn}
@@ -284,6 +301,43 @@ const TakeTurn = () => {
               </div>
             )}
           </div>
+        )}
+
+        {/* Formulario manual: seleccionar consultorio */}
+        {!loading && (
+          <form onSubmit={handleFormSubmit} className="turn-form">
+            <div className="form-group">
+              <label htmlFor="consultorio" className="form-label">
+                <i className="mdi mdi-hospital-building"></i>
+                Consultorio *
+              </label>
+              <select
+                id="consultorio"
+                name="uk_consultorio"
+                value={formData.uk_consultorio}
+                onChange={handleInputChange}
+                className="form-select"
+                required
+              >
+                <option value="">Selecciona un consultorio</option>
+                {consultorios.map((consultorio) => {
+                  const info = getConsultorioInfo(consultorio);
+                  const value = consultorio.uk_consultorio || consultorio.id;
+                  return (
+                    <option key={value} value={value}>
+                      Consultorio {info.numero} - {info.area}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="confirmation-actions" style={{ marginTop: 12 }}>
+              <button type="submit" className="confirm-button" disabled={loading || !consultorios.length}>
+                <FaCheckCircle />
+                Generar Turno en consultorio seleccionado
+              </button>
+            </div>
+          </form>
         )}
 
 
@@ -370,7 +424,7 @@ const TakeTurn = () => {
                       className="area-button"
                       onClick={() => handleSelectArea(area)}
                     >
-                      <div 
+                      <div
                         className="area-icon-button"
                         style={{
                           background: `linear-gradient(135deg, ${areaIcon.color}, ${areaIcon.color}dd)`
