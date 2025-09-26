@@ -1,17 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
-import consultorioService from '../services/consultorioService';
 import areaService from '../services/areaService';
 import '../styles/TakeTurn.css';
+
+// React Icons
+import {
+  FaTicketAlt,
+  FaHospital,
+  FaBuilding,
+  FaStethoscope,
+  FaBaby,
+  FaHeartbeat,
+  FaUserMd,
+  FaFemale,
+  FaEye as FaEyeMed,
+  FaBone,
+  FaBrain,
+  FaMale,
+  FaFlask,
+  FaProcedures,
+  FaInfoCircle,
+  FaCheckCircle,
+  FaArrowLeft,
+  FaRandom,
+  // FaClock // COMENTADO: No se usa sin turno rápido
+} from 'react-icons/fa';
 
 const TakeTurn = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [consultorios, setConsultorios] = useState([]);
+  const [selectedArea, setSelectedArea] = useState(null);
   const [areas, setAreas] = useState([]);
+
+  // Mapa de iconos y colores por nombre de área médica
+  const getAreaIcon = (areaName) => {
+    const iconMap = {
+      'Medicina General': { icon: FaStethoscope, color: 'var(--primary-medical)' },
+      'Pediatría': { icon: FaBaby, color: 'var(--info-color)' },
+      'Cardiología': { icon: FaHeartbeat, color: 'var(--danger-color)' },
+      'Dermatología': { icon: FaUserMd, color: 'var(--warning-color)' },
+      'Ginecología': { icon: FaFemale, color: '#E91E63' },
+      'Oftalmología': { icon: FaEyeMed, color: 'var(--info-color)' },
+      'Ortopedia': { icon: FaBone, color: '#795548' },
+      'Psiquiatría': { icon: FaBrain, color: '#9C27B0' },
+      'Neurología': { icon: FaBrain, color: '#FF5722' },
+      'Urología': { icon: FaMale, color: '#3F51B5' },
+      'Endocrinología': { icon: FaFlask, color: 'var(--success-color)' },
+      'Gastroenterología': { icon: FaProcedures, color: '#FFC107' }
+    };
+
+    return iconMap[areaName] || { icon: FaHospital, color: 'var(--primary-medical)' };
+  };
+
+  // Cargar áreas al montar el componente
   const [formData, setFormData] = useState({
     uk_consultorio: ''
   });
@@ -20,7 +63,7 @@ const TakeTurn = () => {
 
   // Cargar consultorios y áreas al montar el componente
   useEffect(() => {
-    loadData();
+    loadAreas();
   }, []);
 
   // Filtrar por área recibida por query param (?area=)
@@ -32,28 +75,20 @@ const TakeTurn = () => {
     } catch (_) { }
   }, []);
 
-  const loadData = async () => {
+  const loadAreas = async () => {
     try {
       setLoading(true);
       setError('');
 
-      // Cargar consultorios y áreas en paralelo
-      const [consultoriosData, areasData] = await Promise.all([
-        consultorioService.getDisponibles().catch(err => {
-          console.warn('Error cargando consultorios disponibles:', err);
-          return consultorioService.getAll().catch(() => []);
-        }),
-        areaService.getAll().catch(err => {
-          console.warn('Error cargando áreas:', err);
-          return [];
-        })
-      ]);
+      const areasData = await areaService.getAll().catch(err => {
+        console.warn('Error cargando áreas:', err);
+        return [];
+      });
 
-      setConsultorios(consultoriosData || []);
       setAreas(areasData || []);
 
-      if (consultoriosData.length === 0) {
-        setError('No hay consultorios configurados en el sistema');
+      if (areasData.length === 0) {
+        setError('No hay áreas médicas configuradas en el sistema');
       }
     } catch (error) {
       console.error('Error cargando datos:', error);
@@ -63,35 +98,63 @@ const TakeTurn = () => {
     }
   };
 
-  const handleTakeTurn = () => {
-    setError('');
-    setShowForm(true);
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
+  // COMENTADO: Función para turno rápido (asignación automática global)
+  /*
+  const handleTakeRandomTurn = async () => {
     setLoading(true);
     setError('');
 
     try {
-      if (!formData.uk_consultorio) {
-        setError('Por favor selecciona un consultorio');
-        return;
-      }
+      // Crear turno con asignación automática sin especificar área
+      const result = await turnService.createTurnPublicoAuto({});
 
-      // Crear turno enviando únicamente el consultorio.
-      // El backend completará con null o placeholders ("Invitado").
-      const result = await turnService.createTurnPublico({
-        uk_consultorio: formData.uk_consultorio
+      // Mostrar mensaje de éxito con información del consultorio asignado
+      const consultorioInfo = result.asignacion_automatica?.consultorio_asignado;
+      const mensaje = consultorioInfo 
+        ? `¡Turno generado exitosamente!\n\nTu número de turno es: ${result.i_numero_turno}\nConsultorio asignado: #${consultorioInfo.numero} - ${consultorioInfo.area}\nTurnos en espera: ${consultorioInfo.turnos_en_espera}`
+        : `¡Turno generado exitosamente! Tu número de turno es: ${result.i_numero_turno}`;
+      
+      alert(mensaje);
+
+      // Redirigir a la página principal
+      navigate('/');
+
+    } catch (error) {
+      console.error('Error generando turno:', error);
+      setError(error.response?.data?.message || 'Error al generar el turno');
+    } finally {
+      setLoading(false);
+    }
+  };
+  */
+
+  const handleSelectArea = (area) => {
+    setSelectedArea(area);
+    setError('');
+  };
+
+  const handleTakeAreaTurn = async () => {
+    if (!selectedArea) {
+      setError('Por favor selecciona un área');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Crear turno con asignación automática en el área específica
+      const result = await turnService.createTurnPublicoAuto({
+        uk_area: selectedArea.uk_area
       });
 
-      // Mostrar mensaje de éxito
-      alert(`¡Turno generado exitosamente! Tu número de turno es: ${result.i_numero_turno}`);
-
-      // Limpiar formulario
-      setFormData({
-        uk_consultorio: ''
-      });
+      // Mostrar mensaje de éxito con información del consultorio asignado
+      const consultorioInfo = result.asignacion_automatica?.consultorio_asignado;
+      const mensaje = consultorioInfo 
+        ? `¡Turno generado exitosamente!\n\nTu número de turno es: ${result.i_numero_turno}\nConsultorio asignado: #${consultorioInfo.numero} - ${consultorioInfo.area}\nTurnos en espera: ${consultorioInfo.turnos_en_espera}`
+        : `¡Turno generado exitosamente! Tu número de turno es: ${result.i_numero_turno}`;
+      
+      alert(mensaje);
 
       // Redirigir a la página principal
       navigate('/');
@@ -108,45 +171,31 @@ const TakeTurn = () => {
     navigate('/');
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleCloseForm = () => {
-    setShowForm(false);
+  const handleGoBack = () => {
+    setSelectedArea(null);
     setError('');
-    setFormData({
-      uk_consultorio: ''
-    });
-  };
-
-
-  const getConsultorioInfo = (consultorio) => {
-    const area = areas.find(a => a.uk_area === consultorio.uk_area);
-    return {
-      numero: consultorio.i_numero_consultorio,
-      area: area ? area.s_nombre_area : 'Sin área'
-    };
   };
 
   return (
     <div className="take-turn-container">
       <div className="take-turn-content">
-
-        {/* Formulario para tomar turno */}
-        {showForm && (
-          <div className="turn-form-card">
-            <div className="form-header">
-              <h2>
-                <i className="mdi mdi-clipboard-text"></i>
-                Tomar Nuevo Turno
-              </h2>
-              <p>Selecciona el consultorio al que te diriges</p>
+        {/* Encabezado */}
+        <div className="take-turn-header">
+          <div className="header-card">
+            <div className="header-icon">
+              <FaTicketAlt />
             </div>
+            <div className="header-texts">
+              <h1 className="header-title">Tomar Turno</h1>
+              <p className="header-subtitle">Selecciona un área médica y se asignará automáticamente el consultorio más disponible</p>
+            </div>
+            {selectedArea && (
+              <button onClick={handleGoBack} className="back-button">
+                <FaArrowLeft /> Volver
+              </button>
+            )}
+          </div>
+        </div>
 
             <form onSubmit={handleFormSubmit} className="turn-form">
               <div className="form-group">
@@ -174,212 +223,181 @@ const TakeTurn = () => {
                 </select>
               </div>
 
-              {/* Interfaz simplificada: sin formulario de datos personales */}
+        {loading && (
+          <div className="loading-container">
+            <div className="spinner"></div>
+            <p>Procesando solicitud...</p>
+          </div>
+        )}
 
-              {/* Mensajes de Error */}
-              {error && (
-                <div className="message error">
-                  <i className="fas fa-exclamation-triangle"></i>
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Botones de acción */}
-              <div className="form-actions">
+        {/* Vista de confirmación de área seleccionada */}
+        {selectedArea && !loading && (
+          <div className="confirmation-container">
+            <div className="selected-area-card">
+              <div className="area-header-confirmation">
+                {(() => {
+                  const areaIcon = getAreaIcon(selectedArea.s_nombre_area);
+                  const IconComponent = areaIcon.icon;
+                  return (
+                    <>
+                      <div 
+                        className="area-icon-large"
+                        style={{
+                          background: `linear-gradient(135deg, ${areaIcon.color}, ${areaIcon.color}dd)`
+                        }}
+                      >
+                        <IconComponent />
+                      </div>
+                      <div className="area-info-confirmation">
+                        <h2 style={{ color: areaIcon.color }}>{selectedArea.s_nombre_area}</h2>
+                        <p>Se asignará automáticamente el consultorio más disponible de esta área</p>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+              
+              <div className="confirmation-actions">
                 <button
-                  type="button"
-                  onClick={handleCloseForm}
-                  className="cancel-button"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="submit-button"
+                  onClick={handleTakeAreaTurn}
+                  className="confirm-button"
                   disabled={loading}
                 >
                   {loading ? (
                     <>
-                      <div style={{
-                        width: '16px',
-                        height: '16px',
-                        border: '2px solid #e2e8f0',
-                        borderTop: '2px solid #77b8ce',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite',
-                        display: 'inline-block',
-                        marginRight: '8px'
-                      }}></div>
+                      <div className="button-spinner"></div>
                       Generando Turno...
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-ticket-alt"></i>
-                      Generar Turno
+                      <FaCheckCircle />
+                      Generar Turno en {selectedArea.s_nombre_area}
                     </>
                   )}
                 </button>
               </div>
-            </form>
-          </div>
-        )}
+            </div>
 
-        {/* Botón principal para tomar turno */}
-        {!showForm && (
-          <div className="main-button-container">
-            <button
-              onClick={handleTakeTurn}
-              className="main-take-turn-button"
-              disabled={loading || consultorios.length === 0}
-            >
-              {loading ? (
-                <>
-                  <div style={{
-                    width: '16px',
-                    height: '16px',
-                    border: '2px solid #e2e8f0',
-                    borderTop: '2px solid #77b8ce',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite',
-                    display: 'inline-block',
-                    marginRight: '8px'
-                  }}></div>
-                  Cargando...
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-ticket-alt"></i>
-                  Tomar Turno
-                </>
-              )}
-            </button>
-
-            {/* Mensaje de error */}
             {error && (
               <div className="error-message">
-                <i className="fas fa-exclamation-triangle"></i>
                 <span>{error}</span>
               </div>
             )}
+          </div>
+        )}
 
-            {/* Información adicional */}
-            <div className="info-card">
-              <h3>
-                <i className="fas fa-info-circle"></i>
-                Información Importante
-              </h3>
-              <ul className="info-list">
-                <li>Selecciona el consultorio donde deseas ser atendido</li>
-                <li>Tu turno será agregado a la cola de espera del consultorio seleccionado</li>
-                <li>Si no registras datos, tu turno saldrá como "Invitado"</li>
-                <li>Puedes ver el estado de los turnos en la pantalla principal</li>
-                <li>Mantente atento a los llamados en la pantalla de turnos</li>
-              </ul>
+
+        {/* COMENTADO: Vista principal con opción de turno rápido
+        {!showAreaSelection && !selectedArea && !loading && (
+          <div className="main-options-container">
+            <div className="options-grid">
+              {/* Opción de turno aleatorio 
+              <div className="option-card primary">
+                <div className="option-icon">
+                  <FaRandom />
+                </div>
+                <div className="option-content">
+                  <h2>Turno Rápido</h2>
+                  <p>Se asignará automáticamente el consultorio más disponible de todo el hospital</p>
+                  <div className="option-features">
+                    <span><FaClock /> Más rápido</span>
+                    <span><FaRandom /> Automático</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleTakeRandomTurn}
+                  className="option-button primary"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <div className="button-spinner"></div>
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <FaTicketAlt />
+                      Generar Turno Rápido
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Opción de selección por área - MOVIDA ABAJO COMO VISTA PRINCIPAL 
+              <div className="option-card secondary">
+                <div className="option-icon">
+                  <FaHospital />
+                </div>
+                <div className="option-content">
+                  <h2>Por Área Médica</h2>
+                  <p>Elige un área específica y se asignará el consultorio más disponible de esa área</p>
+                  <div className="option-features">
+                    <span><FaHospital /> Específico</span>
+                    <span><FaRandom /> Automático</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleShowAreaSelection}
+                  className="option-button secondary"
+                  disabled={loading || areas.length === 0}
+                >
+                  <FaBuilding />
+                  Seleccionar Área
+                </button>
+              </div>
             </div>
+        )}
+        */}
+
+        {/* Vista principal directa - Selección de áreas */}
+        {!selectedArea && !loading && (
+          <div className="areas-container">
+            {areas.length === 0 ? (
+              <div className="empty-state">
+                <FaBuilding />
+                <h3>No hay áreas médicas disponibles</h3>
+                <p>Actualmente no hay consultorios configurados en el sistema</p>
+              </div>
+            ) : (
+              <div className="areas-grid-simple">
+                {areas.map(area => {
+                  const areaIcon = getAreaIcon(area.s_nombre_area);
+                  const IconComponent = areaIcon.icon;
+
+                  return (
+                    <button
+                      key={area.uk_area}
+                      className="area-button"
+                      onClick={() => handleSelectArea(area)}
+                    >
+                      <div 
+                        className="area-icon-button"
+                        style={{
+                          background: `linear-gradient(135deg, ${areaIcon.color}, ${areaIcon.color}dd)`
+                        }}
+                      >
+                        <IconComponent />
+                      </div>
+                      <div className="area-info-button">
+                        <h3 style={{ color: areaIcon.color }}>
+                          {area.s_nombre_area}
+                        </h3>
+                        <p>Consultorio automático</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {error && !selectedArea && (
+          <div className="error-message">
+            <span>{error}</span>
           </div>
         )}
       </div>
-
-      <style>{`
-        .patient-form {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 20px;
-          margin: 20px 0;
-        }
-
-        .patient-form h3 {
-          margin: 0 0 15px 0;
-          color: #4a5568;
-          font-size: 1.1em;
-          font-weight: 600;
-        }
-
-        .form-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 15px;
-          margin-bottom: 15px;
-        }
-
-        .form-row:last-child {
-          margin-bottom: 0;
-        }
-
-        .checkbox-label {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          cursor: pointer;
-          font-weight: 500;
-          color: #4a5568;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-          width: 18px;
-          height: 18px;
-          cursor: pointer;
-        }
-
-        .checkmark {
-          position: relative;
-          display: inline-block;
-          width: 18px;
-          height: 18px;
-          background: #f7fafc;
-          border: 2px solid #e2e8f0;
-          border-radius: 4px;
-          transition: all 0.3s ease;
-        }
-
-        .checkbox-label input[type="checkbox"]:checked + .checkmark {
-          background: #667eea;
-          border-color: #667eea;
-        }
-
-        .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
-          content: '✓';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          color: white;
-          font-size: 12px;
-          font-weight: bold;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-input::placeholder {
-          color: #a0aec0;
-        }
-
-        @media (max-width: 768px) {
-          .form-row {
-            grid-template-columns: 1fr;
-            gap: 10px;
-          }
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

@@ -183,33 +183,52 @@ const ConsultorioManagement = () => {
 
   const handleDeleteArea = async (area) => {
     const consultoriosEnArea = consultorios.filter(c => c.uk_area === area.uk_area);
-    if (consultoriosEnArea.length > 0) {
-      alert(`No se puede eliminar el área "${area.s_nombre_area}" porque tiene ${consultoriosEnArea.length} consultorio(s) asociado(s).`);
-      return;
-    }
+    const mensaje = consultoriosEnArea.length > 0 
+      ? `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?\n\nEsto eliminará también ${consultoriosEnArea.length} consultorio(s) y todos los turnos asociados.`
+      : `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`;
 
-    if (window.confirm(`¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`)) {
+    if (window.confirm(mensaje)) {
       try {
         // Nota: el servicio expone "remove" para eliminación hard.
         await areaService.remove(area.uk_area);
         await loadData();
         alert('Área eliminada correctamente');
       } catch (error) {
-        alert('Error eliminando área: ' + error.message);
         console.error('Error eliminando área:', error);
+        
+        // Manejar diferentes tipos de errores
+        if (error.response?.status === 404) {
+          alert('El área no fue encontrada');
+        } else if (error.response?.status === 403) {
+          alert('No tienes permisos para eliminar esta área');
+        } else {
+          // Error genérico
+          const mensaje = error.response?.data?.message || error.message || 'Error desconocido al eliminar el área';
+          alert('Error eliminando área: ' + mensaje);
+        }
       }
     }
   };
 
   const handleDeleteConsultorio = async (consultorio) => {
-    if (window.confirm(`¿Estás seguro de eliminar el consultorio #${consultorio.i_numero_consultorio}?`)) {
+    if (window.confirm(`¿Estás seguro de eliminar el consultorio #${consultorio.i_numero_consultorio}?\n\nEsto eliminará también todos los turnos asociados a este consultorio.`)) {
       try {
-        await consultorioService.delete(consultorio.uk_consultorio);
+        await consultorioService.remove(consultorio.uk_consultorio);
         await loadData();
         alert('Consultorio eliminado correctamente');
       } catch (error) {
-        alert('Error eliminando consultorio: ' + error.message);
         console.error('Error eliminando consultorio:', error);
+        
+        // Manejar diferentes tipos de errores
+        if (error.response?.status === 404) {
+          alert('El consultorio no fue encontrado');
+        } else if (error.response?.status === 403) {
+          alert('No tienes permisos para eliminar este consultorio');
+        } else {
+          // Error genérico
+          const mensaje = error.response?.data?.message || error.message || 'Error desconocido al eliminar el consultorio';
+          alert('Error eliminando consultorio: ' + mensaje);
+        }
       }
     }
   };
@@ -219,6 +238,11 @@ const ConsultorioManagement = () => {
 
     if (!formData.s_nombre_area.trim()) {
       alert('El nombre del área es requerido');
+      return;
+    }
+
+    if (formData.s_nombre_area.trim().length > 50) {
+      alert('El nombre del área no puede exceder los 50 caracteres');
       return;
     }
 
@@ -252,6 +276,12 @@ const ConsultorioManagement = () => {
       return;
     }
 
+    const numeroConsultorio = parseInt(formData.i_numero_consultorio);
+    if (numeroConsultorio < 1 || numeroConsultorio > 999) {
+      alert('El número del consultorio debe estar entre 1 y 999 (máximo 3 dígitos)');
+      return;
+    }
+
     try {
       if (editingConsultorio) {
         await consultorioService.update(editingConsultorio.uk_consultorio, {
@@ -277,6 +307,29 @@ const ConsultorioManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Validación específica para número de consultorio
+    if (name === 'i_numero_consultorio') {
+      // Solo permitir números y limitar a 3 dígitos
+      const numericValue = value.replace(/\D/g, '').slice(0, 3);
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }));
+      return;
+    }
+    
+    // Validación específica para nombre de área
+    if (name === 's_nombre_area') {
+      // Limitar a 50 caracteres
+      const trimmedValue = value.slice(0, 50);
+      setFormData(prev => ({
+        ...prev,
+        [name]: trimmedValue
+      }));
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -636,11 +689,19 @@ const ConsultorioManagement = () => {
                   name="s_nombre_area"
                   value={formData.s_nombre_area}
                   onChange={handleInputChange}
-                  placeholder="Ej: Medicina General, Pediatría, Cardiología..."
+                  placeholder="Ej: Medicina General, Pediatría..."
                   className="form-control"
                   required
-                  maxLength={100}
+                  maxLength={50}
                 />
+                <small style={{ 
+                  color: formData.s_nombre_area.length > 40 ? 'var(--warning)' : 'var(--text-muted)',
+                  fontSize: '12px',
+                  marginTop: '4px',
+                  display: 'block'
+                }}>
+                  {formData.s_nombre_area.length}/50 caracteres
+                </small>
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
@@ -710,15 +771,15 @@ const ConsultorioManagement = () => {
               <div className="form-group">
                 <label>Número del Consultorio *</label>
                 <input
-                  type="number"
+                  type="text"
                   name="i_numero_consultorio"
                   value={formData.i_numero_consultorio}
                   onChange={handleInputChange}
-                  placeholder="Ej: 101, 102, 103..."
+                  placeholder="Ej: 101, 102, 103... (máx. 3 dígitos)"
                   className="form-control"
                   required
-                  min="1"
-                  max="9999"
+                  maxLength="3"
+                  pattern="[0-9]{1,3}"
                 />
               </div>
 
