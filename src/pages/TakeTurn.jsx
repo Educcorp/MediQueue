@@ -5,7 +5,7 @@ import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
 import '../styles/TakeTurn.css';
 
-// React Icons
+// React Icons ss
 import {
   FaTicketAlt,
   FaHospital,
