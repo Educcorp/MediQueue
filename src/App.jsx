@@ -16,7 +16,6 @@ import ProtectedRoute from './components/Common/ProtectedRoute'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import AboutPage from './pages/AboutPage'
 import CookieBanner from './components/Common/CookieBanner'
-import Chatbot from './components/Common/Chatbot'
 import './styles/App.css'
 
 function App() {
@@ -136,9 +135,6 @@ function App() {
 
       {/* Cookie Banner - Se muestra globalmente */}
       <CookieBanner />
-
-      {/* Chatbot Médico - Asistente virtual disponible en toda la aplicación */}
-      <Chatbot />
     </div>
   )
 }

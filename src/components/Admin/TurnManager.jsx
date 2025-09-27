@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import AdminHeader from '../Common/AdminHeader';
 import AdminFooter from '../Common/AdminFooter';
 import TestSpinner from '../Common/TestSpinner';
+import Chatbot from '../Common/Chatbot';
 import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
@@ -648,6 +649,7 @@ const TurnManager = () => {
       )}
 
       <AdminFooter isDarkMode={isDarkMode} />
+      <Chatbot />
     </div>
   );
 };

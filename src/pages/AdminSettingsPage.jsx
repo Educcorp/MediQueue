@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
+import AdminFooter from '../components/Common/AdminFooter';
+import Chatbot from '../components/Common/Chatbot';
 import '../styles/UnifiedAdminPages.css';
 
 // React Icons
@@ -708,6 +710,9 @@ const AdminSettingsPage = () => {
                     </div>
                 </div>
             </div>
+            
+            <AdminFooter />
+            <Chatbot />
         </div>
     );
 };

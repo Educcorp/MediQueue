@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
+import Chatbot from '../components/Common/Chatbot';
 import QuickActions from '../components/Dashboard/QuickActions';
 import StatsWidgets from '../components/Dashboard/StatsWidgets';
 import turnService from '../services/turnService';
@@ -690,6 +691,7 @@ const AdminDashboard = () => {
         <p style={{ margin: '0 0 0.5rem 0' }}>© 2024 MediQueue - Sistema de Gestión de Turnos Médicos</p>
         <p style={{ margin: '0' }}>Desarrollado con ❤️ para mejorar la atención médica</p>
       </div>
+      <Chatbot />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
+import Chatbot from '../components/Common/Chatbot';
 import TestSpinner from '../components/Common/TestSpinner';
 import turnService from '../services/turnService';
 import patientService from '../services/patientService';
@@ -637,6 +638,7 @@ const StatisticsPage = () => {
       </div>
       
       <AdminFooter isDarkMode={isDarkMode} />
+      <Chatbot />
     </div>
   );
 };

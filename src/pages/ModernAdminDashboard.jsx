@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
 import TestSpinner from '../components/Common/TestSpinner';
+import Chatbot from '../components/Common/Chatbot';
 import turnService from '../services/turnService';
 import patientService from '../services/patientService';
 import consultorioService from '../services/consultorioService';
@@ -192,10 +193,7 @@ const ModernAdminDashboard = () => {
                     </div>
                     <div className="welcome-actions">
                         <button className="action-btn primary" onClick={() => navigate('/admin/turns')}>
-                            <FaPlus /> Nuevo Turno
-                        </button>
-                        <button className="action-btn secondary" onClick={() => navigate('/admin/statistics')}>
-                            <FaDownload /> Generar Reporte
+                            <FaCalendarCheck /> Administrar Turnos
                         </button>
                     </div>
                 </div>
@@ -384,10 +382,9 @@ const ModernAdminDashboard = () => {
                     </div>
                 </div>
             </div>
-            
+
             <AdminFooter isDarkMode={isDarkMode} />
+            <Chatbot />
         </div>
     );
-};
-
-export default ModernAdminDashboard;
+};export default ModernAdminDashboard;

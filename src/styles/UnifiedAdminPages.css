@@ -34,7 +34,7 @@
 
 /* Dark mode variables aligned to brand */
 [data-theme="dark"] {
-    --primary-medical: #77b8ce;
+    --primary-medical: #2f97d1;
     --secondary-medical: #9aa4ae;
     --accent-medical: #2f97d1;
     --success-color: #34d399;
@@ -167,14 +167,29 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-medical), var(--accent-medical));
-    color: white;
+    background: linear-gradient(135deg, #2f97d1, #2f97d1) !important;
+    color: white !important;
     box-shadow: 0 4px 12px rgba(47, 151, 209, 0.3);
+    border: none;
+    transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
+    background: linear-gradient(135deg, #1e7ba8, #1e7ba8) !important;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(47, 151, 209, 0.4);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: linear-gradient(135deg, #2f97d1, #2f97d1) !important;
+    color: #0a1222 !important;
+    box-shadow: 0 4px 12px rgba(47, 151, 209, 0.4);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: linear-gradient(135deg, #1e7ba8, #1e7ba8) !important;
+    color: #0a1222 !important;
+    box-shadow: 0 6px 16px rgba(47, 151, 209, 0.6);
 }
 
 .btn-secondary {
