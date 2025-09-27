@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
+import Footer from '../components/Footer';
 import '../styles/TakeTurn.css';
 
 // React Icons ss
@@ -452,6 +453,8 @@ const TakeTurn = () => {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 };

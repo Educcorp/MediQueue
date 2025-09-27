@@ -33,6 +33,30 @@
   line-height: 1.6;
 }
 
+.footer-section a {
+  color: var(--color-white);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  opacity: 0.9;
+}
+
+.footer-section a:hover {
+  color: var(--color-accent);
+  opacity: 1;
+}
+
+.footer-section p svg,
+.footer-section a svg {
+  margin-right: 8px;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.footer-section a {
+  display: inline-flex;
+  align-items: center;
+}
+
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 1.5rem;

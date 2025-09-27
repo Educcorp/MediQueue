@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminHeader from '../Common/AdminHeader';
@@ -61,11 +62,28 @@ const TurnManager = () => {
     };
   }, [theme]);
 
+  // Cerrar dropdown cuando se hace click fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.custom-status-select')) {
+        setStatusDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   const [showModal, setShowModal] = useState(false);
   const [editingTurn, setEditingTurn] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [selectedArea, setSelectedArea] = useState('todas');
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  
+  const statusButtonRef = useRef(null);
+  
   const [formData, setFormData] = useState({
     uk_consultorio: '',
     uk_paciente: '',
@@ -77,11 +95,11 @@ const TurnManager = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'EN_ESPERA', label: 'En espera', color: 'info' },
-    { value: 'LLAMANDO', label: 'Llamando', color: 'warning' },
-    { value: 'ATENDIDO', label: 'Atendido', color: 'success' },
-    { value: 'CANCELADO', label: 'Cancelado', color: 'danger' },
-    { value: 'NO_PRESENTE', label: 'No presente', color: 'secondary' }
+    { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
+    { value: 'LLAMANDO', label: 'Llamando', color: 'warning', indicator: '#17a2b8' },
+    { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
+    { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
+    { value: 'NO_PRESENTE', label: 'No presente', color: 'secondary', indicator: '#fd7e14' }
   ];
 
   // Cargar datos al montar el componente
@@ -97,6 +115,25 @@ const TurnManager = () => {
   useEffect(() => {
     loadTurns();
   }, [selectedDate, selectedStatus, selectedArea]);
+
+  // Cerrar dropdown al hacer scroll o resize
+  useEffect(() => {
+    const handleScrollOrResize = () => {
+      if (statusDropdownOpen) {
+        setStatusDropdownOpen(false);
+      }
+    };
+
+    if (statusDropdownOpen) {
+      window.addEventListener('scroll', handleScrollOrResize, true);
+      window.addEventListener('resize', handleScrollOrResize);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScrollOrResize, true);
+        window.removeEventListener('resize', handleScrollOrResize);
+      };
+    }
+  }, [statusDropdownOpen]);
 
   const loadData = async () => {
     try {
@@ -134,6 +171,7 @@ const TurnManager = () => {
 
   const loadTurns = async () => {
     try {
+      console.log('Loading turns with selectedStatus:', selectedStatus);
       let turnsData;
       const filters = {};
 
@@ -142,8 +180,10 @@ const TurnManager = () => {
       }
 
       if (selectedStatus === 'todos') {
+        console.log('Using getTurnsByDate with filters:', filters);
         turnsData = await turnService.getTurnsByDate(selectedDate, filters);
       } else {
+        console.log('Using getTurnsByStatus with status:', selectedStatus, 'and filters:', filters);
         turnsData = await turnService.getTurnsByStatus(selectedStatus, filters);
       }
 
@@ -368,18 +408,77 @@ const TurnManager = () => {
           </div>
           <div className="filter-group">
             <label>Estado</label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="form-control"
-            >
-              <option value="todos">Todos los estados</option>
-              {turnStatuses.map(status => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
+            <div className="custom-status-select">
+              <div 
+                ref={statusButtonRef}
+                className="status-select-trigger"
+                onClick={() => {
+                  if (!statusDropdownOpen && statusButtonRef.current) {
+                    const rect = statusButtonRef.current.getBoundingClientRect();
+                    setDropdownPosition({
+                      top: rect.bottom + window.scrollY,
+                      left: rect.left + window.scrollX,
+                      width: rect.width
+                    });
+                  }
+                  setStatusDropdownOpen(!statusDropdownOpen);
+                }}
+              >
+                <div className="status-selected">
+                  <div className={`status-circle ${selectedStatus === 'todos' ? 'neutral' : selectedStatus.toLowerCase()}`}></div>
+                  <span>{selectedStatus === 'todos' ? 'Todos los estados' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
+                </div>
+                <div className="dropdown-arrow">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {statusDropdownOpen && createPortal(
+                <>
+                  <div 
+                    className="status-dropdown-overlay"
+                    onClick={() => setStatusDropdownOpen(false)}
+                  />
+                  <div 
+                    className="status-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${dropdownPosition.top}px`,
+                      left: `${dropdownPosition.left}px`,
+                      width: `${dropdownPosition.width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="status-option"
+                      onClick={() => {
+                        setSelectedStatus('todos');
+                        setStatusDropdownOpen(false);
+                      }}
+                    >
+                      <div className="status-circle neutral"></div>
+                      <span>Todos los estados</span>
+                    </div>
+                    {turnStatuses.map(status => (
+                      <div
+                        key={status.value}
+                        className="status-option"
+                        onClick={() => {
+                          setSelectedStatus(status.value);
+                          setStatusDropdownOpen(false);
+                        }}
+                      >
+                        <div className={`status-circle ${status.value.toLowerCase()}`}></div>
+                        <span>{status.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>,
+                document.body
+              )}
+            </div>
           </div>
           <div className="filter-group">
             <label>Área</label>

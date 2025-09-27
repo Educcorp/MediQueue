@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
+import Footer from '../components/Footer';
 import '../styles/HomePage.css';
 import '../styles/UnifiedAdminPages.css';
 
@@ -616,6 +617,8 @@ const HomePage = () => {
         .turn-item { padding: 10px 12px; border-bottom: 1px dashed #e2e8f0; font-weight: 700; color: #2d3748; }
         .panel-empty { color: #718096; }
       `}</style>
+      
+      <Footer />
     </div>
   );
 };

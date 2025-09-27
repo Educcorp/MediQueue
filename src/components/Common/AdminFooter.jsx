@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaHeart, FaCode, FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import { MdCopyright } from 'react-icons/md';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
@@ -36,18 +37,23 @@ const AdminFooter = ({ isDarkMode = false }) => {
               marginBottom: '16px'
             }}>
               <div style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: '#77b8ce',
-                borderRadius: '8px',
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '16px'
+                padding: '3px'
               }}>
-                M
+                <img 
+                  src="/images/favicon.png" 
+                  alt="MediQueue Logo" 
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain'
+                  }}
+                />
               </div>
               <h3 style={{
                 margin: 0,
@@ -88,7 +94,9 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 { name: 'Gestión de Turnos', href: '/admin/turns' },
                 { name: 'Pacientes', href: '/admin/patients' },
                 { name: 'Consultorios', href: '/admin/consultorios' },
-                { name: 'Estadísticas', href: '/admin/statistics' }
+                { name: 'Estadísticas', href: '/admin/statistics' },
+                { name: 'Acerca de Nosotros', href: '/about' },
+                { name: 'Política de Privacidad', href: '/privacy' }
               ].map((link) => (
                 <a
                   key={link.name}
@@ -170,26 +178,44 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 gap: '12px'
               }}>
                 {[
-                  { icon: FaEnvelope, href: 'mailto:support@mediqueue.com', color: '#e53e3e' },
-                  { icon: FaGithub, href: '#', color: isDarkMode ? '#ffffff' : '#2d3748' },
-                  { icon: FaLinkedin, href: '#', color: '#3182ce' }
+                  { 
+                    icon: FaEnvelope, 
+                    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Soporte%20MediQueue&body=Hola,%20necesito%20ayuda%20con%20MediQueue.', 
+                    color: '#e53e3e',
+                    target: '_blank'
+                  },
+                  { 
+                    icon: FaGithub, 
+                    href: 'https://github.com/Educcorp/MediQueue', 
+                    color: isDarkMode ? '#ffffff' : '#2d3748',
+                    target: '_blank'
+                  },
+                  { 
+                    icon: FaLinkedin, 
+                    href: 'https://www.linkedin.com/in/educcorp-inc-158297356/', 
+                    color: '#3182ce',
+                    target: '_blank'
+                  },
+                  { 
+                    icon: FaXTwitter, 
+                    href: 'https://x.com/Educcorp', 
+                    color: isDarkMode ? '#ffffff' : '#000000',
+                    target: '_blank'
+                  }
                 ].map((social, index) => (
                   <a
                     key={index}
                     href={social.href}
+                    target={social.target || '_self'}
+                    rel={social.target === '_blank' ? 'noopener noreferrer' : undefined}
+                    className={`social-icon-${index}`}
                     style={{
                       color: social.color,
                       fontSize: '18px',
-                      transition: 'transform 0.2s ease, opacity 0.2s ease',
-                      opacity: 0.8
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.transform = 'translateY(-2px)';
-                      e.target.style.opacity = '1';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.opacity = '0.8';
+                      transition: 'all 0.3s ease',
+                      opacity: 0.8,
+                      transform: 'translateY(0px)',
+                      display: 'inline-block'
                     }}
                   >
                     <social.icon />
@@ -233,17 +259,28 @@ const AdminFooter = ({ isDarkMode = false }) => {
             gap: '4px',
             fontSize: '14px'
           }}>
-            <span>Hecho con</span>
+            <span>Desarrollado con</span>
             <FaHeart style={{ color: '#e53e3e', fontSize: '12px' }} />
             <span>y</span>
             <FaCode style={{ color: '#77b8ce', fontSize: '12px' }} />
-            <span>por el equipo de desarrollo</span>
+            <span>por EducCorp</span>
           </div>
         </div>
 
-        {/* Responsive adjustments */}
+        {/* Responsive adjustments and animations */}
         <style>
           {`
+            /* Social icons hover animations */
+            .social-icon-0:hover, .social-icon-1:hover, .social-icon-2:hover, .social-icon-3:hover {
+              transform: translateY(-2px) !important;
+              opacity: 1 !important;
+              transition: all 0.3s ease !important;
+            }
+            
+            .social-icon-0, .social-icon-1, .social-icon-2, .social-icon-3 {
+              transition: all 0.3s ease !important;
+            }
+            
             @media (max-width: 768px) {
               .admin-footer-bottom {
                 flex-direction: column !important;
