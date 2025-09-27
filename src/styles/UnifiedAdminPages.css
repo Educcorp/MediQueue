@@ -779,6 +779,120 @@
     padding-right: 40px;
 }
 
+/* ENHANCED DATE INPUT STYLING */
+.filter-group input[type="date"].form-control {
+    position: relative;
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+/* Hacer que todo el input sea clickeable para abrir el calendario */
+.filter-group input[type="date"].form-control::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    opacity: 0;
+    background: transparent;
+}
+
+/* Ícono visual del calendario */
+.filter-group input[type="date"].form-control::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%232f97d1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3E%3C/svg%3E");
+    background-size: 18px;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.filter-group input[type="date"].form-control:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 151, 209, 0.1);
+}
+
+.filter-group input[type="date"].form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(47, 151, 209, 0.2);
+}
+
+/* Animación shimmer removida para evitar problemas con el ícono */
+
+/* Estilo obsoleto removido para evitar conflictos */
+
+/* Personalización del texto del date input */
+.filter-group input[type="date"].form-control::-webkit-datetime-edit {
+    padding: 0;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.filter-group input[type="date"].form-control::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+.filter-group input[type="date"].form-control::-webkit-datetime-edit-text {
+    color: var(--text-secondary);
+    padding: 0 2px;
+}
+
+.filter-group input[type="date"].form-control::-webkit-datetime-edit-month-field,
+.filter-group input[type="date"].form-control::-webkit-datetime-edit-day-field,
+.filter-group input[type="date"].form-control::-webkit-datetime-edit-year-field {
+    background: rgba(47, 151, 209, 0.05);
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin: 0 1px;
+    color: var(--text-primary);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.filter-group input[type="date"].form-control:focus::-webkit-datetime-edit-month-field:focus,
+.filter-group input[type="date"].form-control:focus::-webkit-datetime-edit-day-field:focus,
+.filter-group input[type="date"].form-control:focus::-webkit-datetime-edit-year-field:focus {
+    background: rgba(47, 151, 209, 0.15);
+    color: var(--primary-color);
+}
+
+/* Efectos adicionales para mejor UX */
+.filter-group input[type="date"].form-control::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+    pointer-events: none;
+}
+
+.filter-group input[type="date"].form-control:hover::before {
+    transform: translateX(100%);
+}
+
 /* Enhanced Filter Button */
 .filter-group .btn {
     background: linear-gradient(135deg, var(--primary-medical), #1e7ba8);
@@ -991,6 +1105,44 @@
     box-shadow: 0 0 0 4px rgba(47, 151, 209, 0.2), var(--shadow-md);
 }
 
+/* DARK MODE - Date Input Styling */
+[data-theme="dark"] .filter-group input[type="date"].form-control {
+    background: #2a2a2a;
+    border-color: var(--border-color);
+    color: #ffffff;
+}
+
+/* Ícono visual para modo oscuro */
+[data-theme="dark"] .filter-group input[type="date"].form-control::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ffffff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .filter-group input[type="date"].form-control:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 151, 209, 0.15);
+}
+
+[data-theme="dark"] .filter-group input[type="date"].form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(47, 151, 209, 0.25);
+}
+
+/* Eliminar animación que causa problemas con el ícono */
+
+[data-theme="dark"] .filter-group input[type="date"].form-control::-webkit-datetime-edit-month-field,
+[data-theme="dark"] .filter-group input[type="date"].form-control::-webkit-datetime-edit-day-field,
+[data-theme="dark"] .filter-group input[type="date"].form-control::-webkit-datetime-edit-year-field {
+    background: rgba(47, 151, 209, 0.1);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .filter-group input[type="date"].form-control:focus::-webkit-datetime-edit-month-field:focus,
+[data-theme="dark"] .filter-group input[type="date"].form-control:focus::-webkit-datetime-edit-day-field:focus,
+[data-theme="dark"] .filter-group input[type="date"].form-control:focus::-webkit-datetime-edit-year-field:focus {
+    background: rgba(47, 151, 209, 0.25);
+    color: #ffffff;
+}
+
 [data-theme="dark"] .filter-group label::before {
     filter: invert(1) brightness(0.9);
 }
@@ -1084,7 +1236,7 @@
     transform: translateY(-1px);
 }
 
-/* Status Circle - Base Styles */
+/* STATUS CIRCLES REPLACED WITH ICONS - COMMENTED OUT 
 .status-circle {
     width: 12px;
     height: 12px;
@@ -1093,85 +1245,8 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-.status-circle::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 0.6s ease;
-    opacity: 0.3;
-}
-
-/* Hover Animation for Circles */
-.status-circle:hover::after,
-.status-option:hover .status-circle::after {
-    transform: translate(-50%, -50%) scale(1.8);
-}
-
-/* Status Colors with Glow Animations */
-.status-circle.neutral {
-    background: linear-gradient(135deg, #6c757d, #5a6268);
-    box-shadow: 0 0 8px rgba(108, 117, 125, 0.3);
-}
-
-.status-circle.neutral::after {
-    background: radial-gradient(circle, rgba(108, 117, 125, 0.4), transparent 60%);
-}
-
-.status-circle.en_espera {
-    background: linear-gradient(135deg, #ffc107, #e0a800);
-    box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
-    animation: pulseYellow 3s ease-in-out infinite;
-}
-
-.status-circle.en_espera::after {
-    background: radial-gradient(circle, rgba(255, 193, 7, 0.4), transparent 60%);
-}
-
-.status-circle.llamando {
-    background: linear-gradient(135deg, #17a2b8, #138496);
-    box-shadow: 0 0 12px rgba(23, 162, 184, 0.4);
-    animation: pulseBlue 2.5s ease-in-out infinite;
-}
-
-.status-circle.llamando::after {
-    background: radial-gradient(circle, rgba(23, 162, 184, 0.4), transparent 60%);
-}
-
-.status-circle.atendido {
-    background: linear-gradient(135deg, #28a745, #1e7e34);
-    box-shadow: 0 0 12px rgba(40, 167, 69, 0.4);
-    animation: pulseGreen 3.5s ease-in-out infinite;
-}
-
-.status-circle.atendido::after {
-    background: radial-gradient(circle, rgba(40, 167, 69, 0.4), transparent 60%);
-}
-
-.status-circle.cancelado {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    box-shadow: 0 0 12px rgba(220, 53, 69, 0.4);
-    animation: pulseRed 4s ease-in-out infinite;
-}
-
-.status-circle.cancelado::after {
-    background: radial-gradient(circle, rgba(220, 53, 69, 0.4), transparent 60%);
-}
-
-.status-circle.no_presente {
-    background: linear-gradient(135deg, #fd7e14, #e55a00);
-    box-shadow: 0 0 12px rgba(253, 126, 20, 0.4);
-    animation: pulseOrange 3.2s ease-in-out infinite;
-}
-
-.status-circle.no_presente::after {
-    background: radial-gradient(circle, rgba(253, 126, 20, 0.4), transparent 60%);
-}
+... (rest commented out)
+*/
 
 /* Dropdown Overlay - Portal overlay */
 .status-dropdown-overlay {
@@ -1193,7 +1268,304 @@
     box-shadow: var(--shadow-lg);
     max-height: 300px;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 999999999 !important;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.3) transparent;
+}
+
+/* Scrollbar personalizado para webkit */
+.status-dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.status-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 3px;
+}
+
+.status-dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.3);
+    border-radius: 3px;
+}
+
+.status-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.5);
+}
+
+/* AREA DROPDOWN STYLES */
+.custom-area-select {
+    position: relative;
+    width: 100%;
+    z-index: 9999999999 !important;
+}
+
+.area-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 48px;
+}
+
+.area-select-trigger:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 151, 209, 0.1);
+    transform: translateY(-1px);
+}
+
+.area-selected {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.area-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333333;
+    transition: all 0.3s ease;
+}
+
+.area-icon svg {
+    width: 18px;
+    height: 18px;
+    color: inherit;
+}
+
+/* Area Dropdown Overlay */
+.area-dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 999999998 !important;
+    cursor: default;
+}
+
+/* Area Dropdown Menu */
+.area-dropdown-menu {
+    background: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-lg);
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 999999999 !important;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.3) transparent;
+}
+
+/* Scrollbar personalizado para webkit */
+.area-dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.area-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 3px;
+}
+
+.area-dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.3);
+    border-radius: 3px;
+}
+
+.area-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.5);
+}
+
+.area-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.area-option:last-child {
+    border-bottom: none;
+}
+
+.area-option:hover {
+    background: linear-gradient(135deg, #f8f9fa, #e3f2fd);
+    transform: translateX(4px);
+}
+
+.area-option .area-icon {
+    width: 16px;
+    height: 16px;
+    color: #444444;
+}
+
+.area-option .area-icon svg {
+    width: 16px;
+    height: 16px;
+    color: inherit;
+}
+
+.area-option:hover .area-icon {
+    color: var(--primary-color);
+    transform: scale(1.15);
+}
+
+/* Colores específicos por tipo de área */
+.area-icon.medicina-general { color: #2196F3; }
+.area-icon.pediatria { color: #FF9800; }
+.area-icon.ginecologo { color: #E91E63; }
+.area-icon.dentista { color: #00BCD4; }
+.area-icon.neurologo { color: #9C27B0; }
+.area-icon.enfermeria { color: #4CAF50; }
+.area-icon.cardiologia { color: #F44336; }
+.area-icon.dermatologia { color: #795548; }
+.area-icon.oftalmologia { color: #607D8B; }
+.area-icon.traumatologia { color: #FF5722; }
+.area-icon.psicologia { color: #3F51B5; }
+.area-icon.radiologia { color: #9E9E9E; }
+
+/* Color por defecto para áreas sin icono específico */
+.area-icon:not([class*="medicina"]):not([class*="pediatria"]):not([class*="ginecologo"]):not([class*="dentista"]):not([class*="neurologo"]):not([class*="enfermeria"]):not([class*="cardiologia"]):not([class*="dermatologia"]):not([class*="oftalmologia"]):not([class*="traumatologia"]):not([class*="psicologia"]):not([class*="radiologia"]) {
+    color: #666666 !important;
+}
+
+/* STATUS ICON STYLES */
+.status-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.status-icon svg {
+    width: 16px;
+    height: 16px;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+/* Glow effect más suave para el selector principal */
+.status-select-trigger:hover .status-icon.status-todos {
+    filter: drop-shadow(0 0 6px rgba(108, 117, 125, 0.4));
+}
+
+.status-select-trigger:hover .status-icon.status-en_espera {
+    filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.5));
+}
+
+.status-select-trigger:hover .status-icon.status-en_atencion {
+    filter: drop-shadow(0 0 6px rgba(23, 162, 184, 0.5));
+}
+
+.status-select-trigger:hover .status-icon.status-atendido {
+    filter: drop-shadow(0 0 6px rgba(40, 167, 69, 0.5));
+}
+
+.status-select-trigger:hover .status-icon.status-cancelado {
+    filter: drop-shadow(0 0 6px rgba(220, 53, 69, 0.5));
+}
+
+.status-select-trigger:hover .status-icon.status-no_presente {
+    filter: drop-shadow(0 0 6px rgba(253, 126, 20, 0.5));
+}
+
+.status-option .status-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.status-option .status-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.status-option:hover .status-icon {
+    transform: scale(1.15);
+}
+
+/* Efectos hover intensificados para cada estado */
+.status-option:hover .status-icon.status-todos {
+    filter: drop-shadow(0 0 8px rgba(108, 117, 125, 0.5));
+    text-shadow: 0 0 12px rgba(108, 117, 125, 0.4);
+}
+
+.status-option:hover .status-icon.status-en_espera {
+    filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.6));
+    text-shadow: 0 0 12px rgba(255, 193, 7, 0.5);
+}
+
+.status-option:hover .status-icon.status-en_atencion {
+    filter: drop-shadow(0 0 8px rgba(23, 162, 184, 0.6));
+    text-shadow: 0 0 12px rgba(23, 162, 184, 0.5);
+}
+
+.status-option:hover .status-icon.status-atendido {
+    filter: drop-shadow(0 0 8px rgba(40, 167, 69, 0.6));
+    text-shadow: 0 0 12px rgba(40, 167, 69, 0.5);
+}
+
+.status-option:hover .status-icon.status-cancelado {
+    filter: drop-shadow(0 0 8px rgba(220, 53, 69, 0.6));
+    text-shadow: 0 0 12px rgba(220, 53, 69, 0.5);
+}
+
+.status-option:hover .status-icon.status-no_presente {
+    filter: drop-shadow(0 0 8px rgba(253, 126, 20, 0.6));
+    text-shadow: 0 0 12px rgba(253, 126, 20, 0.5);
+}
+
+/* Colores específicos para cada estado con iluminación tenue */
+.status-icon.status-todos {
+    color: #6c757d !important;
+    filter: drop-shadow(0 0 4px rgba(108, 117, 125, 0.3));
+    text-shadow: 0 0 6px rgba(108, 117, 125, 0.2);
+}
+
+.status-icon.status-en_espera {
+    color: #ffc107 !important;
+    filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.4));
+    text-shadow: 0 0 8px rgba(255, 193, 7, 0.3);
+}
+
+.status-icon.status-en_atencion {
+    color: #17a2b8 !important;
+    filter: drop-shadow(0 0 4px rgba(23, 162, 184, 0.4));
+    text-shadow: 0 0 8px rgba(23, 162, 184, 0.3);
+}
+
+.status-icon.status-atendido {
+    color: #28a745 !important;
+    filter: drop-shadow(0 0 4px rgba(40, 167, 69, 0.4));
+    text-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+}
+
+.status-icon.status-cancelado {
+    color: #dc3545 !important;
+    filter: drop-shadow(0 0 4px rgba(220, 53, 69, 0.4));
+    text-shadow: 0 0 8px rgba(220, 53, 69, 0.3);
+}
+
+.status-icon.status-no_presente {
+    color: #fd7e14 !important;
+    filter: drop-shadow(0 0 4px rgba(253, 126, 20, 0.4));
+    text-shadow: 0 0 8px rgba(253, 126, 20, 0.3);
 }
 
 .status-option {

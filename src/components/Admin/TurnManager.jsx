@@ -28,8 +28,123 @@ import {
   FaSync,
   FaUser,
   FaHospital,
-  FaClipboardList
+  FaClipboardList,
+  FaUserMd,
+  FaHeart,
+  FaBaby,
+  FaTooth,
+  FaBrain,
+  FaSyringe,
+  FaEyeDropper,
+  FaBone,
+  FaCamera,
+  FaBandAid,
+  FaHeadSideVirus,
+  FaUserNurse,
+  FaUserTimes,
+  FaList
 } from 'react-icons/fa';
+import {
+  MdPregnantWoman,
+  MdPsychology
+} from 'react-icons/md';
+
+
+// Función para obtener el icono minimalista del área
+const getAreaIcon = (areaName) => {
+  const iconMap = {
+    'Medicina General': FaUserMd,
+    'Pediatría': FaBaby,
+    'Ginecólogo': MdPregnantWoman,
+    'Dentista': FaTooth,
+    'Neurólogo': FaHeadSideVirus,
+    'Neurología': FaHeadSideVirus,
+    'Enfermería': FaSyringe,
+    'Cardiología': FaHeart,
+    'Dermatología': FaBandAid,
+    'Oftalmología': FaEyeDropper,
+    'Traumatología': FaBone,
+    'Psicología': MdPsychology,
+    'Radiología': FaCamera,
+    // Agregando variaciones comunes de nombres
+    'area': FaHospital,
+    'Area Prueba': FaHospital,
+    'Ginecólogo': MdPregnantWoman,
+    'Enfermeria': FaSyringe,  // Sin tilde
+    'Pediatria': FaBaby,      // Sin tilde
+    'Neurologia': FaHeadSideVirus, // Sin tilde
+    'Cardiologia': FaHeart,   // Sin tilde
+    'Dermatologia': FaBandAid, // Sin tilde
+    'Oftalmologia': FaEyeDropper, // Sin tilde
+    'Traumatologia': FaBone,  // Sin tilde
+    'Psicologia': MdPsychology, // Sin tilde
+    'Radiologia': FaCamera    // Sin tilde
+  };
+  
+  return iconMap[areaName] || FaHospital;
+};
+
+// Función para obtener el icono del estado
+const getStatusIcon = (status) => {
+  const statusIconMap = {
+    'EN_ESPERA': FaClock,
+    'EN_ATENCION': FaUserMd, // Cambio a FaUserMd que sí existe
+    'ATENDIDO': FaCheck,
+    'CANCELADO': FaTimes,
+    'NO_PRESENTE': FaUserTimes,
+    'todos': FaList
+  };
+  
+  return statusIconMap[status] || FaList;
+};
+
+// Función para obtener el color del estado
+const getStatusColor = (status) => {
+  const statusColorMap = {
+    'EN_ESPERA': '#ffc107',
+    'EN_ATENCION': '#17a2b8', 
+    'ATENDIDO': '#28a745',
+    'CANCELADO': '#dc3545',
+    'NO_PRESENTE': '#fd7e14',
+    'todos': '#6c757d'
+  };
+  
+  return statusColorMap[status] || '#6c757d';
+};
+
+// Función para obtener la clase CSS del área
+const getAreaClass = (areaName) => {
+  const classMap = {
+    'Medicina General': 'medicina-general',
+    'Pediatría': 'pediatria',
+    'Ginecólogo': 'ginecologo',
+    'Dentista': 'dentista',
+    'Neurólogo': 'neurologo',
+    'Neurología': 'neurologo',
+    'Enfermería': 'enfermeria',
+    'Cardiología': 'cardiologia',
+    'Dermatología': 'dermatologia',
+    'Oftalmología': 'oftalmologia',
+    'Traumatología': 'traumatologia',
+    'Psicología': 'psicologia',
+    'Radiología': 'radiologia',
+    // Variaciones sin tildes y casos especiales
+    'area': '',
+    'Area Prueba': '',
+    'Ginecólogo': 'ginecologo',
+    'Enfermeria': 'enfermeria',
+    'Pediatria': 'pediatria',
+    'Neurologia': 'neurologo',
+    'Cardiologia': 'cardiologia',
+    'Dermatologia': 'dermatologia',
+    'Oftalmologia': 'oftalmologia',
+    'Traumatologia': 'traumatologia',
+    'Psicologia': 'psicologia',
+    'Radiologia': 'radiologia'
+  };
+  
+  return classMap[areaName] || '';
+};
 
 const TurnManager = () => {
   const [turns, setTurns] = useState([]);
@@ -76,13 +191,25 @@ const TurnManager = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [editingTurn, setEditingTurn] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  // Función para obtener la fecha actual en formato YYYY-MM-DD
+  const getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [selectedArea, setSelectedArea] = useState('todas');
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   
   const statusButtonRef = useRef(null);
+  const areaButtonRef = useRef(null);
   
   const [formData, setFormData] = useState({
     uk_consultorio: '',
@@ -96,7 +223,7 @@ const TurnManager = () => {
   // Estados de turnos disponibles
   const turnStatuses = [
     { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
-    { value: 'LLAMANDO', label: 'Llamando', color: 'warning', indicator: '#17a2b8' },
+    { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
     { value: 'NO_PRESENTE', label: 'No presente', color: 'secondary', indicator: '#fd7e14' }
@@ -116,24 +243,90 @@ const TurnManager = () => {
     loadTurns();
   }, [selectedDate, selectedStatus, selectedArea]);
 
-  // Cerrar dropdown al hacer scroll o resize
+  // Efecto para actualizar la fecha automáticamente cada día
   useEffect(() => {
-    const handleScrollOrResize = () => {
-      if (statusDropdownOpen) {
-        setStatusDropdownOpen(false);
+    // Función para actualizar la fecha si ha cambiado
+    const updateDateIfNeeded = () => {
+      const currentDate = getCurrentDate();
+      if (selectedDate !== currentDate) {
+        setSelectedDate(currentDate);
       }
     };
 
-    if (statusDropdownOpen) {
-      window.addEventListener('scroll', handleScrollOrResize, true);
-      window.addEventListener('resize', handleScrollOrResize);
+    // Verificar inmediatamente al cargar el componente
+    updateDateIfNeeded();
+
+    // Calcular cuánto tiempo falta hasta la próxima medianoche
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setDate(now.getDate() + 1);
+    nextMidnight.setHours(0, 0, 0, 0);
+    const timeUntilMidnight = nextMidnight.getTime() - now.getTime();
+
+    // Establecer timeout para la primera actualización a medianoche
+    const midnightTimeout = setTimeout(() => {
+      updateDateIfNeeded();
+      
+      // Después de la primera actualización, establecer intervalo cada 24 horas
+      const dailyInterval = setInterval(updateDateIfNeeded, 24 * 60 * 60 * 1000);
+      
+      // Cleanup del intervalo
+      return () => clearInterval(dailyInterval);
+    }, timeUntilMidnight);
+
+    // Verificación cada minuto para asegurar que no se pierda el cambio de día
+    const minuteInterval = setInterval(updateDateIfNeeded, 60 * 1000);
+
+    // Cleanup
+    return () => {
+      clearTimeout(midnightTimeout);
+      clearInterval(minuteInterval);
+    };
+  }, []); // Solo se ejecuta una vez al montar el componente
+
+  // Cerrar dropdowns al hacer scroll externo o resize
+  useEffect(() => {
+    const handleScroll = (e) => {
+      // Verificar si el target y los métodos existen antes de usarlos
+      if (!e.target) return;
+      
+      // No cerrar si el scroll es dentro del dropdown
+      try {
+        if ((e.target.classList && e.target.classList.contains('status-dropdown-menu')) || 
+            (e.target.classList && e.target.classList.contains('area-dropdown-menu')) ||
+            (e.target.closest && e.target.closest('.status-dropdown-menu')) ||
+            (e.target.closest && e.target.closest('.area-dropdown-menu'))) {
+          return;
+        }
+      } catch (error) {
+        // Si hay error en la detección, simplemente continuar
+        console.warn('Error in scroll detection:', error);
+      }
+      
+      // Cerrar dropdowns solo si es scroll externo
+      if (statusDropdownOpen || areaDropdownOpen) {
+        setStatusDropdownOpen(false);
+        setAreaDropdownOpen(false);
+      }
+    };
+
+    const handleResize = () => {
+      if (statusDropdownOpen || areaDropdownOpen) {
+        setStatusDropdownOpen(false);
+        setAreaDropdownOpen(false);
+      }
+    };
+
+    if (statusDropdownOpen || areaDropdownOpen) {
+      document.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleResize);
       
       return () => {
-        window.removeEventListener('scroll', handleScrollOrResize, true);
-        window.removeEventListener('resize', handleScrollOrResize);
+        document.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleResize);
       };
     }
-  }, [statusDropdownOpen]);
+  }, [statusDropdownOpen, areaDropdownOpen]);
 
   const loadData = async () => {
     try {
@@ -425,7 +618,9 @@ const TurnManager = () => {
                 }}
               >
                 <div className="status-selected">
-                  <div className={`status-circle ${selectedStatus === 'todos' ? 'neutral' : selectedStatus.toLowerCase()}`}></div>
+                  <div className={`status-icon status-${selectedStatus.toLowerCase()}`}>
+                    {React.createElement(getStatusIcon(selectedStatus))}
+                  </div>
                   <span>{selectedStatus === 'todos' ? 'Todos los estados' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
                 </div>
                 <div className="dropdown-arrow">
@@ -458,7 +653,9 @@ const TurnManager = () => {
                         setStatusDropdownOpen(false);
                       }}
                     >
-                      <div className="status-circle neutral"></div>
+                      <div className="status-icon status-todos">
+                        <FaList />
+                      </div>
                       <span>Todos los estados</span>
                     </div>
                     {turnStatuses.map(status => (
@@ -470,7 +667,9 @@ const TurnManager = () => {
                           setStatusDropdownOpen(false);
                         }}
                       >
-                        <div className={`status-circle ${status.value.toLowerCase()}`}></div>
+                        <div className={`status-icon status-${status.value.toLowerCase()}`}>
+                          {React.createElement(getStatusIcon(status.value))}
+                        </div>
                         <span>{status.label}</span>
                       </div>
                     ))}
@@ -482,18 +681,86 @@ const TurnManager = () => {
           </div>
           <div className="filter-group">
             <label>Área</label>
-            <select
-              value={selectedArea}
-              onChange={(e) => setSelectedArea(e.target.value)}
-              className="form-control"
-            >
-              <option value="todas">Todas las áreas</option>
-              {areas.map(area => (
-                <option key={area.uk_area} value={area.uk_area}>
-                  {area.s_nombre_area}
-                </option>
-              ))}
-            </select>
+            <div className="custom-area-select">
+              <div 
+                ref={areaButtonRef}
+                className="area-select-trigger"
+                onClick={() => {
+                  // Siempre calcular posición antes de cambiar el estado
+                  const rect = areaButtonRef.current?.getBoundingClientRect();
+                  if (rect) {
+                    setAreaDropdownPosition({
+                      top: rect.bottom + window.scrollY,
+                      left: rect.left + window.scrollX,
+                      width: rect.width
+                    });
+                  }
+                  setAreaDropdownOpen(!areaDropdownOpen);
+                }}
+              >
+                <div className="area-selected">
+                  <div className={`area-icon ${getAreaClass(selectedArea === 'todas' ? 'todas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea)}`}>
+                    {selectedArea === 'todas' ? (
+                      <FaHospital />
+                    ) : (
+                      React.createElement(getAreaIcon(areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea))
+                    )}
+                  </div>
+                  <span>{selectedArea === 'todas' ? 'Todas las áreas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea}</span>
+                </div>
+                <div className="dropdown-arrow">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {areaDropdownOpen && createPortal(
+                <>
+                  <div 
+                    className="area-dropdown-overlay"
+                    onClick={() => setAreaDropdownOpen(false)}
+                  />
+                  <div 
+                    className="area-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${areaDropdownPosition.top}px`,
+                      left: `${areaDropdownPosition.left}px`,
+                      width: `${areaDropdownPosition.width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="area-option"
+                      onClick={() => {
+                        setSelectedArea('todas');
+                        setAreaDropdownOpen(false);
+                      }}
+                    >
+                      <div className="area-icon"><FaHospital /></div>
+                      <span>Todas las áreas</span>
+                    </div>
+                    {areas.map(area => (
+                      <div
+                        key={area.uk_area}
+                        className="area-option"
+                        onClick={() => {
+                          setSelectedArea(area.uk_area);
+                          setAreaDropdownOpen(false);
+                        }}
+                      >
+                        <div className={`area-icon ${getAreaClass(area.s_nombre_area)}`}>
+                          {React.createElement(getAreaIcon(area.s_nombre_area))}
+                        </div>
+                        <span>{area.s_nombre_area}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>,
+                document.body
+              )}
+            </div>
           </div>
           <div className="filter-group">
             <button className="btn btn-secondary">
