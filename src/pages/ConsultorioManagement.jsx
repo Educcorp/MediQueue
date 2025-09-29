@@ -277,16 +277,31 @@ const ConsultorioManagement = () => {
       return;
     }
 
+    // Validar letra si se proporciona
+    if (letraError) {
+      alert('Por favor corrige el error en la letra identificadora');
+      return;
+    }
+
+    // Validación adicional de color
+    if (formData.s_color && !/^#[0-9A-Fa-f]{6}$/.test(formData.s_color)) {
+      alert('El formato del color no es válido');
+      return;
+    }
+
     try {
+      const areaData = {
+        s_nombre_area: formData.s_nombre_area.trim(),
+        s_letra: formData.s_letra || null,
+        s_color: formData.s_color || null,
+        s_icono: formData.s_icono || null
+      };
+
       if (editingArea) {
-        await areaService.update(editingArea.uk_area, {
-          s_nombre_area: formData.s_nombre_area.trim()
-        });
+        await areaService.update(editingArea.uk_area, areaData);
         alert('Área actualizada correctamente');
       } else {
-        await areaService.create({
-          s_nombre_area: formData.s_nombre_area.trim()
-        });
+        await areaService.create(areaData);
         alert('Área creada correctamente');
       }
 
@@ -300,6 +315,7 @@ const ConsultorioManagement = () => {
         i_numero_consultorio: '', 
         uk_area: '' 
       });
+      setLetraError('');
     } catch (error) {
       alert('Error guardando área: ' + error.message);
       console.error('Error guardando área:', error);
@@ -840,7 +856,10 @@ const ConsultorioManagement = () => {
                 {editingArea ? 'Editar Área Médica' : 'Nueva Área Médica'}
               </h3>
               <button
-                onClick={() => setShowAreaModal(false)}
+                onClick={() => {
+                  setShowAreaModal(false);
+                  setLetraError('');
+                }}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -940,10 +959,21 @@ const ConsultorioManagement = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
-                <button type="button" onClick={() => setShowAreaModal(false)} className="btn btn-secondary">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setShowAreaModal(false);
+                    setLetraError('');
+                  }} 
+                  className="btn btn-secondary"
+                >
                   Cancelar
                 </button>
-                <button type="submit" className="btn btn-primary">
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={!!letraError}
+                >
                   <FaCheck />
                   {editingArea ? 'Actualizar' : 'Crear'}
                 </button>
