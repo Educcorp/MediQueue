@@ -109,7 +109,7 @@ const ConsultorioManagement = () => {
       'Cardiología': { icon: FaHeartbeat, color: 'var(--danger-color)' },
       'Dermatología': { icon: FaUserMd, color: 'var(--warning-color)' },
       'Ginecología': { icon: FaFemale, color: '#E91E63' },
-      'Oftalmología': { icon: FaEyeMed, color: 'var(--info-color)' },
+      'Oftalmología': { icon: FaEye, color: 'var(--info-color)' },
       'Ortopedia': { icon: FaBone, color: '#795548' },
       'Psiquiatría': { icon: FaBrain, color: '#9C27B0' },
       'Neurología': { icon: FaBrain, color: '#FF5722' },
@@ -772,7 +772,7 @@ const ConsultorioManagement = () => {
                             border: '1px solid var(--border-color)'
                           }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <FaDoorOpen style={{ color: areaIcon.color }} />
+                              <FaDoorOpen style={{ color: areaColor }} />
                               <span style={{ fontWeight: '600' }}>
                                 Consultorio #{consultorio.i_numero_consultorio}
                               </span>
