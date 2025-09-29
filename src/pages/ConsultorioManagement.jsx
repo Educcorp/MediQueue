@@ -339,7 +339,8 @@ const ConsultorioManagement = () => {
     try {
       if (editingConsultorio) {
         await consultorioService.update(editingConsultorio.uk_consultorio, {
-          i_numero_consultorio: parseInt(formData.i_numero_consultorio)
+          i_numero_consultorio: parseInt(formData.i_numero_consultorio),
+          uk_area: formData.uk_area
         });
         alert('Consultorio actualizado correctamente');
       } else {
