@@ -6,7 +6,7 @@ import AdminFooter from '../components/Common/AdminFooter';
 import Chatbot from '../components/Common/Chatbot';
 import TestSpinner from '../components/Common/TestSpinner';
 import ColorSelector from '../components/Common/ColorSelector';
-import IconSelector from '../components/Common/IconSelector';
+import IconSelector from '../components/Common/IconSelectorPopup';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
 import { RECORD_STATUS_LABELS } from '../utils/constants';

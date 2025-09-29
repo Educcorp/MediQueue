@@ -117,7 +117,7 @@
   border: 2px solid var(--border-light);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  z-index: 1000;
+  z-index: 10001;
   margin-top: 4px;
   animation: dropdownSlideIn 0.2s ease-out;
   max-height: 400px;
@@ -307,7 +307,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 999;
+  z-index: 10000;
 }
 
 /* Scroll personalizado para dropdown */

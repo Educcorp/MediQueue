@@ -21,27 +21,6 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
   const buttonRef = useRef(null);
   const [usePortal, setUsePortal] = useState(false);
 
-  // Efecto para calcular posición del dropdown y detectar si está en modal
-  useEffect(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const isInModal = buttonRef.current.closest('[style*="position: fixed"]') || 
-                       buttonRef.current.closest('[style*="z-index: 9999"]') ||
-                       buttonRef.current.closest('.modal') ||
-                       buttonRef.current.closest('[role="dialog"]');
-      
-      setUsePortal(!!isInModal);
-      
-      if (isInModal) {
-        setDropdownPosition({
-          top: rect.bottom + 4,
-          left: rect.left,
-          width: rect.width
-        });
-      }
-    }
-  }, [isOpen]);
-
   // Mapa de iconos médicos disponibles con sus nombres y categorías
   const availableIcons = useMemo(() => [
     { name: 'FaStethoscope', component: FaStethoscope, label: 'Estetoscopio', category: 'general' },
@@ -96,6 +75,28 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
     return groups;
   }, [filteredIcons]);
 
+  // Detectar si está en un modal y calcular posición
+  const updatePosition = () => {
+    if (!buttonRef.current) return;
+    
+    const rect = buttonRef.current.getBoundingClientRect();
+    const isInModal = buttonRef.current.closest('[style*="position: fixed"]') || 
+                     buttonRef.current.closest('[style*="z-index: 9999"]') ||
+                     buttonRef.current.closest('.modal') ||
+                     buttonRef.current.closest('[role="dialog"]');
+    
+    const needsPortal = !!isInModal;
+    setUsePortal(needsPortal);
+    
+    if (needsPortal) {
+      setDropdownPosition({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width
+      });
+    }
+  };
+
   const handleIconSelect = (iconName) => {
     onChange(iconName);
     setIsOpen(false);
@@ -104,26 +105,33 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
 
   const toggleDropdown = () => {
     if (!disabled) {
-      if (!isOpen && buttonRef.current) {
-        const rect = buttonRef.current.getBoundingClientRect();
-        const isInModal = buttonRef.current.closest('[style*="position: fixed"]') || 
-                         buttonRef.current.closest('[style*="z-index: 9999"]') ||
-                         buttonRef.current.closest('.modal') ||
-                         buttonRef.current.closest('[role="dialog"]');
-        
-        setUsePortal(!!isInModal);
-        
-        if (isInModal) {
-          setDropdownPosition({
-            top: rect.bottom + 4,
-            left: rect.left,
-            width: rect.width
-          });
-        }
+      if (!isOpen) {
+        updatePosition();
       }
       setIsOpen(!isOpen);
     }
   };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setSearchTerm('');
+  };
+
+  // Actualizar posición si el modal cambia de tamaño o se mueve
+  useEffect(() => {
+    if (isOpen) {
+      const handleScroll = () => updatePosition();
+      const handleResize = () => updatePosition();
+      
+      window.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [isOpen]);
 
   const getCurrentIcon = () => {
     const currentIcon = availableIcons.find(icon => icon.name === value);
@@ -150,6 +158,106 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
     odontologia: 'Odontología',
     rehabilitacion: 'Rehabilitación'
   };
+
+  // Componente del contenido del dropdown
+  const DropdownContent = () => (
+    <>
+      <div 
+        className="icon-dropdown" 
+        style={usePortal ? {
+          position: 'fixed',
+          top: `${dropdownPosition.top}px`,
+          left: `${dropdownPosition.left}px`,
+          width: `${dropdownPosition.width}px`,
+          zIndex: 10001,
+          animation: 'dropdownSlideIn 0.2s ease-out'
+        } : {}}
+      >
+        {/* Buscador */}
+        <div className="icon-search">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Buscar icono..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+            autoFocus
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              className="clear-search"
+              onClick={() => setSearchTerm('')}
+            >
+              <FaTimes />
+            </button>
+          )}
+        </div>
+
+        {/* Lista de iconos por categoría */}
+        <div className="icon-categories">
+          {Object.keys(groupedIcons).length === 0 ? (
+            <div className="no-icons-found">
+              <FaSearch size={24} />
+              <p>No se encontraron iconos</p>
+            </div>
+          ) : (
+            Object.entries(groupedIcons).map(([category, icons]) => (
+              <div key={category} className="icon-category">
+                <h4 className="category-title">
+                  {categoryNames[category] || category}
+                </h4>
+                <div className="icon-grid">
+                  {icons.map((icon) => {
+                    const IconComp = icon.component;
+                    return (
+                      <button
+                        key={icon.name}
+                        type="button"
+                        className={`icon-option ${value === icon.name ? 'selected' : ''}`}
+                        onClick={() => handleIconSelect(icon.name)}
+                        title={`${icon.label} (${icon.name})`}
+                      >
+                        <IconComp size={20} />
+                        <span className="icon-option-label">{icon.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        
+        {/* Acciones */}
+        <div className="icon-actions">
+          <button
+            type="button"
+            className="clear-icon-button"
+            onClick={() => handleIconSelect('')}
+          >
+            <FaTimes size={12} />
+            Limpiar selección
+          </button>
+        </div>
+      </div>
+      
+      {/* Overlay para cerrar dropdown */}
+      <div 
+        className="icon-dropdown-overlay" 
+        onClick={handleClose}
+        style={usePortal ? {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 10000
+        } : {}}
+      />
+    </>
+  );
 
   return (
     <div className={`icon-selector-container ${disabled ? 'disabled' : ''}`}>
@@ -194,82 +302,10 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
         </button>
       </div>
 
-      {/* Dropdown con iconos */}
+      {/* Dropdown con iconos (renderizado con portal si está en modal) */}
       {isOpen && (
-        <div className="icon-dropdown">
-          {/* Buscador */}
-          <div className="icon-search">
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Buscar icono..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-              autoFocus
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                className="clear-search"
-                onClick={() => setSearchTerm('')}
-              >
-                <FaTimes />
-              </button>
-            )}
-          </div>
-
-          {/* Lista de iconos por categoría */}
-          <div className="icon-categories">
-            {Object.keys(groupedIcons).length === 0 ? (
-              <div className="no-icons-found">
-                <FaSearch size={24} />
-                <p>No se encontraron iconos</p>
-              </div>
-            ) : (
-              Object.entries(groupedIcons).map(([category, icons]) => (
-                <div key={category} className="icon-category">
-                  <h4 className="category-title">
-                    {categoryNames[category] || category}
-                  </h4>
-                  <div className="icon-grid">
-                    {icons.map((icon) => {
-                      const IconComp = icon.component;
-                      return (
-                        <button
-                          key={icon.name}
-                          type="button"
-                          className={`icon-option ${value === icon.name ? 'selected' : ''}`}
-                          onClick={() => handleIconSelect(icon.name)}
-                          title={`${icon.label} (${icon.name})`}
-                        >
-                          <IconComp size={20} />
-                          <span className="icon-option-label">{icon.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          
-          {/* Acciones */}
-          <div className="icon-actions">
-            <button
-              type="button"
-              className="clear-icon-button"
-              onClick={() => handleIconSelect('')}
-            >
-              <FaTimes size={12} />
-              Limpiar selección
-            </button>
-          </div>
-        </div>
+        usePortal ? createPortal(<DropdownContent />, document.body) : <DropdownContent />
       )}
-
-      {/* Overlay para cerrar dropdown */}
-      {isOpen && <div className="icon-dropdown-overlay" onClick={() => setIsOpen(false)} />}
     </div>
   );
 };

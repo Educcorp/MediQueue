@@ -191,21 +191,6 @@ const HomePage = () => {
       {/* Barra de marca */}
       {showHeader && (
         <div className="admin-container" style={{ marginTop: 20 }}>
-          <div className="page-header">
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div className="page-header-icon"><i className="mdi mdi-hospital-building"></i></div>
-              <div className="page-header-content">
-                <h1 className="page-title">MediQueue</h1>
-                <p className="page-subtitle">Tu turno, sin filas</p>
-              </div>
-            </div>
-            <div className="page-actions">
-              <button onClick={handleRefresh} className="btn btn-primary" disabled={loading} title="Actualizar información">
-                <i className="fas fa-sync-alt"></i>
-                {loading ? 'Actualizando...' : 'Actualizar'}
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
