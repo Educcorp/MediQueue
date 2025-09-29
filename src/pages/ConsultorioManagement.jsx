@@ -5,6 +5,8 @@ import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
 import Chatbot from '../components/Common/Chatbot';
 import TestSpinner from '../components/Common/TestSpinner';
+import ColorSelector from '../components/Common/ColorSelector';
+import IconSelector from '../components/Common/IconSelector';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
@@ -29,7 +31,6 @@ import {
   FaHeartbeat,
   FaUserMd,
   FaFemale,
-  FaEye as FaEyeMed,
   FaBone,
   FaBrain,
   FaMale,
@@ -37,7 +38,20 @@ import {
   FaProcedures,
   FaDoorOpen,
   FaCheckCircle,
-  FaTimesCircle
+  FaTimesCircle,
+  FaAmbulance,
+  FaSyringe,
+  FaPrescriptionBottle,
+  FaXRay,
+  FaMicroscope,
+  FaLungs,
+  FaTooth,
+  FaHandHoldingHeart,
+  FaWheelchair,
+  FaCrutch,
+  FaThermometer,
+  FaHeadSideCough,
+  FaVials
 } from 'react-icons/fa';
 
 const ConsultorioManagement = () => {
@@ -78,10 +92,14 @@ const ConsultorioManagement = () => {
   const [selectedAreaForConsultorio, setSelectedAreaForConsultorio] = useState(null);
   const [formData, setFormData] = useState({
     s_nombre_area: '',
+    s_letra: '',
+    s_color: '',
+    s_icono: '',
     i_numero_consultorio: '',
     uk_area: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [letraError, setLetraError] = useState('');
 
   // Mapa de iconos y colores por nombre de área médica
   const getAreaIcon = (areaName) => {
@@ -143,6 +161,9 @@ const ConsultorioManagement = () => {
     setEditingArea(null);
     setFormData({
       s_nombre_area: '',
+      s_letra: '',
+      s_color: '',
+      s_icono: '',
       i_numero_consultorio: '',
       uk_area: ''
     });
@@ -153,6 +174,9 @@ const ConsultorioManagement = () => {
     setEditingArea(area);
     setFormData({
       s_nombre_area: area.s_nombre_area,
+      s_letra: area.s_letra || '',
+      s_color: area.s_color || '',
+      s_icono: area.s_icono || '',
       i_numero_consultorio: '',
       uk_area: area.uk_area
     });
@@ -164,6 +188,9 @@ const ConsultorioManagement = () => {
     setSelectedAreaForConsultorio(area);
     setFormData({
       s_nombre_area: '',
+      s_letra: '',
+      s_color: '',
+      s_icono: '',
       i_numero_consultorio: '',
       uk_area: area.uk_area
     });
@@ -176,6 +203,9 @@ const ConsultorioManagement = () => {
     setSelectedAreaForConsultorio(area);
     setFormData({
       s_nombre_area: '',
+      s_letra: '',
+      s_color: '',
+      s_icono: '',
       i_numero_consultorio: consultorio.i_numero_consultorio,
       uk_area: consultorio.uk_area
     });
@@ -262,7 +292,14 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowAreaModal(false);
-      setFormData({ s_nombre_area: '', i_numero_consultorio: '', uk_area: '' });
+      setFormData({ 
+        s_nombre_area: '', 
+        s_letra: '', 
+        s_color: '', 
+        s_icono: '', 
+        i_numero_consultorio: '', 
+        uk_area: '' 
+      });
     } catch (error) {
       alert('Error guardando área: ' + error.message);
       console.error('Error guardando área:', error);
@@ -299,7 +336,14 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowConsultorioModal(false);
-      setFormData({ s_nombre_area: '', i_numero_consultorio: '', uk_area: '' });
+      setFormData({ 
+        s_nombre_area: '', 
+        s_letra: '', 
+        s_color: '', 
+        s_icono: '', 
+        i_numero_consultorio: '', 
+        uk_area: '' 
+      });
     } catch (error) {
       alert('Error guardando consultorio: ' + error.message);
       console.error('Error guardando consultorio:', error);
@@ -331,9 +375,53 @@ const ConsultorioManagement = () => {
       return;
     }
     
+    // Validación específica para letra (máximo 2 letras)
+    if (name === 's_letra') {
+      // Solo permitir letras y limitar a 2 caracteres, convertir a mayúsculas
+      const letterValue = value.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+      
+      // Verificar unicidad si hay valor
+      if (letterValue) {
+        // Verificar si la letra ya está en uso por otra área
+        const letraEnUso = areas.some(area => 
+          area.s_letra === letterValue && 
+          area.uk_area !== editingArea?.uk_area
+        );
+        
+        if (letraEnUso) {
+          setLetraError(`La letra "${letterValue}" ya está en uso por otra área`);
+        } else {
+          setLetraError('');
+        }
+      } else {
+        setLetraError('');
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: letterValue
+      }));
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  // Nuevas funciones para manejar selección de color e icono
+  const handleColorChange = (color) => {
+    setFormData(prev => ({
+      ...prev,
+      s_color: color
+    }));
+  };
+
+  const handleIconChange = (icon) => {
+    setFormData(prev => ({
+      ...prev,
+      s_icono: icon
     }));
   };
 
@@ -514,21 +602,59 @@ const ConsultorioManagement = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
             {filteredAreas.map(area => {
               const areaConsultorios = getConsultoriosByArea(area.uk_area);
-              const areaIcon = getAreaIcon(area.s_nombre_area);
-              const IconComponent = areaIcon.icon;
+              
+              // Usar los nuevos campos personalizados si están disponibles
+              const areaColor = area.s_color || getAreaIcon(area.s_nombre_area).color;
+              const areaIconName = area.s_icono;
+              
+              // Función para obtener el componente de icono basado en el nombre
+              const getIconComponent = (iconName) => {
+                const iconMap = {
+                  'FaStethoscope': FaStethoscope,
+                  'FaBaby': FaBaby,
+                  'FaHeartbeat': FaHeartbeat,
+                  'FaUserMd': FaUserMd,
+                  'FaFemale': FaFemale,
+                  'FaEye': FaEye,
+                  'FaBone': FaBone,
+                  'FaBrain': FaBrain,
+                  'FaMale': FaMale,
+                  'FaFlask': FaFlask,
+                  'FaProcedures': FaProcedures,
+                  'FaDoorOpen': FaDoorOpen,
+                  'FaHospital': FaHospital,
+                  'FaAmbulance': FaAmbulance,
+                  'FaSyringe': FaSyringe,
+                  'FaPrescriptionBottle': FaPrescriptionBottle,
+                  'FaXRay': FaXRay,
+                  'FaMicroscope': FaMicroscope,
+                  'FaLungs': FaLungs,
+                  'FaTooth': FaTooth,
+                  'FaHandHoldingHeart': FaHandHoldingHeart,
+                  'FaWheelchair': FaWheelchair,
+                  'FaCrutch': FaCrutch,
+                  'FaThermometer': FaThermometer,
+                  'FaHeadSideCough': FaHeadSideCough,
+                  'FaVials': FaVials
+                };
+                return iconMap[iconName] || getAreaIcon(area.s_nombre_area).icon;
+              };
+              
+              const IconComponent = areaIconName ? getIconComponent(areaIconName) : getAreaIcon(area.s_nombre_area).icon;
 
               return (
                 <div key={area.uk_area} className="content-card">
                   <div className="card-header" style={{
-                    background: `linear-gradient(135deg, ${areaIcon.color}20, ${areaIcon.color}10)`,
-                    borderBottom: `1px solid ${areaIcon.color}30`
+                    background: `linear-gradient(135deg, ${areaColor}20, ${areaColor}10)`,
+                    borderBottom: `1px solid ${areaColor}30`,
+                    position: 'relative'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{
                         width: '40px',
                         height: '40px',
                         borderRadius: 'var(--border-radius-sm)',
-                        background: `linear-gradient(135deg, ${areaIcon.color}, ${areaIcon.color}dd)`,
+                        background: `linear-gradient(135deg, ${areaColor}, ${areaColor}dd)`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -536,13 +662,59 @@ const ConsultorioManagement = () => {
                       }}>
                         <IconComponent />
                       </div>
-                      <div>
-                        <h3 className="card-title" style={{ margin: 0, fontSize: '18px', color: areaIcon.color }}>
-                          {area.s_nombre_area}
-                        </h3>
-                        <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <h3 className="card-title" style={{ margin: 0, fontSize: '18px', color: areaColor }}>
+                            {area.s_nombre_area}
+                          </h3>
+                          {/* Mostrar letra identificadora si existe */}
+                          {area.s_letra && (
+                            <span style={{
+                              background: areaColor,
+                              color: 'white',
+                              fontSize: '11px',
+                              fontWeight: 'bold',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              textTransform: 'uppercase'
+                            }}>
+                              {area.s_letra}
+                            </span>
+                          )}
+                        </div>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'var(--text-muted)' }}>
                           {areaConsultorios.length} consultorio{areaConsultorios.length !== 1 ? 's' : ''}
                         </p>
+                        
+                        {/* Mostrar información de personalización */}
+                        {(area.s_color || area.s_icono) && (
+                          <div style={{ 
+                            marginTop: '8px', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '12px',
+                            fontSize: '12px',
+                            color: 'var(--text-secondary)'
+                          }}>
+                            {area.s_color && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <div style={{
+                                  width: '12px',
+                                  height: '12px',
+                                  backgroundColor: area.s_color,
+                                  borderRadius: '2px',
+                                  border: '1px solid rgba(0,0,0,0.1)'
+                                }}></div>
+                                <span>{area.s_color}</span>
+                              </div>
+                            )}
+                            {area.s_icono && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span>Icono: {area.s_icono}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="card-actions">
@@ -703,6 +875,68 @@ const ConsultorioManagement = () => {
                 }}>
                   {formData.s_nombre_area.length}/50 caracteres
                 </small>
+              </div>
+
+              {/* Campos de personalización */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+                gap: '20px',
+                marginTop: '20px' 
+              }}>
+                {/* Letra identificadora */}
+                <div className="form-group">
+                  <label>Letra Identificadora</label>
+                  <input
+                    type="text"
+                    name="s_letra"
+                    value={formData.s_letra}
+                    onChange={handleInputChange}
+                    placeholder="Ej: MG, PD..."
+                    className={`form-control ${letraError ? 'error' : ''}`}
+                    maxLength={2}
+                    style={{ textTransform: 'uppercase' }}
+                  />
+                  {letraError ? (
+                    <small style={{ 
+                      color: 'var(--danger-color)',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'block'
+                    }}>
+                      {letraError}
+                    </small>
+                  ) : (
+                    <small style={{ 
+                      color: 'var(--text-muted)',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'block'
+                    }}>
+                      Máximo 2 letras para identificar el área
+                    </small>
+                  )}
+                </div>
+
+                {/* Selector de color */}
+                <div className="form-group">
+                  <ColorSelector
+                    label="Color del Área"
+                    value={formData.s_color}
+                    onChange={handleColorChange}
+                    disabled={false}
+                  />
+                </div>
+              </div>
+
+              {/* Selector de icono */}
+              <div className="form-group" style={{ marginTop: '20px' }}>
+                <IconSelector
+                  label="Icono del Área"
+                  value={formData.s_icono}
+                  onChange={handleIconChange}
+                  disabled={false}
+                />
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>

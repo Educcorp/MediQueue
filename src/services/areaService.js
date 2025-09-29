@@ -94,7 +94,10 @@ const areaService = {
     async create(areaData) {
         try {
             const response = await api.post('/areas', {
-                s_nombre_area: areaData.s_nombre_area
+                s_nombre_area: areaData.s_nombre_area,
+                s_letra: areaData.s_letra || null,
+                s_color: areaData.s_color || null,
+                s_icono: areaData.s_icono || null
             });
             return response.data.data;
         } catch (error) {
@@ -107,7 +110,10 @@ const areaService = {
     async update(uk_area, areaData) {
         try {
             const response = await api.put(`/areas/${uk_area}`, {
-                s_nombre_area: areaData.s_nombre_area
+                s_nombre_area: areaData.s_nombre_area,
+                s_letra: areaData.s_letra || null,
+                s_color: areaData.s_color || null,
+                s_icono: areaData.s_icono || null
             });
             return response.data.data;
         } catch (error) {
@@ -173,11 +179,41 @@ const areaService = {
         };
     },
 
+    // Obtener configuración de personalización
+    async getPersonalizationConfig() {
+        try {
+            const response = await api.get('/areas/personalization/config');
+            return response.data.data;
+        } catch (error) {
+            console.error('Error obteniendo configuración de personalización:', error);
+            throw error;
+        }
+    },
+
+    // Verificar disponibilidad de letra
+    async checkLetraDisponibilidad(letra, uk_area = null) {
+        try {
+            const params = new URLSearchParams({ letra });
+            if (uk_area) {
+                params.append('uk_area', uk_area);
+            }
+            
+            const response = await api.get(`/areas/personalization/check-letra?${params}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error verificando disponibilidad de letra:', error);
+            throw error;
+        }
+    },
+
     // Mapear datos de área básica para el frontend
     mapBasicAreaData(area) {
         return {
             id: area.uk_area,
-            nombre: area.s_nombre_area
+            nombre: area.s_nombre_area,
+            letra: area.s_letra,
+            color: area.s_color,
+            icono: area.s_icono
         };
     },
 
@@ -195,6 +231,25 @@ const areaService = {
 
         if (areaData.s_nombre_area && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-()]+$/.test(areaData.s_nombre_area)) {
             errors.push('El nombre del área solo puede contener letras, espacios, guiones y paréntesis');
+        }
+
+        // Validaciones para los nuevos campos
+        if (areaData.s_letra) {
+            if (!/^[A-Za-z]{1,2}$/.test(areaData.s_letra)) {
+                errors.push('La letra debe contener máximo 2 caracteres alfabéticos');
+            }
+        }
+
+        if (areaData.s_color) {
+            if (!/^#[0-9A-Fa-f]{6}$/.test(areaData.s_color)) {
+                errors.push('El color debe ser un valor hexadecimal válido');
+            }
+        }
+
+        if (areaData.s_icono) {
+            if (!/^[A-Za-z][A-Za-z0-9]*$/.test(areaData.s_icono)) {
+                errors.push('El nombre del icono no es válido');
+            }
         }
 
         return errors;
