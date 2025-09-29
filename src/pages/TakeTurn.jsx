@@ -41,23 +41,40 @@ const TakeTurn = () => {
   });
 
   // Mapa de iconos y colores por nombre de área médica
-  const getAreaIcon = (areaName) => {
+  const getAreaIcon = (areaName, areaData = null) => {
+    // Si tenemos datos del área desde la BD, usar esos
+    if (areaData && areaData.s_color && areaData.s_icono) {
+      const iconClass = areaData.s_icono.startsWith('mdi-') ? areaData.s_icono : `mdi-${areaData.s_icono}`;
+      return {
+        icon: () => <i className={`mdi ${iconClass}`}></i>,
+        color: areaData.s_color,
+        letter: areaData.s_letra || areaName?.charAt(0) || 'A'
+      };
+    }
+
+    // Fallback con iconos hardcodeados
     const iconMap = {
-      'Medicina General': { icon: FaStethoscope, color: 'var(--primary-medical)' },
-      'Pediatría': { icon: FaBaby, color: 'var(--info-color)' },
-      'Cardiología': { icon: FaHeartbeat, color: 'var(--danger-color)' },
-      'Dermatología': { icon: FaUserMd, color: 'var(--warning-color)' },
-      'Ginecología': { icon: FaFemale, color: '#E91E63' },
-      'Oftalmología': { icon: FaEyeMed, color: 'var(--info-color)' },
-      'Ortopedia': { icon: FaBone, color: '#795548' },
-      'Psiquiatría': { icon: FaBrain, color: '#9C27B0' },
-      'Neurología': { icon: FaBrain, color: '#FF5722' },
-      'Urología': { icon: FaMale, color: '#3F51B5' },
-      'Endocrinología': { icon: FaFlask, color: 'var(--success-color)' },
-      'Gastroenterología': { icon: FaProcedures, color: '#FFC107' }
+      'Medicina General': { icon: FaStethoscope, color: '#4A90E2', letter: 'MG' },
+      'Pediatría': { icon: FaBaby, color: '#17A2B8', letter: 'PE' },
+      'Cardiología': { icon: FaHeartbeat, color: '#DC3545', letter: 'C' },
+      'Dermatología': { icon: FaUserMd, color: '#FFC107', letter: 'D' },
+      'Ginecología': { icon: FaFemale, color: '#E91E63', letter: 'G' },
+      'Oftalmología': { icon: FaEyeMed, color: '#17A2B8', letter: 'O' },
+      'Ortopedia': { icon: FaBone, color: '#795548', letter: 'OR' },
+      'Psiquiatría': { icon: FaBrain, color: '#9C27B0', letter: 'PS' },
+      'Neurología': { icon: FaBrain, color: '#FF5722', letter: 'N' },
+      'Urología': { icon: FaMale, color: '#3F51B5', letter: 'U' },
+      'Endocrinología': { icon: FaFlask, color: '#28A745', letter: 'E' },
+      'Gastroenterología': { icon: FaProcedures, color: '#FFC107', letter: 'GA' }
     };
 
-    return iconMap[areaName] || { icon: FaHospital, color: 'var(--primary-medical)' };
+    const defaultArea = iconMap[areaName] || { 
+      icon: FaHospital, 
+      color: '#4A90E2', 
+      letter: areaName?.charAt(0) || 'A' 
+    };
+    
+    return defaultArea;
   };
 
   // Cargar áreas al montar el componente
@@ -416,14 +433,21 @@ const TakeTurn = () => {
             ) : (
               <div className="areas-grid-simple">
                 {areas.map(area => {
-                  const areaIcon = getAreaIcon(area.s_nombre_area);
-                  const IconComponent = areaIcon.icon;
+                  const areaIcon = getAreaIcon(area.s_nombre_area, area);
+                  const IconComponent = typeof areaIcon.icon === 'function' ? areaIcon.icon : 
+                    () => <i className={`mdi ${(area.s_icono || 'hospital-building').startsWith('mdi-') ? 
+                      (area.s_icono || 'hospital-building') : 
+                      `mdi-${area.s_icono || 'hospital-building'}`}`}></i>;
 
                   return (
                     <button
                       key={area.uk_area}
-                      className="area-button"
+                      className="area-button modern-area-btn"
                       onClick={() => handleSelectArea(area)}
+                      style={{
+                        '--area-color': areaIcon.color,
+                        '--area-color-light': areaIcon.color + '20'
+                      }}
                     >
                       <div
                         className="area-icon-button"
@@ -432,12 +456,16 @@ const TakeTurn = () => {
                         }}
                       >
                         <IconComponent />
+                        <div className="area-letter-overlay">{areaIcon.letter}</div>
                       </div>
                       <div className="area-info-button">
                         <h3 style={{ color: areaIcon.color }}>
                           {area.s_nombre_area}
                         </h3>
                         <p>Consultorio automático</p>
+                        <div className="area-id-badge" style={{ background: areaIcon.color }}>
+                          {areaIcon.letter}
+                        </div>
                       </div>
                     </button>
                   );
