@@ -842,8 +842,11 @@ const ConsultorioManagement = () => {
             padding: 0,
             maxWidth: '500px',
             width: '90%',
+            maxHeight: '90vh',
             boxShadow: 'var(--shadow-xl)',
-            border: '1px solid var(--border-color)'
+            border: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             <div style={{
               padding: '24px',
@@ -873,7 +876,12 @@ const ConsultorioManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmitArea} style={{ padding: '24px' }}>
+            <div style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              maxHeight: 'calc(90vh - 120px)' 
+            }}>
+              <form onSubmit={handleSubmitArea} style={{ padding: '24px' }}>
               <div className="form-group">
                 <label>Nombre del Área Médica *</label>
                 <input
@@ -979,6 +987,7 @@ const ConsultorioManagement = () => {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
@@ -1004,8 +1013,11 @@ const ConsultorioManagement = () => {
             padding: 0,
             maxWidth: '500px',
             width: '90%',
+            maxHeight: '90vh',
             boxShadow: 'var(--shadow-xl)',
-            border: '1px solid var(--border-color)'
+            border: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             <div style={{
               padding: '24px',
@@ -1032,7 +1044,12 @@ const ConsultorioManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmitConsultorio} style={{ padding: '24px' }}>
+            <div style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              maxHeight: 'calc(90vh - 120px)' 
+            }}>
+              <form onSubmit={handleSubmitConsultorio} style={{ padding: '24px' }}>
               <div className="form-group">
                 <label>Número del Consultorio *</label>
                 <input
@@ -1058,6 +1075,7 @@ const ConsultorioManagement = () => {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
