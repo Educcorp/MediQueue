@@ -13,7 +13,7 @@ import {
   FaBone, FaBrain, FaMale, FaFlask, FaProcedures, FaDoorOpen,
   FaHospital, FaAmbulance, FaSyringe, FaPrescriptionBottle, 
   FaXRay, FaMicroscope, FaLungs, FaTooth, FaHandHoldingHeart,
-  FaWheelchair, FaCrutch, FaThermometer, FaHeadSideCough, FaVials
+  FaWheelchair, FaCrutch, FaThermometer, FaHeadSideCough, FaVials, FaTicketAlt
 } from 'react-icons/fa';
 
 const HomePage = () => {
@@ -235,8 +235,8 @@ const HomePage = () => {
           {/* Right Section */}
           <div className="header-right">
             <div className="hospital-badge">
-              <FaHospital className="hospital-icon" />
-              <span>Monitor Hospitalario</span>
+              <FaTicketAlt className="hospital-icon" />
+                <a href="/tomar-turno"> Tomar turnos</a>
             </div>
           </div>
         </div>
