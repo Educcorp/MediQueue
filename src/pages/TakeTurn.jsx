@@ -35,16 +35,23 @@ const TakeTurn = () => {
   const [areas, setAreas] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [turnResult, setTurnResult] = useState(null);
+  const [countdown, setCountdown] = useState(5);
 
-  // Mapa de iconos y colores por nombre de área médica
+  // Función mejorada para obtener iconos desde la base de datos
   const getAreaIcon = (areaName, areaData = null) => {
-    // Si tenemos datos del área desde la BD, usar esos
-    if (areaData && areaData.s_color && areaData.s_icono) {
-      const iconClass = areaData.s_icono.startsWith('mdi-') ? areaData.s_icono : `mdi-${areaData.s_icono}`;
+    // Si tenemos datos del área desde la BD, usar esos primero
+    if (areaData) {
+      const iconName = areaData.s_icono || 'hospital-building';
+      const color = areaData.s_color || '#4A90E2';
+      const letter = areaData.s_letra || (areaData.s_nombre_area || areaName)?.charAt(0) || 'A';
+      
+      // Crear el icono MDI apropiado
+      const mdiClass = iconName.startsWith('mdi-') ? iconName : `mdi-${iconName}`;
+      
       return {
-        icon: () => <i className={`mdi ${iconClass}`}></i>,
-        color: areaData.s_color,
-        letter: areaData.s_letra || areaName?.charAt(0) || 'A'
+        icon: () => <i className={`mdi ${mdiClass}`} style={{ fontSize: 'inherit' }}></i>,
+        color: color,
+        letter: letter
       };
     }
 
@@ -72,6 +79,20 @@ const TakeTurn = () => {
     
     return defaultArea;
   };
+
+  // Efecto para el countdown de redirección
+  useEffect(() => {
+    let timer;
+    if (showSuccess && countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    } else if (showSuccess && countdown === 0) {
+      // Redirigir a tomar turno después del countdown
+      handleNewTurn();
+    }
+    return () => clearTimeout(timer);
+  }, [showSuccess, countdown]);
 
   // Cargar áreas al montar el componente
   useEffect(() => {
@@ -123,6 +144,7 @@ const TakeTurn = () => {
 
       setTurnResult(result);
       setShowSuccess(true);
+      setCountdown(5); // Iniciar countdown de 5 segundos
 
     } catch (error) {
       console.error('Error generando turno:', error);
@@ -148,6 +170,7 @@ const TakeTurn = () => {
     setShowSuccess(false);
     setTurnResult(null);
     setError('');
+    setCountdown(5);
   };
 
   return (
@@ -199,13 +222,13 @@ const TakeTurn = () => {
         {/* Success State */}
         {showSuccess && turnResult && (
           <div className="touch-success">
-            <div className="success-card">
+            <div className="success-card-compact">
               <div className="success-icon">
                 <FaCheckCircle />
               </div>
               <h1>¡Turno Generado Exitosamente!</h1>
               
-              <div className="turn-number-display">
+              <div className="turn-number-display-compact">
                 <div className="turn-label">Su número de turno es:</div>
                 <div className="turn-number-big">
                   {selectedArea && getAreaIcon(selectedArea.s_nombre_area, selectedArea).letter}
@@ -214,33 +237,36 @@ const TakeTurn = () => {
               </div>
 
               {turnResult.asignacion_automatica?.consultorio_asignado && (
-                <div className="assignment-info">
-                  <div className="info-item">
-                    <FaHospital className="info-icon" />
-                    <div className="info-text">
-                      <strong>Consultorio Asignado:</strong>
-                      <span>#{turnResult.asignacion_automatica.consultorio_asignado.numero} - {turnResult.asignacion_automatica.consultorio_asignado.area}</span>
+                <div className="assignment-info-compact">
+                  <div className="info-row">
+                    <div className="info-item-compact">
+                      <FaHospital className="info-icon-small" />
+                      <div className="info-text-compact">
+                        <strong>Consultorio:</strong>
+                        <span>#{turnResult.asignacion_automatica.consultorio_asignado.numero} - {turnResult.asignacion_automatica.consultorio_asignado.area}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="info-item">
-                    <FaClipboardList className="info-icon" />
-                    <div className="info-text">
-                      <strong>Turnos en espera:</strong>
-                      <span>{turnResult.asignacion_automatica.consultorio_asignado.turnos_en_espera || 0}</span>
+                    <div className="info-item-compact">
+                      <FaClipboardList className="info-icon-small" />
+                      <div className="info-text-compact">
+                        <strong>En espera:</strong>
+                        <span>{turnResult.asignacion_automatica.consultorio_asignado.turnos_en_espera || 0} turnos</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="success-actions">
-                <button onClick={handleGoHome} className="primary-action-touch">
-                  <FaHome />
-                  Ver Estado de Turnos
-                </button>
-                <button onClick={handleNewTurn} className="secondary-action-touch">
-                  <FaTicketAlt />
-                  Tomar Otro Turno
-                </button>
+              <div className="redirect-info">
+                <p className="redirect-message">
+                  Su turno se mostrará en la pantalla de visualización de turnos
+                </p>
+                <div className="countdown-display">
+                  <div className="countdown-circle">
+                    <span className="countdown-number">{countdown}</span>
+                  </div>
+                  <p className="countdown-text">Redirigiendo automáticamente...</p>
+                </div>
               </div>
             </div>
           </div>
