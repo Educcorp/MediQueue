@@ -24,7 +24,9 @@ import {
   FaArrowLeft,
   FaHome,
   FaHandPaper,
-  FaClipboardList
+  FaClipboardList,
+  FaTooth,
+  FaSyringe
 } from 'react-icons/fa';
 
 const TakeTurn = () => {
@@ -39,44 +41,104 @@ const TakeTurn = () => {
 
   // Función mejorada para obtener iconos desde la base de datos
   const getAreaIcon = (areaName, areaData = null) => {
+    console.log('🎨 getAreaIcon llamada con:', { areaName, areaData });
+    
     // Si tenemos datos del área desde la BD, usar esos primero
     if (areaData && areaData.s_icono && areaData.s_color) {
       const iconName = areaData.s_icono;
       const color = areaData.s_color;
       const letter = areaData.s_letra || (areaData.s_nombre_area || areaName)?.charAt(0) || 'A';
       
-      // Mapear iconos de la BD a React Icons
+      console.log('✅ Usando datos de BD:', { iconName, color, letter });
+      
+      // Mapear iconos de la BD a React Icons (nombres más comunes en Material Design)
       const iconMapping = {
+        // React Icons FontAwesome directos (nombres exactos de la BD)
+        'FaTooth': FaTooth,
+        'FaFemale': FaFemale,
+        'FaFlask': FaFlask,
+        'FaBrain': FaBrain,
+        'FaBaby': FaBaby,
+        'FaSyringe': FaSyringe,
+        'FaStethoscope': FaStethoscope,
+        'FaHeartbeat': FaHeartbeat,
+        'FaUserMd': FaUserMd,
+        'FaEye': FaEyeMed,
+        'FaBone': FaBone,
+        'FaMale': FaMale,
+        'FaProcedures': FaProcedures,
+        'FaHospital': FaHospital,
+        
+        // Material Design Icons (sin prefijo mdi-)
         'stethoscope': FaStethoscope,
         'baby': FaBaby,
+        'baby-face': FaBaby,
+        'baby-face-outline': FaBaby,
+        'heart': FaHeartbeat,
+        'heart-pulse': FaHeartbeat,
         'heartbeat': FaHeartbeat,
-        'user-md': FaUserMd,
-        'female': FaFemale,
+        'doctor': FaUserMd,
+        'account-tie': FaUserMd,
+        'human-male-female': FaUserMd,
+        'gender-female': FaFemale,
+        'human-female': FaFemale,
         'eye': FaEyeMed,
+        'eye-outline': FaEyeMed,
         'bone': FaBone,
         'brain': FaBrain,
-        'male': FaMale,
+        'human-male': FaMale,
+        'test-tube': FaFlask,
         'flask': FaFlask,
-        'procedures': FaProcedures,
+        'flask-outline': FaFlask,
+        'stomach': FaProcedures,
         'hospital': FaHospital,
         'hospital-building': FaHospital,
-        'ambulance': FaHospital, // fallback
-        'syringe': FaHospital, // fallback
-        'prescription-bottle': FaHospital, // fallback
-        'x-ray': FaHospital, // fallback
-        'microscope': FaHospital, // fallback
-        'lungs': FaHospital, // fallback
-        'tooth': FaHospital, // fallback
-        'head-side-cough': FaUserMd, // fallback
-        'hand-holding-heart': FaHeartbeat, // fallback
-        'wheelchair': FaUserMd, // fallback
-        'crutch': FaUserMd, // fallback
-        'thermometer': FaHospital // fallback
+        'hospital-box': FaHospital,
+        'hospital-marker': FaHospital,
+        'needle': FaSyringe,
+        'syringe': FaSyringe,
+        'pill': FaHospital,
+        'medication': FaHospital,
+        'tooth': FaTooth,
+        'tooth-outline': FaTooth,
+        'virus': FaUserMd,
+        'virus-outline': FaUserMd,
+        'shield-cross': FaHospital,
+        'medical-bag': FaHospital,
+        'wheelchair-accessibility': FaUserMd,
+        'thermometer': FaHospital,
+        
+        // FontAwesome icons (con y sin prefijo fa-)
+        'fa-stethoscope': FaStethoscope,
+        'fa-baby': FaBaby,
+        'fa-heartbeat': FaHeartbeat,
+        'fa-user-md': FaUserMd,
+        'fa-female': FaFemale,
+        'fa-eye': FaEyeMed,
+        'fa-bone': FaBone,
+        'fa-brain': FaBrain,
+        'fa-male': FaMale,
+        'fa-flask': FaFlask,
+        'fa-procedures': FaProcedures,
+        'fa-hospital': FaHospital,
+        'fa-tooth': FaTooth,
+        'fa-syringe': FaSyringe
       };
       
       // Limpiar el nombre del icono (remover prefijos como 'mdi-', 'fa-', etc.)
       const cleanIconName = iconName.replace(/^(mdi-|fa-|fas-|far-|fab-)/, '').toLowerCase();
-      const IconComponent = iconMapping[cleanIconName] || FaHospital;
+      
+      // Buscar el icono primero por nombre exacto, luego por nombre limpio
+      const IconComponent = iconMapping[iconName] || iconMapping[cleanIconName] || iconMapping[iconName.toLowerCase()] || FaHospital;
+      
+      console.log('🔍 Mapeo de icono:', { 
+        iconNameOriginal: iconName, 
+        cleanIconName, 
+        foundIconExact: !!iconMapping[iconName],
+        foundIconClean: !!iconMapping[cleanIconName],
+        foundIconLower: !!iconMapping[iconName.toLowerCase()],
+        IconComponent: IconComponent.name 
+      });
       
       return {
         icon: IconComponent,
@@ -85,6 +147,8 @@ const TakeTurn = () => {
       };
     }
 
+    console.log('⚠️ No hay datos de BD válidos, usando fallback para:', areaName);
+
     // Fallback con iconos hardcodeados por nombre del área
     const iconMap = {
       'Medicina General': { icon: FaStethoscope, color: '#4A90E2', letter: 'MG' },
@@ -92,13 +156,17 @@ const TakeTurn = () => {
       'Cardiología': { icon: FaHeartbeat, color: '#DC3545', letter: 'C' },
       'Dermatología': { icon: FaUserMd, color: '#FFC107', letter: 'D' },
       'Ginecología': { icon: FaFemale, color: '#E91E63', letter: 'G' },
+      'Ginecólogo': { icon: FaFemale, color: '#E91E63', letter: 'G' },
       'Oftalmología': { icon: FaEyeMed, color: '#17A2B8', letter: 'O' },
       'Ortopedia': { icon: FaBone, color: '#795548', letter: 'OR' },
       'Psiquiatría': { icon: FaBrain, color: '#9C27B0', letter: 'PS' },
       'Neurología': { icon: FaBrain, color: '#FF5722', letter: 'N' },
       'Urología': { icon: FaMale, color: '#3F51B5', letter: 'U' },
       'Endocrinología': { icon: FaFlask, color: '#28A745', letter: 'E' },
-      'Gastroenterología': { icon: FaProcedures, color: '#FFC107', letter: 'GA' }
+      'Gastroenterología': { icon: FaProcedures, color: '#FFC107', letter: 'GA' },
+      'Laboratorio': { icon: FaFlask, color: '#28A745', letter: 'L' },
+      'Dentista': { icon: FaHospital, color: '#4A90E2', letter: 'D' },
+      'Vacunación': { icon: FaHospital, color: '#DC3545', letter: 'V' }
     };
 
     const defaultArea = iconMap[areaName] || { 
@@ -106,6 +174,8 @@ const TakeTurn = () => {
       color: '#4A90E2', 
       letter: areaName?.charAt(0) || 'A' 
     };
+    
+    console.log('📋 Usando fallback icon para:', areaName, defaultArea);
     
     return defaultArea;
   };
@@ -137,6 +207,18 @@ const TakeTurn = () => {
       const areasData = await areaService.getBasics().catch(err => {
         console.warn('Error cargando áreas:', err);
         return [];
+      });
+
+      // Debug: Mostrar los datos exactos que llegan de la BD
+      console.log('🔍 Datos completos de áreas desde BD:', areasData);
+      areasData.forEach((area, index) => {
+        console.log(`📋 Área ${index + 1}:`, {
+          nombre: area.s_nombre_area,
+          icono: area.s_icono,
+          color: area.s_color,
+          letra: area.s_letra,
+          completo: area
+        });
       });
 
       setAreas(areasData || []);
@@ -252,15 +334,36 @@ const TakeTurn = () => {
         {/* Success State */}
         {showSuccess && turnResult && (
           <div className="touch-success">
-            <div className="success-card-compact">
-              <div className="success-icon">
-                <FaCheckCircle />
-              </div>
-              <h1>¡Turno Generado Exitosamente!</h1>
+            <div className="success-card-compact" style={{
+              '--area-color': selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2',
+              '--area-color-light': selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color + '20' : '#4A90E220'
+            }}>
+              {(() => {
+                const areaIcon = selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea) : null;
+                const IconComponent = areaIcon ? areaIcon.icon : FaCheckCircle;
+                
+                return (
+                  <>
+                    <div className="success-icon-area" style={{
+                      background: `linear-gradient(135deg, ${areaIcon?.color || '#4A90E2'}, ${areaIcon?.color || '#4A90E2'}dd)`
+                    }}>
+                      <IconComponent className="success-area-icon" />
+                      <FaCheckCircle className="success-check-overlay" />
+                    </div>
+                    <h1 style={{ color: areaIcon?.color || '#4A90E2' }}>¡Turno Generado Exitosamente!</h1>
+                    
+                    <div className="area-info-success">
+                      <h3>Área: {selectedArea?.s_nombre_area}</h3>
+                    </div>
+                  </>
+                );
+              })()}
               
               <div className="turn-number-display-compact">
                 <div className="turn-label">Su número de turno es:</div>
-                <div className="turn-number-big">
+                <div className="turn-number-big" style={{
+                  background: `linear-gradient(135deg, ${selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2'}, ${selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2'}dd)`
+                }}>
                   {selectedArea && getAreaIcon(selectedArea.s_nombre_area, selectedArea).letter}
                   {turnResult.i_numero_turno || turnResult.numero_turno || turnResult.id || 'N/A'}
                 </div>
@@ -349,12 +452,12 @@ const TakeTurn = () => {
                   {loading ? (
                     <>
                       <div className="button-spinner"></div>
-                      Generando Turno...
+                      <span>Generando Turno...</span>
                     </>
                   ) : (
                     <>
-                      <FaTicketAlt />
-                      Generar Turno en {selectedArea.s_nombre_area}
+                      <FaTicketAlt className="button-icon" />
+                      <span>Generar Turno</span>
                     </>
                   )}
                 </button>
@@ -567,12 +670,17 @@ const TakeTurn = () => {
 
         /* Contenido principal */
         .touch-content {
-          margin-top: 100px;
-          padding: 40px 20px;
-          min-height: calc(100vh - 120px);
-          max-width: 1400px;
+          margin-top: 80px;
+          padding: 10px 20px;
+          min-height: calc(100vh - 80px);
+          max-width: 100vw;
           margin-left: auto;
           margin-right: auto;
+          box-sizing: border-box;
+          overflow-x: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
 
         /* Estado de carga */
@@ -745,15 +853,15 @@ const TakeTurn = () => {
         /* Compact Success Card - Fits viewport */
         .success-card-compact {
           background: white;
-          border-radius: 25px;
-          padding: 30px 40px;
+          border-radius: 20px;
+          padding: 20px;
           text-align: center;
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-          border: 3px solid #48bb78;
-          max-width: 650px;
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+          border: 3px solid var(--area-color, #48bb78);
+          max-width: 800px;
           width: 100%;
-          max-height: 85vh;
-          overflow-y: auto;
+          margin: 0 auto;
+          box-sizing: border-box;
         }
 
         .success-card-compact .success-icon {
@@ -762,55 +870,117 @@ const TakeTurn = () => {
           margin-bottom: 20px;
         }
 
+        /* Estilos para pantalla de éxito mejorada con área */
+        .success-icon-area {
+          width: 90px;
+          height: 90px;
+          border-radius: 25px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          position: relative;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .success-area-icon {
+          font-size: 36px;
+          color: white;
+          filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .success-check-overlay {
+          position: absolute;
+          bottom: -8px;
+          right: -8px;
+          background: #48bb78;
+          color: white;
+          font-size: 24px;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 3px 10px rgba(72, 187, 120, 0.4);
+          border: 3px solid white;
+        }
+
+        .area-info-success {
+          text-align: center;
+          margin-bottom: 15px;
+          padding: 10px 20px;
+          background: var(--area-color-light, #4A90E220);
+          border-radius: 12px;
+          border: 2px solid var(--area-color, #4A90E2);
+        }
+
+        .area-info-success h3 {
+          color: var(--area-color, #4A90E2);
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+
+        /* Estilos para botón de generar turno */
+        .button-icon {
+          font-size: 20px;
+        }
+
         .success-card-compact h1 {
-          font-size: 28px;
+          font-size: 24px;
           color: #2d3748;
-          margin-bottom: 25px;
+          margin-bottom: 15px;
           font-weight: 700;
         }
 
         .turn-number-display-compact {
-          margin: 25px 0;
-          padding: 25px;
-          background: linear-gradient(135deg, #48bb78, #38a169);
-          border-radius: 20px;
-          color: white;
+          margin: 15px 0;
+          text-align: center;
         }
 
         .turn-number-display-compact .turn-label {
-          font-size: 16px;
-          margin-bottom: 10px;
-          opacity: 0.9;
+          font-size: 14px;
+          margin-bottom: 8px;
+          color: #4a5568;
+          font-weight: 600;
         }
 
         .turn-number-display-compact .turn-number-big {
-          font-size: 64px;
+          font-size: 48px;
           font-weight: 900;
           line-height: 1;
+          color: white;
+          padding: 15px 25px;
+          border-radius: 15px;
+          display: inline-block;
+          min-width: 160px;
+          text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
         .assignment-info-compact {
-          margin: 20px 0;
+          margin: 10px 0;
         }
 
         .info-row {
           display: flex;
           flex-direction: column;
-          gap: 15px;
+          gap: 8px;
         }
 
         .info-item-compact {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 15px;
+          gap: 10px;
+          padding: 10px;
           background: #f8fafc;
-          border-radius: 12px;
+          border-radius: 10px;
           text-align: left;
         }
 
         .info-icon-small {
-          font-size: 18px;
+          font-size: 16px;
           color: #4A90E2;
           flex-shrink: 0;
         }
@@ -818,31 +988,31 @@ const TakeTurn = () => {
         .info-text-compact {
           display: flex;
           flex-direction: column;
-          gap: 3px;
+          gap: 2px;
         }
 
         .info-text-compact strong {
-          font-size: 14px;
+          font-size: 12px;
           color: #2d3748;
         }
 
         .info-text-compact span {
-          font-size: 16px;
+          font-size: 14px;
           color: #4a5568;
         }
 
         .redirect-info {
-          margin-top: 25px;
-          padding: 20px;
+          margin-top: 15px;
+          padding: 12px;
           background: #f0f9ff;
-          border-radius: 15px;
+          border-radius: 10px;
           border: 2px solid #bfdbfe;
         }
 
         .redirect-message {
-          font-size: 16px;
+          font-size: 14px;
           color: #1e40af;
-          margin-bottom: 15px;
+          margin-bottom: 10px;
           font-weight: 600;
         }
 
@@ -850,28 +1020,28 @@ const TakeTurn = () => {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 10px;
+          gap: 6px;
         }
 
         .countdown-circle {
-          width: 50px;
-          height: 50px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
         }
 
         .countdown-number {
           color: white;
-          font-size: 24px;
+          font-size: 18px;
           font-weight: 700;
         }
 
         .countdown-text {
-          font-size: 14px;
+          font-size: 12px;
           color: #64748b;
           margin: 0;
         }
@@ -1027,42 +1197,47 @@ const TakeTurn = () => {
 
         .areas-instruction {
           text-align: center;
-          margin-bottom: 50px;
+          margin-bottom: 25px;
         }
 
         .areas-instruction h2 {
-          font-size: 36px;
+          font-size: 28px;
           color: #2d3748;
-          margin-bottom: 15px;
+          margin-bottom: 10px;
           font-weight: 700;
         }
 
         .areas-instruction p {
-          font-size: 20px;
+          font-size: 18px;
           color: #718096;
         }
 
         .areas-grid-touch {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 30px;
-          padding: 20px 0;
+          grid-template-columns: repeat(3, 1fr);
+          grid-template-rows: repeat(2, 1fr);
+          gap: 20px;
+          padding: 0;
+          max-width: 1400px;
+          margin: 0 auto;
+          height: auto;
         }
 
         .area-button-touch {
           background: white;
           border: 3px solid transparent;
-          border-radius: 25px;
-          padding: 40px 30px;
+          border-radius: 20px;
+          padding: 25px 20px;
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 20px;
-          min-height: 200px;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+          gap: 15px;
+          min-height: 160px;
+          max-height: 180px;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
         }
 
         .area-button-touch:hover {
