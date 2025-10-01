@@ -40,22 +40,52 @@ const TakeTurn = () => {
   // Función mejorada para obtener iconos desde la base de datos
   const getAreaIcon = (areaName, areaData = null) => {
     // Si tenemos datos del área desde la BD, usar esos primero
-    if (areaData) {
-      const iconName = areaData.s_icono || 'hospital-building';
-      const color = areaData.s_color || '#4A90E2';
+    if (areaData && areaData.s_icono && areaData.s_color) {
+      const iconName = areaData.s_icono;
+      const color = areaData.s_color;
       const letter = areaData.s_letra || (areaData.s_nombre_area || areaName)?.charAt(0) || 'A';
       
-      // Crear el icono MDI apropiado
-      const mdiClass = iconName.startsWith('mdi-') ? iconName : `mdi-${iconName}`;
+      // Mapear iconos de la BD a React Icons
+      const iconMapping = {
+        'stethoscope': FaStethoscope,
+        'baby': FaBaby,
+        'heartbeat': FaHeartbeat,
+        'user-md': FaUserMd,
+        'female': FaFemale,
+        'eye': FaEyeMed,
+        'bone': FaBone,
+        'brain': FaBrain,
+        'male': FaMale,
+        'flask': FaFlask,
+        'procedures': FaProcedures,
+        'hospital': FaHospital,
+        'hospital-building': FaHospital,
+        'ambulance': FaHospital, // fallback
+        'syringe': FaHospital, // fallback
+        'prescription-bottle': FaHospital, // fallback
+        'x-ray': FaHospital, // fallback
+        'microscope': FaHospital, // fallback
+        'lungs': FaHospital, // fallback
+        'tooth': FaHospital, // fallback
+        'head-side-cough': FaUserMd, // fallback
+        'hand-holding-heart': FaHeartbeat, // fallback
+        'wheelchair': FaUserMd, // fallback
+        'crutch': FaUserMd, // fallback
+        'thermometer': FaHospital // fallback
+      };
+      
+      // Limpiar el nombre del icono (remover prefijos como 'mdi-', 'fa-', etc.)
+      const cleanIconName = iconName.replace(/^(mdi-|fa-|fas-|far-|fab-)/, '').toLowerCase();
+      const IconComponent = iconMapping[cleanIconName] || FaHospital;
       
       return {
-        icon: () => <i className={`mdi ${mdiClass}`} style={{ fontSize: 'inherit' }}></i>,
+        icon: IconComponent,
         color: color,
         letter: letter
       };
     }
 
-    // Fallback con iconos hardcodeados
+    // Fallback con iconos hardcodeados por nombre del área
     const iconMap = {
       'Medicina General': { icon: FaStethoscope, color: '#4A90E2', letter: 'MG' },
       'Pediatría': { icon: FaBaby, color: '#17A2B8', letter: 'PE' },
@@ -352,10 +382,7 @@ const TakeTurn = () => {
                 <div className="areas-grid-touch">
                   {areas.map(area => {
                     const areaIcon = getAreaIcon(area.s_nombre_area, area);
-                    const IconComponent = typeof areaIcon.icon === 'function' ? areaIcon.icon : 
-                      () => <i className={`mdi ${(area.s_icono || 'hospital-building').startsWith('mdi-') ? 
-                        (area.s_icono || 'hospital-building') : 
-                        `mdi-${area.s_icono || 'hospital-building'}`}`}></i>;
+                    const IconComponent = areaIcon.icon;
 
                     return (
                       <button
@@ -584,7 +611,8 @@ const TakeTurn = () => {
           display: flex;
           justify-content: center;
           align-items: center;
-          min-height: 70vh;
+          min-height: calc(100vh - 120px);
+          padding: 20px;
         }
 
         .success-card {
@@ -714,6 +742,140 @@ const TakeTurn = () => {
           background: #edf2f7;
         }
 
+        /* Compact Success Card - Fits viewport */
+        .success-card-compact {
+          background: white;
+          border-radius: 25px;
+          padding: 30px 40px;
+          text-align: center;
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+          border: 3px solid #48bb78;
+          max-width: 650px;
+          width: 100%;
+          max-height: 85vh;
+          overflow-y: auto;
+        }
+
+        .success-card-compact .success-icon {
+          font-size: 60px;
+          color: #48bb78;
+          margin-bottom: 20px;
+        }
+
+        .success-card-compact h1 {
+          font-size: 28px;
+          color: #2d3748;
+          margin-bottom: 25px;
+          font-weight: 700;
+        }
+
+        .turn-number-display-compact {
+          margin: 25px 0;
+          padding: 25px;
+          background: linear-gradient(135deg, #48bb78, #38a169);
+          border-radius: 20px;
+          color: white;
+        }
+
+        .turn-number-display-compact .turn-label {
+          font-size: 16px;
+          margin-bottom: 10px;
+          opacity: 0.9;
+        }
+
+        .turn-number-display-compact .turn-number-big {
+          font-size: 64px;
+          font-weight: 900;
+          line-height: 1;
+        }
+
+        .assignment-info-compact {
+          margin: 20px 0;
+        }
+
+        .info-row {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .info-item-compact {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 15px;
+          background: #f8fafc;
+          border-radius: 12px;
+          text-align: left;
+        }
+
+        .info-icon-small {
+          font-size: 18px;
+          color: #4A90E2;
+          flex-shrink: 0;
+        }
+
+        .info-text-compact {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+        }
+
+        .info-text-compact strong {
+          font-size: 14px;
+          color: #2d3748;
+        }
+
+        .info-text-compact span {
+          font-size: 16px;
+          color: #4a5568;
+        }
+
+        .redirect-info {
+          margin-top: 25px;
+          padding: 20px;
+          background: #f0f9ff;
+          border-radius: 15px;
+          border: 2px solid #bfdbfe;
+        }
+
+        .redirect-message {
+          font-size: 16px;
+          color: #1e40af;
+          margin-bottom: 15px;
+          font-weight: 600;
+        }
+
+        .countdown-display {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .countdown-circle {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .countdown-number {
+          color: white;
+          font-size: 24px;
+          font-weight: 700;
+        }
+
+        .countdown-text {
+          font-size: 14px;
+          color: #64748b;
+          margin: 0;
+        }
+
         /* Confirmación de área */
         .touch-confirmation {
           display: flex;
@@ -815,6 +977,9 @@ const TakeTurn = () => {
 
         .confirmation-actions-touch {
           margin-top: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
         .generate-turn-button {
