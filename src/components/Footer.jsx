@@ -30,7 +30,7 @@ const Footer = () => {
             <h4>Enlaces</h4>
             <p><a href="/about"><FaInfoCircle /> Acerca de Nosotros</a></p>
             <p><a href="/privacy"><FaShieldAlt /> Política de Privacidad</a></p>
-            <p><a href="/admin"><FaUserShield /> Portal de Admin</a></p>
+            
           </div>
         </div>
         

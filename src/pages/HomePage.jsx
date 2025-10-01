@@ -324,30 +324,31 @@ const HomePage = () => {
                         <div className="current-turn-header">
                           <h2>PRÓXIMO TURNO</h2>
                         </div>
-                        <div className="turn-display-large" style={{ 
-                          background: `linear-gradient(135deg, ${areaColor}, ${areaColor}dd)`,
-                          boxShadow: `0 20px 40px ${areaColor}40`
-                        }}>
-                          <div className="turn-number-huge">
-                            <span className="area-letter-huge">{areaLetter}</span>
-                            <span className="number-huge">{nextForArea.i_numero_turno || nextForArea.id}</span>
-                          </div>
-                          <div className="pulse-ring-large" style={{ borderColor: areaColor }}></div>
-                        </div>
-                        <div className="turn-info-large">
-                          <div className="info-item-large">
-                            <i className="mdi mdi-hospital-building" style={{ color: areaColor }}></i>
-                            <span>Consultorio {nextForArea.i_numero_consultorio || nextForArea.consultorio}</span>
-                          </div>
-                          <div className="status-display-large" style={{ 
-                            background: (nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' 
-                              ? '#FF6B35' : areaColor,
-                            color: 'white'
+                        <div className="turn-display-container">
+                          <div className="turn-display-large" style={{ 
+                            background: `linear-gradient(135deg, ${areaColor}, ${areaColor}dd)`,
+                            boxShadow: `0 20px 40px ${areaColor}40`
                           }}>
-                            {(nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' ? 
-                              <><i className="mdi mdi-bell-ring"></i> LLAMANDO AHORA</> : 
-                              <><i className="mdi mdi-clock"></i> EN ESPERA</>
-                            }
+                            <div className="turn-number-huge">
+                              <span className="area-letter-huge">{areaLetter}</span>
+                              <span className="number-huge">{nextForArea.i_numero_turno || nextForArea.id}</span>
+                            </div>
+                          </div>
+                          <div className="turn-info-large">
+                            <div className="info-item-large">
+                              <i className="mdi mdi-hospital-building" style={{ color: areaColor }}></i>
+                              <span>Consultorio {nextForArea.i_numero_consultorio || nextForArea.consultorio}</span>
+                            </div>
+                            <div className="status-display-large" style={{ 
+                              background: (nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' 
+                                ? '#FF6B35' : areaColor,
+                              color: 'white'
+                            }}>
+                              {(nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' ? 
+                                <><i className="mdi mdi-bell-ring"></i> LLAMANDO AHORA</> : 
+                                <><i className="mdi mdi-clock"></i> EN ESPERA</>
+                              }
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -396,7 +397,7 @@ const HomePage = () => {
                               }}>
                                 {areaLetter}{t.i_numero_turno || t.id}
                               </div>
-                              <div className="queue-info">
+                              <div className="queue-info-right">
                                 <div className="consultorio-info">
                                   <i className="mdi mdi-hospital-building"></i>
                                   Consultorio {t.i_numero_consultorio || t.consultorio}
@@ -889,16 +890,24 @@ const HomePage = () => {
           letter-spacing: 2px;
         }
 
+        .turn-display-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 60px;
+          flex-wrap: wrap;
+        }
+
         .turn-display-large {
           width: 300px;
           height: 300px;
           border-radius: 50%;
-          margin: 0 auto 40px auto;
           display: flex;
           align-items: center;
           justify-content: center;
           position: relative;
           color: white;
+          flex-shrink: 0;
         }
 
         .turn-number-huge {
@@ -921,23 +930,12 @@ const HomePage = () => {
           line-height: 1;
         }
 
-        .pulse-ring-large {
-          position: absolute;
-          top: -20px;
-          left: -20px;
-          right: -20px;
-          bottom: -20px;
-          border: 4px solid;
-          border-radius: 50%;
-          animation: pulse-ring 3s infinite;
-          opacity: 0.6;
-        }
-
         .turn-info-large {
           display: flex;
           flex-direction: column;
-          gap: 20px;
-          align-items: center;
+          gap: 30px;
+          align-items: flex-start;
+          min-width: 300px;
         }
 
         .info-item-large {
@@ -1012,8 +1010,9 @@ const HomePage = () => {
 
         .sidebar-content {
           flex: 1;
-          padding: 20px;
+          padding: 15px;
           overflow-y: auto;
+          overflow-x: hidden;
         }
 
         .sidebar-empty-state {
@@ -1035,18 +1034,21 @@ const HomePage = () => {
         .turns-queue {
           display: flex;
           flex-direction: column;
-          gap: 15px;
+          gap: 12px;
+          max-width: 100%;
+          overflow: visible;
         }
 
         .queue-item {
           display: flex;
           align-items: center;
           gap: 15px;
-          padding: 20px;
+          padding: 15px 20px;
           background: #f8fafc;
           border-radius: 15px;
           border: 2px solid transparent;
           transition: all 0.3s ease;
+          min-height: 80px;
         }
 
         .queue-item.next {
@@ -1078,6 +1080,16 @@ const HomePage = () => {
           display: flex;
           flex-direction: column;
           gap: 8px;
+        }
+
+        .queue-info-right {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 8px;
+          padding-left: 15px;
         }
 
         .consultorio-info {
@@ -1197,6 +1209,26 @@ const HomePage = () => {
             order: -1;
             max-height: 400px;
           }
+          
+          .queue-item {
+            padding: 12px 15px;
+            min-height: 70px;
+          }
+          
+          .queue-number {
+            width: 50px;
+            height: 50px;
+            font-size: 16px;
+          }
+          
+          .turn-display-container {
+            gap: 40px;
+          }
+          
+          .turn-display-large {
+            width: 250px;
+            height: 250px;
+          }
         }
 
         @media (max-width: 768px) {
@@ -1233,8 +1265,36 @@ const HomePage = () => {
             height: 200px;
           }
           
+          .turn-display-container {
+            flex-direction: column;
+            gap: 30px;
+          }
+          
+          .turn-info-large {
+            align-items: center;
+            min-width: auto;
+          }
+
           .number-huge {
             font-size: 80px;
+          }          .queue-item {
+            padding: 10px 12px;
+            min-height: 60px;
+            gap: 12px;
+          }
+          
+          .queue-number {
+            width: 45px;
+            height: 45px;
+            font-size: 14px;
+          }
+          
+          .consultorio-info {
+            font-size: 14px;
+          }
+          
+          .queue-status {
+            font-size: 12px;
           }
         }
       `}</style>
