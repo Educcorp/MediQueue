@@ -503,7 +503,6 @@ const TakeTurn = () => {
                         </div>
                         <div className="area-info-touch">
                           <h3>{area.s_nombre_area}</h3>
-                          <p>Consultorio automático</p>
                         </div>
                         <div className="area-badge-touch">
                           {areaIcon.letter}
@@ -671,7 +670,7 @@ const TakeTurn = () => {
         /* Contenido principal */
         .touch-content {
           margin-top: 80px;
-          padding: 10px 20px;
+          padding: 10px 40px;
           min-height: calc(100vh - 80px);
           max-width: 100vw;
           margin-left: auto;
@@ -924,7 +923,7 @@ const TakeTurn = () => {
 
         /* Estilos para botón de generar turno */
         .button-icon {
-          font-size: 20px;
+          font-size: 28px;
         }
 
         .success-card-compact h1 {
@@ -1156,23 +1155,34 @@ const TakeTurn = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 15px;
-          padding: 25px 50px;
-          background: linear-gradient(135deg, var(--area-color, #4A90E2), var(--area-color, #4A90E2)dd);
-          color: white;
-          border: none;
-          border-radius: 20px;
-          font-size: 22px;
+          gap: 20px;
+          padding: 35px 60px;
+          background: white !important;
+          color: #2d3748 !important;
+          border: 3px solid #e2e8f0;
+          border-radius: 25px;
+          font-size: 28px;
           font-weight: 700;
           cursor: pointer;
           transition: all 0.3s ease;
-          min-width: 400px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          min-width: 500px;
+          min-height: 80px;
+          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .generate-turn-button span {
+          color: #2d3748 !important;
+        }
+
+        .generate-turn-button .button-icon {
+          color: #2d3748 !important;
         }
 
         .generate-turn-button:hover:not(:disabled) {
-          transform: translateY(-4px);
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+          transform: translateY(-6px);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+          background: #f8fafc !important;
+          border-color: var(--area-color, #4A90E2);
         }
 
         .generate-turn-button:disabled {
@@ -1181,10 +1191,10 @@ const TakeTurn = () => {
         }
 
         .button-spinner {
-          width: 24px;
-          height: 24px;
-          border: 3px solid rgba(255, 255, 255, 0.3);
-          border-top: 3px solid white;
+          width: 32px;
+          height: 32px;
+          border: 4px solid rgba(255, 255, 255, 0.3);
+          border-top: 4px solid white;
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -1216,9 +1226,9 @@ const TakeTurn = () => {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           grid-template-rows: repeat(2, 1fr);
-          gap: 20px;
+          gap: 40px;
           padding: 0;
-          max-width: 1400px;
+          max-width: 1600px;
           margin: 0 auto;
           height: auto;
         }
@@ -1227,16 +1237,16 @@ const TakeTurn = () => {
           background: white;
           border: 3px solid transparent;
           border-radius: 20px;
-          padding: 25px 20px;
+          padding: 40px 35px;
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 15px;
-          min-height: 160px;
-          max-height: 180px;
+          gap: 20px;
+          min-height: 40px;
+          width: 100%;
           box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
         }
 
@@ -1248,14 +1258,14 @@ const TakeTurn = () => {
         }
 
         .area-icon-touch {
-          width: 80px;
-          height: 80px;
-          border-radius: 20px;
+          width: 120px;
+          height: 120px;
+          border-radius: 30px;
           background: linear-gradient(135deg, var(--area-color, #4A90E2), var(--area-color-dark, #4A90E2dd));
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 36px;
+          font-size: 56px;
           color: white;
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
@@ -1269,7 +1279,7 @@ const TakeTurn = () => {
         }
 
         .area-info-touch h3 {
-          font-size: 22px;
+          font-size: 30px;
           font-weight: 700;
           color: #2d3748;
           margin-bottom: 8px;
@@ -1287,10 +1297,10 @@ const TakeTurn = () => {
           right: 15px;
           background: var(--area-color, #4A90E2);
           color: white;
-          font-size: 14px;
+          font-size: 18px;
           font-weight: 700;
-          width: 35px;
-          height: 35px;
+          width: 45px;
+          height: 45px;
           border-radius: 50%;
           display: flex;
           align-items: center;
