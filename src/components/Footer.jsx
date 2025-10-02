@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaInfoCircle, FaShieldAlt, FaUserShield } from 'react-icons/fa'
+import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaInfoCircle, FaShieldAlt, FaTicketAlt } from 'react-icons/fa'
 import '../styles/Footer.css'
 
 const Footer = () => {
@@ -30,7 +30,8 @@ const Footer = () => {
             <h4>Enlaces</h4>
             <p><a href="/about"><FaInfoCircle /> Acerca de Nosotros</a></p>
             <p><a href="/privacy"><FaShieldAlt /> Política de Privacidad</a></p>
-            <p><a href="/admin"><FaUserShield /> Portal de Admin</a></p>
+            <p><a href="/tomar-turno"><FaTicketAlt /> Tomar turnos</a></p>
+            
           </div>
         </div>
         

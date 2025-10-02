@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
-import consultorioService from '../services/consultorioService';
 import Footer from '../components/Footer';
 import '../styles/TakeTurn.css';
 
-// React Icons ss
+// React Icons
 import {
   FaTicketAlt,
   FaHospital,
-  FaBuilding,
   FaStethoscope,
   FaBaby,
   FaHeartbeat,
@@ -22,11 +20,13 @@ import {
   FaMale,
   FaFlask,
   FaProcedures,
-  FaInfoCircle,
   FaCheckCircle,
   FaArrowLeft,
-  FaRandom,
-  // FaClock // COMENTADO: No se usa sin turno rápido
+  FaHome,
+  FaHandPaper,
+  FaClipboardList,
+  FaTooth,
+  FaSyringe
 } from 'react-icons/fa';
 
 const TakeTurn = () => {
@@ -35,37 +35,138 @@ const TakeTurn = () => {
   const [error, setError] = useState('');
   const [selectedArea, setSelectedArea] = useState(null);
   const [areas, setAreas] = useState([]);
-  const [consultorios, setConsultorios] = useState([]);
-  const [formData, setFormData] = useState({
-    uk_consultorio: ''
-  });
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [turnResult, setTurnResult] = useState(null);
+  const [countdown, setCountdown] = useState(5);
 
-  // Mapa de iconos y colores por nombre de área médica
+  // Función mejorada para obtener iconos desde la base de datos
   const getAreaIcon = (areaName, areaData = null) => {
-    // Si tenemos datos del área desde la BD, usar esos
-    if (areaData && areaData.s_color && areaData.s_icono) {
-      const iconClass = areaData.s_icono.startsWith('mdi-') ? areaData.s_icono : `mdi-${areaData.s_icono}`;
+    console.log('🎨 getAreaIcon llamada con:', { areaName, areaData });
+    
+    // Si tenemos datos del área desde la BD, usar esos primero
+    if (areaData && areaData.s_icono && areaData.s_color) {
+      const iconName = areaData.s_icono;
+      const color = areaData.s_color;
+      const letter = areaData.s_letra || (areaData.s_nombre_area || areaName)?.charAt(0) || 'A';
+      
+      console.log('✅ Usando datos de BD:', { iconName, color, letter });
+      
+      // Mapear iconos de la BD a React Icons (nombres más comunes en Material Design)
+      const iconMapping = {
+        // React Icons FontAwesome directos (nombres exactos de la BD)
+        'FaTooth': FaTooth,
+        'FaFemale': FaFemale,
+        'FaFlask': FaFlask,
+        'FaBrain': FaBrain,
+        'FaBaby': FaBaby,
+        'FaSyringe': FaSyringe,
+        'FaStethoscope': FaStethoscope,
+        'FaHeartbeat': FaHeartbeat,
+        'FaUserMd': FaUserMd,
+        'FaEye': FaEyeMed,
+        'FaBone': FaBone,
+        'FaMale': FaMale,
+        'FaProcedures': FaProcedures,
+        'FaHospital': FaHospital,
+        
+        // Material Design Icons (sin prefijo mdi-)
+        'stethoscope': FaStethoscope,
+        'baby': FaBaby,
+        'baby-face': FaBaby,
+        'baby-face-outline': FaBaby,
+        'heart': FaHeartbeat,
+        'heart-pulse': FaHeartbeat,
+        'heartbeat': FaHeartbeat,
+        'doctor': FaUserMd,
+        'account-tie': FaUserMd,
+        'human-male-female': FaUserMd,
+        'gender-female': FaFemale,
+        'human-female': FaFemale,
+        'eye': FaEyeMed,
+        'eye-outline': FaEyeMed,
+        'bone': FaBone,
+        'brain': FaBrain,
+        'human-male': FaMale,
+        'test-tube': FaFlask,
+        'flask': FaFlask,
+        'flask-outline': FaFlask,
+        'stomach': FaProcedures,
+        'hospital': FaHospital,
+        'hospital-building': FaHospital,
+        'hospital-box': FaHospital,
+        'hospital-marker': FaHospital,
+        'needle': FaSyringe,
+        'syringe': FaSyringe,
+        'pill': FaHospital,
+        'medication': FaHospital,
+        'tooth': FaTooth,
+        'tooth-outline': FaTooth,
+        'virus': FaUserMd,
+        'virus-outline': FaUserMd,
+        'shield-cross': FaHospital,
+        'medical-bag': FaHospital,
+        'wheelchair-accessibility': FaUserMd,
+        'thermometer': FaHospital,
+        
+        // FontAwesome icons (con y sin prefijo fa-)
+        'fa-stethoscope': FaStethoscope,
+        'fa-baby': FaBaby,
+        'fa-heartbeat': FaHeartbeat,
+        'fa-user-md': FaUserMd,
+        'fa-female': FaFemale,
+        'fa-eye': FaEyeMed,
+        'fa-bone': FaBone,
+        'fa-brain': FaBrain,
+        'fa-male': FaMale,
+        'fa-flask': FaFlask,
+        'fa-procedures': FaProcedures,
+        'fa-hospital': FaHospital,
+        'fa-tooth': FaTooth,
+        'fa-syringe': FaSyringe
+      };
+      
+      // Limpiar el nombre del icono (remover prefijos como 'mdi-', 'fa-', etc.)
+      const cleanIconName = iconName.replace(/^(mdi-|fa-|fas-|far-|fab-)/, '').toLowerCase();
+      
+      // Buscar el icono primero por nombre exacto, luego por nombre limpio
+      const IconComponent = iconMapping[iconName] || iconMapping[cleanIconName] || iconMapping[iconName.toLowerCase()] || FaHospital;
+      
+      console.log('🔍 Mapeo de icono:', { 
+        iconNameOriginal: iconName, 
+        cleanIconName, 
+        foundIconExact: !!iconMapping[iconName],
+        foundIconClean: !!iconMapping[cleanIconName],
+        foundIconLower: !!iconMapping[iconName.toLowerCase()],
+        IconComponent: IconComponent.name 
+      });
+      
       return {
-        icon: () => <i className={`mdi ${iconClass}`}></i>,
-        color: areaData.s_color,
-        letter: areaData.s_letra || areaName?.charAt(0) || 'A'
+        icon: IconComponent,
+        color: color,
+        letter: letter
       };
     }
 
-    // Fallback con iconos hardcodeados
+    console.log('⚠️ No hay datos de BD válidos, usando fallback para:', areaName);
+
+    // Fallback con iconos hardcodeados por nombre del área
     const iconMap = {
       'Medicina General': { icon: FaStethoscope, color: '#4A90E2', letter: 'MG' },
       'Pediatría': { icon: FaBaby, color: '#17A2B8', letter: 'PE' },
       'Cardiología': { icon: FaHeartbeat, color: '#DC3545', letter: 'C' },
       'Dermatología': { icon: FaUserMd, color: '#FFC107', letter: 'D' },
       'Ginecología': { icon: FaFemale, color: '#E91E63', letter: 'G' },
+      'Ginecólogo': { icon: FaFemale, color: '#E91E63', letter: 'G' },
       'Oftalmología': { icon: FaEyeMed, color: '#17A2B8', letter: 'O' },
       'Ortopedia': { icon: FaBone, color: '#795548', letter: 'OR' },
       'Psiquiatría': { icon: FaBrain, color: '#9C27B0', letter: 'PS' },
       'Neurología': { icon: FaBrain, color: '#FF5722', letter: 'N' },
       'Urología': { icon: FaMale, color: '#3F51B5', letter: 'U' },
       'Endocrinología': { icon: FaFlask, color: '#28A745', letter: 'E' },
-      'Gastroenterología': { icon: FaProcedures, color: '#FFC107', letter: 'GA' }
+      'Gastroenterología': { icon: FaProcedures, color: '#FFC107', letter: 'GA' },
+      'Laboratorio': { icon: FaFlask, color: '#28A745', letter: 'L' },
+      'Dentista': { icon: FaHospital, color: '#4A90E2', letter: 'D' },
+      'Vacunación': { icon: FaHospital, color: '#DC3545', letter: 'V' }
     };
 
     const defaultArea = iconMap[areaName] || { 
@@ -74,40 +175,50 @@ const TakeTurn = () => {
       letter: areaName?.charAt(0) || 'A' 
     };
     
+    console.log('📋 Usando fallback icon para:', areaName, defaultArea);
+    
     return defaultArea;
   };
+
+  // Efecto para el countdown de redirección
+  useEffect(() => {
+    let timer;
+    if (showSuccess && countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    } else if (showSuccess && countdown === 0) {
+      // Redirigir a tomar turno después del countdown
+      handleNewTurn();
+    }
+    return () => clearTimeout(timer);
+  }, [showSuccess, countdown]);
 
   // Cargar áreas al montar el componente
   useEffect(() => {
     loadAreas();
   }, []);
 
-  // Cargar consultorios cuando cambia el área seleccionada (o al inicio)
-  useEffect(() => {
-    const loadConsultorios = async () => {
-      try {
-        let data = [];
-        if (selectedArea?.uk_area) {
-          data = await consultorioService.getBasicsByArea(selectedArea.uk_area).catch(() => []);
-        } else {
-          data = await consultorioService.getDisponibles().catch(() => []);
-        }
-        setConsultorios(Array.isArray(data) ? data : (data?.consultorios || []));
-      } catch (_) {
-        setConsultorios([]);
-      }
-    };
-    loadConsultorios();
-  }, [selectedArea]);
-
   const loadAreas = async () => {
     try {
       setLoading(true);
       setError('');
 
-      const areasData = await areaService.getAll().catch(err => {
+      const areasData = await areaService.getBasics().catch(err => {
         console.warn('Error cargando áreas:', err);
         return [];
+      });
+
+      // Debug: Mostrar los datos exactos que llegan de la BD
+      console.log('🔍 Datos completos de áreas desde BD:', areasData);
+      areasData.forEach((area, index) => {
+        console.log(`📋 Área ${index + 1}:`, {
+          nombre: area.s_nombre_area,
+          icono: area.s_icono,
+          color: area.s_color,
+          letra: area.s_letra,
+          completo: area
+        });
       });
 
       setAreas(areasData || []);
@@ -122,71 +233,6 @@ const TakeTurn = () => {
       setLoading(false);
     }
   };
-
-  // Helpers y handlers para flujo manual
-  const getConsultorioInfo = (c) => {
-    if (!c) return { numero: '', area: '' };
-    return {
-      numero: c.i_numero_consultorio || c.numero || c.i_numero || c?.consultorio?.numero || '',
-      area: c.s_nombre_area || c?.area?.nombre || c.area || ''
-    };
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    if (!formData.uk_consultorio) {
-      setError('Selecciona un consultorio');
-      return;
-    }
-    try {
-      setLoading(true);
-      const result = await turnService.createTurnPublico({ uk_consultorio: formData.uk_consultorio });
-      const numero = result?.i_numero_turno || result?.numero_turno || result?.id || 'N/A';
-      alert(`¡Turno generado exitosamente!\n\nTu número de turno es: ${numero}`);
-      navigate('/');
-    } catch (err) {
-      console.error('Error generando turno (manual):', err);
-      setError(err?.response?.data?.message || 'Error al generar el turno');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // COMENTADO: Función para turno rápido (asignación automática global)
-  /*
-  const handleTakeRandomTurn = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      // Crear turno con asignación automática sin especificar área
-      const result = await turnService.createTurnPublicoAuto({});
-
-      // Mostrar mensaje de éxito con información del consultorio asignado
-      const consultorioInfo = result.asignacion_automatica?.consultorio_asignado;
-      const mensaje = consultorioInfo 
-        ? `¡Turno generado exitosamente!\n\nTu número de turno es: ${result.i_numero_turno}\nConsultorio asignado: #${consultorioInfo.numero} - ${consultorioInfo.area}\nTurnos en espera: ${consultorioInfo.turnos_en_espera}`
-        : `¡Turno generado exitosamente! Tu número de turno es: ${result.i_numero_turno}`;
-      
-      alert(mensaje);
-
-      // Redirigir a la página principal
-      navigate('/');
-
-    } catch (error) {
-      console.error('Error generando turno:', error);
-      setError(error.response?.data?.message || 'Error al generar el turno');
-    } finally {
-      setLoading(false);
-    }
-  };
-  */
 
   const handleSelectArea = (area) => {
     setSelectedArea(area);
@@ -208,16 +254,9 @@ const TakeTurn = () => {
         uk_area: selectedArea.uk_area
       });
 
-      // Mostrar mensaje de éxito con información del consultorio asignado
-      const consultorioInfo = result.asignacion_automatica?.consultorio_asignado;
-      const mensaje = consultorioInfo
-        ? `¡Turno generado exitosamente!\n\nTu número de turno es: ${result.i_numero_turno}\nConsultorio asignado: #${consultorioInfo.numero} - ${consultorioInfo.area}\nTurnos en espera: ${consultorioInfo.turnos_en_espera}`
-        : `¡Turno generado exitosamente! Tu número de turno es: ${result.i_numero_turno}`;
-
-      alert(mensaje);
-
-      // Redirigir a la página principal
-      navigate('/');
+      setTurnResult(result);
+      setShowSuccess(true);
+      setCountdown(5); // Iniciar countdown de 5 segundos
 
     } catch (error) {
       console.error('Error generando turno:', error);
@@ -233,55 +272,164 @@ const TakeTurn = () => {
 
   const handleGoBack = () => {
     setSelectedArea(null);
+    setShowSuccess(false);
+    setTurnResult(null);
     setError('');
   };
 
+  const handleNewTurn = () => {
+    setSelectedArea(null);
+    setShowSuccess(false);
+    setTurnResult(null);
+    setError('');
+    setCountdown(5);
+  };
+
   return (
-    <div className="take-turn-container">
-      <div className="take-turn-content">
-        {/* Encabezado */}
-        <div className="take-turn-header">
-          <div className="header-card">
-            <div className="header-icon">
-              <FaTicketAlt />
+    <div className="touch-hospital-container">
+      {/* Header profesional estilo admin panel */}
+      <header className="touch-header">
+        <div className="header-content">
+          {/* Logo Section */}
+          <div className="header-logo-section">
+            <img
+              src="/images/mediqueue_logo.png"
+              alt="MediQueue Logo"
+              className="header-logo-image"
+            />
+            <span className="header-title">MediQueue®</span>
+          </div>
+
+          {/* Title Section */}
+          <div className="header-center">
+            <div className="page-title-section">
+              <h1 className="page-title">
+                <FaHandPaper className="title-icon" />
+                Tomar Turno
+              </h1>
+              <p className="page-subtitle">Seleccione el área médica para generar su turno</p>
             </div>
-            <div className="header-texts">
-              <h1 className="header-title">Tomar Turno</h1>
-              <p className="header-subtitle">Selecciona un área médica y se asignará automáticamente el consultorio más disponible</p>
-            </div>
-            {selectedArea && (
-              <button onClick={handleGoBack} className="back-button">
-                <FaArrowLeft /> Volver
-              </button>
-            )}
+          </div>
+
+          {/* Right Section */}
+          <div className="header-right">
+            <button onClick={handleGoHome} className="home-button-touch">
+              <FaHome className="home-icon" />
+              <span>Inicio</span>
+            </button>
           </div>
         </div>
+      </header>
 
-
+      <div className="touch-content">
+        {/* Loading State */}
         {loading && (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Procesando solicitud...</p>
+          <div className="touch-loading">
+            <div className="loading-circle"></div>
+            <h2>Procesando solicitud...</h2>
+            <p>Generando su turno, por favor espere</p>
           </div>
         )}
 
-        {/* Vista de confirmación de área seleccionada */}
-        {selectedArea && !loading && (
-          <div className="confirmation-container">
-            <div className="selected-area-card">
-              <div className="area-header-confirmation">
+        {/* Success State */}
+        {showSuccess && turnResult && (
+          <div className="touch-success">
+            <div className="success-card-compact" style={{
+              '--area-color': selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2',
+              '--area-color-light': selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color + '20' : '#4A90E220'
+            }}>
+              {(() => {
+                const areaIcon = selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea) : null;
+                const IconComponent = areaIcon ? areaIcon.icon : FaCheckCircle;
+                
+                return (
+                  <>
+                    <div className="success-icon-area" style={{
+                      background: `linear-gradient(135deg, ${areaIcon?.color || '#4A90E2'}, ${areaIcon?.color || '#4A90E2'}dd)`
+                    }}>
+                      <IconComponent className="success-area-icon" />
+                      <FaCheckCircle className="success-check-overlay" />
+                    </div>
+                    <h1 style={{ color: areaIcon?.color || '#4A90E2' }}>¡Turno Generado Exitosamente!</h1>
+                    
+                    <div className="area-info-success">
+                      <h3>Área: {selectedArea?.s_nombre_area}</h3>
+                    </div>
+                  </>
+                );
+              })()}
+              
+              <div className="turn-number-display-compact">
+                <div className="turn-label">Su número de turno es:</div>
+                <div className="turn-number-big" style={{
+                  background: `linear-gradient(135deg, ${selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2'}, ${selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2'}dd)`
+                }}>
+                  {selectedArea && getAreaIcon(selectedArea.s_nombre_area, selectedArea).letter}
+                  {turnResult.i_numero_turno || turnResult.numero_turno || turnResult.id || 'N/A'}
+                </div>
+              </div>
+
+              {turnResult.asignacion_automatica?.consultorio_asignado && (
+                <div className="assignment-info-compact">
+                  <div className="info-row">
+                    <div className="info-item-compact">
+                      <FaHospital className="info-icon-small" />
+                      <div className="info-text-compact">
+                        <strong>Consultorio:</strong>
+                        <span>#{turnResult.asignacion_automatica.consultorio_asignado.numero} - {turnResult.asignacion_automatica.consultorio_asignado.area}</span>
+                      </div>
+                    </div>
+                    <div className="info-item-compact">
+                      <FaClipboardList className="info-icon-small" />
+                      <div className="info-text-compact">
+                        <strong>En espera:</strong>
+                        <span>{turnResult.asignacion_automatica.consultorio_asignado.turnos_en_espera || 0} turnos</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="redirect-info">
+                <p className="redirect-message">
+                  Su turno se mostrará en la pantalla de visualización de turnos
+                </p>
+                <div className="countdown-display">
+                  <div className="countdown-circle">
+                    <span className="countdown-number">{countdown}</span>
+                  </div>
+                  <p className="countdown-text">Redirigiendo automáticamente...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Area Confirmation */}
+        {selectedArea && !loading && !showSuccess && (
+          <div className="touch-confirmation">
+            <div className="confirmation-card">
+              <div className="back-button-container">
+                <button onClick={handleGoBack} className="back-button-touch">
+                  <FaArrowLeft />
+                  Volver a Áreas
+                </button>
+              </div>
+
+              <div className="selected-area-display">
                 {(() => {
-                  const areaIcon = getAreaIcon(selectedArea.s_nombre_area);
+                  const areaIcon = getAreaIcon(selectedArea.s_nombre_area, selectedArea);
                   const IconComponent = areaIcon.icon;
                   return (
                     <>
                       <div
-                        className="area-icon-large"
+                        className="area-icon-huge"
                         style={{
                           background: `linear-gradient(135deg, ${areaIcon.color}, ${areaIcon.color}dd)`
                         }}
                       >
                         <IconComponent />
+                        <div className="area-letter-huge">{areaIcon.letter}</div>
                       </div>
                       <div className="area-info-confirmation">
                         <h2 style={{ color: areaIcon.color }}>{selectedArea.s_nombre_area}</h2>
@@ -292,195 +440,1027 @@ const TakeTurn = () => {
                 })()}
               </div>
 
-              <div className="confirmation-actions">
+              <div className="confirmation-actions-touch">
                 <button
                   onClick={handleTakeAreaTurn}
-                  className="confirm-button"
+                  className="generate-turn-button"
                   disabled={loading}
+                  style={{
+                    '--area-color': selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2'
+                  }}
                 >
                   {loading ? (
                     <>
                       <div className="button-spinner"></div>
-                      Generando Turno...
+                      <span>Generando Turno...</span>
                     </>
                   ) : (
                     <>
-                      <FaCheckCircle />
-                      Generar Turno en {selectedArea.s_nombre_area}
+                      <FaTicketAlt className="button-icon" />
+                      <span>Generar Turno</span>
                     </>
                   )}
                 </button>
               </div>
             </div>
-
-            {error && (
-              <div className="error-message">
-                <span>{error}</span>
-              </div>
-            )}
           </div>
         )}
 
-        {/* Formulario manual: seleccionar consultorio */}
-        {!loading && (
-          <form onSubmit={handleFormSubmit} className="turn-form">
-            <div className="form-group">
-              <label htmlFor="consultorio" className="form-label">
-                <i className="mdi mdi-hospital-building"></i>
-                Consultorio *
-              </label>
-              <select
-                id="consultorio"
-                name="uk_consultorio"
-                value={formData.uk_consultorio}
-                onChange={handleInputChange}
-                className="form-select"
-                required
-              >
-                <option value="">Selecciona un consultorio</option>
-                {consultorios.map((consultorio) => {
-                  const info = getConsultorioInfo(consultorio);
-                  const value = consultorio.uk_consultorio || consultorio.id;
-                  return (
-                    <option key={value} value={value}>
-                      Consultorio {info.numero} - {info.area}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-            <div className="confirmation-actions" style={{ marginTop: 12 }}>
-              <button type="submit" className="confirm-button" disabled={loading || !consultorios.length}>
-                <FaCheckCircle />
-                Generar Turno en consultorio seleccionado
-              </button>
-            </div>
-          </form>
-        )}
-
-
-        {/* COMENTADO: Vista principal con opción de turno rápido
-        {!showAreaSelection && !selectedArea && !loading && (
-          <div className="main-options-container">
-            <div className="options-grid">
-              {/* Opción de turno aleatorio 
-              <div className="option-card primary">
-                <div className="option-icon">
-                  <FaRandom />
-                </div>
-                <div className="option-content">
-                  <h2>Turno Rápido</h2>
-                  <p>Se asignará automáticamente el consultorio más disponible de todo el hospital</p>
-                  <div className="option-features">
-                    <span><FaClock /> Más rápido</span>
-                    <span><FaRandom /> Automático</span>
-                  </div>
-                </div>
-                <button
-                  onClick={handleTakeRandomTurn}
-                  className="option-button primary"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <div className="button-spinner"></div>
-                      Generando...
-                    </>
-                  ) : (
-                    <>
-                      <FaTicketAlt />
-                      Generar Turno Rápido
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Opción de selección por área - MOVIDA ABAJO COMO VISTA PRINCIPAL 
-              <div className="option-card secondary">
-                <div className="option-icon">
-                  <FaHospital />
-                </div>
-                <div className="option-content">
-                  <h2>Por Área Médica</h2>
-                  <p>Elige un área específica y se asignará el consultorio más disponible de esa área</p>
-                  <div className="option-features">
-                    <span><FaHospital /> Específico</span>
-                    <span><FaRandom /> Automático</span>
-                  </div>
-                </div>
-                <button
-                  onClick={handleShowAreaSelection}
-                  className="option-button secondary"
-                  disabled={loading || areas.length === 0}
-                >
-                  <FaBuilding />
-                  Seleccionar Área
-                </button>
-              </div>
-            </div>
-        )}
-        */}
-
-        {/* Vista principal directa - Selección de áreas */}
-        {!selectedArea && !loading && (
-          <div className="areas-container">
+        {/* Area Selection */}
+        {!selectedArea && !loading && !showSuccess && (
+          <div className="touch-areas">
             {areas.length === 0 ? (
-              <div className="empty-state">
-                <FaBuilding />
+              <div className="empty-state-touch">
+                <FaHospital className="empty-icon" />
                 <h3>No hay áreas médicas disponibles</h3>
                 <p>Actualmente no hay consultorios configurados en el sistema</p>
               </div>
             ) : (
-              <div className="areas-grid-simple">
-                {areas.map(area => {
-                  const areaIcon = getAreaIcon(area.s_nombre_area, area);
-                  const IconComponent = typeof areaIcon.icon === 'function' ? areaIcon.icon : 
-                    () => <i className={`mdi ${(area.s_icono || 'hospital-building').startsWith('mdi-') ? 
-                      (area.s_icono || 'hospital-building') : 
-                      `mdi-${area.s_icono || 'hospital-building'}`}`}></i>;
+              <>
+                <div className="areas-instruction">
+                  <h2>Seleccione el área médica</h2>
+                  <p>Toque el área médica para la cual desea tomar un turno</p>
+                </div>
+                
+                <div className="areas-grid-touch">
+                  {areas.map(area => {
+                    const areaIcon = getAreaIcon(area.s_nombre_area, area);
+                    const IconComponent = areaIcon.icon;
 
-                  return (
-                    <button
-                      key={area.uk_area}
-                      className="area-button modern-area-btn"
-                      onClick={() => handleSelectArea(area)}
-                      style={{
-                        '--area-color': areaIcon.color,
-                        '--area-color-light': areaIcon.color + '20'
-                      }}
-                    >
-                      <div
-                        className="area-icon-button"
+                    return (
+                      <button
+                        key={area.uk_area}
+                        className="area-button-touch"
+                        onClick={() => handleSelectArea(area)}
                         style={{
-                          background: `linear-gradient(135deg, ${areaIcon.color}, ${areaIcon.color}dd)`
+                          '--area-color': areaIcon.color,
+                          '--area-color-light': areaIcon.color + '20',
+                          '--area-color-dark': areaIcon.color + 'dd'
                         }}
                       >
-                        <IconComponent />
-                        <div className="area-letter-overlay">{areaIcon.letter}</div>
-                      </div>
-                      <div className="area-info-button">
-                        <h3 style={{ color: areaIcon.color }}>
-                          {area.s_nombre_area}
-                        </h3>
-                        <p>Consultorio automático</p>
-                        <div className="area-id-badge" style={{ background: areaIcon.color }}>
+                        <div className="area-icon-touch">
+                          <IconComponent />
+                        </div>
+                        <div className="area-info-touch">
+                          <h3>{area.s_nombre_area}</h3>
+                        </div>
+                        <div className="area-badge-touch">
                           {areaIcon.letter}
                         </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
         )}
 
-        {error && !selectedArea && (
-          <div className="error-message">
-            <span>{error}</span>
+        {error && (
+          <div className="error-message-touch">
+            <div className="error-content">
+              <h3>⚠️ Error</h3>
+              <p>{error}</p>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Estilos específicos para monitor touch hospitalario */}
+      <style>{`
+        /* Contenedor principal para monitor touch */
+        .touch-hospital-container {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #f8fafc 0%, #e6f5f9 100%);
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          position: relative;
+        }
+
+        /* Header profesional */
+        .touch-header {
+          background: rgba(255, 255, 255, 0.95);
+          color: #4a5568;
+          padding: 12px 40px;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 80px;
+          z-index: 1000;
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+        }
+
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          min-height: 56px;
+          box-sizing: border-box;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        .header-logo-section {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          position: relative;
+          flex-shrink: 0;
+          min-width: 200px;
+        }
+
+        .header-logo-image {
+          width: 122px;
+          height: 122px;
+          object-fit: contain;
+          flex-shrink: 0;
+          position: absolute;
+          top: 50%;
+          left: 0;
+          transform: translateY(-50%);
+          z-index: 25;
+          transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .header-title {
+          color: #4a5568;
+          font-size: 28px;
+          font-weight: 600;
+          letter-spacing: -0.5px;
+          margin-left: 130px;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-center {
+          display: flex;
+          flex: 1;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .page-title-section {
+          text-align: center;
+        }
+
+        .page-title {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 15px;
+          font-size: 32px;
+          font-weight: 700;
+          color: #2d3748;
+          margin: 0;
+        }
+
+        .title-icon {
+          color: #4A90E2;
+          font-size: 36px;
+        }
+
+        .page-subtitle {
+          color: #718096;
+          font-size: 16px;
+          margin: 5px 0 0 0;
+          font-weight: 500;
+        }
+
+        .header-right {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          flex-shrink: 0;
+          min-width: 200px;
+          justify-content: flex-end;
+        }
+
+        .home-button-touch {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 20px;
+          background: linear-gradient(135deg, #4A90E2, #2f97d1);
+          color: white;
+          border: none;
+          border-radius: 20px;
+          font-weight: 600;
+          font-size: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .home-button-touch:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+        }
+
+        .home-icon {
+          font-size: 18px;
+        }
+
+        /* Contenido principal */
+        .touch-content {
+          margin-top: 80px;
+          padding: 10px 40px;
+          min-height: calc(100vh - 80px);
+          max-width: 100vw;
+          margin-left: auto;
+          margin-right: auto;
+          box-sizing: border-box;
+          overflow-x: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        /* Estado de carga */
+        .touch-loading {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 60vh;
+          text-align: center;
+        }
+
+        .loading-circle {
+          width: 80px;
+          height: 80px;
+          border: 6px solid #e2e8f0;
+          border-top: 6px solid #4A90E2;
+          border-radius: 50%;
+          animation: spin 1.5s linear infinite;
+          margin-bottom: 30px;
+        }
+
+        .touch-loading h2 {
+          font-size: 28px;
+          color: #2d3748;
+          margin-bottom: 10px;
+        }
+
+        .touch-loading p {
+          font-size: 18px;
+          color: #718096;
+        }
+
+        /* Estado de éxito */
+        .touch-success {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: calc(100vh - 120px);
+          padding: 20px;
+        }
+
+        .success-card {
+          background: white;
+          border-radius: 30px;
+          padding: 60px;
+          text-align: center;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+          border: 3px solid #48bb78;
+          max-width: 800px;
+          width: 100%;
+        }
+
+        .success-icon {
+          font-size: 100px;
+          color: #48bb78;
+          margin-bottom: 30px;
+        }
+
+        .success-card h1 {
+          font-size: 36px;
+          color: #2d3748;
+          margin-bottom: 40px;
+          font-weight: 700;
+        }
+
+        .turn-number-display {
+          margin: 40px 0;
+          padding: 30px;
+          background: linear-gradient(135deg, #48bb78, #38a169);
+          border-radius: 20px;
+          color: white;
+        }
+
+        .turn-label {
+          font-size: 20px;
+          margin-bottom: 15px;
+          opacity: 0.9;
+        }
+
+        .turn-number-big {
+          font-size: 80px;
+          font-weight: 900;
+          line-height: 1;
+        }
+
+        .assignment-info {
+          margin: 40px 0;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .info-item {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding: 20px;
+          background: #f8fafc;
+          border-radius: 15px;
+          text-align: left;
+        }
+
+        .info-icon {
+          font-size: 24px;
+          color: #4A90E2;
+          flex-shrink: 0;
+        }
+
+        .info-text {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .info-text strong {
+          font-size: 16px;
+          color: #2d3748;
+        }
+
+        .info-text span {
+          font-size: 18px;
+          color: #4a5568;
+        }
+
+        .success-actions {
+          display: flex;
+          gap: 20px;
+          justify-content: center;
+          margin-top: 40px;
+        }
+
+        .primary-action-touch, .secondary-action-touch {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 18px 30px;
+          border: none;
+          border-radius: 15px;
+          font-size: 18px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          min-width: 200px;
+          justify-content: center;
+        }
+
+        .primary-action-touch {
+          background: linear-gradient(135deg, #4A90E2, #2f97d1);
+          color: white;
+          box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .secondary-action-touch {
+          background: #f8fafc;
+          color: #4a5568;
+          border: 2px solid #e2e8f0;
+        }
+
+        .primary-action-touch:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 25px rgba(74, 144, 226, 0.4);
+        }
+
+        .secondary-action-touch:hover {
+          transform: translateY(-3px);
+          background: #edf2f7;
+        }
+
+        /* Compact Success Card - Fits viewport */
+        .success-card-compact {
+          background: white;
+          border-radius: 20px;
+          padding: 20px;
+          text-align: center;
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+          border: 3px solid var(--area-color, #48bb78);
+          max-width: 800px;
+          width: 100%;
+          margin: 0 auto;
+          box-sizing: border-box;
+        }
+
+        .success-card-compact .success-icon {
+          font-size: 60px;
+          color: #48bb78;
+          margin-bottom: 20px;
+        }
+
+        /* Estilos para pantalla de éxito mejorada con área */
+        .success-icon-area {
+          width: 90px;
+          height: 90px;
+          border-radius: 25px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          position: relative;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .success-area-icon {
+          font-size: 36px;
+          color: white;
+          filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .success-check-overlay {
+          position: absolute;
+          bottom: -8px;
+          right: -8px;
+          background: #48bb78;
+          color: white;
+          font-size: 24px;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 3px 10px rgba(72, 187, 120, 0.4);
+          border: 3px solid white;
+        }
+
+        .area-info-success {
+          text-align: center;
+          margin-bottom: 15px;
+          padding: 10px 20px;
+          background: var(--area-color-light, #4A90E220);
+          border-radius: 12px;
+          border: 2px solid var(--area-color, #4A90E2);
+        }
+
+        .area-info-success h3 {
+          color: var(--area-color, #4A90E2);
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+
+        /* Estilos para botón de generar turno */
+        .button-icon {
+          font-size: 28px;
+        }
+
+        .success-card-compact h1 {
+          font-size: 24px;
+          color: #2d3748;
+          margin-bottom: 15px;
+          font-weight: 700;
+        }
+
+        .turn-number-display-compact {
+          margin: 15px 0;
+          text-align: center;
+        }
+
+        .turn-number-display-compact .turn-label {
+          font-size: 14px;
+          margin-bottom: 8px;
+          color: #4a5568;
+          font-weight: 600;
+        }
+
+        .turn-number-display-compact .turn-number-big {
+          font-size: 48px;
+          font-weight: 900;
+          line-height: 1;
+          color: white;
+          padding: 15px 25px;
+          border-radius: 15px;
+          display: inline-block;
+          min-width: 160px;
+          text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .assignment-info-compact {
+          margin: 10px 0;
+        }
+
+        .info-row {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .info-item-compact {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px;
+          background: #f8fafc;
+          border-radius: 10px;
+          text-align: left;
+        }
+
+        .info-icon-small {
+          font-size: 16px;
+          color: #4A90E2;
+          flex-shrink: 0;
+        }
+
+        .info-text-compact {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .info-text-compact strong {
+          font-size: 12px;
+          color: #2d3748;
+        }
+
+        .info-text-compact span {
+          font-size: 14px;
+          color: #4a5568;
+        }
+
+        .redirect-info {
+          margin-top: 15px;
+          padding: 12px;
+          background: #f0f9ff;
+          border-radius: 10px;
+          border: 2px solid #bfdbfe;
+        }
+
+        .redirect-message {
+          font-size: 14px;
+          color: #1e40af;
+          margin-bottom: 10px;
+          font-weight: 600;
+        }
+
+        .countdown-display {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .countdown-circle {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .countdown-number {
+          color: white;
+          font-size: 18px;
+          font-weight: 700;
+        }
+
+        .countdown-text {
+          font-size: 12px;
+          color: #64748b;
+          margin: 0;
+        }
+
+        /* Confirmación de área */
+        .touch-confirmation {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 70vh;
+        }
+
+        .confirmation-card {
+          background: white;
+          border-radius: 30px;
+          padding: 50px;
+          text-align: center;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+          border: 3px solid #e2e8f0;
+          max-width: 900px;
+          width: 100%;
+        }
+
+        .back-button-container {
+          display: flex;
+          justify-content: flex-start;
+          margin-bottom: 30px;
+        }
+
+        .back-button-touch {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 20px;
+          background: #f8fafc;
+          color: #4a5568;
+          border: 2px solid #e2e8f0;
+          border-radius: 15px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .back-button-touch:hover {
+          background: #edf2f7;
+          transform: translateX(-3px);
+        }
+
+        .selected-area-display {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 30px;
+          margin: 40px 0;
+        }
+
+        .area-icon-huge {
+          width: 150px;
+          height: 150px;
+          border-radius: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 60px;
+          color: white;
+          position: relative;
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .area-letter-huge {
+          position: absolute;
+          bottom: -5px;
+          right: -5px;
+          background: rgba(255, 255, 255, 0.9);
+          color: #2d3748;
+          font-size: 24px;
+          font-weight: 700;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .area-info-confirmation {
+          text-align: center;
+        }
+
+        .area-info-confirmation h2 {
+          font-size: 36px;
+          margin-bottom: 15px;
+          font-weight: 700;
+        }
+
+        .area-info-confirmation p {
+          font-size: 18px;
+          color: #718096;
+          line-height: 1.6;
+        }
+
+        .confirmation-actions-touch {
+          margin-top: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .generate-turn-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+          padding: 35px 60px;
+          background: white !important;
+          color: #2d3748 !important;
+          border: 3px solid #e2e8f0;
+          border-radius: 25px;
+          font-size: 28px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          min-width: 500px;
+          min-height: 80px;
+          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .generate-turn-button span {
+          color: #2d3748 !important;
+        }
+
+        .generate-turn-button .button-icon {
+          color: #2d3748 !important;
+        }
+
+        .generate-turn-button:hover:not(:disabled) {
+          transform: translateY(-6px);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+          background: #f8fafc !important;
+          border-color: var(--area-color, #4A90E2);
+        }
+
+        .generate-turn-button:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        .button-spinner {
+          width: 32px;
+          height: 32px;
+          border: 4px solid rgba(255, 255, 255, 0.3);
+          border-top: 4px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        /* Selección de áreas */
+        .touch-areas {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .areas-instruction {
+          text-align: center;
+          margin-bottom: 25px;
+        }
+
+        .areas-instruction h2 {
+          font-size: 28px;
+          color: #2d3748;
+          margin-bottom: 10px;
+          font-weight: 700;
+        }
+
+        .areas-instruction p {
+          font-size: 18px;
+          color: #718096;
+        }
+
+        .areas-grid-touch {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          grid-template-rows: repeat(2, 1fr);
+          gap: 40px;
+          padding: 0;
+          max-width: 1600px;
+          margin: 0 auto;
+          height: auto;
+        }
+
+        .area-button-touch {
+          background: white;
+          border: 3px solid transparent;
+          border-radius: 20px;
+          padding: 40px 35px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+          min-height: 40px;
+          width: 100%;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .area-button-touch:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+          border-color: var(--area-color, #4A90E2);
+          background: var(--area-color-light, #4A90E220);
+        }
+
+        .area-icon-touch {
+          width: 120px;
+          height: 120px;
+          border-radius: 30px;
+          background: linear-gradient(135deg, var(--area-color, #4A90E2), var(--area-color-dark, #4A90E2dd));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 56px;
+          color: white;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .area-info-touch {
+          text-align: center;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        .area-info-touch h3 {
+          font-size: 30px;
+          font-weight: 700;
+          color: #2d3748;
+          margin-bottom: 8px;
+        }
+
+        .area-info-touch p {
+          font-size: 16px;
+          color: #718096;
+          font-weight: 500;
+        }
+
+        .area-badge-touch {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          background: var(--area-color, #4A90E2);
+          color: white;
+          font-size: 18px;
+          font-weight: 700;
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estado vacío */
+        .empty-state-touch {
+          text-align: center;
+          padding: 80px 20px;
+          color: #718096;
+        }
+
+        .empty-icon {
+          font-size: 120px;
+          color: #4A90E2;
+          margin-bottom: 30px;
+          opacity: 0.7;
+        }
+
+        .empty-state-touch h3 {
+          font-size: 28px;
+          color: #2d3748;
+          margin-bottom: 15px;
+          font-weight: 700;
+        }
+
+        .empty-state-touch p {
+          font-size: 18px;
+          color: #718096;
+        }
+
+        /* Mensaje de error */
+        .error-message-touch {
+          position: fixed;
+          bottom: 30px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1000;
+          max-width: 600px;
+          width: 90%;
+        }
+
+        .error-content {
+          background: #fed7d7;
+          color: #c53030;
+          padding: 20px 30px;
+          border-radius: 15px;
+          text-align: center;
+          box-shadow: 0 10px 30px rgba(197, 48, 48, 0.2);
+          border: 2px solid #feb2b2;
+        }
+
+        .error-content h3 {
+          margin: 0 0 10px 0;
+          font-size: 18px;
+        }
+
+        .error-content p {
+          margin: 0;
+          font-size: 16px;
+        }
+
+        /* Animaciones */
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+          .areas-grid-touch {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+          }
+          
+          .confirmation-card, .success-card {
+            padding: 40px 30px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .touch-header {
+            height: auto;
+            min-height: 120px;
+          }
+          
+          .header-content {
+            flex-direction: column;
+            padding: 10px;
+            gap: 10px;
+          }
+          
+          .header-logo-section {
+            min-width: auto;
+          }
+          
+          .touch-content {
+            margin-top: 140px;
+          }
+          
+          .areas-grid-touch {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+          
+          .area-button-touch {
+            padding: 30px 20px;
+            min-height: 160px;
+          }
+          
+          .page-title {
+            font-size: 24px;
+          }
+          
+          .areas-instruction h2 {
+            font-size: 28px;
+          }
+          
+          .success-actions {
+            flex-direction: column;
+            gap: 15px;
+          }
+          
+          .generate-turn-button {
+            min-width: 300px;
+            padding: 20px 30px;
+            font-size: 18px;
+          }
+          
+          .turn-number-big {
+            font-size: 60px;
+          }
+          
+          .success-card h1 {
+            font-size: 28px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .touch-content {
+            padding: 20px 15px;
+          }
+          
+          .confirmation-card, .success-card {
+            padding: 30px 20px;
+          }
+          
+          .area-icon-huge {
+            width: 120px;
+            height: 120px;
+            font-size: 48px;
+          }
+          
+          .area-info-confirmation h2 {
+            font-size: 28px;
+          }
+        }
+      `}</style>
       
       <Footer />
     </div>
