@@ -364,7 +364,6 @@ const TurnManager = () => {
 
   const loadTurns = async () => {
     try {
-      console.log('Loading turns with selectedStatus:', selectedStatus);
       let turnsData;
       const filters = {};
 
@@ -373,17 +372,20 @@ const TurnManager = () => {
       }
 
       if (selectedStatus === 'todos') {
-        console.log('Using getTurnsByDate with filters:', filters);
         turnsData = await turnService.getTurnsByDate(selectedDate, filters);
+        
+        // Si no hay turnos para la fecha específica, intentar obtener todos los turnos
+        if (!turnsData || turnsData.length === 0) {
+          turnsData = await turnService.getAllTurns(filters);
+        }
       } else {
-        console.log('Using getTurnsByStatus with status:', selectedStatus, 'and filters:', filters);
         turnsData = await turnService.getTurnsByStatus(selectedStatus, filters);
       }
 
       setTurns(turnsData || []);
     } catch (error) {
-      setError('Error cargando turnos: ' + error.message);
       console.error('Error cargando turnos:', error);
+      setError('Error cargando turnos: ' + error.message);
       setTurns([]);
     }
   };
@@ -411,12 +413,15 @@ const TurnManager = () => {
   const handleDelete = async (turn) => {
     if (window.confirm(`¿Estás seguro de eliminar el turno #${turn.i_numero_turno}?`)) {
       try {
+        console.log('🗑️ Intentando eliminar turno:', turn.uk_turno);
         await turnService.deleteTurn(turn.uk_turno);
+        console.log('✅ Turno eliminado exitosamente');
         await loadTurns();
         alert('Turno eliminado correctamente');
       } catch (error) {
+        console.error('❌ Error eliminando turno:', error);
+        console.error('❌ Detalles del error:', error.response?.data);
         alert('Error eliminando turno: ' + error.message);
-        console.error('Error eliminando turno:', error);
       }
     }
   };
@@ -777,6 +782,9 @@ const TurnManager = () => {
               Lista de Turnos
             </h3>
             <div className="card-actions">
+              <button className="card-action" onClick={handleAddNew} title="Agregar nuevo turno">
+                <FaPlus />
+              </button>
               <button className="card-action" title="Ver detalles">
                 <FaEye />
               </button>
