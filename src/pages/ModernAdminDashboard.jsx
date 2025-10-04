@@ -49,10 +49,10 @@ const ModernAdminDashboard = () => {
     });
     const [recentTurns, setRecentTurns] = useState([]);
     const [quickStats, setQuickStats] = useState({
-        todayGrowth: 12,
-        patientsGrowth: 8,
-        consultoriosActive: 5,
-        avgWaitTime: 15
+        todayGrowth: 0,
+        patientsGrowth: 0,
+        consultoriosActive: 0,
+        avgWaitTime: 0
     });
 
     // Detectar tema actual
@@ -134,7 +134,7 @@ const ModernAdminDashboard = () => {
 
     const statCards = [
         {
-            id: 'patients',
+            id: 'f',
             title: 'Total Pacientes',
             value: stats.totalPatients,
             icon: FaUsers,
@@ -166,7 +166,7 @@ const ModernAdminDashboard = () => {
             value: stats.activeTurns,
             icon: FaClock,
             color: 'warning',
-            growth: -3,
+            growth: 0,
             subtitle: `~${quickStats.avgWaitTime}min promedio`
         }
     ];

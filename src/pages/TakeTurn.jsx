@@ -41,7 +41,7 @@ const TakeTurn = () => {
 
   // Función mejorada para obtener iconos desde la base de datos
   const getAreaIcon = (areaName, areaData = null) => {
-    console.log('🎨 getAreaIcon llamada con:', { areaName, areaData });
+    console.log('getAreaIcon llamada con:', { areaName, areaData });
     
     // Si tenemos datos del área desde la BD, usar esos primero
     if (areaData && areaData.s_icono && areaData.s_color) {
@@ -49,7 +49,7 @@ const TakeTurn = () => {
       const color = areaData.s_color;
       const letter = areaData.s_letra || (areaData.s_nombre_area || areaName)?.charAt(0) || 'A';
       
-      console.log('✅ Usando datos de BD:', { iconName, color, letter });
+      console.log('Usando datos de BD:', { iconName, color, letter });
       
       // Mapear iconos de la BD a React Icons (nombres más comunes en Material Design)
       const iconMapping = {
@@ -131,7 +131,7 @@ const TakeTurn = () => {
       // Buscar el icono primero por nombre exacto, luego por nombre limpio
       const IconComponent = iconMapping[iconName] || iconMapping[cleanIconName] || iconMapping[iconName.toLowerCase()] || FaHospital;
       
-      console.log('🔍 Mapeo de icono:', { 
+      console.log('Mapeo de icono:', { 
         iconNameOriginal: iconName, 
         cleanIconName, 
         foundIconExact: !!iconMapping[iconName],
@@ -210,9 +210,9 @@ const TakeTurn = () => {
       });
 
       // Debug: Mostrar los datos exactos que llegan de la BD
-      console.log('🔍 Datos completos de áreas desde BD:', areasData);
+      console.log('Datos completos de áreas desde BD:', areasData);
       areasData.forEach((area, index) => {
-        console.log(`📋 Área ${index + 1}:`, {
+        console.log(`Área ${index + 1}:`, {
           nombre: area.s_nombre_area,
           icono: area.s_icono,
           color: area.s_color,

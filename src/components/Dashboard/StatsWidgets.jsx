@@ -53,7 +53,7 @@ const StatsWidgets = ({ stats, loading }) => {
             value: stats.totalPatients,
             icon: <FaUserInjured />,
             color: 'success',
-            trend: '+8%',
+            trend: '',
             trendUp: true,
             subtitle: 'Pacientes registrados'
         },

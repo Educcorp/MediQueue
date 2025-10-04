@@ -213,7 +213,7 @@ const AdminDashboard = () => {
                 <p>Total Turnos</p>
                 <div className="stat-trend">
                   <LuTrendingUp />
-                  <span>+12% este mes</span>
+                  <span>+1% este mes</span>
                 </div>
               </div>
             </div>
