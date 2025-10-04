@@ -183,7 +183,7 @@ export const THEME = {
 
 // Configuración de API
 export const API_CONFIG = {
-    BASE_URL: 'http://localhost:3000/api',
+    BASE_URL: 'http://localhost:3004/api',
     TIMEOUT: 30000,
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000

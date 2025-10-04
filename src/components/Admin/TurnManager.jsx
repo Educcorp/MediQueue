@@ -208,10 +208,6 @@ const TurnManager = () => {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   
-  // Estados para paginación
-  const [currentPage, setCurrentPage] = useState(1);
-  const turnsPerPage = 5;
-  
   const statusButtonRef = useRef(null);
   const areaButtonRef = useRef(null);
   
@@ -368,6 +364,7 @@ const TurnManager = () => {
 
   const loadTurns = async () => {
     try {
+      console.log('Loading turns with selectedStatus:', selectedStatus);
       let turnsData;
       const filters = {};
 
@@ -376,20 +373,17 @@ const TurnManager = () => {
       }
 
       if (selectedStatus === 'todos') {
+        console.log('Using getTurnsByDate with filters:', filters);
         turnsData = await turnService.getTurnsByDate(selectedDate, filters);
-        
-        // Si no hay turnos para la fecha específica, intentar obtener todos los turnos
-        if (!turnsData || turnsData.length === 0) {
-          turnsData = await turnService.getAllTurns(filters);
-        }
       } else {
+        console.log('Using getTurnsByStatus with status:', selectedStatus, 'and filters:', filters);
         turnsData = await turnService.getTurnsByStatus(selectedStatus, filters);
       }
 
       setTurns(turnsData || []);
     } catch (error) {
-      console.error('Error cargando turnos:', error);
       setError('Error cargando turnos: ' + error.message);
+      console.error('Error cargando turnos:', error);
       setTurns([]);
     }
   };
@@ -417,17 +411,12 @@ const TurnManager = () => {
   const handleDelete = async (turn) => {
     if (window.confirm(`¿Estás seguro de eliminar el turno #${turn.i_numero_turno}?`)) {
       try {
-        console.log('🗑️ Intentando eliminar turno:', turn.uk_turno);
-        console.log('🔍 Longitud del UUID:', turn.uk_turno?.length);
-        console.log('🔍 UUID completo:', JSON.stringify(turn.uk_turno));
         await turnService.deleteTurn(turn.uk_turno);
-        console.log('✅ Turno eliminado exitosamente');
         await loadTurns();
         alert('Turno eliminado correctamente');
       } catch (error) {
-        console.error('❌ Error eliminando turno:', error);
-        console.error('❌ Detalles del error:', error.response?.data);
         alert('Error eliminando turno: ' + error.message);
+        console.error('Error eliminando turno:', error);
       }
     }
   };
@@ -540,18 +529,9 @@ const TurnManager = () => {
     return statusObj ? statusObj.color : 'secondary';
   };
 
-  const getPatientName = (turn) => {
-    // Si el turno ya trae los nombres del paciente del backend, usarlos
-    if (turn.s_nombre_paciente && turn.s_apellido_paciente) {
-      if (turn.s_nombre_paciente === 'Paciente' && turn.s_apellido_paciente === 'Invitado') {
-        return 'Invitado';
-      }
-      return `${turn.s_nombre_paciente} ${turn.s_apellido_paciente}`;
-    }
-    
-    // Fallback al método original
-    if (!turn.uk_paciente) return 'Invitado';
-    const patient = patients.find(p => p.uk_paciente === turn.uk_paciente);
+  const getPatientName = (uk_paciente) => {
+    if (!uk_paciente) return 'Invitado';
+    const patient = patients.find(p => p.uk_paciente === uk_paciente);
     return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Paciente no encontrado';
   };
 
@@ -566,23 +546,6 @@ const TurnManager = () => {
     const area = areas.find(a => a.uk_area === consultorio.uk_area);
     return area ? area.s_nombre_area : '';
   };
-
-  // ===== LÓGICA DE PAGINACIÓN =====
-  const totalTurns = turns.length;
-  const totalPages = Math.ceil(totalTurns / turnsPerPage);
-  const startIndex = (currentPage - 1) * turnsPerPage;
-  const endIndex = startIndex + turnsPerPage;
-  const currentTurns = turns.slice(startIndex, endIndex);
-
-  const goToFirstPage = () => setCurrentPage(1);
-  const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
-  const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
-  const goToLastPage = () => setCurrentPage(totalPages);
-
-  // Resetear página al cambiar filtros
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedDate, selectedStatus, selectedArea]);
 
   if (loading) {
     return <TestSpinner message="Cargando turnos..." />;
@@ -814,9 +777,6 @@ const TurnManager = () => {
               Lista de Turnos
             </h3>
             <div className="card-actions">
-              <button className="card-action" onClick={handleAddNew} title="Agregar nuevo turno">
-                <FaPlus />
-              </button>
               <button className="card-action" title="Ver detalles">
                 <FaEye />
               </button>
@@ -832,39 +792,27 @@ const TurnManager = () => {
                 <FaCalendarCheck />
                 <h3>No hay turnos registrados</h3>
                 <p>No se encontraron turnos para los filtros seleccionados</p>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={handleAddNew}
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: '14px',
-                    fontWeight: 'normal',
-                    minWidth: 'auto',
-                    width: 'auto',
-                    maxWidth: '200px'
-                  }}
-                >
-                  Crear Turno
+                <button className="btn btn-primary" onClick={handleAddNew}>
+                  <FaPlus /> Crear Primer Turno
                 </button>
               </div>
             ) : (
-              <div>
-                <div className="data-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th># Turno</th>
-                        <th>Paciente</th>
-                        <th>Fecha</th>
-                        <th>Hora</th>
-                        <th>Estado</th>
-                        <th>Consultorio</th>
-                        <th>Área</th>
-                        <th>Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentTurns.map(turn => (
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th># Turno</th>
+                      <th>Paciente</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Estado</th>
+                      <th>Consultorio</th>
+                      <th>Área</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {turns.map(turn => (
                       <tr key={turn.uk_turno}>
                         <td>
                           <strong>#{turn.i_numero_turno}</strong>
@@ -872,7 +820,7 @@ const TurnManager = () => {
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
-                            {getPatientName(turn)}
+                            {getPatientName(turn.uk_paciente)}
                           </div>
                         </td>
                         <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
@@ -946,175 +894,8 @@ const TurnManager = () => {
                         </td>
                       </tr>
                     ))}
-                    
-                    {/* Filas vacías para mantener altura constante (solo después de página 1) */}
-                    {currentPage > 1 && Array.from({ length: turnsPerPage - currentTurns.length }, (_, index) => (
-                      <tr key={`empty-${index}`} style={{ 
-                        height: '60px',
-                        backgroundColor: 'transparent'
-                      }}>
-                        <td style={{ color: 'transparent' }}>-</td>
-                        <td style={{ color: 'transparent' }}>-</td>
-                        <td style={{ color: 'transparent' }}>-</td>
-                        <td style={{ color: 'transparent' }}>-</td>
-                        <td style={{ color: 'transparent' }}>-</td>
-                        <td style={{ color: 'transparent' }}>-</td>
-                        <td style={{ color: 'transparent' }}>-</td>
-                        <td style={{ color: 'transparent' }}>-</td>
-                      </tr>
-                    ))}
                   </tbody>
                 </table>
-              </div>
-              
-              {/* Barra de Paginación */}
-              {totalTurns > turnsPerPage && (
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '15px',
-                  marginTop: '20px',
-                  padding: '15px',
-                  backgroundColor: isDarkMode ? '#1a252f' : '#f8f9fa',
-                  borderTop: `1px solid ${isDarkMode ? '#2c3e50' : '#dee2e6'}`,
-                  borderRadius: '0 0 8px 8px'
-                }}>
-                  {/* Primera página */}
-                  <button 
-                    onClick={goToFirstPage} 
-                    disabled={currentPage === 1}
-                    style={{
-                      padding: '12px 16px',
-                      backgroundColor: 'transparent',
-                      color: currentPage === 1 ? '#6c757d' : (isDarkMode ? '#74b9ff' : '#007bff'),
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                      fontSize: '18px',
-                      fontWeight: '900',
-                      transition: 'all 0.3s ease',
-                      textShadow: currentPage === 1 ? 'none' : (isDarkMode ? '0 0 8px rgba(116, 185, 255, 0.5)' : '0 0 6px rgba(0, 123, 255, 0.3)')
-                    }}
-                    title="Primera página"
-                    onMouseEnter={(e) => {
-                      if (currentPage !== 1) {
-                        e.target.style.backgroundColor = isDarkMode ? 'rgba(52, 73, 94, 0.3)' : 'rgba(227, 242, 253, 0.5)';
-                        e.target.style.textShadow = isDarkMode ? '0 0 12px rgba(116, 185, 255, 0.8)' : '0 0 8px rgba(0, 123, 255, 0.5)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    &lt;&lt;
-                  </button>
-                  
-                  {/* Página anterior */}
-                  <button 
-                    onClick={goToPreviousPage} 
-                    disabled={currentPage === 1}
-                    style={{
-                      padding: '12px 16px',
-                      backgroundColor: 'transparent',
-                      color: currentPage === 1 ? '#6c757d' : (isDarkMode ? '#74b9ff' : '#007bff'),
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                      fontSize: '18px',
-                      fontWeight: '900',
-                      transition: 'all 0.3s ease',
-                      textShadow: currentPage === 1 ? 'none' : (isDarkMode ? '0 0 8px rgba(116, 185, 255, 0.5)' : '0 0 6px rgba(0, 123, 255, 0.3)')
-                    }}
-                    title="Página anterior"
-                    onMouseEnter={(e) => {
-                      if (currentPage !== 1) {
-                        e.target.style.backgroundColor = isDarkMode ? 'rgba(52, 73, 94, 0.3)' : 'rgba(227, 242, 253, 0.5)';
-                        e.target.style.textShadow = isDarkMode ? '0 0 12px rgba(116, 185, 255, 0.8)' : '0 0 8px rgba(0, 123, 255, 0.5)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    &lt;
-                  </button>
-                  
-                  {/* Indicador de página */}
-                  <div style={{ 
-                    padding: '12px 24px',
-                    backgroundColor: 'transparent',
-                    color: isDarkMode ? '#ecf0f1' : '#495057',
-                    borderRadius: '8px',
-                    fontWeight: 'bold',
-                    fontSize: '15px',
-                    border: `1px solid ${isDarkMode ? '#2c3e50' : '#dee2e6'}`,
-                    textShadow: isDarkMode ? '0 0 6px rgba(236, 240, 241, 0.3)' : 'none'
-                  }}>
-                    Página {currentPage} de {totalPages} | {totalTurns} turnos total
-                  </div>
-                  
-                  {/* Página siguiente */}
-                  <button 
-                    onClick={goToNextPage} 
-                    disabled={currentPage === totalPages}
-                    style={{
-                      padding: '12px 16px',
-                      backgroundColor: 'transparent',
-                      color: currentPage === totalPages ? '#6c757d' : (isDarkMode ? '#74b9ff' : '#007bff'),
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                      fontSize: '18px',
-                      fontWeight: '900',
-                      transition: 'all 0.3s ease',
-                      textShadow: currentPage === totalPages ? 'none' : (isDarkMode ? '0 0 8px rgba(116, 185, 255, 0.5)' : '0 0 6px rgba(0, 123, 255, 0.3)')
-                    }}
-                    title="Página siguiente"
-                    onMouseEnter={(e) => {
-                      if (currentPage !== totalPages) {
-                        e.target.style.backgroundColor = isDarkMode ? 'rgba(52, 73, 94, 0.3)' : 'rgba(227, 242, 253, 0.5)';
-                        e.target.style.textShadow = isDarkMode ? '0 0 12px rgba(116, 185, 255, 0.8)' : '0 0 8px rgba(0, 123, 255, 0.5)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    &gt;
-                  </button>
-                  
-                  {/* Última página */}
-                  <button 
-                    onClick={goToLastPage} 
-                    disabled={currentPage === totalPages}
-                    style={{
-                      padding: '12px 16px',
-                      backgroundColor: 'transparent',
-                      color: currentPage === totalPages ? '#6c757d' : (isDarkMode ? '#74b9ff' : '#007bff'),
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                      fontSize: '18px',
-                      fontWeight: '900',
-                      transition: 'all 0.3s ease',
-                      textShadow: currentPage === totalPages ? 'none' : (isDarkMode ? '0 0 8px rgba(116, 185, 255, 0.5)' : '0 0 6px rgba(0, 123, 255, 0.3)')
-                    }}
-                    title="Última página"
-                    onMouseEnter={(e) => {
-                      if (currentPage !== totalPages) {
-                        e.target.style.backgroundColor = isDarkMode ? 'rgba(52, 73, 94, 0.3)' : 'rgba(227, 242, 253, 0.5)';
-                        e.target.style.textShadow = isDarkMode ? '0 0 12px rgba(116, 185, 255, 0.8)' : '0 0 8px rgba(0, 123, 255, 0.5)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    &gt;&gt;
-                  </button>
-                </div>
-              )}
               </div>
             )}
           </div>
