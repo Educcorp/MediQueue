@@ -307,7 +307,7 @@ const TakeTurn = () => {
                 <FaHandPaper className="title-icon" />
                 Tomar Turno
               </h1>
-              <p className="page-subtitle">Seleccione el área médica para generar su turno</p>
+              <p className="page-subtitle"></p>
             </div>
           </div>
 
