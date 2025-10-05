@@ -1,0 +1,315 @@
+/* Pantalla de carga minimalista para MediQueue */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.minimal-loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg,
+            #f8f9fa 0%,
+            #e9ecef 50%,
+            #dee2e6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    z-index: 9999;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.minimal-loading-container {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-radius: 24px;
+    padding: 40px 50px;
+    text-align: center;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        0 8px 24px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    max-width: 320px;
+    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Icono médico simple */
+.minimal-medical-icon {
+    margin-bottom: 24px;
+    animation: iconEntrance 0.8s ease-out 0.2s both;
+}
+
+@keyframes iconEntrance {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.medical-cross-simple {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    margin: 0 auto;
+}
+
+.cross-h,
+.cross-v {
+    position: absolute;
+    background: linear-gradient(135deg, #77b8ce, #6c757d);
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(119, 184, 206, 0.3);
+}
+
+.cross-h {
+    width: 48px;
+    height: 8px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cross-v {
+    width: 8px;
+    height: 48px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Título */
+.minimal-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #2c3e50 0%, #495057 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titleFade 0.8s ease-out 0.4s both;
+}
+
+@keyframes titleFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Spinner minimalista */
+.minimal-spinner {
+    margin: 32px 0;
+    display: flex;
+    justify-content: center;
+    animation: spinnerFade 0.8s ease-out 0.6s both;
+}
+
+@keyframes spinnerFade {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.loading-screen-circle {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #77b8ce;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(119, 184, 206, 0.3);
+    animation: adminPulse 2s ease-in-out infinite;
+}
+
+@keyframes adminPulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        box-shadow: 0 0 10px rgba(119, 184, 206, 0.2);
+    }
+
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 25px rgba(119, 184, 206, 0.4);
+    }
+}
+
+/* Mensaje */
+.minimal-message {
+    font-size: 16px;
+    color: #495057;
+    font-weight: 500;
+    margin-bottom: 20px;
+    opacity: 0.9;
+    animation: messageFade 0.8s ease-out 0.8s both;
+}
+
+@keyframes messageFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 0.9;
+        transform: translateY(0);
+    }
+}
+
+/* Barra de progreso minimalista */
+.minimal-progress {
+    margin-top: 24px;
+    animation: progressFade 0.8s ease-out 1s both;
+}
+
+@keyframes progressFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.progress-bar-minimal {
+    width: 100%;
+    height: 4px;
+    background: rgba(119, 184, 206, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.progress-fill-minimal {
+    height: 100%;
+    background: linear-gradient(90deg, #77b8ce, #6c757d);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-fill-minimal::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent);
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.progress-percentage {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .minimal-loading-container {
+        margin: 20px;
+        padding: 32px 24px;
+        max-width: 280px;
+    }
+
+    .minimal-title {
+        font-size: 24px;
+    }
+
+    .medical-cross-simple {
+        width: 40px;
+        height: 40px;
+    }
+
+    .cross-h {
+        width: 40px;
+        height: 6px;
+    }
+
+    .cross-v {
+        width: 6px;
+        height: 40px;
+    }
+
+    .loading-screen-circle {
+        width: 36px;
+        height: 36px;
+        border-width: 2px;
+    }
+
+    .minimal-message {
+        font-size: 14px;
+    }
+}
+
+/* Hover effects en desktop */
+@media (hover: hover) {
+    .minimal-loading-container:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 25px 70px rgba(0, 0, 0, 0.2),
+            0 12px 32px rgba(0, 0, 0, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        transition: all 0.3s ease;
+    }
+}

@@ -1,0 +1,698 @@
+/* MediQueue Chatbot Styles - Temática Médica */
+
+.mediqueue-chatbot-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Botón principal del chatbot con tema médico */
+.mediqueue-chatbot-toggle {
+    background: linear-gradient(135deg, #77b8ce 0%, #a8d1e0 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(119, 184, 206, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.mediqueue-chatbot-toggle::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.6s ease;
+}
+
+.mediqueue-chatbot-toggle:hover::before {
+    transform: scale(1);
+}
+
+.mediqueue-chatbot-toggle:hover {
+    transform: scale(1.05) translateZ(0);
+    box-shadow: 0 6px 20px rgba(119, 184, 206, 0.4);
+}
+
+.mediqueue-chatbot-toggle:active {
+    transform: scale(0.95) translateZ(0);
+}
+
+/* Ventana principal del chatbot */
+.mediqueue-chatbot-window {
+    width: 360px;
+    height: 500px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(119, 184, 206, 0.12), 0 2px 8px rgba(119, 184, 206, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: mediqueueFadeIn 0.3s ease-out;
+    border: 1px solid #77b8ce;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.mediqueue-chatbot-window.minimized {
+    height: 60px;
+    transition: height 0.3s ease-in-out;
+}
+
+/* Header con gradiente médico */
+.mediqueue-chatbot-header {
+    background: linear-gradient(135deg, #77b8ce 0%, #a8d1e0 100%);
+    color: #ffffff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #a8d1e0;
+    position: relative;
+}
+
+.mediqueue-chatbot-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.mediqueue-chatbot-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mediqueue-chatbot-header-icon {
+    font-size: 1.2rem;
+    animation: mediqueueHeartbeat 2s infinite;
+}
+
+/* Controles del header */
+.mediqueue-chatbot-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.mediqueue-chatbot-control-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #ffffff;
+}
+
+.mediqueue-chatbot-control-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Área de mensajes */
+.mediqueue-chatbot-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+}
+
+.mediqueue-chatbot-messages::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to bottom, rgba(248, 249, 250, 0.8), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.mediqueue-chatbot-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mediqueue-chatbot-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.mediqueue-chatbot-messages::-webkit-scrollbar-thumb {
+    background: #77b8ce;
+    border-radius: 3px;
+}
+
+.mediqueue-chatbot-messages::-webkit-scrollbar-thumb:hover {
+    background: #5a9bb0;
+}
+
+/* Estilos de mensajes */
+.mediqueue-chatbot-message {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-break: break-word;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    animation: mediqueueSlideIn 0.3s ease-out;
+}
+
+.mediqueue-chatbot-message.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #77b8ce 0%, #a8d1e0 100%);
+    color: #ffffff;
+    border-bottom-right-radius: 5px;
+    margin-left: 20px;
+}
+
+.mediqueue-chatbot-message.bot {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #2c3e50;
+    border-bottom-left-radius: 5px;
+    margin-right: 20px;
+    border: 1px solid #e9ecef;
+}
+
+/* Íconos de mensaje */
+.mediqueue-chatbot-message-icon {
+    position: absolute;
+    top: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mediqueue-chatbot-message.user .mediqueue-chatbot-message-icon {
+    right: -8px;
+    background: #77b8ce;
+    color: #ffffff;
+}
+
+.mediqueue-chatbot-message.bot .mediqueue-chatbot-message-icon {
+    left: -8px;
+    background: #f8f9fa;
+    color: #77b8ce;
+    border: 1px solid #e9ecef;
+}
+
+/* Indicador de escritura */
+.mediqueue-chatbot-typing {
+    align-self: flex-start;
+    background: #e9ecef;
+    border-radius: 18px;
+    padding: 8px 16px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    animation: mediqueueFadeIn 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Puntos de escritura */
+.mediqueue-chatbot-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #77b8ce;
+    opacity: 0.7;
+}
+
+/* Área de input */
+.mediqueue-chatbot-input-area {
+    display: flex;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.mediqueue-chatbot-input-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(119, 184, 206, 0.3), transparent);
+}
+
+.mediqueue-chatbot-input-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 30px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.mediqueue-chatbot-input-wrapper:focus-within {
+    box-shadow: 0 0 0 2px rgba(119, 184, 206, 0.2);
+    border-color: #77b8ce;
+    transform: translateY(-1px);
+}
+
+.mediqueue-chatbot-input {
+    flex: 1;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    outline: none;
+    background: transparent;
+    color: #2c3e50;
+    font-family: inherit;
+}
+
+.mediqueue-chatbot-input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Botón de envío */
+.mediqueue-chatbot-send-btn {
+    background: linear-gradient(135deg, #77b8ce 0%, #a8d1e0 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+    box-shadow: 0 2px 5px rgba(119, 184, 206, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.mediqueue-chatbot-send-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.mediqueue-chatbot-send-btn:hover::before {
+    left: 100%;
+}
+
+.mediqueue-chatbot-send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(119, 184, 206, 0.3);
+}
+
+.mediqueue-chatbot-send-btn:active {
+    transform: scale(0.95);
+}
+
+.mediqueue-chatbot-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: scale(1);
+}
+
+.mediqueue-chatbot-send-btn:disabled:hover {
+    transform: scale(1);
+    box-shadow: 0 2px 5px rgba(119, 184, 206, 0.2);
+}
+
+/* Mensaje promocional */
+.mediqueue-chatbot-promo {
+    position: absolute;
+    bottom: 75px;
+    right: 10px;
+    background: #ffffff;
+    color: #2c3e50;
+    padding: 12px 16px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(119, 184, 206, 0.15);
+    max-width: 220px;
+    font-size: 0.9rem;
+    border: 1px solid #77b8ce;
+    cursor: pointer;
+    animation: mediqueueSlideInRight 0.3s ease-out;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.mediqueue-chatbot-promo::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #77b8ce;
+}
+
+.mediqueue-chatbot-promo::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #ffffff;
+}
+
+.mediqueue-chatbot-promo-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #77b8ce;
+    margin-bottom: 8px;
+}
+
+.mediqueue-chatbot-promo-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    transition: all 0.2s ease;
+}
+
+.mediqueue-chatbot-promo-close:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+/* Animaciones */
+@keyframes mediqueueFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes mediqueueSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes mediqueueSlideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes mediqueueBounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes mediqueuePulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes mediqueueSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes mediqueueHeartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.1);
+    }
+
+    50% {
+        transform: scale(1);
+    }
+
+    75% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes mediqueueFloatUpDown {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* Clases para animaciones */
+.mediqueue-chatbot-toggle-icon {
+    animation: mediqueuePulse 2s infinite;
+}
+
+.mediqueue-chatbot-message {
+    animation: mediqueueSlideIn 0.3s ease;
+}
+
+.mediqueue-chatbot-dot-1 {
+    animation: mediqueueBounce 1.4s infinite ease-in-out;
+    animation-delay: 0s;
+}
+
+.mediqueue-chatbot-dot-2 {
+    animation: mediqueueBounce 1.4s infinite ease-in-out;
+    animation-delay: 0.2s;
+}
+
+.mediqueue-chatbot-dot-3 {
+    animation: mediqueueBounce 1.4s infinite ease-in-out;
+    animation-delay: 0.4s;
+}
+
+.mediqueue-chatbot-spinner {
+    animation: mediqueueSpin 1s linear infinite;
+}
+
+.mediqueue-chatbot-promo-icon {
+    animation: mediqueueFloatUpDown 2s infinite ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mediqueue-chatbot-container {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .mediqueue-chatbot-toggle {
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
+    }
+
+    .mediqueue-chatbot-window {
+        width: calc(100vw - 40px);
+        max-width: 340px;
+        height: 450px;
+    }
+
+    .mediqueue-chatbot-promo {
+        max-width: 200px;
+        right: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mediqueue-chatbot-window {
+        width: calc(100vw - 20px);
+        height: 400px;
+    }
+
+    .mediqueue-chatbot-messages {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .mediqueue-chatbot-message {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+
+    .mediqueue-chatbot-promo {
+        max-width: 180px;
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+}
+
+/* Estados de hover mejorados */
+.mediqueue-chatbot-message:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mediqueue-chatbot-promo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(119, 184, 206, 0.2);
+}
+
+/* Efectos de glassmorphism */
+.mediqueue-chatbot-window {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.mediqueue-chatbot-promo {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Indicadores de estado */
+.mediqueue-chatbot-online-indicator {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: #28a745;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    animation: mediqueuePulse 2s infinite;
+}
+
+/* Tema oscuro (opcional - para futuro) */
+@media (prefers-color-scheme: dark) {
+    .mediqueue-chatbot-window {
+        background: rgba(44, 62, 80, 0.95);
+        color: #ffffff;
+    }
+
+    .mediqueue-chatbot-messages {
+        background: #2c3e50;
+    }
+
+    .mediqueue-chatbot-message.bot {
+        background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        color: #ffffff;
+        border-color: #34495e;
+    }
+
+    .mediqueue-chatbot-input-area {
+        background: #2c3e50;
+        border-top-color: #34495e;
+    }
+
+    .mediqueue-chatbot-input-wrapper {
+        background: #34495e;
+        border-color: #34495e;
+    }
+
+    .mediqueue-chatbot-input {
+        color: #ffffff;
+    }
+
+    .mediqueue-chatbot-input::placeholder {
+        color: #95a5a6;
+    }
+}

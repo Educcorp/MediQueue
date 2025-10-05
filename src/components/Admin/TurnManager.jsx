@@ -1,27 +1,220 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import AdminHeader from '../Common/AdminHeader';
+import AdminFooter from '../Common/AdminFooter';
+import TestSpinner from '../Common/TestSpinner';
+import Chatbot from '../Common/Chatbot';
 import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
+import consultorioService from '../../services/consultorioService';
+import areaService from '../../services/areaService';
+import '../../styles/UnifiedAdminPages.css';
+
+// React Icons
+import {
+  FaCalendarCheck,
+  FaUsers,
+  FaClock,
+  FaEdit,
+  FaTrash,
+  FaCheck,
+  FaTimes,
+  FaExclamationTriangle,
+  FaEye,
+  FaFilter,
+  FaPlus,
+  FaSync,
+  FaUser,
+  FaHospital,
+  FaClipboardList,
+  FaUserMd,
+  FaHeart,
+  FaBaby,
+  FaTooth,
+  FaBrain,
+  FaSyringe,
+  FaEyeDropper,
+  FaBone,
+  FaCamera,
+  FaBandAid,
+  FaHeadSideVirus,
+  FaUserNurse,
+  FaUserTimes,
+  FaList
+} from 'react-icons/fa';
+import {
+  MdPregnantWoman,
+  MdPsychology
+} from 'react-icons/md';
+
+
+// Función para obtener el icono minimalista del área
+const getAreaIcon = (areaName) => {
+  const iconMap = {
+    'Medicina General': FaUserMd,
+    'Pediatría': FaBaby,
+    'Ginecólogo': MdPregnantWoman,
+    'Dentista': FaTooth,
+    'Neurólogo': FaHeadSideVirus,
+    'Neurología': FaHeadSideVirus,
+    'Enfermería': FaSyringe,
+    'Cardiología': FaHeart,
+    'Dermatología': FaBandAid,
+    'Oftalmología': FaEyeDropper,
+    'Traumatología': FaBone,
+    'Psicología': MdPsychology,
+    'Radiología': FaCamera,
+    // Agregando variaciones comunes de nombres
+    'area': FaHospital,
+    'Area Prueba': FaHospital,
+    'Ginecólogo': MdPregnantWoman,
+    'Enfermeria': FaSyringe,  // Sin tilde
+    'Pediatria': FaBaby,      // Sin tilde
+    'Neurologia': FaHeadSideVirus, // Sin tilde
+    'Cardiologia': FaHeart,   // Sin tilde
+    'Dermatologia': FaBandAid, // Sin tilde
+    'Oftalmologia': FaEyeDropper, // Sin tilde
+    'Traumatologia': FaBone,  // Sin tilde
+    'Psicologia': MdPsychology, // Sin tilde
+    'Radiologia': FaCamera    // Sin tilde
+  };
+  
+  return iconMap[areaName] || FaHospital;
+};
+
+// Función para obtener el icono del estado
+const getStatusIcon = (status) => {
+  const statusIconMap = {
+    'EN_ESPERA': FaClock,
+    'EN_ATENCION': FaUserMd, // Cambio a FaUserMd que sí existe
+    'ATENDIDO': FaCheck,
+    'CANCELADO': FaTimes,
+    'NO_PRESENTE': FaUserTimes,
+    'todos': FaList
+  };
+  
+  return statusIconMap[status] || FaList;
+};
+
+// Función para obtener el color del estado
+const getStatusColor = (status) => {
+  const statusColorMap = {
+    'EN_ESPERA': '#ffc107',
+    'EN_ATENCION': '#17a2b8', 
+    'ATENDIDO': '#28a745',
+    'CANCELADO': '#dc3545',
+    'NO_PRESENTE': '#fd7e14',
+    'todos': '#6c757d'
+  };
+  
+  return statusColorMap[status] || '#6c757d';
+};
+
+// Función para obtener la clase CSS del área
+const getAreaClass = (areaName) => {
+  const classMap = {
+    'Medicina General': 'medicina-general',
+    'Pediatría': 'pediatria',
+    'Ginecólogo': 'ginecologo',
+    'Dentista': 'dentista',
+    'Neurólogo': 'neurologo',
+    'Neurología': 'neurologo',
+    'Enfermería': 'enfermeria',
+    'Cardiología': 'cardiologia',
+    'Dermatología': 'dermatologia',
+    'Oftalmología': 'oftalmologia',
+    'Traumatología': 'traumatologia',
+    'Psicología': 'psicologia',
+    'Radiología': 'radiologia',
+    // Variaciones sin tildes y casos especiales
+    'area': '',
+    'Area Prueba': '',
+    'Ginecólogo': 'ginecologo',
+    'Enfermeria': 'enfermeria',
+    'Pediatria': 'pediatria',
+    'Neurologia': 'neurologo',
+    'Cardiologia': 'cardiologia',
+    'Dermatologia': 'dermatologia',
+    'Oftalmologia': 'oftalmologia',
+    'Traumatologia': 'traumatologia',
+    'Psicologia': 'psicologia',
+    'Radiologia': 'radiologia'
+  };
+  
+  return classMap[areaName] || '';
+};
 
 const TurnManager = () => {
   const [turns, setTurns] = useState([]);
   const [patients, setPatients] = useState([]);
+  const [consultorios, setConsultorios] = useState([]);
+  const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Detectar tema actual
+  const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
+  const isDarkMode = theme === 'dark';
+
+  // Escuchar cambios de tema
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      if (currentTheme !== theme) {
+        setTheme(currentTheme);
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [theme]);
+
+  // Cerrar dropdown cuando se hace click fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.custom-status-select')) {
+        setStatusDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   const [showModal, setShowModal] = useState(false);
   const [editingTurn, setEditingTurn] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  // Función para obtener la fecha actual en formato YYYY-MM-DD
+  const getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
   const [selectedStatus, setSelectedStatus] = useState('todos');
+  const [selectedArea, setSelectedArea] = useState('todas');
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  
+  const statusButtonRef = useRef(null);
+  const areaButtonRef = useRef(null);
+  
   const [formData, setFormData] = useState({
-    numero_turno: '',
-    estado: 'En espera',
-    fecha: new Date().toISOString().split('T')[0],
-    hora: '',
-    id_paciente: '',
-    id_consultorio: 1,
-    id_administrador: '',
-    id_area: ''
+    uk_consultorio: '',
+    uk_paciente: '',
+    s_observaciones: ''
   });
 
   const { user, logout } = useAuth();
@@ -29,99 +222,178 @@ const TurnManager = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'En espera', label: 'En espera', color: '#4299e1' },
-    { value: 'Llamando', label: 'Llamando', color: '#805ad5' },
-    { value: 'Atendido', label: 'Atendido', color: '#48bb78' },
-    { value: 'Cancelado', label: 'Cancelado', color: '#e53e3e' }
+    { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
+    { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
+    { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
+    { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
+    { value: 'NO_PRESENTE', label: 'No presente', color: 'secondary', indicator: '#fd7e14' }
   ];
 
   // Cargar datos al montar el componente
   useEffect(() => {
-    loadData();
+    // Mostrar spinner brevemente para mejor UX
+    setLoading(true);
+    setTimeout(() => {
+      loadData();
+    }, 800);
   }, []);
 
-  // Cargar turnos cuando cambie la fecha o estado
+  // Cargar turnos cuando cambie la fecha, estado o área
   useEffect(() => {
     loadTurns();
-  }, [selectedDate, selectedStatus]);
+  }, [selectedDate, selectedStatus, selectedArea]);
+
+  // Efecto para actualizar la fecha automáticamente cada día
+  useEffect(() => {
+    // Función para actualizar la fecha si ha cambiado
+    const updateDateIfNeeded = () => {
+      const currentDate = getCurrentDate();
+      if (selectedDate !== currentDate) {
+        setSelectedDate(currentDate);
+      }
+    };
+
+    // Verificar inmediatamente al cargar el componente
+    updateDateIfNeeded();
+
+    // Calcular cuánto tiempo falta hasta la próxima medianoche
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setDate(now.getDate() + 1);
+    nextMidnight.setHours(0, 0, 0, 0);
+    const timeUntilMidnight = nextMidnight.getTime() - now.getTime();
+
+    // Establecer timeout para la primera actualización a medianoche
+    const midnightTimeout = setTimeout(() => {
+      updateDateIfNeeded();
+      
+      // Después de la primera actualización, establecer intervalo cada 24 horas
+      const dailyInterval = setInterval(updateDateIfNeeded, 24 * 60 * 60 * 1000);
+      
+      // Cleanup del intervalo
+      return () => clearInterval(dailyInterval);
+    }, timeUntilMidnight);
+
+    // Verificación cada minuto para asegurar que no se pierda el cambio de día
+    const minuteInterval = setInterval(updateDateIfNeeded, 60 * 1000);
+
+    // Cleanup
+    return () => {
+      clearTimeout(midnightTimeout);
+      clearInterval(minuteInterval);
+    };
+  }, []); // Solo se ejecuta una vez al montar el componente
+
+  // Cerrar dropdowns al hacer scroll externo o resize
+  useEffect(() => {
+    const handleScroll = (e) => {
+      // Verificar si el target y los métodos existen antes de usarlos
+      if (!e.target) return;
+      
+      // No cerrar si el scroll es dentro del dropdown
+      try {
+        if ((e.target.classList && e.target.classList.contains('status-dropdown-menu')) || 
+            (e.target.classList && e.target.classList.contains('area-dropdown-menu')) ||
+            (e.target.closest && e.target.closest('.status-dropdown-menu')) ||
+            (e.target.closest && e.target.closest('.area-dropdown-menu'))) {
+          return;
+        }
+      } catch (error) {
+        // Si hay error en la detección, simplemente continuar
+        console.warn('Error in scroll detection:', error);
+      }
+      
+      // Cerrar dropdowns solo si es scroll externo
+      if (statusDropdownOpen || areaDropdownOpen) {
+        setStatusDropdownOpen(false);
+        setAreaDropdownOpen(false);
+      }
+    };
+
+    const handleResize = () => {
+      if (statusDropdownOpen || areaDropdownOpen) {
+        setStatusDropdownOpen(false);
+        setAreaDropdownOpen(false);
+      }
+    };
+
+    if (statusDropdownOpen || areaDropdownOpen) {
+      document.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        document.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [statusDropdownOpen, areaDropdownOpen]);
 
   const loadData = async () => {
     try {
-      setLoading(true);
       setError(null);
 
-      // Cargar pacientes y turnos en paralelo
-      const [patientsData, turnsData] = await Promise.all([
+      // Cargar datos en paralelo
+      const [patientsData, consultoriosData, areasData] = await Promise.all([
         patientService.getAllPatients().catch(err => {
           console.warn('Error cargando pacientes:', err);
-          return []; // Retornar array vacío si falla
+          return [];
         }),
-        turnService.getAllTurns().catch(err => {
-          console.warn('Error cargando turnos:', err);
-          return []; // Retornar array vacío si falla
+        consultorioService.getAll().catch(err => {
+          console.warn('Error cargando consultorios:', err);
+          return [];
+        }),
+        areaService.getAll().catch(err => {
+          console.warn('Error cargando áreas:', err);
+          return [];
         })
       ]);
 
       setPatients(patientsData);
-      setTurns(turnsData);
+      setConsultorios(consultoriosData);
+      setAreas(areasData);
     } catch (error) {
       setError('Error cargando datos: ' + error.message);
       console.error('Error cargando datos:', error);
     } finally {
-      setLoading(false);
+      // Delay mínimo para transición suave del spinner
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
     }
   };
 
   const loadTurns = async () => {
     try {
+      console.log('Loading turns with selectedStatus:', selectedStatus);
       let turnsData;
-      if (selectedStatus === 'todos') {
-        // Intentar obtener turnos por fecha, si falla usar getAllTurns
-        try {
-          turnsData = await turnService.getTurnsByDate(selectedDate, { id_area: formData.id_area || undefined });
-        } catch (dateError) {
-          console.warn('Error obteniendo turnos por fecha, usando getAllTurns:', dateError);
-          turnsData = await turnService.getAllTurns({ id_area: formData.id_area || undefined });
-          // Filtrar por fecha en el frontend si es necesario
-          if (turnsData && Array.isArray(turnsData)) {
-            turnsData = turnsData.filter(turn => turn.fecha === selectedDate);
-          }
-        }
-      } else {
-        try {
-          turnsData = await turnService.getTurnsByStatus(selectedStatus, { id_area: formData.id_area || undefined });
-        } catch (statusError) {
-          console.warn('Error obteniendo turnos por estado, usando getAllTurns:', statusError);
-          turnsData = await turnService.getAllTurns({ id_area: formData.id_area || undefined });
-          // Filtrar por estado en el frontend si es necesario
-          if (turnsData && Array.isArray(turnsData)) {
-            turnsData = turnsData.filter(turn => turn.estado === selectedStatus);
-          }
-        }
+      const filters = {};
+
+      if (selectedArea !== 'todas') {
+        filters.uk_area = selectedArea;
       }
+
+      if (selectedStatus === 'todos') {
+        console.log('Using getTurnsByDate with filters:', filters);
+        turnsData = await turnService.getTurnsByDate(selectedDate, filters);
+      } else {
+        console.log('Using getTurnsByStatus with status:', selectedStatus, 'and filters:', filters);
+        turnsData = await turnService.getTurnsByStatus(selectedStatus, filters);
+      }
+
       setTurns(turnsData || []);
     } catch (error) {
       setError('Error cargando turnos: ' + error.message);
       console.error('Error cargando turnos:', error);
-      setTurns([]); // Asegurar que turns sea un array
+      setTurns([]);
     }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/admin');
   };
 
   const handleAddNew = () => {
     setEditingTurn(null);
     setFormData({
-      numero_turno: '',
-      estado: 'En espera',
-      fecha: selectedDate,
-      hora: '',
-      id_paciente: '',
-      id_consultorio: 1,
-      id_administrador: user?.id_administrador || ''
+      uk_consultorio: '',
+      uk_paciente: '',
+      s_observaciones: ''
     });
     setShowModal(true);
   };
@@ -129,21 +401,17 @@ const TurnManager = () => {
   const handleEdit = (turn) => {
     setEditingTurn(turn);
     setFormData({
-      numero_turno: turn.numero_turno,
-      estado: turn.estado,
-      fecha: turn.fecha,
-      hora: turn.hora,
-      id_paciente: turn.id_paciente,
-      id_consultorio: turn.id_consultorio,
-      id_administrador: turn.id_administrador
+      uk_consultorio: turn.uk_consultorio,
+      uk_paciente: turn.uk_paciente || '',
+      s_observaciones: turn.s_observaciones || ''
     });
     setShowModal(true);
   };
 
   const handleDelete = async (turn) => {
-    if (window.confirm(`¿Estás seguro de eliminar el turno #${turn.numero_turno}?`)) {
+    if (window.confirm(`¿Estás seguro de eliminar el turno #${turn.i_numero_turno}?`)) {
       try {
-        await turnService.deleteTurn(turn.id_turno);
+        await turnService.deleteTurn(turn.uk_turno);
         await loadTurns();
         alert('Turno eliminado correctamente');
       } catch (error) {
@@ -155,50 +423,81 @@ const TurnManager = () => {
 
   const handleStatusChange = async (turn, newStatus) => {
     try {
-      await turnService.changeTurnStatus(turn.id_turno, newStatus);
+      await turnService.updateTurnStatus(turn.uk_turno, newStatus);
       await loadTurns();
-      alert(`Estado del turno #${turn.numero_turno} actualizado a "${newStatus}"`);
+      alert(`Estado del turno #${turn.i_numero_turno} actualizado a "${turnStatuses.find(s => s.value === newStatus)?.label}"`);
     } catch (error) {
       alert('Error actualizando estado: ' + error.message);
       console.error('Error actualizando estado:', error);
     }
   };
 
+  const handleMarkAsAttended = async (turn) => {
+    try {
+      await turnService.markTurnAsAttended(turn.uk_turno);
+      await loadTurns();
+      alert(`Turno #${turn.i_numero_turno} marcado como atendido`);
+    } catch (error) {
+      alert('Error marcando turno como atendido: ' + error.message);
+      console.error('Error marcando turno como atendido:', error);
+    }
+  };
+
+  const handleMarkAsNoShow = async (turn) => {
+    try {
+      await turnService.markTurnAsNoShow(turn.uk_turno);
+      await loadTurns();
+      alert(`Turno #${turn.i_numero_turno} marcado como no presente`);
+    } catch (error) {
+      alert('Error marcando turno como no presente: ' + error.message);
+      console.error('Error marcando turno como no presente:', error);
+    }
+  };
+
+  const handleCancelTurn = async (turn) => {
+    if (window.confirm(`¿Estás seguro de cancelar el turno #${turn.i_numero_turno}?`)) {
+      try {
+        await turnService.cancelTurn(turn.uk_turno);
+        await loadTurns();
+        alert(`Turno #${turn.i_numero_turno} cancelado`);
+      } catch (error) {
+        alert('Error cancelando turno: ' + error.message);
+        console.error('Error cancelando turno:', error);
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.id_consultorio) {
+    if (!formData.uk_consultorio) {
       alert('Seleccione consultorio');
       return;
     }
 
     try {
       if (editingTurn) {
-        // Actualizar turno existente
-        await turnService.updateTurn(editingTurn.id_turno, formData);
+        // Actualizar observaciones del turno
+        await turnService.updateTurnObservations(editingTurn.uk_turno, formData.s_observaciones);
         alert('Turno actualizado correctamente');
       } else {
         // Crear nuevo turno
-        {
-          const payload = { id_consultorio: Number(formData.id_consultorio) };
-          if (formData.id_paciente) {
-            payload.id_paciente = Number(formData.id_paciente);
-          }
-          await turnService.createTurn(payload);
-        }
-        alert('Turno creado correctamente');
+        // Para asignar un paciente ya existente, usar el endpoint estándar /turnos
+        // con uk_consultorio y opcionalmente uk_paciente.
+        const payload = {
+          uk_consultorio: formData.uk_consultorio,
+          s_observaciones: formData.s_observaciones,
+          ...(formData.uk_paciente ? { uk_paciente: formData.uk_paciente } : {})
+        };
+        await turnService.createTurn(payload);
       }
 
       await loadTurns();
       setShowModal(false);
       setFormData({
-        numero_turno: '',
-        estado: 'En espera',
-        fecha: selectedDate,
-        hora: '',
-        id_paciente: '',
-        id_consultorio: 1,
-        id_administrador: user?.id_administrador || ''
+        uk_consultorio: '',
+        uk_paciente: '',
+        s_observaciones: ''
       });
     } catch (error) {
       let errorMessage = 'Error guardando turno';
@@ -220,282 +519,493 @@ const TurnManager = () => {
     }));
   };
 
-  const getStatusColor = (status) => {
+  const getStatusLabel = (status) => {
     const statusObj = turnStatuses.find(s => s.value === status);
-    return statusObj ? statusObj.color : '#718096';
+    return statusObj ? statusObj.label : status;
   };
 
-  const getPatientName = (patientId) => {
-    const patient = patients.find(p => p.id_paciente === patientId);
-    return patient ? patient.nombre : 'Paciente no encontrado';
+  const getStatusColor = (status) => {
+    const statusObj = turnStatuses.find(s => s.value === status);
+    return statusObj ? statusObj.color : 'secondary';
+  };
+
+  const getPatientName = (uk_paciente) => {
+    if (!uk_paciente) return 'Invitado';
+    const patient = patients.find(p => p.uk_paciente === uk_paciente);
+    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Paciente no encontrado';
+  };
+
+  const getConsultorioInfo = (uk_consultorio) => {
+    const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
+    return consultorio ? `Consultorio ${consultorio.i_numero_consultorio}` : 'Consultorio no encontrado';
+  };
+
+  const getAreaInfo = (uk_consultorio) => {
+    const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
+    if (!consultorio) return '';
+    const area = areas.find(a => a.uk_area === consultorio.uk_area);
+    return area ? area.s_nombre_area : '';
   };
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Cargando turnos...</p>
-        </div>
-      </div>
-    );
+    return <TestSpinner message="Cargando turnos..." />;
   }
 
   return (
-    <div className="turn-manager-page">
-      {/* Header */}
-      <header className="page-header">
-        <div className="header-content">
-          <div className="header-left">
-            <button onClick={() => navigate('/admin/dashboard')} className="back-button">
-              ← Volver al Dashboard
-            </button>
-            <h1>📋 Gestión de Turnos</h1>
+    <div className="admin-page-unified">
+      <AdminHeader />
+
+      <div className="admin-container">
+        {/* Page Header */}
+        <div className="page-header">
+          <div className="page-header-icon">
+            <FaCalendarCheck />
           </div>
-          <div className="header-right">
-            <span className="user-info">👤 {user?.nombre}</span>
-            <button onClick={handleLogout} className="logout-button">
-              Cerrar Sesión
+          <div className="page-header-content">
+            <h1 className="page-title">Gestión de Turnos</h1>
+            <p className="page-subtitle">
+              Administra los turnos médicos del sistema - {turns.length} turnos encontrados
+            </p>
+          </div>
+          <div className="page-actions">
+            <button className="btn btn-secondary" onClick={loadTurns}>
+              <FaSync /> Actualizar
+            </button>
+            <button className="btn btn-primary" onClick={handleAddNew}>
+              <FaPlus /> Nuevo Turno
             </button>
           </div>
         </div>
-      </header>
 
-      {/* Contenido principal */}
-      <main className="page-main">
-        <div className="page-container">
-          {error && (
-            <div className="error-banner">
-              <span>❌ {error}</span>
-              <button onClick={() => setError(null)}>✕</button>
-            </div>
-          )}
+        {/* Error Message */}
+        {error && (
+          <div className="error-message">
+            <FaExclamationTriangle />
+            <span>{error}</span>
+            <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+              <FaTimes />
+            </button>
+          </div>
+        )}
 
-          {/* Filtros */}
-          <div className="filters-section">
-            <div className="filter-group">
-              <label>Fecha:</label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="filter-input"
-              />
-            </div>
-            <div className="filter-group">
-              <label>Estado:</label>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="filter-select"
+        {/* Filters Section */}
+        <div className="filters-section">
+          <div className="filter-group">
+            <label>Fecha</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="form-control"
+            />
+          </div>
+          <div className="filter-group">
+            <label>Estado</label>
+            <div className="custom-status-select">
+              <div 
+                ref={statusButtonRef}
+                className="status-select-trigger"
+                onClick={() => {
+                  if (!statusDropdownOpen && statusButtonRef.current) {
+                    const rect = statusButtonRef.current.getBoundingClientRect();
+                    setDropdownPosition({
+                      top: rect.bottom + window.scrollY,
+                      left: rect.left + window.scrollX,
+                      width: rect.width
+                    });
+                  }
+                  setStatusDropdownOpen(!statusDropdownOpen);
+                }}
               >
-                <option value="todos">Todos los estados</option>
-                {turnStatuses.map(status => (
-                  <option key={status.value} value={status.value}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
+                <div className="status-selected">
+                  <div className={`status-icon status-${selectedStatus.toLowerCase()}`}>
+                    {React.createElement(getStatusIcon(selectedStatus))}
+                  </div>
+                  <span>{selectedStatus === 'todos' ? 'Todos los estados' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
+                </div>
+                <div className="dropdown-arrow">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {statusDropdownOpen && createPortal(
+                <>
+                  <div 
+                    className="status-dropdown-overlay"
+                    onClick={() => setStatusDropdownOpen(false)}
+                  />
+                  <div 
+                    className="status-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${dropdownPosition.top}px`,
+                      left: `${dropdownPosition.left}px`,
+                      width: `${dropdownPosition.width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="status-option"
+                      onClick={() => {
+                        setSelectedStatus('todos');
+                        setStatusDropdownOpen(false);
+                      }}
+                    >
+                      <div className="status-icon status-todos">
+                        <FaList />
+                      </div>
+                      <span>Todos los estados</span>
+                    </div>
+                    {turnStatuses.map(status => (
+                      <div
+                        key={status.value}
+                        className="status-option"
+                        onClick={() => {
+                          setSelectedStatus(status.value);
+                          setStatusDropdownOpen(false);
+                        }}
+                      >
+                        <div className={`status-icon status-${status.value.toLowerCase()}`}>
+                          {React.createElement(getStatusIcon(status.value))}
+                        </div>
+                        <span>{status.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>,
+                document.body
+              )}
+            </div>
+          </div>
+          <div className="filter-group">
+            <label>Área</label>
+            <div className="custom-area-select">
+              <div 
+                ref={areaButtonRef}
+                className="area-select-trigger"
+                onClick={() => {
+                  // Siempre calcular posición antes de cambiar el estado
+                  const rect = areaButtonRef.current?.getBoundingClientRect();
+                  if (rect) {
+                    setAreaDropdownPosition({
+                      top: rect.bottom + window.scrollY,
+                      left: rect.left + window.scrollX,
+                      width: rect.width
+                    });
+                  }
+                  setAreaDropdownOpen(!areaDropdownOpen);
+                }}
+              >
+                <div className="area-selected">
+                  <div className={`area-icon ${getAreaClass(selectedArea === 'todas' ? 'todas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea)}`}>
+                    {selectedArea === 'todas' ? (
+                      <FaHospital />
+                    ) : (
+                      React.createElement(getAreaIcon(areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea))
+                    )}
+                  </div>
+                  <span>{selectedArea === 'todas' ? 'Todas las áreas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea}</span>
+                </div>
+                <div className="dropdown-arrow">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {areaDropdownOpen && createPortal(
+                <>
+                  <div 
+                    className="area-dropdown-overlay"
+                    onClick={() => setAreaDropdownOpen(false)}
+                  />
+                  <div 
+                    className="area-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${areaDropdownPosition.top}px`,
+                      left: `${areaDropdownPosition.left}px`,
+                      width: `${areaDropdownPosition.width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="area-option"
+                      onClick={() => {
+                        setSelectedArea('todas');
+                        setAreaDropdownOpen(false);
+                      }}
+                    >
+                      <div className="area-icon"><FaHospital /></div>
+                      <span>Todas las áreas</span>
+                    </div>
+                    {areas.map(area => (
+                      <div
+                        key={area.uk_area}
+                        className="area-option"
+                        onClick={() => {
+                          setSelectedArea(area.uk_area);
+                          setAreaDropdownOpen(false);
+                        }}
+                      >
+                        <div className={`area-icon ${getAreaClass(area.s_nombre_area)}`}>
+                          {React.createElement(getAreaIcon(area.s_nombre_area))}
+                        </div>
+                        <span>{area.s_nombre_area}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>,
+                document.body
+              )}
+            </div>
+          </div>
+          <div className="filter-group">
+            <button className="btn btn-secondary">
+              <FaFilter /> Aplicar Filtros
+            </button>
+          </div>
+        </div>
+
+        {/* Turns Table */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FaClipboardList />
+              Lista de Turnos
+            </h3>
+            <div className="card-actions">
+              <button className="card-action" title="Ver detalles">
+                <FaEye />
+              </button>
+              <button className="card-action" title="Filtros">
+                <FaFilter />
+              </button>
             </div>
           </div>
 
-          {/* Barra de acciones */}
-          <div className="actions-bar">
-            <button onClick={handleAddNew} className="add-button">
-              + Nuevo Turno
-            </button>
-            <button onClick={loadTurns} className="refresh-button">
-              🔄 Actualizar
-            </button>
-          </div>
-
-          {/* Tabla de turnos */}
-          <div className="turns-table">
-            <table>
-              <thead>
-                <tr>
-                  <th># Turno</th>
-                  <th>Paciente</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Estado</th>
-                  <th>Consultorio</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {turns.map(turn => (
-                  <tr key={turn.id_turno}>
-                    <td className="turn-number">#{turn.numero_turno}</td>
-                    <td>{getPatientName(turn.id_paciente)}</td>
-                    <td>{new Date(turn.fecha).toLocaleDateString('es-ES')}</td>
-                    <td>{turn.hora}</td>
-                    <td>
-                      <span
-                        className="status-badge"
-                        style={{ backgroundColor: getStatusColor(turn.estado) }}
-                      >
-                        {turn.estado}
-                      </span>
-                    </td>
-                    <td>Consultorio {turn.id_consultorio}</td>
-                    <td className="actions-cell">
-                      <select
-                        value={turn.estado}
-                        onChange={(e) => handleStatusChange(turn, e.target.value)}
-                        className="status-select"
-                      >
-                        {turnStatuses.map(status => (
-                          <option key={status.value} value={status.value}>
-                            {status.label}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={() => handleEdit(turn)}
-                        className="edit-button"
-                      >
-                        ✏️ Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(turn)}
-                        className="delete-button"
-                      >
-                        🗑️ Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {turns.length === 0 && (
+          <div className="card-content" style={{ padding: 0 }}>
+            {turns.length === 0 ? (
               <div className="empty-state">
-                <p>No hay turnos registrados para la fecha seleccionada</p>
+                <FaCalendarCheck />
+                <h3>No hay turnos registrados</h3>
+                <p>No se encontraron turnos para los filtros seleccionados</p>
+                <button className="btn btn-primary" onClick={handleAddNew}>
+                  <FaPlus /> Crear Primer Turno
+                </button>
+              </div>
+            ) : (
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th># Turno</th>
+                      <th>Paciente</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Estado</th>
+                      <th>Consultorio</th>
+                      <th>Área</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {turns.map(turn => (
+                      <tr key={turn.uk_turno}>
+                        <td>
+                          <strong>#{turn.i_numero_turno}</strong>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                            {getPatientName(turn.uk_paciente)}
+                          </div>
+                        </td>
+                        <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <FaClock style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                            {turn.t_hora}
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`status-badge ${getStatusColor(turn.s_estado)}`}>
+                            {getStatusLabel(turn.s_estado)}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FaHospital style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                            {getConsultorioInfo(turn.uk_consultorio)}
+                          </div>
+                        </td>
+                        <td>{getAreaInfo(turn.uk_consultorio)}</td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            {turn.s_estado === 'EN_ESPERA' && (
+                              <>
+                                <button
+                                  onClick={() => handleMarkAsAttended(turn)}
+                                  className="btn btn-success"
+                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  title="Marcar como atendido"
+                                >
+                                  <FaCheck />
+                                </button>
+                                <button
+                                  onClick={() => handleMarkAsNoShow(turn)}
+                                  className="btn btn-secondary"
+                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  title="Marcar como no presente"
+                                >
+                                  <FaTimes />
+                                </button>
+                              </>
+                            )}
+                            {turn.s_estado !== 'CANCELADO' && turn.s_estado !== 'ATENDIDO' && (
+                              <button
+                                onClick={() => handleCancelTurn(turn)}
+                                className="btn btn-secondary"
+                                style={{ padding: '4px 8px', fontSize: '12px' }}
+                                title="Cancelar turno"
+                              >
+                                <FaTimes />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleEdit(turn)}
+                              className="btn btn-secondary"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Editar observaciones"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(turn)}
+                              className="btn btn-danger"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Eliminar turno"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Modal para crear/editar */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'hidden',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
                 {editingTurn ? 'Editar Turno' : 'Nuevo Turno'}
-              </h2>
+              </h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="close-button"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  padding: '4px'
+                }}
               >
-                ✕
+                <FaTimes />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Número de Turno</label>
-                  <input
-                    type="number"
-                    name="numero_turno"
-                    value={formData.numero_turno}
-                    onChange={handleInputChange}
-                    min="1"
-                    placeholder="Generado automáticamente"
-                    disabled
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Estado</label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleInputChange}
-                    disabled
-                  >
-                    {turnStatuses.map(status => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha</label>
-                  <input
-                    type="date"
-                    name="fecha"
-                    value={formData.fecha}
-                    onChange={handleInputChange}
-                    disabled
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Hora</label>
-                  <input
-                    type="time"
-                    name="hora"
-                    value={formData.hora}
-                    onChange={handleInputChange}
-                    disabled
-                  />
-                </div>
-              </div>
-
+            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
               <div className="form-group">
-                <label>Paciente *</label>
+                <label>Consultorio *</label>
                 <select
-                  name="id_paciente"
-                  value={formData.id_paciente}
+                  name="uk_consultorio"
+                  value={formData.uk_consultorio}
                   onChange={handleInputChange}
+                  className="form-control"
                   required
                 >
-                  <option value="">Seleccionar paciente</option>
-                  {patients.map(patient => (
-                    <option key={patient.id_paciente} value={patient.id_paciente}>
-                      {patient.nombre} {patient.apellido} {patient.telefono ? `- ${patient.telefono}` : ''}
+                  <option value="">Seleccionar consultorio</option>
+                  {consultorios.map(consultorio => (
+                    <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
+                      Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="form-group">
-                <label>Consultorio *</label>
-                <input
-                  type="number"
-                  name="id_consultorio"
-                  value={formData.id_consultorio}
+                <label>Paciente (opcional)</label>
+                <select
+                  name="uk_paciente"
+                  value={formData.uk_paciente}
                   onChange={handleInputChange}
-                  required
-                  min="1"
-                />
+                  className="form-control"
+                >
+                  <option value="">Sin paciente asignado</option>
+                  {patients.map(patient => (
+                    <option key={patient.uk_paciente} value={patient.uk_paciente}>
+                      {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-group">
-                <label>Área (opcional)</label>
-                <input
-                  type="number"
-                  name="id_area"
-                  value={formData.id_area}
+                <label>Observaciones</label>
+                <textarea
+                  name="s_observaciones"
+                  value={formData.s_observaciones}
                   onChange={handleInputChange}
-                  min="1"
-                  placeholder="Filtrar por área para la tabla"
+                  rows="3"
+                  className="form-control"
+                  placeholder="Observaciones adicionales..."
                 />
               </div>
 
-              <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
                   Cancelar
                 </button>
-                <button type="submit" className="primary">
+                <button type="submit" className="btn btn-primary">
                   {editingTurn ? 'Actualizar' : 'Crear'}
                 </button>
               </div>
@@ -504,480 +1014,8 @@ const TurnManager = () => {
         </div>
       )}
 
-      <style>{`
-        .turn-manager-page {
-          min-height: 100vh;
-          background: #f8fafc;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .page-header {
-          background: white;
-          border-bottom: 1px solid #e2e8f0;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .header-content {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 20px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .back-button {
-          background: #f1f5f9;
-          border: 1px solid #cbd5e0;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          color: #4a5568;
-          text-decoration: none;
-          transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-          background: #e2e8f0;
-        }
-
-        .header-left h1 {
-          margin: 0;
-          color: #2d3748;
-          font-size: 1.8em;
-        }
-
-        .header-right {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .user-info {
-          color: #4a5568;
-          font-weight: 500;
-        }
-
-        .logout-button {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.3s ease;
-        }
-
-        .logout-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 5px 15px rgba(197, 48, 48, 0.3);
-        }
-
-        .page-main {
-          padding: 40px 20px;
-        }
-
-        .page-container {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .error-banner {
-          background: #fed7d7;
-          color: #c53030;
-          padding: 15px 20px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .error-banner button {
-          background: none;
-          border: none;
-          color: #c53030;
-          cursor: pointer;
-          font-size: 1.2em;
-        }
-
-        .filters-section {
-          background: white;
-          border-radius: 12px;
-          padding: 20px;
-          margin-bottom: 20px;
-          box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-          display: flex;
-          gap: 20px;
-          align-items: center;
-        }
-
-        .filter-group {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
-
-        .filter-group label {
-          font-weight: 600;
-          color: #4a5568;
-          font-size: 0.9em;
-        }
-
-        .filter-input, .filter-select {
-          padding: 8px 12px;
-          border: 2px solid #e2e8f0;
-          border-radius: 6px;
-          font-size: 0.9em;
-          transition: all 0.3s ease;
-        }
-
-        .filter-input:focus, .filter-select:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .actions-bar {
-          display: flex;
-          gap: 15px;
-          margin-bottom: 30px;
-        }
-
-        .add-button {
-          background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .add-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
-        }
-
-        .refresh-button {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
-          padding: 12px 24px;
-          border-radius: 8px;
-          cursor: pointer;
-          color: #4a5568;
-          font-weight: 500;
-          transition: all 0.3s ease;
-        }
-
-        .refresh-button:hover {
-          background: #edf2f7;
-        }
-
-        .turns-table {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th {
-          background: #f7fafc;
-          padding: 15px 20px;
-          text-align: left;
-          font-weight: 600;
-          color: #4a5568;
-          border-bottom: 1px solid #e2e8f0;
-        }
-
-        td {
-          padding: 15px 20px;
-          border-bottom: 1px solid #f1f5f9;
-        }
-
-        tr:hover {
-          background: #f8fafc;
-        }
-
-        .turn-number {
-          font-weight: 600;
-          color: #667eea;
-        }
-
-        .status-badge {
-          color: white;
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.8em;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-
-        .actions-cell {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-        }
-
-        .status-select {
-          padding: 4px 8px;
-          border: 1px solid #e2e8f0;
-          border-radius: 4px;
-          font-size: 0.8em;
-          background: white;
-          cursor: pointer;
-        }
-
-        .edit-button {
-          background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.8em;
-          transition: all 0.3s ease;
-        }
-
-        .edit-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
-        }
-
-        .delete-button {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.8em;
-          transition: all 0.3s ease;
-        }
-
-        .delete-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(197, 48, 48, 0.3);
-        }
-
-        .empty-state {
-          padding: 60px 20px;
-          text-align: center;
-          color: #718096;
-        }
-
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-
-        .modal {
-          background: white;
-          border-radius: 12px;
-          width: 90%;
-          max-width: 600px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-          padding: 25px;
-          border-bottom: 1px solid #e2e8f0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .modal-header h2 {
-          margin: 0;
-          color: #2d3748;
-        }
-
-        .close-button {
-          background: none;
-          border: none;
-          font-size: 1.5em;
-          cursor: pointer;
-          color: #718096;
-          padding: 0;
-          width: 30px;
-          height: 30px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          transition: all 0.3s ease;
-        }
-
-        .close-button:hover {
-          background: #f1f5f9;
-          color: #4a5568;
-        }
-
-        .modal-form {
-          padding: 25px;
-        }
-
-        .form-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 20px;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .form-group label {
-          font-weight: 600;
-          color: #4a5568;
-        }
-
-        .form-group input, .form-group select {
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-actions {
-          display: flex;
-          gap: 15px;
-          justify-content: flex-end;
-          margin-top: 30px;
-        }
-
-        .form-actions button {
-          padding: 12px 24px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .form-actions button[type="button"] {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
-          color: #4a5568;
-        }
-
-        .form-actions button[type="button"]:hover {
-          background: #edf2f7;
-        }
-
-        .form-actions button.primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-        }
-
-        .form-actions button.primary:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .loading-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f8fafc;
-        }
-
-        .loading-spinner {
-          text-align: center;
-          color: #718096;
-        }
-
-        .spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #e2e8f0;
-          border-top: 4px solid #667eea;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 20px auto;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-          .header-content {
-            flex-direction: column;
-            gap: 20px;
-          }
-
-          .header-left {
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-          }
-
-          .filters-section {
-            flex-direction: column;
-            gap: 15px;
-          }
-
-          .actions-bar {
-            flex-direction: column;
-          }
-
-          .turns-table {
-            overflow-x: auto;
-          }
-
-          .actions-cell {
-            flex-direction: column;
-            gap: 5px;
-          }
-
-          .form-row {
-            grid-template-columns: 1fr;
-          }
-
-          .modal {
-            width: 95%;
-            margin: 10px;
-          }
-
-          .form-actions {
-            flex-direction: column;
-          }
-        }
-      `}</style>
+      <AdminFooter isDarkMode={isDarkMode} />
+      <Chatbot />
     </div>
   );
 };

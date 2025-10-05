@@ -1,16 +1,40 @@
 :root {
   /* Paleta de colores principal */
-  --color-primary: #d8f0f4;      /* Azul claro - principal */
-  --color-secondary: #d7c0c6;    /* Rosa pálido - secundario */
-  --color-accent: #77b8ce;       /* Azul medio - acento */
-  --color-dark: #544e52;         /* Gris oscuro - texto */
-  --color-accent-red: #ea5d4b;   /* Rojo - destacado */
-  
+  --color-primary: #d8f0f4;
+  /* Azul claro - principal */
+  --color-secondary: #d7c0c6;
+  /* Rosa pálido - secundario */
+  --color-accent: #77b8ce;
+  /* Azul medio - acento */
+  --color-dark: #544e52;
+  /* Gris oscuro - texto */
+  --color-accent-red: #ea5d4b;
+  /* Rojo - destacado */
+
   /* Colores adicionales para mejor contraste */
   --color-white: #ffffff;
   --color-light-gray: #f8f9fa;
   --color-border: #e9ecef;
   --color-shadow: rgba(84, 78, 82, 0.1);
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] {
+  --color-primary: #0a1222;
+  /* deep blue-night background */
+  --color-secondary: #040814;
+  /* almost black with blue tint */
+  --color-accent: #77b8ce;
+  /* keep brand accent */
+  --color-dark: #ffffff;
+  /* white text for maximum readability */
+  --color-accent-red: #ea5d4b;
+  --color-white: #08111d;
+  /* very dark blue-black for panels */
+  --color-light-gray: #08111d;
+  --color-border: #0d1829;
+  /* darker blue-night border, almost black */
+  --color-shadow: rgba(0, 0, 0, 0.8);
 }
 
 * {
@@ -47,4 +71,24 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-dark);
+}
+
+/* Global form element styles for dark mode */
+[data-theme="dark"] input:not([class]),
+[data-theme="dark"] select:not([class]),
+[data-theme="dark"] textarea:not([class]),
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] input[type="search"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"] {
+  background: var(--color-white) !important;
+  color: var(--color-dark) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] button:not([class]) {
+  background: var(--color-white);
+  color: var(--color-dark);
+  border-color: var(--color-border);
 }

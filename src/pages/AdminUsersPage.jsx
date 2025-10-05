@@ -1,7 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AdminHeader from '../components/Common/AdminHeader';
+import AdminFooter from '../components/Common/AdminFooter';
+import Chatbot from '../components/Common/Chatbot';
 import adminService from '../services/adminService';
+import { USER_TYPE_LABELS } from '../utils/constants';
+import '../styles/UnifiedAdminPages.css';
+
+// React Icons
+import {
+  FaUsersCog,
+  FaUserShield,
+  FaUser,
+  FaPlus,
+  FaSync,
+  FaEdit,
+  FaTrash,
+  FaSearch,
+  FaFilter,
+  FaEye,
+  FaExclamationTriangle,
+  FaTimes,
+  FaCheck,
+  FaEnvelope,
+  FaPhone,
+  FaCalendarAlt,
+  FaLock,
+  FaUsers,
+  FaCrown,
+  FaEyeSlash,
+  FaKey
+} from 'react-icons/fa';
 
 const AdminUsersPage = () => {
   const [admins, setAdmins] = useState([]);
@@ -9,10 +39,16 @@ const AdminUsersPage = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    password: ''
+    s_nombre: '',
+    s_apellido: '',
+    s_email: '',
+    s_usuario: '',
+    s_password: '',
+    c_telefono: '',
+    tipo_usuario: 2
   });
 
   const { user, logout } = useAuth();
@@ -28,7 +64,6 @@ const AdminUsersPage = () => {
       setLoading(true);
       setError(null);
 
-      // Usar el servicio real para obtener administradores
       const administradores = await adminService.getAllAdmins();
       setAdmins(administradores);
 
@@ -40,39 +75,43 @@ const AdminUsersPage = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/admin');
-  };
-
   const handleAddNew = () => {
     setEditingAdmin(null);
-    setFormData({ nombre: '', email: '', password: '' });
+    setFormData({
+      s_nombre: '',
+      s_apellido: '',
+      s_email: '',
+      s_usuario: '',
+      s_password: '',
+      c_telefono: '',
+      tipo_usuario: 2
+    });
     setShowModal(true);
   };
 
   const handleEdit = (admin) => {
     setEditingAdmin(admin);
     setFormData({
-      nombre: admin.nombre,
-      email: admin.email,
-      password: ''
+      s_nombre: admin.s_nombre,
+      s_apellido: admin.s_apellido,
+      s_email: admin.s_email,
+      s_usuario: admin.s_usuario,
+      s_password: '',
+      c_telefono: admin.c_telefono || '',
+      tipo_usuario: admin.tipo_usuario
     });
     setShowModal(true);
   };
 
   const handleDelete = async (admin) => {
-    if (admin.id_administrador === user?.id_administrador) {
+    if (admin.uk_administrador === user?.uk_administrador) {
       alert('No puedes eliminar tu propia cuenta');
       return;
     }
 
-    if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.nombre}"?`)) {
+    if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.s_nombre} ${admin.s_apellido}"?`)) {
       try {
-        // Llamar al servicio real para eliminar
-        await adminService.deleteAdmin(admin.id_administrador);
-
-        // Recargar la lista de administradores
+        await adminService.deleteAdmin(admin.uk_administrador);
         await loadAdmins();
         alert('Administrador eliminado correctamente');
       } catch (error) {
@@ -85,62 +124,79 @@ const AdminUsersPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.nombre || !formData.email) {
+    if (!formData.s_nombre || !formData.s_apellido || !formData.s_email || !formData.s_usuario) {
       alert('Por favor complete todos los campos requeridos');
       return;
     }
 
-    if (!formData.email.includes('@')) {
-      alert('Por favor ingrese un email válido');
+    // Validación de contraseña (debe coincidir con la del backend: min 6, 1 minúscula, 1 mayúscula y 1 número)
+    const passwordProvided = !!formData.s_password && formData.s_password.length > 0;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+    if (!editingAdmin && !passwordProvided) {
+      alert('La contraseña es requerida para crear un nuevo administrador');
+      return;
+    }
+
+    if (passwordProvided && !passwordRegex.test(formData.s_password)) {
+      alert('La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número');
       return;
     }
 
     try {
-      if (editingAdmin) {
-        // Actualizar administrador existente
-        await adminService.updateAdmin(editingAdmin.id_administrador, {
-          nombre: formData.nombre,
-          email: formData.email,
-          password: formData.password || undefined // Solo enviar password si se proporcionó
-        });
+      const adminData = {
+        s_nombre: formData.s_nombre.trim(),
+        s_apellido: formData.s_apellido.trim(),
+        s_email: formData.s_email.trim(),
+        s_usuario: formData.s_usuario.trim(),
+        tipo_usuario: parseInt(formData.tipo_usuario)
+      };
 
+      // Solo incluir teléfono si viene no vacío para evitar errores de validación (trim sobre null)
+      const telefonoTrimmed = (formData.c_telefono || '').trim();
+      if (telefonoTrimmed) {
+        adminData.c_telefono = telefonoTrimmed;
+      }
+
+      if (passwordProvided) {
+        adminData.s_password = formData.s_password;
+      }
+
+      if (editingAdmin) {
+        await adminService.updateAdmin(editingAdmin.uk_administrador, adminData);
         alert('Administrador actualizado correctamente');
       } else {
-        // Crear nuevo administrador
-        if (!formData.password) {
-          alert('La contraseña es requerida para nuevos administradores');
-          return;
-        }
-
-        await adminService.createAdmin({
-          nombre: formData.nombre,
-          email: formData.email,
-          password: formData.password
-        });
-
+        await adminService.createAdmin(adminData);
         alert('Administrador creado correctamente');
       }
 
-      // Recargar la lista de administradores
       await loadAdmins();
       setShowModal(false);
-      setFormData({ nombre: '', email: '', password: '' });
+      setFormData({
+        s_nombre: '',
+        s_apellido: '',
+        s_email: '',
+        s_usuario: '',
+        s_password: '',
+        c_telefono: '',
+        tipo_usuario: 2
+      });
     } catch (error) {
       let errorMessage = 'Error guardando administrador';
-
       if (error.response && error.response.data) {
-        const { message, errors } = error.response.data;
-        errorMessage = message;
-
-        // Si hay errores de validación específicos, mostrarlos
-        if (errors && errors.length > 0) {
-          const validationErrors = errors.map(err => err.message).join('\n');
-          errorMessage += '\n\nDetalles:\n' + validationErrors;
+        const data = error.response.data;
+        if (data.message) {
+          errorMessage += ': ' + data.message;
+        }
+        if (Array.isArray(data.errors) && data.errors.length > 0) {
+          const detail = data.errors
+            .map(err => (err.field ? `${err.field}: ${err.message}` : err.message))
+            .join('; ');
+          errorMessage += `\nDetalles: ${detail}`;
         }
       } else {
         errorMessage += ': ' + error.message;
       }
-
       alert(errorMessage);
       console.error('Error guardando administrador:', error);
     }
@@ -154,162 +210,532 @@ const AdminUsersPage = () => {
     }));
   };
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Filtrar administradores
+  const filteredAdmins = admins.filter(admin =>
+    admin.s_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    admin.s_apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    admin.s_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    admin.s_usuario.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Calcular estadísticas
+  const totalAdmins = admins.length;
+  const superAdmins = admins.filter(a => a.tipo_usuario === 1).length;
+  const supervisors = admins.filter(a => a.tipo_usuario === 2).length;
+
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Cargando administradores...</p>
+      <div className="admin-page-unified">
+        <AdminHeader />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px 20px',
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+        }}>
+          <div style={{
+            textAlign: 'center',
+            color: '#718096'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '4px solid #e2e8f0',
+              borderTop: '4px solid #77b8ce',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 20px auto'
+            }}></div>
+            <p>Cargando usuarios...</p>
+          </div>
         </div>
+        <style>
+          {`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}
+        </style>
       </div>
     );
   }
 
   return (
-    <div className="admin-users-page">
-      {/* Header */}
-      <header className="page-header">
-        <div className="header-content">
-          <div className="header-left">
-            <button onClick={() => navigate('/admin/dashboard')} className="back-button">
-              ← Volver al Dashboard
-            </button>
-            <h1>👥 Gestión de Administradores</h1>
+    <div className="admin-page-unified">
+      <AdminHeader />
+
+      <div className="admin-container">
+        {/* Page Header */}
+        <div className="page-header">
+          <div className="page-header-icon">
+            <FaUsersCog />
           </div>
-          <div className="header-right">
-            <span className="user-info">👤 {user?.nombre}</span>
-            <button onClick={handleLogout} className="logout-button">
-              Cerrar Sesión
+          <div className="page-header-content">
+            <h1 className="page-title">Gestión de Usuarios</h1>
+            <p className="page-subtitle">
+              Administra los usuarios del sistema - {totalAdmins} administradores registrados
+            </p>
+          </div>
+          <div className="page-actions">
+            <button className="btn btn-secondary" onClick={loadAdmins}>
+              <FaSync /> Actualizar
+            </button>
+            <button className="btn btn-primary" onClick={handleAddNew}>
+              <FaPlus /> Nuevo Usuario
             </button>
           </div>
         </div>
-      </header>
 
-      {/* Contenido principal */}
-      <main className="page-main">
-        <div className="page-container">
-          {error && (
-            <div className="error-banner">
-              <span>❌ {error}</span>
-              <button onClick={() => setError(null)}>✕</button>
-            </div>
-          )}
-
-          <div className="actions-bar">
-            <button onClick={handleAddNew} className="add-button">
-              + Nuevo Administrador
-            </button>
-            <button onClick={loadAdmins} className="refresh-button">
-              🔄 Actualizar
+        {/* Error Message */}
+        {error && (
+          <div className="error-message">
+            <FaExclamationTriangle />
+            <span>{error}</span>
+            <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+              <FaTimes />
             </button>
           </div>
+        )}
 
-          <div className="admins-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Email</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {admins.map(admin => (
-                  <tr key={admin.id_administrador}>
-                    <td>{admin.id_administrador}</td>
-                    <td>{admin.nombre}</td>
-                    <td>{admin.email}</td>
-                    <td className="actions-cell">
-                      <button
-                        onClick={() => handleEdit(admin)}
-                        className="edit-button"
-                      >
-                        ✏️ Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(admin)}
-                        className="delete-button"
-                        disabled={admin.id_administrador === user?.id_administrador}
-                      >
-                        🗑️ Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Statistics Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--primary-medical), var(--accent-medical))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUsers />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {totalAdmins}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Total Usuarios
+                </p>
+              </div>
+            </div>
+          </div>
 
-            {admins.length === 0 && (
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--warning-color), #fd7e14)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaCrown />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {superAdmins}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Super Administradores
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-card">
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: 'var(--border-radius-sm)',
+                background: 'linear-gradient(135deg, var(--success-color), #20c997)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '20px'
+              }}>
+                <FaUserShield />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                  {supervisors}
+                </h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
+                  Supervisores
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Section */}
+        <div className="filters-section">
+          <div className="filter-group" style={{ flex: '1', maxWidth: '400px' }}>
+            <label>Buscar Usuarios</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Buscar por nombre, email o usuario..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="form-control"
+                style={{ paddingLeft: '40px' }}
+              />
+              <FaSearch style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)'
+              }} />
+            </div>
+          </div>
+          <div className="filter-group">
+            <button className="btn btn-secondary">
+              <FaFilter /> Aplicar Filtros
+            </button>
+          </div>
+        </div>
+
+        {/* Users Table */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FaUsersCog />
+              Lista de Usuarios Administrativos
+            </h3>
+            <div className="card-actions">
+              <button className="card-action" title="Ver detalles">
+                <FaEye />
+              </button>
+              <button className="card-action" title="Filtros">
+                <FaFilter />
+              </button>
+            </div>
+          </div>
+
+          <div className="card-content" style={{ padding: 0 }}>
+            {filteredAdmins.length === 0 ? (
               <div className="empty-state">
-                <p>No hay administradores registrados</p>
+                <FaUsersCog />
+                <h3>No hay usuarios registrados</h3>
+                <p>
+                  {searchTerm
+                    ? 'No se encontraron usuarios con los filtros aplicados'
+                    : 'No hay usuarios administrativos en el sistema'}
+                </p>
+                <button className="btn btn-primary" onClick={handleAddNew}>
+                  <FaPlus /> Crear Primer Usuario
+                </button>
+              </div>
+            ) : (
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Usuario</th>
+                      <th>Nombre Completo</th>
+                      <th>Email</th>
+                      <th>Teléfono</th>
+                      <th>Tipo</th>
+                      <th>Fecha Registro</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAdmins.map(admin => (
+                      <tr key={admin.uk_administrador}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                            <strong>{admin.s_usuario}</strong>
+                            {admin.uk_administrador === user?.uk_administrador && (
+                              <span style={{
+                                backgroundColor: 'var(--primary-medical)',
+                                color: 'white',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '10px',
+                                fontWeight: '600'
+                              }}>
+                                TÚ
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div>
+                            <div style={{ fontWeight: '600' }}>
+                              {admin.s_nombre} {admin.s_apellido}
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
+                            <span style={{ color: 'var(--primary-medical)' }}>{admin.s_email}</span>
+                          </div>
+                        </td>
+                        <td>
+                          {admin.c_telefono ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <FaPhone style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                              <span style={{ fontFamily: 'monospace' }}>{admin.c_telefono}</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No registrado</span>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`status-badge ${admin.tipo_usuario === 1 ? 'warning' : 'success'}`}>
+                            {admin.tipo_usuario === 1 ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <FaCrown style={{ fontSize: '10px' }} />
+                                Admin
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <FaUserShield style={{ fontSize: '10px' }} />
+                                Supervisor
+                              </div>
+                            )}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <FaCalendarAlt style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
+                            <span style={{ fontSize: '14px' }}>
+                              {admin.d_fecha_creacion ? new Date(admin.d_fecha_creacion).toLocaleDateString('es-ES') : 'No disponible'}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              onClick={() => handleEdit(admin)}
+                              className="btn btn-secondary"
+                              style={{ padding: '4px 8px', fontSize: '12px' }}
+                              title="Editar usuario"
+                            >
+                              <FaEdit />
+                            </button>
+                            {admin.uk_administrador !== user?.uk_administrador && (
+                              <button
+                                onClick={() => handleDelete(admin)}
+                                className="btn btn-danger"
+                                style={{ padding: '4px 8px', fontSize: '12px' }}
+                                title="Eliminar usuario"
+                              >
+                                <FaTrash />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
         </div>
-      </main>
+      </div>
 
-      {/* Modal para crear/editar */}
+      {/* Modal para crear/editar usuario */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>
-                {editingAdmin ? 'Editar Administrador' : 'Nuevo Administrador'}
-              </h2>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
+                {editingAdmin ? 'Editar Usuario' : 'Nuevo Usuario Administrativo'}
+              </h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="close-button"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  padding: '4px'
+                }}
               >
-                ✕
+                <FaTimes />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-group">
-                <label>Nombre *</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleInputChange}
-                  required
-                />
+            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Nombre *</label>
+                  <input
+                    type="text"
+                    name="s_nombre"
+                    value={formData.s_nombre}
+                    onChange={handleInputChange}
+                    placeholder="Nombre"
+                    className="form-control"
+                    required
+                    maxLength={50}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Apellido *</label>
+                  <input
+                    type="text"
+                    name="s_apellido"
+                    value={formData.s_apellido}
+                    onChange={handleInputChange}
+                    placeholder="Apellido"
+                    className="form-control"
+                    required
+                    maxLength={50}
+                  />
+                </div>
               </div>
 
-              <div className="form-group">
-                <label>Email *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Email *</label>
+                  <input
+                    type="email"
+                    name="s_email"
+                    value={formData.s_email}
+                    onChange={handleInputChange}
+                    placeholder="email@ejemplo.com"
+                    className="form-control"
+                    required
+                    maxLength={100}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Teléfono</label>
+                  <input
+                    type="tel"
+                    name="c_telefono"
+                    value={formData.c_telefono}
+                    onChange={handleInputChange}
+                    placeholder="+57 300 123 4567"
+                    className="form-control"
+                    maxLength={15}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Usuario *</label>
+                  <input
+                    type="text"
+                    name="s_usuario"
+                    value={formData.s_usuario}
+                    onChange={handleInputChange}
+                    placeholder="nombre_usuario"
+                    className="form-control"
+                    required
+                    maxLength={30}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Tipo de Usuario *</label>
+                  <select
+                    name="tipo_usuario"
+                    value={formData.tipo_usuario}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                  >
+                    <option value={2}>Supervisor</option>
+                    <option value={1}>Super Administrador</option>
+                  </select>
+                </div>
               </div>
 
               <div className="form-group">
                 <label>
-                  Contraseña {editingAdmin ? '(dejar vacío para no cambiar)' : '*'}
+                  {editingAdmin ? 'Nueva Contraseña (opcional)' : 'Contraseña *'}
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required={!editingAdmin}
-                  placeholder="Ej: Admin123"
-                />
-                <small style={{ color: '#666', fontSize: '0.8em', marginTop: '4px', display: 'block' }}>
-                  Debe contener al menos una mayúscula, una minúscula y un número
-                </small>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="s_password"
+                    value={formData.s_password}
+                    onChange={handleInputChange}
+                    placeholder={editingAdmin ? 'Dejar vacío para no cambiar' : 'Contraseña segura'}
+                    className="form-control"
+                    style={{ paddingRight: '40px' }}
+                    required={!editingAdmin}
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </div>
 
-              <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
                   Cancelar
                 </button>
-                <button type="submit" className="primary">
+                <button type="submit" className="btn btn-primary">
+                  <FaCheck />
                   {editingAdmin ? 'Actualizar' : 'Crear'}
                 </button>
               </div>
@@ -317,413 +743,9 @@ const AdminUsersPage = () => {
           </div>
         </div>
       )}
-
-      <style>{`
-        .admin-users-page {
-          min-height: 100vh;
-          background: #f8fafc;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .page-header {
-          background: white;
-          border-bottom: 1px solid #e2e8f0;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .header-content {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 20px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .back-button {
-          background: #f1f5f9;
-          border: 1px solid #cbd5e0;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          color: #4a5568;
-          text-decoration: none;
-          transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-          background: #e2e8f0;
-        }
-
-        .header-left h1 {
-          margin: 0;
-          color: #2d3748;
-          font-size: 1.8em;
-        }
-
-        .header-right {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-
-        .user-info {
-          color: #4a5568;
-          font-weight: 500;
-        }
-
-        .logout-button {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.3s ease;
-        }
-
-        .logout-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 5px 15px rgba(197, 48, 48, 0.3);
-        }
-
-        .page-main {
-          padding: 40px 20px;
-        }
-
-        .page-container {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .error-banner {
-          background: #fed7d7;
-          color: #c53030;
-          padding: 15px 20px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .error-banner button {
-          background: none;
-          border: none;
-          color: #c53030;
-          cursor: pointer;
-          font-size: 1.2em;
-        }
-
-        .actions-bar {
-          display: flex;
-          gap: 15px;
-          margin-bottom: 30px;
-        }
-
-        .add-button {
-          background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .add-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
-        }
-
-        .refresh-button {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
-          padding: 12px 24px;
-          border-radius: 8px;
-          cursor: pointer;
-          color: #4a5568;
-          font-weight: 500;
-          transition: all 0.3s ease;
-        }
-
-        .refresh-button:hover {
-          background: #edf2f7;
-        }
-
-        .admins-table {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th {
-          background: #f7fafc;
-          padding: 15px 20px;
-          text-align: left;
-          font-weight: 600;
-          color: #4a5568;
-          border-bottom: 1px solid #e2e8f0;
-        }
-
-        td {
-          padding: 15px 20px;
-          border-bottom: 1px solid #f1f5f9;
-        }
-
-        tr:hover {
-          background: #f8fafc;
-        }
-
-        .actions-cell {
-          display: flex;
-          gap: 10px;
-        }
-
-        .edit-button {
-          background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.8em;
-          transition: all 0.3s ease;
-        }
-
-        .edit-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
-        }
-
-        .delete-button {
-          background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.8em;
-          transition: all 0.3s ease;
-        }
-
-        .delete-button:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(197, 48, 48, 0.3);
-        }
-
-        .delete-button:disabled {
-          background: #a0aec0;
-          cursor: not-allowed;
-          transform: none;
-          box-shadow: none;
-        }
-
-        .empty-state {
-          padding: 60px 20px;
-          text-align: center;
-          color: #718096;
-        }
-
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-
-        .modal {
-          background: white;
-          border-radius: 12px;
-          width: 90%;
-          max-width: 500px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-          padding: 25px;
-          border-bottom: 1px solid #e2e8f0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .modal-header h2 {
-          margin: 0;
-          color: #2d3748;
-        }
-
-        .close-button {
-          background: none;
-          border: none;
-          font-size: 1.5em;
-          cursor: pointer;
-          color: #718096;
-          padding: 0;
-          width: 30px;
-          height: 30px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          transition: all 0.3s ease;
-        }
-
-        .close-button:hover {
-          background: #f1f5f9;
-          color: #4a5568;
-        }
-
-        .modal-form {
-          padding: 25px;
-        }
-
-        .form-group {
-          margin-bottom: 20px;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 8px;
-          font-weight: 600;
-          color: #4a5568;
-        }
-
-        .form-group input {
-          width: 100%;
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 1em;
-          transition: all 0.3s ease;
-          box-sizing: border-box;
-        }
-
-        .form-group input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-actions {
-          display: flex;
-          gap: 15px;
-          justify-content: flex-end;
-          margin-top: 30px;
-        }
-
-        .form-actions button {
-          padding: 12px 24px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .form-actions button[type="button"] {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
-          color: #4a5568;
-        }
-
-        .form-actions button[type="button"]:hover {
-          background: #edf2f7;
-        }
-
-        .form-actions button.primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-        }
-
-        .form-actions button.primary:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .loading-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f8fafc;
-        }
-
-        .loading-spinner {
-          text-align: center;
-          color: #718096;
-        }
-
-        .spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #e2e8f0;
-          border-top: 4px solid #667eea;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 20px auto;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-          .header-content {
-            flex-direction: column;
-            gap: 20px;
-          }
-
-          .header-left {
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-          }
-
-          .actions-bar {
-            flex-direction: column;
-          }
-
-          .admins-table {
-            overflow-x: auto;
-          }
-
-          .actions-cell {
-            flex-direction: column;
-            gap: 5px;
-          }
-
-          .modal {
-            width: 95%;
-            margin: 10px;
-          }
-
-          .form-actions {
-            flex-direction: column;
-          }
-        }
-      `}</style>
+      
+      <AdminFooter />
+      <Chatbot />
     </div>
   );
 };
