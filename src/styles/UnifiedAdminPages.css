@@ -1421,7 +1421,6 @@
 }
 
 .area-option:hover .area-icon {
-    color: var(--primary-color);
     transform: scale(1.15);
 }
 
@@ -1431,6 +1430,8 @@
 .area-icon.ginecologo { color: #E91E63; }
 .area-icon.dentista { color: #00BCD4; }
 .area-icon.neurologo { color: #9C27B0; }
+.area-icon.laboratorio { color: #4CAF50; }
+.area-icon.vacunacion { color: #FF5722; }
 .area-icon.enfermeria { color: #4CAF50; }
 .area-icon.cardiologia { color: #F44336; }
 .area-icon.dermatologia { color: #795548; }
@@ -1440,7 +1441,7 @@
 .area-icon.radiologia { color: #9E9E9E; }
 
 /* Color por defecto para áreas sin icono específico */
-.area-icon:not([class*="medicina"]):not([class*="pediatria"]):not([class*="ginecologo"]):not([class*="dentista"]):not([class*="neurologo"]):not([class*="enfermeria"]):not([class*="cardiologia"]):not([class*="dermatologia"]):not([class*="oftalmologia"]):not([class*="traumatologia"]):not([class*="psicologia"]):not([class*="radiologia"]) {
+.area-icon:not([class*="medicina"]):not([class*="pediatria"]):not([class*="ginecologo"]):not([class*="dentista"]):not([class*="neurologo"]):not([class*="laboratorio"]):not([class*="vacunacion"]):not([class*="enfermeria"]):not([class*="cardiologia"]):not([class*="dermatologia"]):not([class*="oftalmologia"]):not([class*="traumatologia"]):not([class*="psicologia"]):not([class*="radiologia"]) {
     color: #666666 !important;
 }
 

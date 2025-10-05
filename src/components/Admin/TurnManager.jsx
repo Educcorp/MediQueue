@@ -42,7 +42,8 @@ import {
   FaHeadSideVirus,
   FaUserNurse,
   FaUserTimes,
-  FaList
+  FaList,
+  FaFlask
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -59,6 +60,8 @@ const getAreaIcon = (areaName) => {
     'Dentista': FaTooth,
     'Neurólogo': FaHeadSideVirus,
     'Neurología': FaHeadSideVirus,
+    'Laboratorio': FaFlask,
+    'Vacunación': FaSyringe,
     'Enfermería': FaSyringe,
     'Cardiología': FaHeart,
     'Dermatología': FaBandAid,
@@ -72,7 +75,10 @@ const getAreaIcon = (areaName) => {
     'Ginecólogo': MdPregnantWoman,
     'Enfermeria': FaSyringe,  // Sin tilde
     'Pediatria': FaBaby,      // Sin tilde
+    'Neurologo': FaHeadSideVirus, // Sin tilde
     'Neurologia': FaHeadSideVirus, // Sin tilde
+    'Laboratorio': FaFlask,   // Laboratorio
+    'Vacunacion': FaSyringe, // Sin tilde
     'Cardiologia': FaHeart,   // Sin tilde
     'Dermatologia': FaBandAid, // Sin tilde
     'Oftalmologia': FaEyeDropper, // Sin tilde
@@ -121,6 +127,8 @@ const getAreaClass = (areaName) => {
     'Dentista': 'dentista',
     'Neurólogo': 'neurologo',
     'Neurología': 'neurologo',
+    'Laboratorio': 'laboratorio',
+    'Vacunación': 'vacunacion',
     'Enfermería': 'enfermeria',
     'Cardiología': 'cardiologia',
     'Dermatología': 'dermatologia',
@@ -134,7 +142,10 @@ const getAreaClass = (areaName) => {
     'Ginecólogo': 'ginecologo',
     'Enfermeria': 'enfermeria',
     'Pediatria': 'pediatria',
+    'Neurologo': 'neurologo',
     'Neurologia': 'neurologo',
+    'Laboratorio': 'laboratorio',
+    'Vacunacion': 'vacunacion',
     'Cardiologia': 'cardiologia',
     'Dermatologia': 'dermatologia',
     'Oftalmologia': 'oftalmologia',
@@ -226,7 +237,7 @@ const TurnManager = () => {
     { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
-    { value: 'NO_PRESENTE', label: 'No presente', color: 'secondary', indicator: '#fd7e14' }
+  
   ];
 
   // Cargar datos al montar el componente
@@ -369,7 +380,8 @@ const TurnManager = () => {
       const filters = {};
 
       if (selectedArea !== 'todas') {
-        filters.uk_area = selectedArea;
+        // Solo filtrar por consultorio específico
+        filters.uk_consultorio = selectedArea;
       }
 
       if (selectedStatus === 'todos') {
@@ -547,6 +559,58 @@ const TurnManager = () => {
     return area ? area.s_nombre_area : '';
   };
 
+  // Generar lista de consultorios con área
+  const getCombinedAreaConsultorioList = () => {
+    const combined = [];
+
+    // Agregar todos los consultorios con su área
+    consultorios.forEach(consultorio => {
+      const area = areas.find(a => a.uk_area === consultorio.uk_area);
+      if (area) {
+        combined.push({
+          type: 'consultorio',
+          id: consultorio.uk_consultorio,
+          name: `Consultorio ${consultorio.i_numero_consultorio}`,
+          displayName: `Consultorio ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
+          areaName: area.s_nombre_area,
+          icon: getAreaIcon(area.s_nombre_area),
+          className: getAreaClass(area.s_nombre_area)
+        });
+      }
+    });
+
+    return combined;
+  };
+
+  // Obtener la información del elemento seleccionado (consultorio)
+  const getSelectedItemInfo = () => {
+    if (selectedArea === 'todas') {
+      return {
+        icon: FaHospital,
+        className: '',
+        displayName: 'Todos los consultorios'
+      };
+    }
+    
+    const combined = getCombinedAreaConsultorioList();
+    const selected = combined.find(item => item.id === selectedArea);
+    
+    if (selected) {
+      return {
+        icon: selected.icon,
+        className: selected.className,
+        displayName: selected.displayName
+      };
+    }
+    
+    // Fallback
+    return {
+      icon: FaHospital,
+      className: '',
+      displayName: 'Todos los consultorios'
+    };
+  };
+
   if (loading) {
     return <TestSpinner message="Cargando turnos..." />;
   }
@@ -680,7 +744,7 @@ const TurnManager = () => {
             </div>
           </div>
           <div className="filter-group">
-            <label>Área</label>
+            <label>ÁREA Y CONSULTORIO</label>
             <div className="custom-area-select">
               <div 
                 ref={areaButtonRef}
@@ -699,14 +763,10 @@ const TurnManager = () => {
                 }}
               >
                 <div className="area-selected">
-                  <div className={`area-icon ${getAreaClass(selectedArea === 'todas' ? 'todas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea)}`}>
-                    {selectedArea === 'todas' ? (
-                      <FaHospital />
-                    ) : (
-                      React.createElement(getAreaIcon(areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea))
-                    )}
+                  <div className={`area-icon ${getSelectedItemInfo().className}`}>
+                    {React.createElement(getSelectedItemInfo().icon)}
                   </div>
-                  <span>{selectedArea === 'todas' ? 'Todas las áreas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea}</span>
+                  <span>{getSelectedItemInfo().displayName}</span>
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -739,21 +799,21 @@ const TurnManager = () => {
                       }}
                     >
                       <div className="area-icon"><FaHospital /></div>
-                      <span>Todas las áreas</span>
+                      <span>Todos los consultorios</span>
                     </div>
-                    {areas.map(area => (
+                    {getCombinedAreaConsultorioList().map(item => (
                       <div
-                        key={area.uk_area}
+                        key={`${item.type}-${item.id}`}
                         className="area-option"
                         onClick={() => {
-                          setSelectedArea(area.uk_area);
+                          setSelectedArea(item.id);
                           setAreaDropdownOpen(false);
                         }}
                       >
-                        <div className={`area-icon ${getAreaClass(area.s_nombre_area)}`}>
-                          {React.createElement(getAreaIcon(area.s_nombre_area))}
+                        <div className={`area-icon ${item.className}`}>
+                          {React.createElement(item.icon)}
                         </div>
-                        <span>{area.s_nombre_area}</span>
+                        <span>{item.displayName}</span>
                       </div>
                     ))}
                   </div>
@@ -777,12 +837,6 @@ const TurnManager = () => {
               Lista de Turnos
             </h3>
             <div className="card-actions">
-              <button className="card-action" title="Ver detalles">
-                <FaEye />
-              </button>
-              <button className="card-action" title="Filtros">
-                <FaFilter />
-              </button>
             </div>
           </div>
 
