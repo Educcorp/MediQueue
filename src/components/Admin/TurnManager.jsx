@@ -1086,14 +1086,6 @@ const TurnManager = () => {
                                 <FaTimes />
                               </button>
                             )}
-                            <button
-                              onClick={() => handleEdit(turn)}
-                              className="btn btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '12px' }}
-                              title="Editar observaciones"
-                            >
-                              <FaEdit />
-                            </button>
                           </div>
                         </td>
                       </tr>
