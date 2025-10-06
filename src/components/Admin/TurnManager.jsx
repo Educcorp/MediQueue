@@ -383,22 +383,27 @@ const TurnManager = () => {
 
   const loadTurns = async () => {
     try {
-      console.log('Loading turns with selectedStatus:', selectedStatus);
+      console.log('Loading turns with selectedStatus:', selectedStatus, 'and selectedDate:', selectedDate);
       let turnsData;
-      const filters = {};
+      const filters = {
+        fecha: selectedDate // Siempre incluir la fecha seleccionada
+      };
 
       if (selectedArea !== 'todas') {
         // Solo filtrar por consultorio específico
         filters.uk_consultorio = selectedArea;
       }
 
-      if (selectedStatus === 'todos') {
-        console.log('Using getTurnsByDate with filters:', filters);
-        turnsData = await turnService.getTurnsByDate(selectedDate, filters);
-      } else {
-        console.log('Using getTurnsByStatus with status:', selectedStatus, 'and filters:', filters);
-        turnsData = await turnService.getTurnsByStatus(selectedStatus, filters);
+      if (selectedStatus !== 'todos') {
+        // Incluir filtro de estado si no es "todos"
+        filters.estado = selectedStatus;
       }
+
+      console.log('Using getTurnsByDate with filters:', filters);
+      turnsData = await turnService.getTurnsByDate(selectedDate, filters);
+      
+      console.log('Received turnsData:', turnsData);
+      console.log('Number of turns:', turnsData?.length || 0);
 
       setTurns(turnsData || []);
     } catch (error) {
@@ -545,8 +550,15 @@ const TurnManager = () => {
   };
 
   const getStatusColor = (status) => {
-    const statusObj = turnStatuses.find(s => s.value === status);
-    return statusObj ? statusObj.color : 'secondary';
+    const statusColorMap = {
+      'EN_ESPERA': 'status-en-espera',
+      'EN_ATENCION': 'status-en-atencion', 
+      'ATENDIDO': 'status-atendido',
+      'CANCELADO': 'status-cancelado',
+      'NO_PRESENTE': 'status-no-presente'
+    };
+    
+    return statusColorMap[status] || 'status-default';
   };
 
   const getPatientName = (uk_paciente) => {
@@ -665,9 +677,6 @@ const TurnManager = () => {
           <div className="page-actions">
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> Actualizar
-            </button>
-            <button className="btn btn-primary" onClick={handleAddNew}>
-              <FaPlus /> Nuevo Turno
             </button>
           </div>
         </div>
@@ -961,6 +970,10 @@ const TurnManager = () => {
                         </td>
                         <td>
                           <span className={`status-badge ${getStatusColor(turn.s_estado)}`}>
+                            {React.createElement(getStatusIcon(turn.s_estado), { 
+                              className: 'status-icon-inline',
+                              size: 12 
+                            })}
                             {getStatusLabel(turn.s_estado)}
                           </span>
                         </td>
@@ -977,19 +990,11 @@ const TurnManager = () => {
                               <>
                                 <button
                                   onClick={() => handleMarkAsAttended(turn)}
-                                  className="btn btn-success"
+                                  className="btn btn-secondary"
                                   style={{ padding: '4px 8px', fontSize: '12px' }}
                                   title="Marcar como atendido"
                                 >
                                   <FaCheck />
-                                </button>
-                                <button
-                                  onClick={() => handleMarkAsNoShow(turn)}
-                                  className="btn btn-secondary"
-                                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                                  title="Marcar como no presente"
-                                >
-                                  <FaTimes />
                                 </button>
                               </>
                             )}
@@ -1010,14 +1015,6 @@ const TurnManager = () => {
                               title="Editar observaciones"
                             >
                               <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(turn)}
-                              className="btn btn-danger"
-                              style={{ padding: '4px 8px', fontSize: '12px' }}
-                              title="Eliminar turno"
-                            >
-                              <FaTrash />
                             </button>
                           </div>
                         </td>
