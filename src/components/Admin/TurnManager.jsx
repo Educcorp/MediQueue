@@ -919,6 +919,7 @@ const TurnManager = () => {
                       <th>Paciente</th>
                       <th>Fecha</th>
                       <th>Hora</th>
+                      <th>Fecha Creación</th>
                       <th>Estado</th>
                       <th>Consultorio</th>
                       <th>Área</th>
@@ -942,6 +943,20 @@ const TurnManager = () => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <FaClock style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
                             {turn.t_hora}
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                            {turn.d_fecha_creacion ? 
+                              new Date(turn.d_fecha_creacion).toLocaleString('es-ES', {
+                                day: '2-digit',
+                                month: '2-digit', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              }) 
+                              : 'N/A'
+                            }
                           </div>
                         </td>
                         <td>
