@@ -754,6 +754,8 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-sm);
     position: relative;
+    min-height: 48px;
+    height: 48px;
 }
 
 .filter-group .form-control:focus {
@@ -1213,6 +1215,8 @@
     transition: all 0.3s ease;
     font-weight: 500;
     color: var(--text-primary);
+    min-height: 48px;
+    height: 48px;
 }
 
 .status-select-trigger:hover {
@@ -1312,6 +1316,7 @@
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 48px;
+    height: 48px;
 }
 
 .area-select-trigger:hover {
@@ -1335,12 +1340,37 @@
     justify-content: center;
     color: #333333;
     transition: all 0.3s ease;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
 }
 
 .area-icon svg {
     width: 18px;
     height: 18px;
     color: inherit;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Regla adicional para asegurar que no hay fondos en los iconos */
+.area-dropdown-menu .area-icon,
+.area-dropdown-menu .area-icon svg,
+.area-option .area-icon,
+.area-option .area-icon svg {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 /* Area Dropdown Overlay */
@@ -1404,7 +1434,6 @@
 }
 
 .area-option:hover {
-    background: linear-gradient(135deg, #f8f9fa, #e3f2fd);
     transform: translateX(4px);
 }
 
@@ -1412,12 +1441,24 @@
     width: 16px;
     height: 16px;
     color: #444444;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
 }
 
 .area-option .area-icon svg {
     width: 16px;
     height: 16px;
     color: inherit;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
 }
 
 .area-option:hover .area-icon {
@@ -1676,4 +1717,70 @@
     border-color: var(--border-color);
     color: var(--text-primary);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ccc' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* PAGINATION STYLES */
+.pagination-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--bg-white);
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.pagination-info {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+[data-theme="dark"] .pagination-bar {
+    background: var(--bg-white);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .pagination-btn {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .pagination-btn:hover:not(:disabled) {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
 }

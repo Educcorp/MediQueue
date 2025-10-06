@@ -43,7 +43,11 @@ import {
   FaUserNurse,
   FaUserTimes,
   FaList,
-  FaFlask
+  FaFlask,
+  FaChevronLeft,
+  FaChevronRight,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -219,6 +223,10 @@ const TurnManager = () => {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   
+  // Estados de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const turnsPerPage = 5;
+  
   const statusButtonRef = useRef(null);
   const areaButtonRef = useRef(null);
   
@@ -237,7 +245,7 @@ const TurnManager = () => {
     { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
-  
+
   ];
 
   // Cargar datos al montar el componente
@@ -611,6 +619,29 @@ const TurnManager = () => {
     };
   };
 
+  // Funciones de paginación
+  const totalPages = Math.ceil(turns.length / turnsPerPage);
+  const startIndex = (currentPage - 1) * turnsPerPage;
+  const endIndex = startIndex + turnsPerPage;
+  const currentTurns = turns.slice(startIndex, endIndex);
+
+  const goToFirstPage = () => setCurrentPage(1);
+  const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const goToLastPage = () => setCurrentPage(totalPages);
+
+  // Resetear a la primera página cuando cambian los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedDate, selectedStatus, selectedArea]);
+
+  // Ajustar página actual si se queda sin turnos
+  useEffect(() => {
+    if (turns.length > 0 && currentTurns.length === 0 && currentPage > 1) {
+      setCurrentPage(Math.max(1, Math.ceil(turns.length / turnsPerPage)));
+    }
+  }, [turns.length, currentTurns.length, currentPage, turnsPerPage]);
+
   if (loading) {
     return <TestSpinner message="Cargando turnos..." />;
   }
@@ -763,7 +794,17 @@ const TurnManager = () => {
                 }}
               >
                 <div className="area-selected">
-                  <div className={`area-icon ${getSelectedItemInfo().className}`}>
+                  <div 
+                    className={`area-icon ${getSelectedItemInfo().className}`}
+                    style={{
+                      background: 'none',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      borderRadius: '0',
+                      padding: '0',
+                      boxShadow: 'none'
+                    }}
+                  >
                     {React.createElement(getSelectedItemInfo().icon)}
                   </div>
                   <span>{getSelectedItemInfo().displayName}</span>
@@ -798,7 +839,19 @@ const TurnManager = () => {
                         setAreaDropdownOpen(false);
                       }}
                     >
-                      <div className="area-icon"><FaHospital /></div>
+                      <div 
+                        className="area-icon"
+                        style={{ 
+                          background: 'none',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0',
+                          boxShadow: 'none'
+                        }}
+                      >
+                        <FaHospital />
+                      </div>
                       <span>Todos los consultorios</span>
                     </div>
                     {getCombinedAreaConsultorioList().map(item => (
@@ -810,7 +863,17 @@ const TurnManager = () => {
                           setAreaDropdownOpen(false);
                         }}
                       >
-                        <div className={`area-icon ${item.className}`}>
+                        <div 
+                          className={`area-icon ${item.className}`}
+                          style={{ 
+                            background: 'none',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0',
+                            boxShadow: 'none'
+                          }}
+                        >
                           {React.createElement(item.icon)}
                         </div>
                         <span>{item.displayName}</span>
@@ -846,9 +909,6 @@ const TurnManager = () => {
                 <FaCalendarCheck />
                 <h3>No hay turnos registrados</h3>
                 <p>No se encontraron turnos para los filtros seleccionados</p>
-                <button className="btn btn-primary" onClick={handleAddNew}>
-                  <FaPlus /> Crear Primer Turno
-                </button>
               </div>
             ) : (
               <div className="data-table">
@@ -866,7 +926,7 @@ const TurnManager = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {turns.map(turn => (
+                    {currentTurns.map(turn => (
                       <tr key={turn.uk_turno}>
                         <td>
                           <strong>#{turn.i_numero_turno}</strong>
@@ -948,8 +1008,67 @@ const TurnManager = () => {
                         </td>
                       </tr>
                     ))}
+                    
+                    {/* Filas vacías para mantener altura consistente en páginas 2+ */}
+                    {currentPage > 1 && currentTurns.length < turnsPerPage && 
+                      Array.from({ length: turnsPerPage - currentTurns.length }).map((_, index) => (
+                        <tr key={`empty-${index}`} style={{ height: '57px', opacity: 0 }}>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                        </tr>
+                      ))
+                    }
                   </tbody>
                 </table>
+              </div>
+            )}
+            
+            {/* Barra de paginación */}
+            {turns.length > turnsPerPage && (
+              <div className="pagination-bar">
+                <div className="pagination-info">
+                  <span>Página {currentPage} de {totalPages} | {turns.length} turnos total</span>
+                </div>
+                <div className="pagination-controls">
+                  <button
+                    onClick={goToFirstPage}
+                    disabled={currentPage === 1}
+                    className="pagination-btn"
+                    title="Primera página"
+                  >
+                    <FaAngleDoubleLeft />
+                  </button>
+                  <button
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 1}
+                    className="pagination-btn"
+                    title="Página anterior"
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <button
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                    className="pagination-btn"
+                    title="Página siguiente"
+                  >
+                    <FaChevronRight />
+                  </button>
+                  <button
+                    onClick={goToLastPage}
+                    disabled={currentPage === totalPages}
+                    className="pagination-btn"
+                    title="Última página"
+                  >
+                    <FaAngleDoubleRight />
+                  </button>
+                </div>
               </div>
             )}
           </div>
