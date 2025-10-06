@@ -215,7 +215,8 @@ const TurnManager = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+  const [selectedStartDate, setSelectedStartDate] = useState(getCurrentDate());
+  const [selectedEndDate, setSelectedEndDate] = useState(getCurrentDate());
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [selectedArea, setSelectedArea] = useState('todas');
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
@@ -260,15 +261,17 @@ const TurnManager = () => {
   // Cargar turnos cuando cambie la fecha, estado o área
   useEffect(() => {
     loadTurns();
-  }, [selectedDate, selectedStatus, selectedArea]);
+  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea]);
 
   // Efecto para actualizar la fecha automáticamente cada día
   useEffect(() => {
     // Función para actualizar la fecha si ha cambiado
     const updateDateIfNeeded = () => {
       const currentDate = getCurrentDate();
-      if (selectedDate !== currentDate) {
-        setSelectedDate(currentDate);
+      // Si ambas fechas son iguales y diferentes a la fecha actual, actualizarlas
+      if (selectedStartDate === selectedEndDate && selectedStartDate !== currentDate) {
+        setSelectedStartDate(currentDate);
+        setSelectedEndDate(currentDate);
       }
     };
 
@@ -383,11 +386,9 @@ const TurnManager = () => {
 
   const loadTurns = async () => {
     try {
-      console.log('Loading turns with selectedStatus:', selectedStatus, 'and selectedDate:', selectedDate);
+      console.log('Loading turns with selectedStatus:', selectedStatus, 'startDate:', selectedStartDate, 'endDate:', selectedEndDate);
       let turnsData;
-      const filters = {
-        fecha: selectedDate // Siempre incluir la fecha seleccionada
-      };
+      const filters = {};
 
       if (selectedArea !== 'todas') {
         // Solo filtrar por consultorio específico
@@ -399,8 +400,8 @@ const TurnManager = () => {
         filters.estado = selectedStatus;
       }
 
-      console.log('Using getTurnsByDate with filters:', filters);
-      turnsData = await turnService.getTurnsByDate(selectedDate, filters);
+      console.log('Using getTurnsByDateRange with filters:', filters);
+      turnsData = await turnService.getTurnsByDateRange(selectedStartDate, selectedEndDate, filters);
       
       console.log('Received turnsData:', turnsData);
       console.log('Number of turns:', turnsData?.length || 0);
@@ -645,7 +646,7 @@ const TurnManager = () => {
   // Resetear a la primera página cuando cambian los filtros
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedDate, selectedStatus, selectedArea]);
+  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea]);
 
   // Ajustar página actual si se queda sin turnos
   useEffect(() => {
@@ -694,14 +695,91 @@ const TurnManager = () => {
 
         {/* Filters Section */}
         <div className="filters-section">
-          <div className="filter-group">
-            <label>Fecha</label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="form-control"
-            />
+          <div className="filter-group date-range-filter">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ margin: 0 }}>Fechas</label>
+              <button
+                type="button"
+                onClick={() => {
+                  const today = getCurrentDate();
+                  setSelectedStartDate(today);
+                  setSelectedEndDate(today);
+                }}
+                className="btn btn-secondary"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  minHeight: 'auto',
+                  height: 'auto',
+                  lineHeight: '1'
+                }}
+                title="Reiniciar a hoy"
+              >
+                <FaSync style={{ fontSize: '10px' }} />
+              </button>
+            </div>
+            <div className="date-range-container" style={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+              flexWrap: 'nowrap',
+              width: '100%',
+              maxWidth: '100%'
+            }}>
+              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
+                <input
+                  type="date"
+                  value={selectedStartDate}
+                  onChange={(e) => {
+                    const newStartDate = e.target.value;
+                    setSelectedStartDate(newStartDate);
+                    // Si la fecha inicial es mayor que la final, ajustar la final
+                    if (newStartDate > selectedEndDate) {
+                      setSelectedEndDate(newStartDate);
+                    }
+                  }}
+                  onClick={(e) => {
+                    // Forzar que se abra el calendario al hacer click en cualquier parte
+                    e.target.showPicker && e.target.showPicker();
+                  }}
+                  className="form-control"
+                  placeholder="Fecha inicial"
+                  title="Fecha inicial"
+                  style={{ width: '100%', minWidth: '0' }}
+                />
+              </div>
+              <span style={{ 
+                color: 'var(--text-muted)', 
+                fontSize: '13px',
+                fontWeight: '500',
+                whiteSpace: 'nowrap',
+                padding: '0 6px',
+                flexShrink: 0
+              }}>a</span>
+              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
+                <input
+                  type="date"
+                  value={selectedEndDate}
+                  onChange={(e) => {
+                    const newEndDate = e.target.value;
+                    setSelectedEndDate(newEndDate);
+                    // Si la fecha final es menor que la inicial, ajustar la inicial
+                    if (newEndDate < selectedStartDate) {
+                      setSelectedStartDate(newEndDate);
+                    }
+                  }}
+                  onClick={(e) => {
+                    // Forzar que se abra el calendario al hacer click en cualquier parte
+                    e.target.showPicker && e.target.showPicker();
+                  }}
+                  min={selectedStartDate}
+                  className="form-control"
+                  placeholder="Fecha final"
+                  title="Fecha final"
+                  style={{ width: '100%', minWidth: '0' }}
+                />
+              </div>
+            </div>
           </div>
           <div className="filter-group">
             <label>Estado</label>

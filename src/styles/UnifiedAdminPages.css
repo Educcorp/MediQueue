@@ -378,6 +378,49 @@
     box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
 }
 
+/* Dark Mode Status Badges - Better visibility and contrast */
+[data-theme="dark"] .status-badge.status-en-espera {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.25), rgba(255, 193, 7, 0.1));
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.5);
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-en-atencion {
+    background: linear-gradient(135deg, rgba(23, 162, 184, 0.25), rgba(23, 162, 184, 0.1));
+    color: #17a2b8;
+    border: 1px solid rgba(23, 162, 184, 0.5);
+    box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-atendido {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.25), rgba(40, 167, 69, 0.1));
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.5);
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-cancelado {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.25), rgba(220, 53, 69, 0.1));
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.5);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-no-presente {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.25), rgba(253, 126, 20, 0.1));
+    color: #fd7e14;
+    border: 1px solid rgba(253, 126, 20, 0.5);
+    box-shadow: 0 2px 8px rgba(253, 126, 20, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-default {
+    background: linear-gradient(135deg, rgba(108, 117, 125, 0.25), rgba(108, 117, 125, 0.1));
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.5);
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
 /* Estilos base eliminados - definidos más abajo */
 
 .status-badge.success {
@@ -467,12 +510,192 @@
     min-width: 150px;
 }
 
+/* Override for date range filter specifically */
+.filter-group:has(.date-range-container) {
+    min-width: unset;
+    flex: 1;
+    max-width: 100%;
+}
+
+.filter-group.date-range-filter {
+    min-width: unset !important;
+    flex: 1;
+    max-width: 100%;
+}
+
 .filter-group label {
     font-weight: 600;
     color: var(--text-secondary);
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* Date Range Selector Styles */
+.date-range-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow: hidden;
+}
+
+.date-range-container .date-input-wrapper {
+    flex: 1;
+    min-width: 0 !important;
+    width: 100%;
+}
+
+.date-range-container .date-input-wrapper input {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+}
+
+.date-input-wrapper {
+    flex: 1;
+    min-width: 140px;
+    position: relative;
+}
+
+.date-input-wrapper input[type="date"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--bg-white);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.date-input-wrapper input[type="date"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.date-range-container > span {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 0 6px;
+    flex-shrink: 0;
+}
+
+/* Ocultar iconos directamente cuando hay poco espacio */
+.date-input-wrapper input[type="date"] {
+    position: relative;
+}
+
+/* Siempre ocultar iconos en campos de fecha pequeños */
+@media (max-width: 768px) {
+    .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+        pointer-events: none !important;
+    }
+    
+    .date-input-wrapper input[type="date"]::-webkit-inner-spin-button {
+        display: none !important;
+        opacity: 0 !important;
+    }
+    
+    .date-input-wrapper input[type="date"]::-webkit-clear-button {
+        display: none !important;
+        opacity: 0 !important;
+    }
+    
+    /* Para Firefox */
+    .date-input-wrapper input[type="date"] {
+        appearance: textfield !important;
+        -moz-appearance: textfield !important;
+        background-image: none !important;
+    }
+}
+
+/* Para pantallas aún más pequeñas */
+@media (max-width: 480px) {
+    .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+/* Clase específica para ocultar iconos en campos compactos */
+.date-input-compact::-webkit-calendar-picker-indicator {
+    display: none !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+.date-input-compact::-webkit-inner-spin-button {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+.date-input-compact::-webkit-clear-button {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+/* Para Firefox */
+.date-input-compact {
+    appearance: textfield !important;
+    -moz-appearance: textfield !important;
+    background-image: none !important;
+}
+
+/* Responsive design for date range */
+@media (max-width: 768px) {
+    .date-range-container {
+        gap: 6px;
+    }
+    
+    .date-input-wrapper {
+        min-width: 120px;
+    }
+    
+    .date-range-container > span {
+        font-size: 12px;
+        padding: 0 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-group {
+        min-width: 100% !important;
+    }
+    
+    .date-range-container {
+        gap: 4px;
+    }
+    
+    .date-input-wrapper {
+        min-width: 110px;
+    }
+    
+    .date-input-wrapper input[type="date"] {
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+    
+    .date-range-container > span {
+        padding: 0 2px;
+    }
 }
 
 /* Action Bars */
@@ -816,50 +1039,41 @@
     padding-right: 40px;
 }
 
-/* ENHANCED DATE INPUT STYLING */
+/* SIMPLIFIED DATE INPUT STYLING - NO ICONS */
 .filter-group input[type="date"].form-control {
-    position: relative;
     cursor: pointer;
     background: #ffffff;
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: 4px 6px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-primary);
     transition: all 0.3s ease;
     width: 100%;
 }
 
-/* Hacer que todo el input sea clickeable para abrir el calendario */
+/* Make calendar icon transparent but functional */
 .filter-group input[type="date"].form-control::-webkit-calendar-picker-indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
     opacity: 0;
-    background: transparent;
+    cursor: pointer;
 }
 
-/* Ícono visual del calendario */
-.filter-group input[type="date"].form-control::after {
-    content: '';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%232f97d1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3E%3C/svg%3E");
-    background-size: 18px;
-    background-repeat: no-repeat;
-    background-position: center;
-    pointer-events: none;
-    z-index: 1;
+.filter-group input[type="date"].form-control::-webkit-inner-spin-button,
+.filter-group input[type="date"].form-control::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.filter-group input[type="date"].form-control:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(47, 151, 209, 0.1);
+}
+
+.filter-group input[type="date"].form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(47, 151, 209, 0.2);
 }
 
 .filter-group input[type="date"].form-control:hover {
