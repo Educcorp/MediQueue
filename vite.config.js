@@ -9,11 +9,16 @@ export default defineConfig({
         open: true,
         proxy: {
             '/api': {
-                target: 'http://localhost:3000',
+                target: process.env.VITE_API_URL ? 
+                    process.env.VITE_API_URL.replace('/api', '') : 
+                    'http://localhost:3000',
                 changeOrigin: true,
-                secure: false,
+                secure: true,
                 rewrite: (path) => path.replace(/^\/api/, '/api')
             },
         },
+    },
+    define: {
+        __APP_ENV__: process.env.VITE_NODE_ENV,
     },
 })
