@@ -234,10 +234,33 @@ const HomePage = () => {
 
           {/* Right Section */}
           <div className="header-right">
-            <div className="hospital-badge">
-              <FaTicketAlt className="hospital-icon" />
-                <a href="/tomar-turno"> Tomar turnos</a>
-            </div>
+            <a href="/tomar-turno" className="take-turn-button" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 20px',
+              background: 'linear-gradient(135deg, #4A90E2, #2f97d1)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '20px',
+              fontWeight: '600',
+              fontSize: '16px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 12px rgba(74, 144, 226, 0.3)',
+              textDecoration: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 8px 20px rgba(74, 144, 226, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 12px rgba(74, 144, 226, 0.3)';
+            }}>
+              <FaTicketAlt style={{ fontSize: '18px' }} />
+              <span>Tomar turnos</span>
+            </a>
           </div>
         </div>
       </header>

@@ -42,7 +42,12 @@ import {
   FaHeadSideVirus,
   FaUserNurse,
   FaUserTimes,
-  FaList
+  FaList,
+  FaFlask,
+  FaChevronLeft,
+  FaChevronRight,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -59,6 +64,8 @@ const getAreaIcon = (areaName) => {
     'Dentista': FaTooth,
     'Neurólogo': FaHeadSideVirus,
     'Neurología': FaHeadSideVirus,
+    'Laboratorio': FaFlask,
+    'Vacunación': FaSyringe,
     'Enfermería': FaSyringe,
     'Cardiología': FaHeart,
     'Dermatología': FaBandAid,
@@ -72,7 +79,10 @@ const getAreaIcon = (areaName) => {
     'Ginecólogo': MdPregnantWoman,
     'Enfermeria': FaSyringe,  // Sin tilde
     'Pediatria': FaBaby,      // Sin tilde
+    'Neurologo': FaHeadSideVirus, // Sin tilde
     'Neurologia': FaHeadSideVirus, // Sin tilde
+    'Laboratorio': FaFlask,   // Laboratorio
+    'Vacunacion': FaSyringe, // Sin tilde
     'Cardiologia': FaHeart,   // Sin tilde
     'Dermatologia': FaBandAid, // Sin tilde
     'Oftalmologia': FaEyeDropper, // Sin tilde
@@ -121,6 +131,8 @@ const getAreaClass = (areaName) => {
     'Dentista': 'dentista',
     'Neurólogo': 'neurologo',
     'Neurología': 'neurologo',
+    'Laboratorio': 'laboratorio',
+    'Vacunación': 'vacunacion',
     'Enfermería': 'enfermeria',
     'Cardiología': 'cardiologia',
     'Dermatología': 'dermatologia',
@@ -134,7 +146,10 @@ const getAreaClass = (areaName) => {
     'Ginecólogo': 'ginecologo',
     'Enfermeria': 'enfermeria',
     'Pediatria': 'pediatria',
+    'Neurologo': 'neurologo',
     'Neurologia': 'neurologo',
+    'Laboratorio': 'laboratorio',
+    'Vacunacion': 'vacunacion',
     'Cardiologia': 'cardiologia',
     'Dermatologia': 'dermatologia',
     'Oftalmologia': 'oftalmologia',
@@ -200,13 +215,18 @@ const TurnManager = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+  const [selectedStartDate, setSelectedStartDate] = useState(getCurrentDate());
+  const [selectedEndDate, setSelectedEndDate] = useState(getCurrentDate());
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [selectedArea, setSelectedArea] = useState('todas');
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  
+  // Estados de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const turnsPerPage = 5;
   
   const statusButtonRef = useRef(null);
   const areaButtonRef = useRef(null);
@@ -226,7 +246,7 @@ const TurnManager = () => {
     { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
-    { value: 'NO_PRESENTE', label: 'No presente', color: 'secondary', indicator: '#fd7e14' }
+
   ];
 
   // Cargar datos al montar el componente
@@ -241,15 +261,17 @@ const TurnManager = () => {
   // Cargar turnos cuando cambie la fecha, estado o área
   useEffect(() => {
     loadTurns();
-  }, [selectedDate, selectedStatus, selectedArea]);
+  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea]);
 
   // Efecto para actualizar la fecha automáticamente cada día
   useEffect(() => {
     // Función para actualizar la fecha si ha cambiado
     const updateDateIfNeeded = () => {
       const currentDate = getCurrentDate();
-      if (selectedDate !== currentDate) {
-        setSelectedDate(currentDate);
+      // Si ambas fechas son iguales y diferentes a la fecha actual, actualizarlas
+      if (selectedStartDate === selectedEndDate && selectedStartDate !== currentDate) {
+        setSelectedStartDate(currentDate);
+        setSelectedEndDate(currentDate);
       }
     };
 
@@ -364,21 +386,25 @@ const TurnManager = () => {
 
   const loadTurns = async () => {
     try {
-      console.log('Loading turns with selectedStatus:', selectedStatus);
+      console.log('Loading turns with selectedStatus:', selectedStatus, 'startDate:', selectedStartDate, 'endDate:', selectedEndDate);
       let turnsData;
       const filters = {};
 
       if (selectedArea !== 'todas') {
-        filters.uk_area = selectedArea;
+        // Solo filtrar por consultorio específico
+        filters.uk_consultorio = selectedArea;
       }
 
-      if (selectedStatus === 'todos') {
-        console.log('Using getTurnsByDate with filters:', filters);
-        turnsData = await turnService.getTurnsByDate(selectedDate, filters);
-      } else {
-        console.log('Using getTurnsByStatus with status:', selectedStatus, 'and filters:', filters);
-        turnsData = await turnService.getTurnsByStatus(selectedStatus, filters);
+      if (selectedStatus !== 'todos') {
+        // Incluir filtro de estado si no es "todos"
+        filters.estado = selectedStatus;
       }
+
+      console.log('Using getTurnsByDateRange with filters:', filters);
+      turnsData = await turnService.getTurnsByDateRange(selectedStartDate, selectedEndDate, filters);
+      
+      console.log('Received turnsData:', turnsData);
+      console.log('Number of turns:', turnsData?.length || 0);
 
       setTurns(turnsData || []);
     } catch (error) {
@@ -525,8 +551,15 @@ const TurnManager = () => {
   };
 
   const getStatusColor = (status) => {
-    const statusObj = turnStatuses.find(s => s.value === status);
-    return statusObj ? statusObj.color : 'secondary';
+    const statusColorMap = {
+      'EN_ESPERA': 'status-en-espera',
+      'EN_ATENCION': 'status-en-atencion', 
+      'ATENDIDO': 'status-atendido',
+      'CANCELADO': 'status-cancelado',
+      'NO_PRESENTE': 'status-no-presente'
+    };
+    
+    return statusColorMap[status] || 'status-default';
   };
 
   const getPatientName = (uk_paciente) => {
@@ -546,6 +579,81 @@ const TurnManager = () => {
     const area = areas.find(a => a.uk_area === consultorio.uk_area);
     return area ? area.s_nombre_area : '';
   };
+
+  // Generar lista de consultorios con área
+  const getCombinedAreaConsultorioList = () => {
+    const combined = [];
+
+    // Agregar todos los consultorios con su área
+    consultorios.forEach(consultorio => {
+      const area = areas.find(a => a.uk_area === consultorio.uk_area);
+      if (area) {
+        combined.push({
+          type: 'consultorio',
+          id: consultorio.uk_consultorio,
+          name: `Consultorio ${consultorio.i_numero_consultorio}`,
+          displayName: `Consultorio ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
+          areaName: area.s_nombre_area,
+          icon: getAreaIcon(area.s_nombre_area),
+          className: getAreaClass(area.s_nombre_area)
+        });
+      }
+    });
+
+    return combined;
+  };
+
+  // Obtener la información del elemento seleccionado (consultorio)
+  const getSelectedItemInfo = () => {
+    if (selectedArea === 'todas') {
+      return {
+        icon: FaHospital,
+        className: '',
+        displayName: 'Todos los consultorios'
+      };
+    }
+    
+    const combined = getCombinedAreaConsultorioList();
+    const selected = combined.find(item => item.id === selectedArea);
+    
+    if (selected) {
+      return {
+        icon: selected.icon,
+        className: selected.className,
+        displayName: selected.displayName
+      };
+    }
+    
+    // Fallback
+    return {
+      icon: FaHospital,
+      className: '',
+      displayName: 'Todos los consultorios'
+    };
+  };
+
+  // Funciones de paginación
+  const totalPages = Math.ceil(turns.length / turnsPerPage);
+  const startIndex = (currentPage - 1) * turnsPerPage;
+  const endIndex = startIndex + turnsPerPage;
+  const currentTurns = turns.slice(startIndex, endIndex);
+
+  const goToFirstPage = () => setCurrentPage(1);
+  const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const goToLastPage = () => setCurrentPage(totalPages);
+
+  // Resetear a la primera página cuando cambian los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea]);
+
+  // Ajustar página actual si se queda sin turnos
+  useEffect(() => {
+    if (turns.length > 0 && currentTurns.length === 0 && currentPage > 1) {
+      setCurrentPage(Math.max(1, Math.ceil(turns.length / turnsPerPage)));
+    }
+  }, [turns.length, currentTurns.length, currentPage, turnsPerPage]);
 
   if (loading) {
     return <TestSpinner message="Cargando turnos..." />;
@@ -571,9 +679,6 @@ const TurnManager = () => {
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> Actualizar
             </button>
-            <button className="btn btn-primary" onClick={handleAddNew}>
-              <FaPlus /> Nuevo Turno
-            </button>
           </div>
         </div>
 
@@ -590,14 +695,91 @@ const TurnManager = () => {
 
         {/* Filters Section */}
         <div className="filters-section">
-          <div className="filter-group">
-            <label>Fecha</label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="form-control"
-            />
+          <div className="filter-group date-range-filter">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ margin: 0 }}>Fechas</label>
+              <button
+                type="button"
+                onClick={() => {
+                  const today = getCurrentDate();
+                  setSelectedStartDate(today);
+                  setSelectedEndDate(today);
+                }}
+                className="btn btn-secondary"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  minHeight: 'auto',
+                  height: 'auto',
+                  lineHeight: '1'
+                }}
+                title="Reiniciar a hoy"
+              >
+                <FaSync style={{ fontSize: '10px' }} />
+              </button>
+            </div>
+            <div className="date-range-container" style={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+              flexWrap: 'nowrap',
+              width: '100%',
+              maxWidth: '100%'
+            }}>
+              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
+                <input
+                  type="date"
+                  value={selectedStartDate}
+                  onChange={(e) => {
+                    const newStartDate = e.target.value;
+                    setSelectedStartDate(newStartDate);
+                    // Si la fecha inicial es mayor que la final, ajustar la final
+                    if (newStartDate > selectedEndDate) {
+                      setSelectedEndDate(newStartDate);
+                    }
+                  }}
+                  onClick={(e) => {
+                    // Forzar que se abra el calendario al hacer click en cualquier parte
+                    e.target.showPicker && e.target.showPicker();
+                  }}
+                  className="form-control"
+                  placeholder="Fecha inicial"
+                  title="Fecha inicial"
+                  style={{ width: '100%', minWidth: '0' }}
+                />
+              </div>
+              <span style={{ 
+                color: 'var(--text-muted)', 
+                fontSize: '13px',
+                fontWeight: '500',
+                whiteSpace: 'nowrap',
+                padding: '0 6px',
+                flexShrink: 0
+              }}>a</span>
+              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
+                <input
+                  type="date"
+                  value={selectedEndDate}
+                  onChange={(e) => {
+                    const newEndDate = e.target.value;
+                    setSelectedEndDate(newEndDate);
+                    // Si la fecha final es menor que la inicial, ajustar la inicial
+                    if (newEndDate < selectedStartDate) {
+                      setSelectedStartDate(newEndDate);
+                    }
+                  }}
+                  onClick={(e) => {
+                    // Forzar que se abra el calendario al hacer click en cualquier parte
+                    e.target.showPicker && e.target.showPicker();
+                  }}
+                  min={selectedStartDate}
+                  className="form-control"
+                  placeholder="Fecha final"
+                  title="Fecha final"
+                  style={{ width: '100%', minWidth: '0' }}
+                />
+              </div>
+            </div>
           </div>
           <div className="filter-group">
             <label>Estado</label>
@@ -680,7 +862,7 @@ const TurnManager = () => {
             </div>
           </div>
           <div className="filter-group">
-            <label>Área</label>
+            <label>ÁREA Y CONSULTORIO</label>
             <div className="custom-area-select">
               <div 
                 ref={areaButtonRef}
@@ -699,14 +881,20 @@ const TurnManager = () => {
                 }}
               >
                 <div className="area-selected">
-                  <div className={`area-icon ${getAreaClass(selectedArea === 'todas' ? 'todas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea)}`}>
-                    {selectedArea === 'todas' ? (
-                      <FaHospital />
-                    ) : (
-                      React.createElement(getAreaIcon(areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea))
-                    )}
+                  <div 
+                    className={`area-icon ${getSelectedItemInfo().className}`}
+                    style={{
+                      background: 'none',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      borderRadius: '0',
+                      padding: '0',
+                      boxShadow: 'none'
+                    }}
+                  >
+                    {React.createElement(getSelectedItemInfo().icon)}
                   </div>
-                  <span>{selectedArea === 'todas' ? 'Todas las áreas' : areas.find(a => a.uk_area === selectedArea)?.s_nombre_area || selectedArea}</span>
+                  <span>{getSelectedItemInfo().displayName}</span>
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -738,22 +926,44 @@ const TurnManager = () => {
                         setAreaDropdownOpen(false);
                       }}
                     >
-                      <div className="area-icon"><FaHospital /></div>
-                      <span>Todas las áreas</span>
+                      <div 
+                        className="area-icon"
+                        style={{ 
+                          background: 'none',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          borderRadius: '0',
+                          padding: '0',
+                          boxShadow: 'none'
+                        }}
+                      >
+                        <FaHospital />
+                      </div>
+                      <span>Todos los consultorios</span>
                     </div>
-                    {areas.map(area => (
+                    {getCombinedAreaConsultorioList().map(item => (
                       <div
-                        key={area.uk_area}
+                        key={`${item.type}-${item.id}`}
                         className="area-option"
                         onClick={() => {
-                          setSelectedArea(area.uk_area);
+                          setSelectedArea(item.id);
                           setAreaDropdownOpen(false);
                         }}
                       >
-                        <div className={`area-icon ${getAreaClass(area.s_nombre_area)}`}>
-                          {React.createElement(getAreaIcon(area.s_nombre_area))}
+                        <div 
+                          className={`area-icon ${item.className}`}
+                          style={{ 
+                            background: 'none',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderRadius: '0',
+                            padding: '0',
+                            boxShadow: 'none'
+                          }}
+                        >
+                          {React.createElement(item.icon)}
                         </div>
-                        <span>{area.s_nombre_area}</span>
+                        <span>{item.displayName}</span>
                       </div>
                     ))}
                   </div>
@@ -777,12 +987,6 @@ const TurnManager = () => {
               Lista de Turnos
             </h3>
             <div className="card-actions">
-              <button className="card-action" title="Ver detalles">
-                <FaEye />
-              </button>
-              <button className="card-action" title="Filtros">
-                <FaFilter />
-              </button>
             </div>
           </div>
 
@@ -792,9 +996,6 @@ const TurnManager = () => {
                 <FaCalendarCheck />
                 <h3>No hay turnos registrados</h3>
                 <p>No se encontraron turnos para los filtros seleccionados</p>
-                <button className="btn btn-primary" onClick={handleAddNew}>
-                  <FaPlus /> Crear Primer Turno
-                </button>
               </div>
             ) : (
               <div className="data-table">
@@ -805,6 +1006,7 @@ const TurnManager = () => {
                       <th>Paciente</th>
                       <th>Fecha</th>
                       <th>Hora</th>
+                      <th>Fecha Creación</th>
                       <th>Estado</th>
                       <th>Consultorio</th>
                       <th>Área</th>
@@ -812,7 +1014,7 @@ const TurnManager = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {turns.map(turn => (
+                    {currentTurns.map(turn => (
                       <tr key={turn.uk_turno}>
                         <td>
                           <strong>#{turn.i_numero_turno}</strong>
@@ -831,7 +1033,25 @@ const TurnManager = () => {
                           </div>
                         </td>
                         <td>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                            {turn.d_fecha_creacion ? 
+                              new Date(turn.d_fecha_creacion).toLocaleString('es-ES', {
+                                day: '2-digit',
+                                month: '2-digit', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              }) 
+                              : 'N/A'
+                            }
+                          </div>
+                        </td>
+                        <td>
                           <span className={`status-badge ${getStatusColor(turn.s_estado)}`}>
+                            {React.createElement(getStatusIcon(turn.s_estado), { 
+                              className: 'status-icon-inline',
+                              size: 12 
+                            })}
                             {getStatusLabel(turn.s_estado)}
                           </span>
                         </td>
@@ -848,19 +1068,11 @@ const TurnManager = () => {
                               <>
                                 <button
                                   onClick={() => handleMarkAsAttended(turn)}
-                                  className="btn btn-success"
+                                  className="btn btn-secondary"
                                   style={{ padding: '4px 8px', fontSize: '12px' }}
                                   title="Marcar como atendido"
                                 >
                                   <FaCheck />
-                                </button>
-                                <button
-                                  onClick={() => handleMarkAsNoShow(turn)}
-                                  className="btn btn-secondary"
-                                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                                  title="Marcar como no presente"
-                                >
-                                  <FaTimes />
                                 </button>
                               </>
                             )}
@@ -874,28 +1086,71 @@ const TurnManager = () => {
                                 <FaTimes />
                               </button>
                             )}
-                            <button
-                              onClick={() => handleEdit(turn)}
-                              className="btn btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '12px' }}
-                              title="Editar observaciones"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(turn)}
-                              className="btn btn-danger"
-                              style={{ padding: '4px 8px', fontSize: '12px' }}
-                              title="Eliminar turno"
-                            >
-                              <FaTrash />
-                            </button>
                           </div>
                         </td>
                       </tr>
                     ))}
+                    
+                    {/* Filas vacías para mantener altura consistente en páginas 2+ */}
+                    {currentPage > 1 && currentTurns.length < turnsPerPage && 
+                      Array.from({ length: turnsPerPage - currentTurns.length }).map((_, index) => (
+                        <tr key={`empty-${index}`} style={{ height: '57px', opacity: 0 }}>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                          <td>&nbsp;</td>
+                        </tr>
+                      ))
+                    }
                   </tbody>
                 </table>
+              </div>
+            )}
+            
+            {/* Barra de paginación */}
+            {turns.length > turnsPerPage && (
+              <div className="pagination-bar">
+                <div className="pagination-info">
+                  <span>Página {currentPage} de {totalPages} | {turns.length} turnos total</span>
+                </div>
+                <div className="pagination-controls">
+                  <button
+                    onClick={goToFirstPage}
+                    disabled={currentPage === 1}
+                    className="pagination-btn"
+                    title="Primera página"
+                  >
+                    <FaAngleDoubleLeft />
+                  </button>
+                  <button
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 1}
+                    className="pagination-btn"
+                    title="Página anterior"
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <button
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                    className="pagination-btn"
+                    title="Página siguiente"
+                  >
+                    <FaChevronRight />
+                  </button>
+                  <button
+                    onClick={goToLastPage}
+                    disabled={currentPage === totalPages}
+                    className="pagination-btn"
+                    title="Última página"
+                  >
+                    <FaAngleDoubleRight />
+                  </button>
+                </div>
               </div>
             )}
           </div>

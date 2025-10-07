@@ -112,17 +112,6 @@ const turnService = {
         }
     },
 
-    // Marcar turno como no presente
-    async markTurnAsNoShow(uk_turno) {
-        try {
-            const response = await api.put(`/turnos/${uk_turno}/no-presente`);
-            return response.data.data;
-        } catch (error) {
-            console.error('Error marcando turno como no presente:', error);
-            throw error;
-        }
-    },
-
     // Eliminar turno
     async deleteTurn(uk_turno) {
         try {
