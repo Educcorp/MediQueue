@@ -154,7 +154,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 <span>Estado: Operativo</span>
               </div>
               <div>Versión: 2.1.0</div>
-              <div>Última actualización: Septiembre 2025</div>
+              <div>Última actualización: Octubre 2025</div>
             </div>
           </div>
 
