@@ -5,7 +5,7 @@
         "buildCommand": "npm run build"
     },
     "deploy": {
-        "startCommand": "npm run preview",
+        "startCommand": "npx vite preview --host --port $PORT",
         "healthcheckPath": "/",
         "healthcheckTimeout": 60,
         "restartPolicyType": "ON_FAILURE",
