@@ -243,10 +243,7 @@ const StatisticsPage = () => {
             </p>
           </div>
           <div className="page-actions">
-            <button className="btn btn-secondary" onClick={exportData}>
-              <FaDownload /> Exportar
-            </button>
-            <button className="btn btn-primary" onClick={refreshData}>
+                        <button className="btn btn-primary" onClick={refreshData}>
               <FaSync /> Actualizar
             </button>
           </div>
@@ -262,35 +259,6 @@ const StatisticsPage = () => {
             </button>
           </div>
         )}
-
-        {/* Date Range Filters */}
-        <div className="filters-section">
-          <div className="filter-group">
-            <label>Fecha Inicio</label>
-            <input
-              type="date"
-              name="start"
-              value={dateRange.start}
-              onChange={handleDateRangeChange}
-              className="form-control"
-            />
-          </div>
-          <div className="filter-group">
-            <label>Fecha Fin</label>
-            <input
-              type="date"
-              name="end"
-              value={dateRange.end}
-              onChange={handleDateRangeChange}
-              className="form-control"
-            />
-          </div>
-          <div className="filter-group">
-            <button className="btn btn-secondary" onClick={refreshData}>
-              <FaFilter /> Aplicar Filtros
-            </button>
-          </div>
-        </div>
 
         {/* Main Statistics Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
@@ -351,64 +319,6 @@ const StatisticsPage = () => {
               </div>
             </div>
           </div>
-
-          <div className="content-card">
-            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: 'var(--border-radius-sm)',
-                background: 'linear-gradient(135deg, var(--info-color), var(--primary-medical))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '20px'
-              }}>
-                <FaHospital />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                  {stats.consultorios.total}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Consultorios
-                </p>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Activos: {stats.consultorios.active}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="content-card">
-            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: 'var(--border-radius-sm)',
-                background: 'linear-gradient(135deg, var(--warning-color), #fd7e14)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '20px'
-              }}>
-                <FaUserShield />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                  {stats.admins.total}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Administradores
-                </p>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {Object.entries(stats.admins.byType).map(([type, count]) => `${type}: ${count}`).join(', ')}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Content Grid */}
@@ -421,9 +331,6 @@ const StatisticsPage = () => {
                 Turnos por Estado
               </h3>
               <div className="card-actions">
-                <button className="card-action" title="Ver gráfico">
-                  <FaEye />
-                </button>
               </div>
             </div>
             <div className="card-content">
@@ -433,10 +340,8 @@ const StatisticsPage = () => {
                     const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
                     const colors = {
                       'En espera': 'var(--info-color)',
-                      'Llamando': 'var(--warning-color)',
                       'Atendido': 'var(--success-color)',
                       'Cancelado': 'var(--danger-color)',
-                      'No presente': 'var(--secondary-medical)'
                     };
                     const color = colors[status] || 'var(--primary-medical)';
 
@@ -504,7 +409,7 @@ const StatisticsPage = () => {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                     <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '14px' }} />
-                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Pacientes con Email</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Turnos del Año</span>
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--primary-medical)' }}>
                     {stats.patients.withEmail}
@@ -522,7 +427,7 @@ const StatisticsPage = () => {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                     <FaBuilding style={{ color: 'var(--success-color)', fontSize: '14px' }} />
-                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Áreas Médicas</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Turnos del Mes</span>
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--success-color)' }}>
                     {stats.areas.total}
@@ -540,7 +445,7 @@ const StatisticsPage = () => {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                     <FaCalendarDay style={{ color: 'var(--info-color)', fontSize: '14px' }} />
-                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Turnos Hoy</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>Turnos del Día</span>
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--info-color)' }}>
                     {stats.turns.today}
@@ -586,6 +491,35 @@ const StatisticsPage = () => {
           </div>
         )}
 
+        {/* Date Range Filters */}
+        <div className="filters-section">
+          <div className="filter-group">
+            <label>Fecha Inicio</label>
+            <input
+              type="date"
+              name="start"
+              value={dateRange.start}
+              onChange={handleDateRangeChange}
+              className="form-control"
+            />
+          </div>
+          <div className="filter-group">
+            <label>Fecha Fin</label>
+            <input
+              type="date"
+              name="end"
+              value={dateRange.end}
+              onChange={handleDateRangeChange}
+              className="form-control"
+            />
+          </div>
+          <div className="filter-group">
+            <button className="btn btn-secondary" onClick={refreshData}>
+              <FaFilter /> Aplicar Filtros
+            </button>
+          </div>
+        </div>
+
         {/* Recent Turns */}
         {recentTurns.length > 0 && (
           <div className="content-card">
@@ -606,9 +540,10 @@ const StatisticsPage = () => {
                   <thead>
                     <tr>
                       <th># Turno</th>
+                      <th>Consultorio</th>
+                      <th>Área</th>
                       <th>Fecha</th>
                       <th>Estado</th>
-                      <th>Paciente</th>
                     </tr>
                   </thead>
                   <tbody>

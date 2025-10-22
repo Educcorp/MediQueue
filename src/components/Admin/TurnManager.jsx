@@ -469,17 +469,6 @@ const TurnManager = () => {
     }
   };
 
-  const handleMarkAsNoShow = async (turn) => {
-    try {
-      await turnService.markTurnAsNoShow(turn.uk_turno);
-      await loadTurns();
-      alert(`Turno #${turn.i_numero_turno} marcado como no presente`);
-    } catch (error) {
-      alert('Error marcando turno como no presente: ' + error.message);
-      console.error('Error marcando turno como no presente:', error);
-    }
-  };
-
   const handleCancelTurn = async (turn) => {
     if (window.confirm(`¿Estás seguro de cancelar el turno #${turn.i_numero_turno}?`)) {
       try {

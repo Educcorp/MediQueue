@@ -3,19 +3,15 @@
 // Estados de turnos
 export const TURN_STATUS = {
     EN_ESPERA: 'EN_ESPERA',
-    LLAMANDO: 'LLAMANDO',
     ATENDIDO: 'ATENDIDO',
-    CANCELADO: 'CANCELADO',
-    NO_PRESENTE: 'NO_PRESENTE'
+    CANCELADO: 'CANCELADO'
 };
 
 // Etiquetas de estados de turnos
 export const TURN_STATUS_LABELS = {
     [TURN_STATUS.EN_ESPERA]: 'En espera',
-    [TURN_STATUS.LLAMANDO]: 'Llamando',
     [TURN_STATUS.ATENDIDO]: 'Atendido',
     [TURN_STATUS.CANCELADO]: 'Cancelado',
-    [TURN_STATUS.NO_PRESENTE]: 'No presente'
 };
 
 // Colores de estados de turnos
