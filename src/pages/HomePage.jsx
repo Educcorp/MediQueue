@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
-import Footer from '../components/Footer';
 import '../styles/HomePage.css';
 import '../styles/UnifiedAdminPages.css';
 
@@ -85,10 +84,8 @@ const HomePage = () => {
         // Usar endpoint público para evitar 401
         const data = await areaService.getBasics();
         setAreas(data || []);
-        if ((data || []).length > 0) {
-          const firstId = data[0].uk_area || data[0].id;
-          setSelectedArea(firstId);
-        }
+        // Establecer vista general como predeterminada
+        setSelectedArea('general');
       } catch (e) {
         console.warn('Error cargando áreas:', e);
         setAreasError('No se pudieron cargar las áreas');
@@ -218,6 +215,7 @@ const HomePage = () => {
                     onChange={(e) => setSelectedArea(e.target.value || null)}
                   >
                     <option value="">Seleccionar área médica</option>
+                    <option value="general">📊 General - Todas las áreas</option>
                     {areas.map((area) => (
                       <option 
                         key={area.uk_area || area.id} 
@@ -279,6 +277,127 @@ const HomePage = () => {
       {selectedArea ? (
         <div className="hospital-monitor-display">
           {(() => {
+            // Manejar vista general
+            if (selectedArea === 'general') {
+              // Agrupar turnos por área
+              const turnsByArea = {};
+              (activeTurns || []).forEach(turn => {
+                const areaName = turn.s_nombre_area || turn.area;
+                if (!turnsByArea[areaName]) {
+                  turnsByArea[areaName] = [];
+                }
+                turnsByArea[areaName].push(turn);
+              });
+
+              // Obtener información de cada área
+              const areasWithTurns = Object.keys(turnsByArea).map(areaName => {
+                const areaObj = (areas || []).find(a => (a.s_nombre_area || a.nombre) === areaName);
+                const areaColor = areaObj?.s_color || '#4A90E2';
+                const areaIcon = areaObj?.s_icono || 'FaHospital';
+                const areaLetter = areaObj?.s_letra || areaName?.charAt(0) || 'A';
+                const turnsArea = turnsByArea[areaName];
+                
+                // determinar próximo turno del área: 1) LLAMANDO; 2) EN_ESPERA por número
+                const calling = turnsArea.filter(t => (t.s_estado || t.estado) === 'LLAMANDO');
+                const waiting = turnsArea.filter(t => (t.s_estado || t.estado) === 'EN_ESPERA');
+                const sortByNum = (a, b) => (a.i_numero_turno || a.id || 0) - (b.i_numero_turno || b.id || 0);
+                const nextForArea = (calling.sort(sortByNum)[0]) || (waiting.sort(sortByNum)[0]) || null;
+
+                return {
+                  areaName,
+                  areaColor,
+                  areaIcon,
+                  areaLetter,
+                  turnsArea,
+                  nextForArea,
+                  AreaIconComponent: getIconComponent(areaIcon)
+                };
+              });
+
+              return (
+                <div className="general-monitor-layout">
+                  {areasWithTurns.length === 0 ? (
+                    <div className="general-empty-state">
+                      <div className="empty-state-content">
+                        <div className="empty-state-icon">
+                          <FaHospital />
+                        </div>
+                        <h2>No hay turnos activos</h2>
+                        <p>Todas las áreas médicas están sin turnos en espera en este momento</p>
+                        <div className="empty-state-actions">
+                          <button 
+                            className="refresh-button"
+                            onClick={handleRefresh}
+                          >
+                            <i className="mdi mdi-refresh"></i>
+                            Actualizar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="areas-grid">
+                      {areasWithTurns.map((areaData, index) => (
+                      <div key={index} className="area-card" style={{ '--area-color': areaData.areaColor }}>
+                        <div className="area-card-header">
+                          <div className="area-card-icon" style={{ background: areaData.areaColor }}>
+                            <areaData.AreaIconComponent />
+                          </div>
+                          <div className="area-card-title">
+                            <h3>{areaData.areaName}</h3>
+                            <span className="area-letter-badge" style={{ background: areaData.areaColor }}>
+                              {areaData.areaLetter}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="area-card-content">
+                          {!areaData.nextForArea ? (
+                            <div className="area-empty-state">
+                              <i className="mdi mdi-check-circle" style={{ color: areaData.areaColor }}></i>
+                              <p>Sin turnos en espera</p>
+                            </div>
+                          ) : (
+                            <div className="area-current-turn">
+                              <div className="turn-display-small" style={{ 
+                                background: `linear-gradient(135deg, ${areaData.areaColor}, ${areaData.areaColor}dd)`
+                              }}>
+                                <span className="turn-number-small">
+                                  {areaData.areaLetter}{areaData.nextForArea.i_numero_turno || areaData.nextForArea.id}
+                                </span>
+                              </div>
+                              <div className="turn-info-small">
+                                <div className="consultorio-small">
+                                  <i className="mdi mdi-hospital-building"></i>
+                                  Consultorio {areaData.nextForArea.i_numero_consultorio || areaData.nextForArea.consultorio}
+                                </div>
+                                <div className="status-small" style={{ 
+                                  background: (areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' 
+                                    ? '#FF6B35' : areaData.areaColor
+                                }}>
+                                  {(areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' ? 
+                                    'LLAMANDO' : 'EN ESPERA'
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="area-card-footer">
+                          <span className="turns-count" style={{ color: areaData.areaColor }}>
+                            {areaData.turnsArea.length} turnos activos
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // Vista individual de área (código original)
             const areaObj = (areas || []).find(a => (a.uk_area || a.id) === selectedArea);
             const areaName = areaObj?.s_nombre_area || areaObj?.nombre || '';
             const areaColor = areaObj?.s_color || '#4A90E2';
@@ -1373,10 +1492,8 @@ const HomePage = () => {
         .turns-list { list-style: none; padding: 0; margin: 0; width: 100%; }
         .turn-item { padding: 10px 12px; border-bottom: 1px dashed #e2e8f0; font-weight: 700; color: #2d3748; }
         .panel-empty { color: #718096; }
-      `}</style>
-      
-      <Footer />
-    </div>
+        `}</style>
+      </div>
   );
 };
 
