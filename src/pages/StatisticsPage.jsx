@@ -117,7 +117,7 @@ const StatisticsPage = () => {
       setError(null);
 
       const [
-        turnsStats,
+        allTurns,
         patientsData,
         consultoriosData,
         areasData,
@@ -125,7 +125,7 @@ const StatisticsPage = () => {
         todayTurns,
         recentTurnsData
       ] = await Promise.all([
-        turnService.getTurnStatistics().catch(() => null),
+        turnService.getAllTurns().catch(() => []),
         patientService.getAllPatients().catch(() => []),
         consultorioService.getAll().catch(() => []),
         areaService.getAll().catch(() => []),
@@ -134,22 +134,27 @@ const StatisticsPage = () => {
         turnService.getTurnsByDateRange?.(dateRange.start, dateRange.end).catch(() => []) || []
       ]);
 
-      // Procesar estadísticas de turnos
-      const turnsByStatus = {};
-      Object.values(TURN_STATUS_LABELS || {}).forEach(status => {
-        turnsByStatus[status] = 0;
+      // Procesar estadísticas de turnos - contar directamente desde los datos
+      const turnsByStatus = {
+        'En espera': 0,
+        'Atendido': 0,
+        'Cancelado': 0,
+      };
+
+      // Contar turnos por estado
+      allTurns.forEach(turn => {
+        const estado = turn.s_estado;
+        if (estado === 'EN_ESPERA') {
+          turnsByStatus['En espera']++;
+        } else if (estado === 'ATENDIDO') {
+          turnsByStatus['Atendido']++;
+        } else if (estado === 'CANCELADO') {
+          turnsByStatus['Cancelado']++;
+        }
       });
 
-      if (turnsStats) {
-        Object.entries(turnsStats).forEach(([key, value]) => {
-          if (key.includes('turnos_')) {
-            const status = key.replace('turnos_', '').toUpperCase();
-            if (TURN_STATUS_LABELS && TURN_STATUS_LABELS[status]) {
-              turnsByStatus[TURN_STATUS_LABELS[status]] = value || 0;
-            }
-          }
-        });
-      }
+      // Calcular el total de turnos
+      const totalTurnos = allTurns.length;
 
       // Procesar estadísticas de consultorios por área
       const consultoriosByArea = {};
@@ -166,7 +171,7 @@ const StatisticsPage = () => {
 
       setStats({
         turns: {
-          total: turnsStats?.total_turnos || 0,
+          total: totalTurnos,
           byStatus: turnsByStatus,
           today: todayTurns.length,
           thisWeek: 0, // Se puede calcular con más datos
@@ -324,7 +329,7 @@ const StatisticsPage = () => {
         {/* Content Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '32px' }}>
           {/* Turns by Status Chart */}
-          <div className="content-card">
+          <div className="content-card" style={{ maxHeight: '250px' }}>
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartPie />
@@ -333,7 +338,7 @@ const StatisticsPage = () => {
               <div className="card-actions">
               </div>
             </div>
-            <div className="card-content">
+            <div className="card-content" style={{ padding: '18px 24px' }}>
               {Object.keys(stats.turns.byStatus).length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {Object.entries(stats.turns.byStatus).map(([status, count]) => {
@@ -342,6 +347,7 @@ const StatisticsPage = () => {
                       'En espera': 'var(--info-color)',
                       'Atendido': 'var(--success-color)',
                       'Cancelado': 'var(--danger-color)',
+                      'En atención': 'var(--warning-color)'
                     };
                     const color = colors[status] || 'var(--primary-medical)';
 
@@ -413,10 +419,7 @@ const StatisticsPage = () => {
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--primary-medical)' }}>
                     {stats.patients.withEmail}
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {stats.patients.total > 0 ? ((stats.patients.withEmail / stats.patients.total) * 100).toFixed(1) : 0}% del total
-                  </div>
+                  </div>                  
                 </div>
 
                 <div style={{
@@ -431,9 +434,6 @@ const StatisticsPage = () => {
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--success-color)' }}>
                     {stats.areas.total}
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {stats.areas.active} activas
                   </div>
                 </div>
 
