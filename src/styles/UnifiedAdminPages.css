@@ -2072,3 +2072,10 @@
     border-color: var(--primary-color);
     color: white;
 }
+
+/* Responsive grid for statistics */
+@media (max-width: 768px) {
+    .stats-content-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
