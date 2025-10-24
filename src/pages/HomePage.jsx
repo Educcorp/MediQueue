@@ -159,9 +159,7 @@ const HomePage = () => {
     const statusMap = {
       'EN_ESPERA': 'En espera',
       'LLAMANDO': 'Llamando',
-      'ATENDIDO': 'Atendido',
-      'CANCELADO': 'Cancelado',
-      'NO_PRESENTE': 'No presente'
+      'CANCELADO': 'Cancelado'
     };
     return statusMap[status] || status;
   };
