@@ -249,9 +249,6 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
             <span className="icon-name">
               {currentIcon ? currentIcon.label : 'Sin seleccionar'}
             </span>
-            {value && (
-              <span className="icon-code">{value}</span>
-            )}
           </div>
           
           <div className="dropdown-arrow">

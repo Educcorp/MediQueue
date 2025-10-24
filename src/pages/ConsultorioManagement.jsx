@@ -214,7 +214,7 @@ const ConsultorioManagement = () => {
 
   const handleDeleteArea = async (area) => {
     const consultoriosEnArea = consultorios.filter(c => c.uk_area === area.uk_area);
-    const mensaje = consultoriosEnArea.length > 0 
+    const mensaje = consultoriosEnArea.length > 0
       ? `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?\n\nEsto eliminará también ${consultoriosEnArea.length} consultorio(s) y todos los turnos asociados.`
       : `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`;
 
@@ -226,7 +226,7 @@ const ConsultorioManagement = () => {
         alert('Área eliminada correctamente');
       } catch (error) {
         console.error('Error eliminando área:', error);
-        
+
         // Manejar diferentes tipos de errores
         if (error.response?.status === 404) {
           alert('El área no fue encontrada');
@@ -249,7 +249,7 @@ const ConsultorioManagement = () => {
         alert('Consultorio eliminado correctamente');
       } catch (error) {
         console.error('Error eliminando consultorio:', error);
-        
+
         // Manejar diferentes tipos de errores
         if (error.response?.status === 404) {
           alert('El consultorio no fue encontrado');
@@ -307,13 +307,13 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowAreaModal(false);
-      setFormData({ 
-        s_nombre_area: '', 
-        s_letra: '', 
-        s_color: '', 
-        s_icono: '', 
-        i_numero_consultorio: '', 
-        uk_area: '' 
+      setFormData({
+        s_nombre_area: '',
+        s_letra: '',
+        s_color: '',
+        s_icono: '',
+        i_numero_consultorio: '',
+        uk_area: ''
       });
       setLetraError('');
     } catch (error) {
@@ -353,13 +353,13 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowConsultorioModal(false);
-      setFormData({ 
-        s_nombre_area: '', 
-        s_letra: '', 
-        s_color: '', 
-        s_icono: '', 
-        i_numero_consultorio: '', 
-        uk_area: '' 
+      setFormData({
+        s_nombre_area: '',
+        s_letra: '',
+        s_color: '',
+        s_icono: '',
+        i_numero_consultorio: '',
+        uk_area: ''
       });
     } catch (error) {
       alert('Error guardando consultorio: ' + error.message);
@@ -369,7 +369,7 @@ const ConsultorioManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validación específica para número de consultorio
     if (name === 'i_numero_consultorio') {
       // Solo permitir números y limitar a 3 dígitos
@@ -380,7 +380,7 @@ const ConsultorioManagement = () => {
       }));
       return;
     }
-    
+
     // Validación específica para nombre de área
     if (name === 's_nombre_area') {
       // Limitar a 50 caracteres
@@ -391,20 +391,20 @@ const ConsultorioManagement = () => {
       }));
       return;
     }
-    
+
     // Validación específica para letra (máximo 2 letras)
     if (name === 's_letra') {
       // Solo permitir letras y limitar a 2 caracteres, convertir a mayúsculas
       const letterValue = value.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
-      
+
       // Verificar unicidad si hay valor
       if (letterValue) {
         // Verificar si la letra ya está en uso por otra área
-        const letraEnUso = areas.some(area => 
-          area.s_letra === letterValue && 
+        const letraEnUso = areas.some(area =>
+          area.s_letra === letterValue &&
           area.uk_area !== editingArea?.uk_area
         );
-        
+
         if (letraEnUso) {
           setLetraError(`La letra "${letterValue}" ya está en uso por otra área`);
         } else {
@@ -413,14 +413,14 @@ const ConsultorioManagement = () => {
       } else {
         setLetraError('');
       }
-      
+
       setFormData(prev => ({
         ...prev,
         [name]: letterValue
       }));
       return;
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -619,11 +619,11 @@ const ConsultorioManagement = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
             {filteredAreas.map(area => {
               const areaConsultorios = getConsultoriosByArea(area.uk_area);
-              
+
               // Usar los nuevos campos personalizados si están disponibles
               const areaColor = area.s_color || getAreaIcon(area.s_nombre_area).color;
               const areaIconName = area.s_icono;
-              
+
               // Función para obtener el componente de icono basado en el nombre
               const getIconComponent = (iconName) => {
                 const iconMap = {
@@ -656,7 +656,7 @@ const ConsultorioManagement = () => {
                 };
                 return iconMap[iconName] || getAreaIcon(area.s_nombre_area).icon;
               };
-              
+
               const IconComponent = areaIconName ? getIconComponent(areaIconName) : getAreaIcon(area.s_nombre_area).icon;
 
               return (
@@ -847,117 +847,117 @@ const ConsultorioManagement = () => {
               </button>
             </div>
 
-            <div style={{ 
-              flex: 1, 
-              overflowY: 'auto', 
-              maxHeight: 'calc(90vh - 120px)' 
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              maxHeight: 'calc(90vh - 120px)'
             }}>
               <form onSubmit={handleSubmitArea} style={{ padding: '24px' }}>
-              <div className="form-group">
-                <label>Nombre del Área Médica *</label>
-                <input
-                  type="text"
-                  name="s_nombre_area"
-                  value={formData.s_nombre_area}
-                  onChange={handleInputChange}
-                  placeholder="Ej: Medicina General, Pediatría..."
-                  className="form-control"
-                  required
-                  maxLength={50}
-                />
-                <small style={{ 
-                  color: formData.s_nombre_area.length > 40 ? 'var(--warning)' : 'var(--text-muted)',
-                  fontSize: '12px',
-                  marginTop: '4px',
-                  display: 'block'
-                }}>
-                  {formData.s_nombre_area.length}/50 caracteres
-                </small>
-              </div>
-
-              {/* Campos de personalización */}
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-                gap: '20px',
-                marginTop: '20px' 
-              }}>
-                {/* Letra identificadora */}
                 <div className="form-group">
-                  <label>Letra Identificadora</label>
+                  <label>Nombre del Área Médica *</label>
                   <input
                     type="text"
-                    name="s_letra"
-                    value={formData.s_letra}
+                    name="s_nombre_area"
+                    value={formData.s_nombre_area}
                     onChange={handleInputChange}
-                    placeholder="Ej: MG, PD..."
-                    className={`form-control ${letraError ? 'error' : ''}`}
-                    maxLength={2}
-                    style={{ textTransform: 'uppercase' }}
+                    placeholder="Ej: Medicina General, Pediatría..."
+                    className="form-control"
+                    required
+                    maxLength={50}
                   />
-                  {letraError ? (
-                    <small style={{ 
-                      color: 'var(--danger-color)',
-                      fontSize: '12px',
-                      marginTop: '4px',
-                      display: 'block'
-                    }}>
-                      {letraError}
-                    </small>
-                  ) : (
-                    <small style={{ 
-                      color: 'var(--text-muted)',
-                      fontSize: '12px',
-                      marginTop: '4px',
-                      display: 'block'
-                    }}>
-                      Máximo 2 letras para identificar el área
-                    </small>
-                  )}
+                  <small style={{
+                    color: formData.s_nombre_area.length > 40 ? 'var(--warning)' : 'var(--text-muted)',
+                    fontSize: '12px',
+                    marginTop: '4px',
+                    display: 'block'
+                  }}>
+                    {formData.s_nombre_area.length}/50 caracteres
+                  </small>
                 </div>
 
-                {/* Selector de color */}
-                <div className="form-group">
-                  <ColorSelector
-                    label="Color del Área"
-                    value={formData.s_color}
-                    onChange={handleColorChange}
+                {/* Campos de personalización */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: '20px',
+                  marginTop: '20px'
+                }}>
+                  {/* Letra identificadora */}
+                  <div className="form-group">
+                    <label>Letra Identificadora</label>
+                    <input
+                      type="text"
+                      name="s_letra"
+                      value={formData.s_letra}
+                      onChange={handleInputChange}
+                      placeholder="Ej: MG, PD..."
+                      className={`form-control ${letraError ? 'error' : ''}`}
+                      maxLength={2}
+                      style={{ textTransform: 'uppercase' }}
+                    />
+                    {letraError ? (
+                      <small style={{
+                        color: 'var(--danger-color)',
+                        fontSize: '12px',
+                        marginTop: '4px',
+                        display: 'block'
+                      }}>
+                        {letraError}
+                      </small>
+                    ) : (
+                      <small style={{
+                        color: 'var(--text-muted)',
+                        fontSize: '12px',
+                        marginTop: '4px',
+                        display: 'block'
+                      }}>
+                        Máximo 2 letras para identificar el área
+                      </small>
+                    )}
+                  </div>
+
+                  {/* Selector de color */}
+                  <div className="form-group">
+                    <ColorSelector
+                      label="Color del Área"
+                      value={formData.s_color}
+                      onChange={handleColorChange}
+                      disabled={false}
+                    />
+                  </div>
+                </div>
+
+                {/* Selector de icono */}
+                <div className="form-group" style={{ marginTop: '20px' }}>
+                  <IconSelector
+                    label="Icono del Área"
+                    value={formData.s_icono}
+                    onChange={handleIconChange}
                     disabled={false}
                   />
                 </div>
-              </div>
 
-              {/* Selector de icono */}
-              <div className="form-group" style={{ marginTop: '20px' }}>
-                <IconSelector
-                  label="Icono del Área"
-                  value={formData.s_icono}
-                  onChange={handleIconChange}
-                  disabled={false}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
-                <button 
-                  type="button" 
-                  onClick={() => {
-                    setShowAreaModal(false);
-                    setLetraError('');
-                  }} 
-                  className="btn btn-secondary"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={!!letraError}
-                >
-                  <FaCheck />
-                  {editingArea ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAreaModal(false);
+                      setLetraError('');
+                    }}
+                    className="btn btn-secondary"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={!!letraError}
+                  >
+                    <FaCheck />
+                    {editingArea ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -1015,37 +1015,37 @@ const ConsultorioManagement = () => {
               </button>
             </div>
 
-            <div style={{ 
-              flex: 1, 
-              overflowY: 'auto', 
-              maxHeight: 'calc(90vh - 120px)' 
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              maxHeight: 'calc(90vh - 120px)'
             }}>
               <form onSubmit={handleSubmitConsultorio} style={{ padding: '24px' }}>
-              <div className="form-group">
-                <label>Número del Consultorio *</label>
-                <input
-                  type="text"
-                  name="i_numero_consultorio"
-                  value={formData.i_numero_consultorio}
-                  onChange={handleInputChange}
-                  placeholder="Ej: 101, 102, 103... (máx. 3 dígitos)"
-                  className="form-control"
-                  required
-                  maxLength="3"
-                  pattern="[0-9]{1,3}"
-                />
-              </div>
+                <div className="form-group">
+                  <label>Número del Consultorio *</label>
+                  <input
+                    type="text"
+                    name="i_numero_consultorio"
+                    value={formData.i_numero_consultorio}
+                    onChange={handleInputChange}
+                    placeholder="Ej: 101, 102, 103... (máx. 3 dígitos)"
+                    className="form-control"
+                    required
+                    maxLength="3"
+                    pattern="[0-9]{1,3}"
+                  />
+                </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
-                <button type="button" onClick={() => setShowConsultorioModal(false)} className="btn btn-secondary">
-                  Cancelar
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  <FaCheck />
-                  {editingConsultorio ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                  <button type="button" onClick={() => setShowConsultorioModal(false)} className="btn btn-secondary">
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    <FaCheck />
+                    {editingConsultorio ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
