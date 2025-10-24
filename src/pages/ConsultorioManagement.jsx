@@ -702,36 +702,6 @@ const ConsultorioManagement = () => {
                         <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'var(--text-muted)' }}>
                           {areaConsultorios.length} consultorio{areaConsultorios.length !== 1 ? 's' : ''}
                         </p>
-                        
-                        {/* Mostrar información de personalización */}
-                        {(area.s_color || area.s_icono) && (
-                          <div style={{ 
-                            marginTop: '8px', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '12px',
-                            fontSize: '12px',
-                            color: 'var(--text-secondary)'
-                          }}>
-                            {area.s_color && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <div style={{
-                                  width: '12px',
-                                  height: '12px',
-                                  backgroundColor: area.s_color,
-                                  borderRadius: '2px',
-                                  border: '1px solid rgba(0,0,0,0.1)'
-                                }}></div>
-                                <span>{area.s_color}</span>
-                              </div>
-                            )}
-                            {area.s_icono && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span>Icono: {area.s_icono}</span>
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="card-actions">
