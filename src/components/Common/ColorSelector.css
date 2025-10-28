@@ -44,7 +44,7 @@
   border-radius: 50%;
   border: 2px solid var(--border-color);
   flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
 .color-name {
@@ -129,7 +129,7 @@
   .color-selector-button-wrapper {
     gap: 8px;
   }
-  
+
   .custom-color-input-main {
     width: 44px;
     height: 44px;

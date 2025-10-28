@@ -52,9 +52,9 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
   // Filtrar iconos basado en el término de búsqueda
   const filteredIcons = useMemo(() => {
     if (!searchTerm) return availableIcons;
-    
+
     const term = searchTerm.toLowerCase();
-    return availableIcons.filter(icon => 
+    return availableIcons.filter(icon =>
       icon.label.toLowerCase().includes(term) ||
       icon.category.toLowerCase().includes(term) ||
       icon.name.toLowerCase().includes(term)
@@ -117,8 +117,8 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
         {/* Header del popup */}
         <div className="icon-popup-header">
           <h3>Seleccionar Icono del Área</h3>
-          <button 
-            className="icon-popup-close" 
+          <button
+            className="icon-popup-close"
             onClick={handleClose}
             title="Cerrar"
           >
@@ -225,7 +225,7 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
   return (
     <div className={`icon-selector-container ${disabled ? 'disabled' : ''}`}>
       <label className="icon-selector-label">{label}</label>
-      
+
       {/* Botón principal */}
       <div className="icon-selector-button-wrapper">
         <button
@@ -244,13 +244,13 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
               </div>
             )}
           </div>
-          
+
           <div className="icon-info">
             <span className="icon-name">
               {currentIcon ? currentIcon.label : 'Sin seleccionar'}
             </span>
           </div>
-          
+
           <div className="dropdown-arrow">
             <FaSearch size={14} />
           </div>

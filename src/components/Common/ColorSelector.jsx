@@ -52,11 +52,11 @@ const ColorSelector = ({ value, onChange, disabled = false, label = "Seleccionar
   return (
     <div className={`color-selector-container ${disabled ? 'disabled' : ''}`}>
       <label className="color-selector-label">{label}</label>
-      
+
       {/* Input de color directo sin dropdown */}
       <div className="color-selector-button-wrapper">
         <div className="color-input-display">
-          <div 
+          <div
             className="color-preview"
             style={{ backgroundColor: value || '#f0f0f0' }}
           />

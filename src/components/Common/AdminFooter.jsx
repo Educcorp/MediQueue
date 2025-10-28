@@ -153,7 +153,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 }}></div>
                 <span>Estado: Operativo</span>
               </div>
-              <div>Versión: 2.1.0</div>
+              <div>Versión: 1.8.8</div>
               <div>Última actualización: Octubre 2025</div>
             </div>
           </div>
