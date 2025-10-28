@@ -4,6 +4,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { MdCopyright } from 'react-icons/md';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
+
 const AdminFooter = ({ isDarkMode = false }) => {
   const currentYear = new Date().getFullYear();
 
