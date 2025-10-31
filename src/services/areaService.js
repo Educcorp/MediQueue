@@ -133,6 +133,17 @@ const areaService = {
         }
     },
 
+    // Toggle estado del área (ACTIVO <-> INACTIVO)
+    async toggleEstado(uk_area) {
+        try {
+            const response = await api.put(`/areas/${uk_area}/toggle-estado`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error cambiando estado del área:', error);
+            throw error;
+        }
+    },
+
     // Eliminar área (hard delete)
     async remove(uk_area) {
         try {
@@ -197,7 +208,7 @@ const areaService = {
             if (uk_area) {
                 params.append('uk_area', uk_area);
             }
-            
+
             const response = await api.get(`/areas/personalization/check-letra?${params}`);
             return response.data.data;
         } catch (error) {

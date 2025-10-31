@@ -38,7 +38,7 @@ const PatientManagement = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
   const isDarkMode = theme === 'dark';
@@ -51,7 +51,7 @@ const PatientManagement = () => {
         setTheme(currentTheme);
       }
     });
-    
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme']
@@ -662,7 +662,7 @@ const PatientManagement = () => {
           </div>
         </div>
       )}
-      
+
       <AdminFooter isDarkMode={isDarkMode} />
       <Chatbot />
     </div>
