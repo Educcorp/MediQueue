@@ -833,15 +833,25 @@ const ConsultorioManagement = () => {
                                 <button
                                   onClick={() => handleToggleConsultorioEstado(consultorio)}
                                   className={consultorio.ck_estado === 'ACTIVO' ? 'btn btn-warning' : 'btn btn-success'}
-                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  style={{
+                                    padding: '4px 8px',
+                                    fontSize: '12px',
+                                    color: consultorio.ck_estado === 'ACTIVO' ? '#FFA000' : undefined
+                                  }}
                                   title={consultorio.ck_estado === 'ACTIVO' ? 'Bloquear consultorio' : 'Desbloquear consultorio'}
                                 >
                                   {consultorio.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
                                 </button>
                                 <button
                                   onClick={() => handleEditConsultorio(consultorio)}
-                                  className="btn btn-secondary"
-                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  className="btn"
+                                  style={{ 
+                                    padding: '4px 8px', 
+                                    fontSize: '12px',
+                                    background: '#4299e1',
+                                    color: 'white',
+                                    border: '1px solid #4299e1'
+                                  }}
                                   title="Editar consultorio"
                                 >
                                   <FaEdit />
