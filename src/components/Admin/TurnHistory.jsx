@@ -973,12 +973,15 @@ const TurnHistory = () => {
               </div>
 
               <div className="detail-section">
-                <h4>Información de Registro</h4>
+                <h4>Información de Registro y Auditoría</h4>
                 <div className="detail-grid">
                   {selectedTurn.uk_usuario_registro && (
                     <div className="detail-row">
-                      <span className="detail-label">Registrado por:</span>
-                      <span className="detail-value">Admin (ID: {selectedTurn.uk_usuario_registro})</span>
+                      <span className="detail-label">Creado por:</span>
+                      <span className="detail-value" style={{ fontWeight: 700, color: 'var(--primary-medical)' }}>
+                        <FaUserMd style={{ marginRight: '6px' }} />
+                        Administrador ID: {selectedTurn.uk_usuario_registro}
+                      </span>
                     </div>
                   )}
                   {selectedTurn.d_fecha_creacion && (
