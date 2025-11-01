@@ -1574,18 +1574,7 @@ const HomePage = () => {
           overflow: visible;
         }
 
-        .area-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 120px;
-          height: 120px;
-          background: var(--area-color, #4A90E2);
-          opacity: 0.03;
-          border-radius: 50%;
-          transform: translate(40%, -40%);
-        }
+
 
         .area-card:hover {
           transform: translateY(-4px);
@@ -1684,17 +1673,17 @@ const HomePage = () => {
         .area-current-turn::before {
           content: 'TURNO ACTUAL';
           position: absolute;
-          top: 0;
-          left: 20px;
+          top: -12px;
+          left: 22px;
           background: var(--area-color, #4A90E2);
           color: white;
-          padding: 4px 14px;
+          padding: 5px 16px;
           font-size: 10px;
           font-weight: 800;
-          letter-spacing: 0.8px;
-          border-radius: 0 0 8px 8px;
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-          transform: translateY(-2px);
+          letter-spacing: 1px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          z-index: 10;
         }
 
         .area-current-turn.calling::before {
