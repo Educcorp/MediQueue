@@ -243,7 +243,6 @@ const TurnManager = () => {
   // Estados de turnos disponibles
   const turnStatuses = [
     { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
-    { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
 
