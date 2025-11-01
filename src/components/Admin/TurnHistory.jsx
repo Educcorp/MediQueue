@@ -57,7 +57,9 @@ const getAreaIcon = (areaName) => {
     'Medicina General': FaUserMd,
     'Pediatría': FaBaby,
     'Ginecólogo': MdPregnantWoman,
+    'Ginecología': MdPregnantWoman,
     'Dentista': FaTooth,
+    'Odontología': FaTooth,
     'Neurólogo': FaHeadSideVirus,
     'Neurología': FaHeadSideVirus,
     'Laboratorio': FaFlask,
@@ -69,8 +71,34 @@ const getAreaIcon = (areaName) => {
     'Traumatología': FaBone,
     'Psicología': MdPsychology,
     'Radiología': FaCamera,
+    'Operaciones': FaHospital,
   };
   return iconMap[areaName] || FaHospital;
+};
+
+// Función para obtener el color del icono del área
+const getAreaIconColor = (areaName) => {
+  const colorMap = {
+    'Cardiología': '#e74c3c', // Rojo
+    'Medicina General': '#3498db', // Azul
+    'Operaciones': '#27ae60', // Verde
+    'Ginecólogo': '#e91e63', // Rosa/Magenta
+    'Ginecología': '#e91e63', // Rosa/Magenta
+    'Odontología': '#00bcd4', // Verde agua/Turquesa
+    'Dentista': '#00bcd4', // Verde agua/Turquesa
+    'Pediatría': '#f39c12', // Amarillo/Naranja
+    'Neurología': '#9b59b6', // Púrpura
+    'Neurólogo': '#9b59b6', // Púrpura
+    'Laboratorio': '#34495e', // Gris oscuro
+    'Vacunación': '#16a085', // Verde azulado
+    'Enfermería': '#1abc9c', // Turquesa
+    'Dermatología': '#e67e22', // Naranja
+    'Oftalmología': '#3498db', // Azul claro
+    'Traumatología': '#95a5a6', // Gris
+    'Psicología': '#9b59b6', // Púrpura
+    'Radiología': '#34495e', // Gris oscuro
+  };
+  return colorMap[areaName] || 'var(--primary-medical)';
 };
 
 // Función para obtener el icono del estado
@@ -131,10 +159,13 @@ const TurnHistory = () => {
   const [selectedEndDate, setSelectedEndDate] = useState(getCurrentDate());
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [selectedArea, setSelectedArea] = useState('todas');
+  const [selectedConsultorio, setSelectedConsultorio] = useState('todos');
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
+  const [consultorioDropdownOpen, setConsultorioDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [consultorioDropdownPosition, setConsultorioDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -142,6 +173,7 @@ const TurnHistory = () => {
   
   const statusButtonRef = useRef(null);
   const areaButtonRef = useRef(null);
+  const consultorioButtonRef = useRef(null);
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -185,6 +217,9 @@ const TurnHistory = () => {
       if (!event.target.closest('.custom-area-select')) {
         setAreaDropdownOpen(false);
       }
+      if (!event.target.closest('.custom-consultorio-select')) {
+        setConsultorioDropdownOpen(false);
+      }
     };
 
     document.addEventListener('click', handleClickOutside);
@@ -202,7 +237,7 @@ const TurnHistory = () => {
   // Cargar turnos cuando cambien los filtros
   useEffect(() => {
     loadTurns();
-  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea]);
+  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea, selectedConsultorio]);
 
   const loadData = async () => {
     try {
@@ -239,15 +274,24 @@ const TurnHistory = () => {
       let turnsData;
       const filters = {};
 
-      if (selectedArea !== 'todas') {
-        filters.uk_consultorio = selectedArea;
-      }
-
       if (selectedStatus !== 'todos') {
         filters.estado = selectedStatus;
       }
 
       turnsData = await turnService.getTurnsByDateRange(selectedStartDate, selectedEndDate, filters);
+      
+      // Filtrar por área después de cargar
+      if (selectedArea !== 'todas' && turnsData) {
+        turnsData = turnsData.filter(turn => {
+          const consultorio = consultorios.find(c => c.uk_consultorio === turn.uk_consultorio);
+          return consultorio && consultorio.uk_area === parseInt(selectedArea);
+        });
+      }
+      
+      // Filtrar por consultorio específico
+      if (selectedConsultorio !== 'todos' && turnsData) {
+        turnsData = turnsData.filter(turn => turn.uk_consultorio === parseInt(selectedConsultorio));
+      }
       
       // Ordenar por fecha de creación descendente (más recientes primero)
       if (turnsData && turnsData.length > 0) {
@@ -289,45 +333,77 @@ const TurnHistory = () => {
     return area ? area.s_nombre_area : '';
   };
 
-  const getCombinedAreaConsultorioList = () => {
-    const combined = [];
-    consultorios.forEach(consultorio => {
-      const area = areas.find(a => a.uk_area === consultorio.uk_area);
-      if (area) {
-        combined.push({
-          type: 'consultorio',
-          id: consultorio.uk_consultorio,
-          name: `Consultorio ${consultorio.i_numero_consultorio}`,
-          displayName: `Consultorio ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
-          areaName: area.s_nombre_area,
-          icon: getAreaIcon(area.s_nombre_area)
-        });
-      }
-    });
-    return combined;
+  const getAreasList = () => {
+    return areas.map(area => ({
+      id: area.uk_area,
+      name: area.s_nombre_area,
+      icon: getAreaIcon(area.s_nombre_area),
+      color: getAreaIconColor(area.s_nombre_area)
+    }));
   };
 
-  const getSelectedItemInfo = () => {
+  const getConsultoriosList = () => {
+    return consultorios.map(consultorio => {
+      const area = areas.find(a => a.uk_area === consultorio.uk_area);
+      return {
+        id: consultorio.uk_consultorio,
+        numero: consultorio.i_numero_consultorio,
+        name: `Consultorio ${consultorio.i_numero_consultorio}`,
+        areaName: area ? area.s_nombre_area : '',
+        icon: area ? getAreaIcon(area.s_nombre_area) : FaHospital,
+        color: area ? getAreaIconColor(area.s_nombre_area) : 'var(--primary-medical)'
+      };
+    });
+  };
+
+  const getSelectedAreaInfo = () => {
     if (selectedArea === 'todas') {
       return {
         icon: FaHospital,
-        displayName: 'Todos los consultorios'
+        displayName: 'Todas las áreas',
+        color: 'var(--primary-medical)'
       };
     }
     
-    const combined = getCombinedAreaConsultorioList();
-    const selected = combined.find(item => item.id === selectedArea);
-    
-    if (selected) {
+    const area = areas.find(a => a.uk_area === parseInt(selectedArea));
+    if (area) {
       return {
-        icon: selected.icon,
-        displayName: selected.displayName
+        icon: getAreaIcon(area.s_nombre_area),
+        displayName: area.s_nombre_area,
+        color: getAreaIconColor(area.s_nombre_area)
       };
     }
     
     return {
       icon: FaHospital,
-      displayName: 'Todos los consultorios'
+      displayName: 'Todas las áreas',
+      color: 'var(--primary-medical)'
+    };
+  };
+
+  const getSelectedConsultorioInfo = () => {
+    if (selectedConsultorio === 'todos') {
+      return {
+        icon: FaHospital,
+        displayName: 'Todos los consultorios',
+        color: 'var(--primary-medical)'
+      };
+    }
+    
+    const consultorio = consultorios.find(c => c.uk_consultorio === parseInt(selectedConsultorio));
+    if (consultorio) {
+      const area = areas.find(a => a.uk_area === consultorio.uk_area);
+      return {
+        icon: area ? getAreaIcon(area.s_nombre_area) : FaHospital,
+        displayName: `Consultorio ${consultorio.i_numero_consultorio}`,
+        color: area ? getAreaIconColor(area.s_nombre_area) : 'var(--primary-medical)'
+      };
+    }
+    
+    return {
+      icon: FaHospital,
+      displayName: 'Todos los consultorios',
+      color: 'var(--primary-medical)'
     };
   };
 
@@ -536,7 +612,7 @@ const TurnHistory = () => {
           </div>
 
           <div className="filter-group">
-            <label>Área/Consultorio</label>
+            <label>Área</label>
             <div className="custom-area-select">
               <div 
                 ref={areaButtonRef}
@@ -554,10 +630,10 @@ const TurnHistory = () => {
                 }}
               >
                 <div className="area-selected">
-                  <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0 }}>
-                    {React.createElement(getSelectedItemInfo().icon)}
+                  <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0, color: getSelectedAreaInfo().color }}>
+                    {React.createElement(getSelectedAreaInfo().icon)}
                   </div>
-                  <span>{getSelectedItemInfo().displayName}</span>
+                  <span>{getSelectedAreaInfo().displayName}</span>
                 </div>
                 <div className="dropdown-arrow">
                   <FaChevronDown />
@@ -590,21 +666,100 @@ const TurnHistory = () => {
                       <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0 }}>
                         <FaHospital />
                       </div>
-                      <span>Todos los consultorios</span>
+                      <span>Todas las áreas</span>
                     </div>
-                    {getCombinedAreaConsultorioList().map(item => (
+                    {getAreasList().map(area => (
                       <div
-                        key={`${item.type}-${item.id}`}
+                        key={`area-${area.id}`}
                         className="area-option"
                         onClick={() => {
-                          setSelectedArea(item.id);
+                          setSelectedArea(area.id.toString());
                           setAreaDropdownOpen(false);
                         }}
                       >
-                        <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0 }}>
-                          {React.createElement(item.icon)}
+                        <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0, color: area.color }}>
+                          {React.createElement(area.icon)}
                         </div>
-                        <span>{item.displayName}</span>
+                        <span>{area.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>,
+                document.body
+              )}
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <label>Consultorio</label>
+            <div className="custom-consultorio-select">
+              <div 
+                ref={consultorioButtonRef}
+                className="consultorio-select-trigger"
+                onClick={() => {
+                  const rect = consultorioButtonRef.current?.getBoundingClientRect();
+                  if (rect) {
+                    setConsultorioDropdownPosition({
+                      top: rect.bottom + window.scrollY,
+                      left: rect.left + window.scrollX,
+                      width: rect.width
+                    });
+                  }
+                  setConsultorioDropdownOpen(!consultorioDropdownOpen);
+                }}
+              >
+                <div className="consultorio-selected">
+                  <div className="consultorio-icon" style={{ background: 'none', border: 'none', padding: 0, color: getSelectedConsultorioInfo().color }}>
+                    {React.createElement(getSelectedConsultorioInfo().icon)}
+                  </div>
+                  <span>{getSelectedConsultorioInfo().displayName}</span>
+                </div>
+                <div className="dropdown-arrow">
+                  <FaChevronDown />
+                </div>
+              </div>
+              
+              {consultorioDropdownOpen && createPortal(
+                <>
+                  <div 
+                    className="consultorio-dropdown-overlay"
+                    onClick={() => setConsultorioDropdownOpen(false)}
+                  />
+                  <div 
+                    className="consultorio-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${consultorioDropdownPosition.top}px`,
+                      left: `${consultorioDropdownPosition.left}px`,
+                      width: `${consultorioDropdownPosition.width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="consultorio-option"
+                      onClick={() => {
+                        setSelectedConsultorio('todos');
+                        setConsultorioDropdownOpen(false);
+                      }}
+                    >
+                      <div className="consultorio-icon" style={{ background: 'none', border: 'none', padding: 0 }}>
+                        <FaHospital />
+                      </div>
+                      <span>Todos los consultorios</span>
+                    </div>
+                    {getConsultoriosList().map(consultorio => (
+                      <div
+                        key={`consultorio-${consultorio.id}`}
+                        className="consultorio-option"
+                        onClick={() => {
+                          setSelectedConsultorio(consultorio.id.toString());
+                          setConsultorioDropdownOpen(false);
+                        }}
+                      >
+                        <div className="consultorio-icon" style={{ background: 'none', border: 'none', padding: 0, color: consultorio.color }}>
+                          {React.createElement(consultorio.icon)}
+                        </div>
+                        <span>{consultorio.name} {consultorio.areaName && `(${consultorio.areaName})`}</span>
                       </div>
                     ))}
                   </div>
@@ -633,130 +788,54 @@ const TurnHistory = () => {
               </div>
             ) : (
               <>
-                <div className="history-list">
+                <div className="history-list-compact">
                   {currentTurns.map(turn => {
-                    const patientInfo = getPatientInfo(turn.uk_paciente);
                     const areaName = getAreaInfo(turn.uk_consultorio);
                     const AreaIcon = getAreaIcon(areaName);
+                    const iconColor = getAreaIconColor(areaName);
+                    
+                    // Validar y formatear fecha de creación
+                    let creationTimeDisplay = '--:--';
+                    if (turn.d_fecha_creacion) {
+                      const creationDate = new Date(turn.d_fecha_creacion);
+                      if (!isNaN(creationDate.getTime())) {
+                        creationTimeDisplay = creationDate.toLocaleTimeString('es-ES', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        });
+                      }
+                    }
+                    
+                    // Validar fecha del turno
+                    let turnDateDisplay = '';
+                    if (turn.d_fecha) {
+                      const turnDate = new Date(turn.d_fecha);
+                      if (!isNaN(turnDate.getTime())) {
+                        turnDateDisplay = turnDate.toLocaleDateString('es-ES');
+                      }
+                    }
 
                     return (
-                      <div key={turn.uk_turno} className="history-item">
-                        <div className="history-item-header">
-                          <div className="history-item-title">
-                            <div className="turn-number-badge">
-                              #{turn.i_numero_turno}
-                            </div>
-                            <div className="history-patient-info">
-                              <div className="patient-name">
-                                <FaUser style={{ fontSize: '14px', color: 'var(--text-muted)' }} />
-                                <strong>{getPatientName(turn.uk_paciente)}</strong>
-                              </div>
-                              {patientInfo && (
-                                <div className="patient-details">
-                                  {patientInfo.c_telefono && (
-                                    <span className="detail-chip">📞 {patientInfo.c_telefono}</span>
-                                  )}
-                                  {patientInfo.c_dni && (
-                                    <span className="detail-chip">🆔 {patientInfo.c_dni}</span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="history-item-actions">
-                            <span className={`status-badge ${getStatusColor(turn.s_estado)}`}>
-                              {React.createElement(getStatusIcon(turn.s_estado), { 
-                                className: 'status-icon-inline',
-                                size: 12 
-                              })}
-                              {turnStatuses.find(s => s.value === turn.s_estado)?.label || turn.s_estado}
-                            </span>
-                            <button 
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => handleViewDetails(turn)}
-                              title="Ver detalles"
-                            >
-                              <FaInfoCircle />
-                            </button>
-                          </div>
+                      <div 
+                        key={turn.uk_turno} 
+                        className="history-row"
+                        onClick={() => handleViewDetails(turn)}
+                      >
+                        <div className="history-time">{creationTimeDisplay}</div>
+                        <div className="history-icon" style={{ color: iconColor }}>
+                          <AreaIcon />
                         </div>
-
-                        <div className="history-item-body">
-                          <div className="history-info-grid">
-                            <div className="info-item">
-                              <FaCalendarAlt className="info-icon" />
-                              <div className="info-content">
-                                <span className="info-label">Fecha del turno</span>
-                                <span className="info-value">
-                                  {new Date(turn.d_fecha).toLocaleDateString('es-ES', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                  })}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="info-item">
-                              <FaClock className="info-icon" />
-                              <div className="info-content">
-                                <span className="info-label">Hora</span>
-                                <span className="info-value">{turn.t_hora}</span>
-                              </div>
-                            </div>
-
-                            <div className="info-item">
-                              <AreaIcon className="info-icon" />
-                              <div className="info-content">
-                                <span className="info-label">Área</span>
-                                <span className="info-value">{areaName}</span>
-                              </div>
-                            </div>
-
-                            <div className="info-item">
-                              <FaHospital className="info-icon" />
-                              <div className="info-content">
-                                <span className="info-label">Consultorio</span>
-                                <span className="info-value">{getConsultorioInfo(turn.uk_consultorio)}</span>
-                              </div>
-                            </div>
-
-                            {turn.uk_usuario_registro && (
-                              <div className="info-item">
-                                <FaUserMd className="info-icon" />
-                                <div className="info-content">
-                                  <span className="info-label">Registrado por</span>
-                                  <span className="info-value">Admin (ID: {turn.uk_usuario_registro})</span>
-                                </div>
-                              </div>
-                            )}
-
-                            {turn.d_fecha_creacion && (
-                              <div className="info-item">
-                                <FaClock className="info-icon" />
-                                <div className="info-content">
-                                  <span className="info-label">Fecha de registro</span>
-                                  <span className="info-value">
-                                    {new Date(turn.d_fecha_creacion).toLocaleString('es-ES', {
-                                      day: '2-digit',
-                                      month: '2-digit',
-                                      year: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {turn.s_observaciones && (
-                            <div className="history-observations">
-                              <strong>Observaciones:</strong>
-                              <p>{turn.s_observaciones}</p>
-                            </div>
-                          )}
+                        <div className="history-content">
+                          <span className="history-main-text">
+                            Turno #{turn.i_numero_turno} - {getPatientName(turn.uk_paciente)}
+                          </span>
+                          <span className="history-secondary-text">
+                            {areaName} • {turnDateDisplay} {turn.t_hora} • {turnStatuses.find(s => s.value === turn.s_estado)?.label}
+                            {turn.uk_usuario_registro && ` • Admin ID: ${turn.uk_usuario_registro}`}
+                          </span>
+                        </div>
+                        <div className={`history-status-indicator status-${turn.s_estado.toLowerCase()}`}>
+                          {React.createElement(getStatusIcon(turn.s_estado), { size: 14 })}
                         </div>
                       </div>
                     );
