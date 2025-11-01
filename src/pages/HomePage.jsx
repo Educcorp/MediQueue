@@ -1574,7 +1574,9 @@ const HomePage = () => {
           overflow: visible;
         }
 
-
+        .area-card::before {
+          display: none !important;
+        }
 
         .area-card:hover {
           transform: translateY(-4px);
