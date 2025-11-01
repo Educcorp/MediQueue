@@ -295,11 +295,16 @@ const HomePage = () => {
                 const areaLetter = areaObj?.s_letra || areaName?.charAt(0) || 'A';
                 const turnsArea = turnsByArea[areaName];
                 
-                // determinar próximo turno del área: 1) LLAMANDO; 2) EN_ESPERA por número
+                // Obtener turnos en espera y llamando
                 const calling = turnsArea.filter(t => (t.s_estado || t.estado) === 'LLAMANDO');
                 const waiting = turnsArea.filter(t => (t.s_estado || t.estado) === 'EN_ESPERA');
                 const sortByNum = (a, b) => (a.i_numero_turno || a.id || 0) - (b.i_numero_turno || b.id || 0);
-                const nextForArea = (calling.sort(sortByNum)[0]) || (waiting.sort(sortByNum)[0]) || null;
+                
+                // Combinar turnos llamando y en espera, ordenados
+                const allActiveTurns = [...calling, ...waiting].sort(sortByNum);
+                
+                // Obtener los últimos 3 turnos activos
+                const lastThreeTurns = allActiveTurns.slice(0, 3);
 
                 return {
                   areaName,
@@ -307,7 +312,7 @@ const HomePage = () => {
                   areaIcon,
                   areaLetter,
                   turnsArea,
-                  nextForArea,
+                  lastThreeTurns,
                   AreaIconComponent: getIconComponent(areaIcon)
                 };
               });
@@ -343,48 +348,51 @@ const HomePage = () => {
                           </div>
                           <div className="area-card-title">
                             <h3>{areaData.areaName}</h3>
-                            <span className="area-letter-badge" style={{ background: areaData.areaColor }}>
-                              {areaData.areaLetter}
-                            </span>
                           </div>
                         </div>
                         
                         <div className="area-card-content">
-                          {!areaData.nextForArea ? (
+                          {areaData.lastThreeTurns.length === 0 ? (
                             <div className="area-empty-state">
                               <i className="mdi mdi-check-circle" style={{ color: areaData.areaColor }}></i>
                               <p>Sin turnos en espera</p>
                             </div>
                           ) : (
-                            <div className="area-current-turn">
-                              <div className="turn-display-small" style={{ 
-                                background: `linear-gradient(135deg, ${areaData.areaColor}, ${areaData.areaColor}dd)`
-                              }}>
-                                <span className="turn-number-small">
-                                  {areaData.areaLetter}{areaData.nextForArea.i_numero_turno || areaData.nextForArea.id}
-                                </span>
-                              </div>
-                              <div className="turn-info-small">
-                                <div className="consultorio-small">
-                                  <i className="mdi mdi-hospital-building"></i>
-                                  Consultorio {areaData.nextForArea.i_numero_consultorio || areaData.nextForArea.consultorio}
-                                </div>
-                                <div className="status-small" style={{ 
-                                  background: (areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' 
-                                    ? '#FF6B35' : areaData.areaColor
-                                }}>
-                                  {(areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' ? 
-                                    'LLAMANDO' : 'EN ESPERA'
-                                  }
-                                </div>
-                              </div>
+                            <div className="area-turns-list">
+                              {areaData.lastThreeTurns.map((turn, turnIndex) => {
+                                const isLlamando = (turn.s_estado || turn.estado) === 'LLAMANDO';
+                                return (
+                                  <div key={turnIndex} className={`turn-item-card ${isLlamando ? 'calling' : ''}`}>
+                                    <div className="turn-badge" style={{ 
+                                      background: isLlamando ? '#FF6B35' : areaData.areaColor
+                                    }}>
+                                      <span className="turn-id">
+                                        {areaData.areaLetter}{turn.i_numero_turno || turn.id}
+                                      </span>
+                                    </div>
+                                    <div className="turn-details">
+                                      <div className="consultorio-badge">
+                                        <i className="mdi mdi-hospital-building"></i>
+                                        Consultorio {turn.i_numero_consultorio || turn.consultorio}
+                                      </div>
+                                      <div className={`status-badge-small ${isLlamando ? 'calling' : 'waiting'}`}>
+                                        {isLlamando ? (
+                                          <><i className="mdi mdi-bell-ring"></i> LLAMANDO</>
+                                        ) : (
+                                          <><i className="mdi mdi-clock-outline"></i> EN ESPERA</>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
                         
                         <div className="area-card-footer">
                           <span className="turns-count" style={{ color: areaData.areaColor }}>
-                            {areaData.turnsArea.length} turnos activos
+                            {areaData.turnsArea.length} {areaData.turnsArea.length === 1 ? 'turno activo' : 'turnos activos'}
                           </span>
                         </div>
                       </div>
@@ -1490,6 +1498,317 @@ const HomePage = () => {
         .turns-list { list-style: none; padding: 0; margin: 0; width: 100%; }
         .turn-item { padding: 10px 12px; border-bottom: 1px dashed #e2e8f0; font-weight: 700; color: #2d3748; }
         .panel-empty { color: #718096; }
+
+        /* Vista general de áreas */
+        .general-monitor-layout {
+          width: 100%;
+          max-width: 1600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+
+        .general-empty-state {
+          text-align: center;
+          padding: 60px 20px;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state-content {
+          max-width: 500px;
+          margin: 0 auto;
+        }
+
+        .empty-state-icon {
+          font-size: 80px;
+          color: #4A90E2;
+          margin-bottom: 20px;
+          opacity: 0.6;
+        }
+
+        .empty-state-actions {
+          margin-top: 30px;
+        }
+
+        .refresh-button {
+          background: linear-gradient(135deg, #4A90E2, #2f97d1);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .refresh-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Grid de tarjetas de áreas */
+        .areas-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+          gap: 24px;
+          padding: 10px;
+        }
+
+        .area-card {
+          background: white;
+          border-radius: 20px;
+          padding: 24px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          border: 3px solid var(--area-color, #4A90E2);
+          transition: all 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          min-height: 380px;
+        }
+
+        .area-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .area-card-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 20px;
+          padding-bottom: 16px;
+          border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .area-card-icon {
+          width: 56px;
+          height: 56px;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          color: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          flex-shrink: 0;
+        }
+
+        .area-card-title {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .area-card-title h3 {
+          font-size: 22px;
+          font-weight: 700;
+          color: #2d3748;
+          margin: 0;
+          flex: 1;
+        }
+
+        .area-card-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 10px 0;
+        }
+
+        .area-empty-state {
+          text-align: center;
+          padding: 40px 20px;
+          color: #718096;
+        }
+
+        .area-empty-state i {
+          font-size: 48px;
+          margin-bottom: 12px;
+          opacity: 0.6;
+        }
+
+        .area-empty-state p {
+          font-size: 16px;
+          font-weight: 500;
+          margin: 0;
+        }
+
+        /* Lista de turnos en tarjetas de área */
+        .area-turns-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .turn-item-card {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 16px;
+          background: #f8fafc;
+          border-radius: 12px;
+          border: 2px solid transparent;
+          transition: all 0.3s ease;
+        }
+
+        .turn-item-card:hover {
+          background: #f1f5f9;
+          transform: translateX(4px);
+        }
+
+        .turn-item-card.calling {
+          background: #fff5f5;
+          border-color: #FF6B35;
+          animation: calling-pulse-card 2s infinite;
+        }
+
+        .turn-badge {
+          min-width: 70px;
+          height: 70px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          flex-shrink: 0;
+        }
+
+        .turn-id {
+          font-size: 24px;
+          font-weight: 900;
+          letter-spacing: -0.5px;
+        }
+
+        .turn-details {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .consultorio-badge {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #4a5568;
+        }
+
+        .consultorio-badge i {
+          font-size: 18px;
+          color: #718096;
+        }
+
+        .status-badge-small {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 13px;
+          font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 8px;
+          width: fit-content;
+        }
+
+        .status-badge-small.calling {
+          background: #fed7d7;
+          color: #FF6B35;
+        }
+
+        .status-badge-small.waiting {
+          background: #e6f5f9;
+          color: #2c7a8c;
+        }
+
+        .status-badge-small i {
+          font-size: 14px;
+        }
+
+        .area-card-footer {
+          margin-top: auto;
+          padding-top: 16px;
+          border-top: 2px solid rgba(0, 0, 0, 0.08);
+          display: flex;
+          justify-content: center;
+        }
+
+        .turns-count {
+          font-size: 15px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        @keyframes calling-pulse-card {
+          0%, 100% {
+            background: #fff5f5;
+            box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4);
+          }
+          50% {
+            background: #fed7d7;
+            box-shadow: 0 0 0 8px rgba(255, 107, 53, 0);
+          }
+        }
+
+        /* Responsive para tarjetas */
+        @media (max-width: 1200px) {
+          .areas-grid {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+          }
+
+          .area-card {
+            min-height: 350px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .areas-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+
+          .area-card {
+            padding: 20px;
+            min-height: 320px;
+          }
+
+          .area-card-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 24px;
+          }
+
+          .area-card-title h3 {
+            font-size: 18px;
+          }
+
+          .turn-badge {
+            min-width: 60px;
+            height: 60px;
+          }
+
+          .turn-id {
+            font-size: 20px;
+          }
+
+          .consultorio-badge {
+            font-size: 14px;
+          }
+
+          .status-badge-small {
+            font-size: 12px;
+          }
+        }
         `}</style>
       </div>
   );
