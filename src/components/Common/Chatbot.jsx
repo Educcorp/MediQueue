@@ -20,11 +20,43 @@ const Chatbot = () => {
     const [minimized, setMinimized] = useState(false);
     const [showPromo, setShowPromo] = useState(false);
     const [promoAnimation, setPromoAnimation] = useState('');
+    const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const promoTimeoutRef = useRef(null);
     const chatWindowRef = useRef(null);
     const promoRef = useRef(null);
+
+    // Detectar cambios de tema
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const currentTheme = localStorage.getItem('mq-theme') || 'light';
+            setTheme(currentTheme);
+        };
+
+        // Escuchar cambios en localStorage
+        window.addEventListener('storage', handleStorageChange);
+
+        // Observar cambios en el atributo data-theme del documento
+        const observer = new MutationObserver(() => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 
+                                localStorage.getItem('mq-theme') || 'light';
+            setTheme(currentTheme);
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            observer.disconnect();
+        };
+    }, []);
+
+    // Variable para determinar si está en modo oscuro
+    const isDarkMode = theme === 'dark';
 
     // Función para obtener contexto de la página actual
     const getPageContext = () => {
@@ -161,8 +193,32 @@ MediQueue te ayuda a gestionar tus turnos médicos, pero para diagnósticos espe
 ¿Podrías ser más específico sobre lo que necesitas? Estoy aquí para ayudarte.`;
     };
 
-    // Paleta de colores médica de MediQueue
-    const colors = {
+    // Paleta de colores médica de MediQueue adaptada al tema
+    const colors = isDarkMode ? {
+        // Modo oscuro
+        primary: '#77b8ce',      // Azul médico principal
+        primaryLight: '#5a9bb0', // Azul más intenso para oscuro
+        primaryDark: '#4a8a9d',  // Azul oscuro
+        secondary: '#6c757d',    // Gris médico
+        accent: '#28a745',       // Verde médico (salud)
+        white: '#ffffff',
+        background: '#1a202c',   // Fondo oscuro
+        textPrimary: '#f7fafc',  // Texto claro
+        textSecondary: '#a0aec0', // Texto secundario claro
+        gray100: '#2d3748',      // Gris oscuro
+        gray200: '#4a5568',      // Gris medio
+        gray300: '#718096',      // Gris más claro
+        gray400: '#a0aec0',      // Gris claro
+        gray600: '#cbd5e0',      // Muy claro
+        gray700: '#e2e8f0',      // Casi blanco
+        success: '#48bb78',      // Verde más claro
+        danger: '#f56565',       // Rojo más claro
+        warning: '#f6ad55',      // Naranja más claro
+        info: '#4299e1',         // Azul más claro
+        cardBg: '#2d3748',       // Fondo de tarjetas
+        border: '#4a5568'        // Bordes
+    } : {
+        // Modo claro
         primary: '#77b8ce',      // Azul médico principal
         primaryLight: '#a8d1e0', // Azul claro
         primaryDark: '#5a9bb0',  // Azul oscuro
@@ -181,7 +237,9 @@ MediQueue te ayuda a gestionar tus turnos médicos, pero para diagnósticos espe
         success: '#28a745',
         danger: '#dc3545',
         warning: '#ffc107',
-        info: '#17a2b8'
+        info: '#17a2b8',
+        cardBg: '#ffffff',       // Fondo de tarjetas
+        border: '#e9ecef'        // Bordes
     };
 
     // Mostrar mensaje promocional después de unos segundos si el chat está cerrado
@@ -407,14 +465,16 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
             position: 'absolute',
             bottom: 75,
             right: 10,
-            background: colors.white,
+            background: colors.cardBg,
             color: colors.textPrimary,
             padding: '12px 16px',
             borderRadius: 15,
-            boxShadow: '0 4px 15px rgba(119, 184, 206, 0.15)',
+            boxShadow: isDarkMode
+                ? '0 4px 15px rgba(0, 0, 0, 0.4)'
+                : '0 4px 15px rgba(119, 184, 206, 0.15)',
             maxWidth: 220,
             fontSize: '0.9rem',
-            border: `1px solid ${colors.primary}`,
+            border: `1px solid ${colors.border}`,
             transition: 'all 0.3s ease',
             display: 'flex',
             flexDirection: 'column',
@@ -471,14 +531,16 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
         window: {
             width: 360,
             height: minimized ? 60 : 500,
-            background: colors.white,
+            background: colors.cardBg,
             borderRadius: 20,
-            boxShadow: '0 8px 30px rgba(119, 184, 206, 0.12), 0 2px 8px rgba(119, 184, 206, 0.06)',
+            boxShadow: isDarkMode 
+                ? '0 8px 30px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)'
+                : '0 8px 30px rgba(119, 184, 206, 0.12), 0 2px 8px rgba(119, 184, 206, 0.06)',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             transition: 'all 0.3s ease-in-out',
-            border: `1px solid ${colors.primary}`
+            border: `1px solid ${colors.border}`
         },
         header: {
             background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
@@ -550,7 +612,9 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
         },
         bot: {
             alignSelf: 'flex-start',
-            background: `linear-gradient(135deg, ${colors.gray100} 0%, ${colors.gray200} 100%)`,
+            background: isDarkMode 
+                ? `linear-gradient(135deg, ${colors.gray200} 0%, ${colors.gray100} 100%)`
+                : `linear-gradient(135deg, ${colors.gray100} 0%, ${colors.gray200} 100%)`,
             color: colors.textPrimary,
             borderBottomLeftRadius: 5,
         },
@@ -558,11 +622,13 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
             position: 'absolute',
             top: -15,
             left: -8,
-            background: colors.gray100,
+            background: isDarkMode ? colors.gray200 : colors.gray100,
             borderRadius: '50%',
             padding: 5,
             fontSize: '0.8rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            boxShadow: isDarkMode 
+                ? '0 1px 3px rgba(0,0,0,0.3)'
+                : '0 1px 3px rgba(0,0,0,0.1)',
             color: colors.primary,
             display: 'flex',
             alignItems: 'center',
@@ -578,7 +644,7 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
         },
         typingIndicator: {
             alignSelf: 'flex-start',
-            background: colors.gray200,
+            background: isDarkMode ? colors.gray200 : colors.gray200,
             borderRadius: 18,
             padding: '8px 16px',
             color: colors.textPrimary,
@@ -587,7 +653,9 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
             gap: 8,
             fontSize: '0.9rem',
             animation: 'fadeIn 0.3s ease',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+            boxShadow: isDarkMode 
+                ? '0 1px 2px rgba(0,0,0,0.3)'
+                : '0 1px 2px rgba(0,0,0,0.1)',
         },
         dot: {
             width: 8,
@@ -611,8 +679,8 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
         inputArea: {
             display: 'flex',
             padding: '12px 16px',
-            background: colors.gray100,
-            borderTop: `1px solid ${colors.gray200}`,
+            background: isDarkMode ? colors.gray100 : colors.gray100,
+            borderTop: `1px solid ${colors.border}`,
             transition: 'all 0.2s ease',
             opacity: minimized ? 0 : 1,
             maxHeight: minimized ? 0 : 60,
@@ -623,11 +691,13 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
-            background: colors.white,
+            background: isDarkMode ? colors.background : colors.white,
             borderRadius: 30,
-            border: `1px solid ${colors.gray200}`,
+            border: `1px solid ${colors.border}`,
             transition: 'all 0.2s ease',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            boxShadow: isDarkMode
+                ? '0 1px 3px rgba(0,0,0,0.3)'
+                : '0 1px 3px rgba(0,0,0,0.05)',
         },
         input: {
             flex: 1,
