@@ -1673,21 +1673,22 @@ const HomePage = () => {
         .area-current-turn::before {
           content: 'TURNO ACTUAL';
           position: absolute;
-          top: -12px;
+          top: -10px;
           left: 22px;
-          background: var(--area-color, #4A90E2);
-          color: white;
-          padding: 5px 16px;
-          font-size: 10px;
-          font-weight: 800;
-          letter-spacing: 1px;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          background: transparent;
+          color: var(--area-color, #4A90E2);
+          padding: 0;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 1.2px;
+          border-radius: 0;
+          box-shadow: none;
           z-index: 10;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .area-current-turn.calling::before {
-          background: #FF6B35;
+          color: #FF6B35;
           content: 'LLAMANDO';
           animation: pulse-text 1.5s infinite;
         }
