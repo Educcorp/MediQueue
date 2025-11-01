@@ -442,18 +442,7 @@ const HomePage = () => {
                         <p className="area-subtitle">Turnos en tiempo real</p>
                       </div>
                     </div>
-                    <div className="monitor-status">
-                      <div className="live-indicator">
-                        <div className="pulse-dot"></div>
-                        <span>EN VIVO</span>
-                      </div>
-                      <div className="area-badge-large" style={{ 
-                        background: areaColor,
-                        color: 'white'
-                      }}>
-                        {areaLetter}
-                      </div>
-                    </div>
+                    
                   </div>
                   
                   <div className="monitor-content">
@@ -468,7 +457,7 @@ const HomePage = () => {
                     ) : (
                       <div className="monitor-current-turn">
                         <div className="current-turn-header">
-                          <h2>PRÓXIMO TURNO</h2>
+                          <h2>TURNO ACTUAL</h2>
                         </div>
                         <div className="turn-display-container">
                           <div className="turn-display-large" style={{ 
@@ -492,7 +481,7 @@ const HomePage = () => {
                             }}>
                               {(nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' ? 
                                 <><i className="mdi mdi-bell-ring"></i> LLAMANDO AHORA</> : 
-                                <><i className="mdi mdi-clock"></i> EN ESPERA</>
+                                <>PRÓXIMOS TURNOS <i className="mdi mdi-arrow-right-bold"></i></>
                               }
                             </div>
                           </div>
@@ -513,7 +502,7 @@ const HomePage = () => {
                       background: areaColor + '20',
                       color: areaColor 
                     }}>
-                      {turnsArea.length} en espera
+                      {nextForArea ? turnsArea.length - 1 : turnsArea.length} en espera
                     </div>
                   </div>
                   <div className="sidebar-content">
@@ -524,8 +513,12 @@ const HomePage = () => {
                       </div>
                     ) : (
                       <div className="turns-queue">
-                        {turnsArea.sort(sortByNum).map((t, idx) => {
-                          const isNext = nextForArea && (nextForArea.i_numero_turno || nextForArea.id) === (t.i_numero_turno || t.id);
+                        {turnsArea.sort(sortByNum).filter((t) => {
+                          // Excluir el turno actual (nextForArea) de la cola
+                          const isCurrentTurn = nextForArea && (nextForArea.i_numero_turno || nextForArea.id) === (t.i_numero_turno || t.id);
+                          return !isCurrentTurn;
+                        }).map((t, idx) => {
+                          const isNext = false; // Ya no hay "next" en la cola
                           const isCalling = (t.s_estado || t.estado) === 'LLAMANDO';
                           
                           return (
