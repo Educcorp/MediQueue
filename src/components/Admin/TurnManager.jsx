@@ -47,7 +47,8 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaAngleDoubleLeft,
-  FaAngleDoubleRight
+  FaAngleDoubleRight,
+  FaHistory
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -664,6 +665,9 @@ const TurnManager = () => {
             </p>
           </div>
           <div className="page-actions">
+            <button className="btn btn-secondary" onClick={() => navigate('/admin/turn-history')}>
+              <FaHistory /> Ver Historial
+            </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> Actualizar
             </button>

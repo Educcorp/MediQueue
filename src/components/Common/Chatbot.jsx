@@ -68,6 +68,7 @@ const Chatbot = () => {
             '/admin/dashboard': 'Dashboard administrativo - Estadísticas y gestión de turnos',
             '/admin/users': 'Gestión de usuarios - Administración de cuentas de administradores',
             '/admin/turns': 'Gestión de turnos - Administración de citas médicas',
+            '/admin/turn-history': 'Historial de turnos - Auditoría completa de turnos con tracking de administradores',
             '/admin/consultorios': 'Gestión de consultorios - Configuración de espacios médicos',
             '/admin/patients': 'Gestión de pacientes - Administración de información de pacientes',
             '/admin/statistics': 'Estadísticas - Reportes y métricas del sistema',

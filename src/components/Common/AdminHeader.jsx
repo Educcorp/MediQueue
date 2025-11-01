@@ -16,7 +16,8 @@ import {
     FaSun,
     FaMoon,
     FaShieldAlt,
-    FaCookie
+    FaCookie,
+    FaHistory
 } from 'react-icons/fa';
 
 const AdminHeader = () => {
@@ -120,6 +121,12 @@ const AdminHeader = () => {
             label: 'Turnos',
             permission: 'supervisor',
             icon: <FaCalendarCheck />
+        },
+        {
+            path: '/admin/turn-history',
+            label: 'Historial',
+            permission: 'supervisor',
+            icon: <FaHistory />
         },
         {
             path: '/admin/patients',
