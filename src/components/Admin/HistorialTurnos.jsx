@@ -468,7 +468,7 @@ const HistorialTurnos = () => {
     return area ? area.s_nombre_area : '';
   };
 
-  // Generar lista de consultorios con área
+  // Generar lista de consultorios con área (usando colores e iconos desde BD)
   const getCombinedAreaConsultorioList = () => {
     const combined = [];
 
@@ -476,13 +476,20 @@ const HistorialTurnos = () => {
     consultorios.forEach(consultorio => {
       const area = areas.find(a => a.uk_area === consultorio.uk_area);
       if (area) {
+        // Obtener color e icono desde la BD
+        const areaColor = area.s_color || '#4A90E2';
+        const areaIconName = area.s_icono || 'FaHospital';
+        const AreaIconComponent = getIconComponent(areaIconName);
+        
         combined.push({
           type: 'consultorio',
           id: consultorio.uk_consultorio,
           name: `Consultorio ${consultorio.i_numero_consultorio}`,
           displayName: `Consultorio ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
           areaName: area.s_nombre_area,
-          icon: getAreaIcon(area.s_nombre_area),
+          areaColor: areaColor,
+          icon: AreaIconComponent,
+          iconName: areaIconName,
           className: getAreaClass(area.s_nombre_area)
         });
       }
@@ -496,6 +503,8 @@ const HistorialTurnos = () => {
     if (selectedArea === 'todas') {
       return {
         icon: FaHospital,
+        iconComponent: FaHospital,
+        areaColor: '#4A90E2',
         className: '',
         displayName: 'Todos los consultorios'
       };
@@ -507,6 +516,8 @@ const HistorialTurnos = () => {
     if (selected) {
       return {
         icon: selected.icon,
+        iconComponent: selected.icon,
+        areaColor: selected.areaColor,
         className: selected.className,
         displayName: selected.displayName
       };
@@ -515,6 +526,8 @@ const HistorialTurnos = () => {
     // Fallback
     return {
       icon: FaHospital,
+      iconComponent: FaHospital,
+      areaColor: '#4A90E2',
       className: '',
       displayName: 'Todos los consultorios'
     };
@@ -776,17 +789,18 @@ const HistorialTurnos = () => {
               >
                 <div className="area-selected">
                   <div 
-                    className={`area-icon ${getSelectedItemInfo().className}`}
+                    className="area-icon"
                     style={{
                       background: 'none',
                       backgroundColor: 'transparent',
                       border: 'none',
                       borderRadius: '0',
                       padding: '0',
-                      boxShadow: 'none'
+                      boxShadow: 'none',
+                      color: getSelectedItemInfo().areaColor
                     }}
                   >
-                    {React.createElement(getSelectedItemInfo().icon)}
+                    {React.createElement(getSelectedItemInfo().iconComponent)}
                   </div>
                   <span>{getSelectedItemInfo().displayName}</span>
                 </div>
@@ -828,7 +842,8 @@ const HistorialTurnos = () => {
                           border: 'none',
                           borderRadius: '0',
                           padding: '0',
-                          boxShadow: 'none'
+                          boxShadow: 'none',
+                          color: '#4A90E2'
                         }}
                       >
                         <FaHospital />
@@ -845,14 +860,15 @@ const HistorialTurnos = () => {
                         }}
                       >
                         <div 
-                          className={`area-icon ${item.className}`}
+                          className="area-icon"
                           style={{ 
                             background: 'none',
                             backgroundColor: 'transparent',
                             border: 'none',
                             borderRadius: '0',
                             padding: '0',
-                            boxShadow: 'none'
+                            boxShadow: 'none',
+                            color: item.areaColor
                           }}
                         >
                           {React.createElement(item.icon)}
