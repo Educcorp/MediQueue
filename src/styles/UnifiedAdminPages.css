@@ -235,9 +235,10 @@
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border-light);
-    overflow: hidden;
+    overflow: visible;
     transition: all 0.3s ease;
     margin-bottom: 24px;
+    position: relative;
     z-index: 1;
 }
 
@@ -2561,5 +2562,347 @@
 
     .modal-body {
         padding: 16px;
+    }
+}
+
+/* ============================================
+   FILTROS DEL HISTORIAL - NUEVO
+   ============================================ */
+
+.filters-container {
+    padding: 20px;
+    position: relative;
+}
+
+/* Tarjeta de filtros con z-index elevado */
+.content-card.filters-card {
+    z-index: 100;
+    overflow: visible;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.filter-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Elevar z-index cuando el dropdown está abierto */
+.filter-group:has(.filter-dropdown) {
+    z-index: 1001;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.filter-label svg {
+    font-size: 14px;
+    color: var(--primary-medical);
+}
+
+.filter-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+    border-color: var(--primary-medical);
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-button.active {
+    background: rgba(47, 151, 209, 0.08);
+    border-color: var(--primary-medical);
+    color: var(--primary-medical);
+    font-weight: 600;
+}
+
+.filter-button svg {
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.filter-button svg.rotate {
+    transform: rotate(180deg);
+}
+
+.filter-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropdownSlideIn 0.2s ease;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-dropdown-section {
+    padding: 12px;
+}
+
+.filter-dropdown-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0;
+}
+
+.date-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.preset-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preset-button:hover {
+    background: var(--bg-card);
+    border-color: var(--primary-medical);
+    color: var(--primary-medical);
+}
+
+.preset-button svg {
+    font-size: 14px;
+    color: var(--primary-medical);
+}
+
+.date-input-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    margin-top: 8px;
+}
+
+.date-input-label:first-child {
+    margin-top: 0;
+}
+
+.date-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.date-input:hover,
+.date-input:focus {
+    border-color: var(--primary-medical);
+    outline: none;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.filter-option:hover {
+    background: var(--bg-card);
+    color: var(--primary-medical);
+}
+
+.filter-option svg {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.filter-option span:first-of-type {
+    flex: 1;
+}
+
+.status-badge-mini {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-badge-mini.status-en-espera {
+    background: #ffc107;
+}
+
+.status-badge-mini.status-en-atencion {
+    background: #17a2b8;
+}
+
+.status-badge-mini.status-atendido {
+    background: #28a745;
+}
+
+.status-badge-mini.status-cancelado {
+    background: #dc3545;
+}
+
+.status-badge-mini.status-no-presente {
+    background: #6c757d;
+}
+
+.area-color-indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid var(--bg-white);
+}
+
+/* Dark mode para filtros */
+[data-theme="dark"] .filter-button {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .filter-button:hover {
+    border-color: var(--primary-medical);
+}
+
+[data-theme="dark"] .filter-button.active {
+    background: rgba(47, 151, 209, 0.15);
+}
+
+[data-theme="dark"] .filter-dropdown {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .preset-button {
+    background: var(--bg-white);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .preset-button:hover {
+    background: rgba(47, 151, 209, 0.1);
+}
+
+[data-theme="dark"] .date-input {
+    background: var(--bg-white);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .filter-option:hover {
+    background: rgba(47, 151, 209, 0.1);
+}
+
+[data-theme="dark"] .area-color-indicator {
+    border-color: var(--bg-card);
+}
+
+/* Responsive para filtros */
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .filters-container {
+        padding: 16px;
+    }
+
+    .filter-dropdown {
+        max-height: 300px;
+    }
+
+    .page-actions {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .page-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-button {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .filter-label {
+        font-size: 12px;
+    }
+
+    .filter-option {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .preset-button {
+        padding: 8px 10px;
+        font-size: 12px;
     }
 }

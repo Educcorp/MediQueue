@@ -10,6 +10,7 @@ import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
 import areaService from '../../services/areaService';
+import adminService from '../../services/adminService';
 import '../../styles/UnifiedAdminPages.css';
 
 // React Icons
@@ -48,7 +49,11 @@ import {
   FaFemale,
   FaProcedures,
   FaHeartbeat,
-  FaStethoscope
+  FaStethoscope,
+  FaCalendarWeek,
+  FaCalendarDay,
+  FaChartLine,
+  FaEraser
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -178,6 +183,7 @@ const TurnHistory = () => {
   const [patients, setPatients] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
   const [areas, setAreas] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTurn, setSelectedTurn] = useState(null);
@@ -186,6 +192,27 @@ const TurnHistory = () => {
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
   const turnsPerPage = 10;
+
+  // Estados de filtros
+  const [filters, setFilters] = useState({
+    dateFrom: '',
+    dateTo: '',
+    status: '',
+    area: '',
+    consultorio: ''
+  });
+
+  // Estados para dropdowns
+  const [showDateRangeDropdown, setShowDateRangeDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showAreaDropdown, setShowAreaDropdown] = useState(false);
+  const [showConsultorioDropdown, setShowConsultorioDropdown] = useState(false);
+
+  // Refs para cerrar dropdowns al hacer click fuera
+  const dateRangeRef = useRef(null);
+  const statusRef = useRef(null);
+  const areaRef = useRef(null);
+  const consultorioRef = useRef(null);
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -235,7 +262,7 @@ const TurnHistory = () => {
     try {
       setError(null);
 
-      const [turnsData, patientsData, consultoriosData, areasData] = await Promise.all([
+      const [turnsData, patientsData, consultoriosData, areasData, adminsData] = await Promise.all([
         turnService.getAllTurns().catch(err => {
           console.warn('Error cargando turnos:', err);
           return [];
@@ -250,6 +277,10 @@ const TurnHistory = () => {
         }),
         areaService.getAll().catch(err => {
           console.warn('Error cargando áreas:', err);
+          return [];
+        }),
+        adminService.getAllAdmins().catch(err => {
+          console.warn('Error cargando administradores:', err);
           return [];
         })
       ]);
@@ -267,6 +298,7 @@ const TurnHistory = () => {
       setPatients(patientsData);
       setConsultorios(consultoriosData);
       setAreas(areasData);
+      setAdmins(adminsData || []);
     } catch (error) {
       setError('Error cargando datos: ' + error.message);
       console.error('Error cargando datos:', error);
@@ -324,16 +356,139 @@ const TurnHistory = () => {
     return areas.find(a => a.uk_area === consultorio.uk_area);
   };
 
+  const getAdminName = (uk_usuario) => {
+    if (!uk_usuario) return 'Sistema';
+    const admin = admins.find(a => a.uk_administrador === uk_usuario);
+    return admin ? `${admin.s_nombre} ${admin.s_apellido}` : `Admin (ID: ${uk_usuario})`;
+  };
+
   const handleViewDetails = (turn) => {
     setSelectedTurn(turn);
     setShowDetailModal(true);
   };
 
-  // Paginación
-  const totalPages = Math.ceil(turns.length / turnsPerPage);
+  // Cerrar dropdowns al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dateRangeRef.current && !dateRangeRef.current.contains(event.target)) {
+        setShowDateRangeDropdown(false);
+      }
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setShowStatusDropdown(false);
+      }
+      if (areaRef.current && !areaRef.current.contains(event.target)) {
+        setShowAreaDropdown(false);
+      }
+      if (consultorioRef.current && !consultorioRef.current.contains(event.target)) {
+        setShowConsultorioDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Funciones de filtrado
+  const handleDatePreset = (preset) => {
+    const today = new Date();
+    let dateFrom = new Date();
+    
+    switch(preset) {
+      case 'today':
+        dateFrom = today;
+        break;
+      case 'week':
+        dateFrom.setDate(today.getDate() - 7);
+        break;
+      case 'month':
+        dateFrom.setMonth(today.getMonth() - 1);
+        break;
+      case 'quarter':
+        dateFrom.setMonth(today.getMonth() - 3);
+        break;
+      default:
+        return;
+    }
+
+    setFilters({
+      ...filters,
+      dateFrom: dateFrom.toISOString().split('T')[0],
+      dateTo: today.toISOString().split('T')[0]
+    });
+    setShowDateRangeDropdown(false);
+  };
+
+  const handleFilterChange = (filterKey, value) => {
+    setFilters({
+      ...filters,
+      [filterKey]: value
+    });
+    setCurrentPage(1); // Reset a la primera página al filtrar
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      dateFrom: '',
+      dateTo: '',
+      status: '',
+      area: '',
+      consultorio: ''
+    });
+    setCurrentPage(1);
+  };
+
+  // Aplicar filtros a los turnos
+  const getFilteredTurns = () => {
+    let filtered = [...turns];
+
+    // Filtro de fecha
+    if (filters.dateFrom) {
+      filtered = filtered.filter(turn => {
+        const turnDate = new Date(turn.d_fecha);
+        const fromDate = new Date(filters.dateFrom);
+        return turnDate >= fromDate;
+      });
+    }
+
+    if (filters.dateTo) {
+      filtered = filtered.filter(turn => {
+        const turnDate = new Date(turn.d_fecha);
+        const toDate = new Date(filters.dateTo);
+        return turnDate <= toDate;
+      });
+    }
+
+    // Filtro de estado
+    if (filters.status) {
+      filtered = filtered.filter(turn => turn.s_estado === filters.status);
+    }
+
+    // Filtro de área
+    if (filters.area) {
+      filtered = filtered.filter(turn => {
+        const consultorio = consultorios.find(c => c.uk_consultorio === turn.uk_consultorio);
+        return consultorio && consultorio.uk_area === filters.area;
+      });
+    }
+
+    // Filtro de consultorio
+    if (filters.consultorio) {
+      filtered = filtered.filter(turn => turn.uk_consultorio === filters.consultorio);
+    }
+
+    return filtered;
+  };
+
+  const filteredTurns = getFilteredTurns();
+
+  // Contar filtros activos
+  const activeFiltersCount = Object.values(filters).filter(v => v !== '').length;
+
+  // Paginación (aplicada a turnos filtrados)
+  const totalPages = Math.ceil(filteredTurns.length / turnsPerPage);
   const startIndex = (currentPage - 1) * turnsPerPage;
   const endIndex = startIndex + turnsPerPage;
-  const currentTurns = turns.slice(startIndex, endIndex);
+  const currentTurns = filteredTurns.slice(startIndex, endIndex);
 
   const goToFirstPage = () => setCurrentPage(1);
   const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
@@ -357,13 +512,229 @@ const TurnHistory = () => {
           <div className="page-header-content">
             <h1 className="page-title">Historial de Turnos</h1>
             <p className="page-subtitle">
-              Registro completo de todos los turnos del sistema - {turns.length} registros encontrados
+              Registro completo de todos los turnos del sistema - {filteredTurns.length} de {turns.length} registros
+              {activeFiltersCount > 0 && ` (${activeFiltersCount} filtro${activeFiltersCount > 1 ? 's' : ''} activo${activeFiltersCount > 1 ? 's' : ''})`}
             </p>
           </div>
           <div className="page-actions">
+            {activeFiltersCount > 0 && (
+              <button className="btn btn-outline" onClick={clearFilters}>
+                <FaEraser /> Limpiar Filtros
+              </button>
+            )}
             <button className="btn btn-secondary" onClick={() => loadTurns()}>
               <FaSync /> Actualizar
             </button>
+          </div>
+        </div>
+
+        {/* Filtros */}
+        <div className="content-card filters-card" style={{ marginBottom: '1.5rem' }}>
+          <div className="filters-container">
+            <div className="filters-grid">
+              {/* Filtro de Rango de Fechas */}
+              <div className="filter-group" ref={dateRangeRef}>
+                <label className="filter-label">
+                  <FaCalendarAlt />
+                  Rango de Fechas
+                </label>
+                <button 
+                  className={`filter-button ${filters.dateFrom || filters.dateTo ? 'active' : ''}`}
+                  onClick={() => setShowDateRangeDropdown(!showDateRangeDropdown)}
+                >
+                  {filters.dateFrom || filters.dateTo 
+                    ? `${filters.dateFrom ? new Date(filters.dateFrom).toLocaleDateString('es-ES') : '...'} - ${filters.dateTo ? new Date(filters.dateTo).toLocaleDateString('es-ES') : '...'}`
+                    : 'Seleccionar fechas'
+                  }
+                  <FaChevronDown className={showDateRangeDropdown ? 'rotate' : ''} />
+                </button>
+                {showDateRangeDropdown && (
+                  <div className="filter-dropdown">
+                    <div className="filter-dropdown-section">
+                      <div className="date-presets">
+                        <button onClick={() => handleDatePreset('today')} className="preset-button">
+                          <FaCalendarDay /> Hoy
+                        </button>
+                        <button onClick={() => handleDatePreset('week')} className="preset-button">
+                          <FaCalendarWeek /> Última semana
+                        </button>
+                        <button onClick={() => handleDatePreset('month')} className="preset-button">
+                          <FaCalendarAlt /> Último mes
+                        </button>
+                        <button onClick={() => handleDatePreset('quarter')} className="preset-button">
+                          <FaChartLine /> Último trimestre
+                        </button>
+                      </div>
+                    </div>
+                    <div className="filter-dropdown-divider"></div>
+                    <div className="filter-dropdown-section">
+                      <label className="date-input-label">Desde:</label>
+                      <input
+                        type="date"
+                        className="date-input"
+                        value={filters.dateFrom}
+                        onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                      />
+                      <label className="date-input-label">Hasta:</label>
+                      <input
+                        type="date"
+                        className="date-input"
+                        value={filters.dateTo}
+                        onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Filtro de Estado */}
+              <div className="filter-group" ref={statusRef}>
+                <label className="filter-label">
+                  <FaList />
+                  Estado
+                </label>
+                <button 
+                  className={`filter-button ${filters.status ? 'active' : ''}`}
+                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                >
+                  {filters.status 
+                    ? turnStatuses.find(s => s.value === filters.status)?.label || 'Seleccionar estado'
+                    : 'Todos'
+                  }
+                  <FaChevronDown className={showStatusDropdown ? 'rotate' : ''} />
+                </button>
+                {showStatusDropdown && (
+                  <div className="filter-dropdown">
+                    <button 
+                      className="filter-option"
+                      onClick={() => {
+                        handleFilterChange('status', '');
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      <FaList />
+                      <span>Todos</span>
+                    </button>
+                    {turnStatuses.map(status => {
+                      const StatusIcon = getStatusIcon(status.value);
+                      return (
+                        <button
+                          key={status.value}
+                          className="filter-option"
+                          onClick={() => {
+                            handleFilterChange('status', status.value);
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          <StatusIcon />
+                          <span>{status.label}</span>
+                          <span className={`status-badge-mini ${getStatusColor(status.value)}`}></span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Filtro de Área */}
+              <div className="filter-group" ref={areaRef}>
+                <label className="filter-label">
+                  <FaHospital />
+                  Área
+                </label>
+                <button 
+                  className={`filter-button ${filters.area ? 'active' : ''}`}
+                  onClick={() => setShowAreaDropdown(!showAreaDropdown)}
+                >
+                  {filters.area 
+                    ? areas.find(a => a.uk_area === filters.area)?.s_nombre_area || 'Seleccionar área'
+                    : 'Todas las áreas'
+                  }
+                  <FaChevronDown className={showAreaDropdown ? 'rotate' : ''} />
+                </button>
+                {showAreaDropdown && (
+                  <div className="filter-dropdown">
+                    <button 
+                      className="filter-option"
+                      onClick={() => {
+                        handleFilterChange('area', '');
+                        setShowAreaDropdown(false);
+                      }}
+                    >
+                      <FaHospital />
+                      <span>Todas las áreas</span>
+                    </button>
+                    {areas.map(area => {
+                      const { icon: AreaIcon, color: iconColor } = getAreaIconFromDB(area);
+                      return (
+                        <button
+                          key={area.uk_area}
+                          className="filter-option"
+                          onClick={() => {
+                            handleFilterChange('area', area.uk_area);
+                            setShowAreaDropdown(false);
+                          }}
+                        >
+                          <AreaIcon style={{ color: iconColor }} />
+                          <span>{area.s_nombre_area}</span>
+                          <span 
+                            className="area-color-indicator" 
+                            style={{ backgroundColor: iconColor }}
+                          ></span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Filtro de Consultorio */}
+              <div className="filter-group" ref={consultorioRef}>
+                <label className="filter-label">
+                  <FaHospital />
+                  Consultorio
+                </label>
+                <button 
+                  className={`filter-button ${filters.consultorio ? 'active' : ''}`}
+                  onClick={() => setShowConsultorioDropdown(!showConsultorioDropdown)}
+                >
+                  {filters.consultorio 
+                    ? `Consultorio ${consultorios.find(c => c.uk_consultorio === filters.consultorio)?.i_numero_consultorio || ''}`
+                    : 'Todos los consultorios'
+                  }
+                  <FaChevronDown className={showConsultorioDropdown ? 'rotate' : ''} />
+                </button>
+                {showConsultorioDropdown && (
+                  <div className="filter-dropdown">
+                    <button 
+                      className="filter-option"
+                      onClick={() => {
+                        handleFilterChange('consultorio', '');
+                        setShowConsultorioDropdown(false);
+                      }}
+                    >
+                      <FaHospital />
+                      <span>Todos los consultorios</span>
+                    </button>
+                    {consultorios
+                      .sort((a, b) => a.i_numero_consultorio - b.i_numero_consultorio)
+                      .map(consultorio => (
+                        <button
+                          key={consultorio.uk_consultorio}
+                          className="filter-option"
+                          onClick={() => {
+                            handleFilterChange('consultorio', consultorio.uk_consultorio);
+                            setShowConsultorioDropdown(false);
+                          }}
+                        >
+                          <FaHospital />
+                          <span>Consultorio {consultorio.i_numero_consultorio}</span>
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -388,11 +759,21 @@ const TurnHistory = () => {
           </div>
 
           <div className="card-content" style={{ padding: 0 }}>
-            {turns.length === 0 ? (
+            {filteredTurns.length === 0 ? (
               <div className="empty-state">
                 <FaHistory />
-                <h3>No hay registros</h3>
-                <p>No se encontraron turnos en el sistema</p>
+                <h3>{turns.length === 0 ? 'No hay registros' : 'No se encontraron resultados'}</h3>
+                <p>
+                  {turns.length === 0 
+                    ? 'No se encontraron turnos en el sistema'
+                    : 'No hay turnos que coincidan con los filtros seleccionados'
+                  }
+                </p>
+                {activeFiltersCount > 0 && (
+                  <button className="btn btn-secondary" onClick={clearFilters} style={{ marginTop: '1rem' }}>
+                    <FaEraser /> Limpiar filtros
+                  </button>
+                )}
               </div>
             ) : (
               <>
@@ -401,6 +782,7 @@ const TurnHistory = () => {
                     const areaName = getAreaInfo(turn.uk_consultorio);
                     const areaObject = getAreaObject(turn.uk_consultorio);
                     const { icon: AreaIcon, color: iconColor } = getAreaIconFromDB(areaObject);
+                    const adminName = getAdminName(turn.uk_usuario_registro);
 
                     return (
                       <div 
@@ -416,8 +798,8 @@ const TurnHistory = () => {
                             Turno #{turn.i_numero_turno} - {getPatientName(turn.uk_paciente)}
                           </span>
                           <span className="history-secondary-text">
-                            {areaName} • {turn.d_fecha} {turn.t_hora} • {turnStatuses.find(s => s.value === turn.s_estado)?.label}
-                            {turn.uk_usuario_registro && ` • Admin ID: ${turn.uk_usuario_registro}`}
+                            {areaName} • {new Date(turn.d_fecha).toLocaleDateString('es-ES')} {turn.t_hora} • {turnStatuses.find(s => s.value === turn.s_estado)?.label}
+                            {turn.uk_usuario_registro && ` • Asignado por: ${adminName}`}
                           </span>
                         </div>
                         <div className={`history-status-indicator status-${turn.s_estado.toLowerCase()}`}>
@@ -429,10 +811,10 @@ const TurnHistory = () => {
                 </div>
 
                 {/* Paginación */}
-                {turns.length > turnsPerPage && (
+                {filteredTurns.length > turnsPerPage && (
                   <div className="pagination-bar">
                     <div className="pagination-info">
-                      <span>Mostrando {startIndex + 1} - {Math.min(endIndex, turns.length)} de {turns.length} registros</span>
+                      <span>Mostrando {startIndex + 1} - {Math.min(endIndex, filteredTurns.length)} de {filteredTurns.length} registros</span>
                     </div>
                     <div className="pagination-controls">
                       <button
@@ -563,10 +945,10 @@ const TurnHistory = () => {
                 <div className="detail-grid">
                   {selectedTurn.uk_usuario_registro && (
                     <div className="detail-row">
-                      <span className="detail-label">Creado por:</span>
+                      <span className="detail-label">Asignado por:</span>
                       <span className="detail-value" style={{ fontWeight: 700, color: 'var(--primary-medical)' }}>
                         <FaUserMd style={{ marginRight: '6px' }} />
-                        Administrador ID: {selectedTurn.uk_usuario_registro}
+                        {getAdminName(selectedTurn.uk_usuario_registro)}
                       </span>
                     </div>
                   )}
@@ -605,7 +987,10 @@ const TurnHistory = () => {
                   {selectedTurn.uk_usuario_modificacion && (
                     <div className="detail-row">
                       <span className="detail-label">Modificado por:</span>
-                      <span className="detail-value">Admin (ID: {selectedTurn.uk_usuario_modificacion})</span>
+                      <span className="detail-value">
+                        <FaUserMd style={{ marginRight: '6px' }} />
+                        {getAdminName(selectedTurn.uk_usuario_modificacion)}
+                      </span>
                     </div>
                   )}
                 </div>
