@@ -44,61 +44,108 @@ import {
   FaBandAid,
   FaHeadSideVirus,
   FaHeart,
-  FaFlask
+  FaFlask,
+  FaFemale,
+  FaProcedures,
+  FaHeartbeat,
+  FaStethoscope
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
   MdPsychology
 } from 'react-icons/md';
 
-// Función para obtener el icono del área
-const getAreaIcon = (areaName) => {
-  const iconMap = {
-    'Medicina General': FaUserMd,
-    'Pediatría': FaBaby,
-    'Ginecólogo': MdPregnantWoman,
-    'Ginecología': MdPregnantWoman,
-    'Dentista': FaTooth,
-    'Odontología': FaTooth,
-    'Neurólogo': FaHeadSideVirus,
-    'Neurología': FaHeadSideVirus,
-    'Laboratorio': FaFlask,
-    'Vacunación': FaSyringe,
-    'Enfermería': FaSyringe,
-    'Cardiología': FaHeart,
-    'Dermatología': FaBandAid,
-    'Oftalmología': FaEyeDropper,
-    'Traumatología': FaBone,
-    'Psicología': MdPsychology,
-    'Radiología': FaCamera,
-    'Operaciones': FaHospital,
+// Función para obtener el icono del área desde la BD
+const getAreaIconComponent = (iconName) => {
+  if (!iconName) return FaHospital;
+  
+  // Mapa completo de iconos de React Icons
+  const iconMapping = {
+    // Sin prefijo
+    'stethoscope': FaStethoscope,
+    'baby': FaBaby,
+    'heartbeat': FaHeartbeat,
+    'heart': FaHeart,
+    'user-md': FaUserMd,
+    'female': FaFemale,
+    'eye': FaEyeDropper,
+    'bone': FaBone,
+    'brain': FaBrain,
+    'tooth': FaTooth,
+    'flask': FaFlask,
+    'syringe': FaSyringe,
+    'hospital': FaHospital,
+    'procedures': FaProcedures,
+    'male': FaBaby,
+    'camera': FaCamera,
+    'bandaid': FaBandAid,
+    'eye-dropper': FaEyeDropper,
+    
+    // Con prefijo fa-
+    'fa-stethoscope': FaStethoscope,
+    'fa-baby': FaBaby,
+    'fa-heartbeat': FaHeartbeat,
+    'fa-heart': FaHeart,
+    'fa-user-md': FaUserMd,
+    'fa-female': FaFemale,
+    'fa-eye': FaEyeDropper,
+    'fa-bone': FaBone,
+    'fa-brain': FaBrain,
+    'fa-tooth': FaTooth,
+    'fa-flask': FaFlask,
+    'fa-syringe': FaSyringe,
+    'fa-hospital': FaHospital,
+    'fa-procedures': FaProcedures,
+    'fa-male': FaBaby,
+    'fa-camera': FaCamera,
+    'fa-bandaid': FaBandAid,
+    'fa-eye-dropper': FaEyeDropper,
+    
+    // Componentes directos (por si se guardan así)
+    'FaStethoscope': FaStethoscope,
+    'FaBaby': FaBaby,
+    'FaHeartbeat': FaHeartbeat,
+    'FaHeart': FaHeart,
+    'FaUserMd': FaUserMd,
+    'FaFemale': FaFemale,
+    'FaEyeDropper': FaEyeDropper,
+    'FaBone': FaBone,
+    'FaBrain': FaBrain,
+    'FaTooth': FaTooth,
+    'FaFlask': FaFlask,
+    'FaSyringe': FaSyringe,
+    'FaHospital': FaHospital,
+    'FaProcedures': FaProcedures,
+    'FaCamera': FaCamera,
+    'FaBandAid': FaBandAid,
+    'MdPregnantWoman': MdPregnantWoman,
+    'MdPsychology': MdPsychology
   };
-  return iconMap[areaName] || FaHospital;
+  
+  // Limpiar el nombre del icono (remover prefijos)
+  const cleanIconName = iconName.replace(/^(mdi-|fa-|fas-|far-|fab-)/, '').toLowerCase();
+  
+  // Buscar el icono
+  return iconMapping[iconName] || iconMapping[cleanIconName] || iconMapping[iconName.toLowerCase()] || FaHospital;
 };
 
-// Función para obtener el color del icono del área
-const getAreaIconColor = (areaName) => {
-  const colorMap = {
-    'Cardiología': '#e74c3c', // Rojo
-    'Medicina General': '#3498db', // Azul
-    'Operaciones': '#27ae60', // Verde
-    'Ginecólogo': '#e91e63', // Rosa/Magenta
-    'Ginecología': '#e91e63', // Rosa/Magenta
-    'Odontología': '#00bcd4', // Verde agua/Turquesa
-    'Dentista': '#00bcd4', // Verde agua/Turquesa
-    'Pediatría': '#f39c12', // Amarillo/Naranja
-    'Neurología': '#9b59b6', // Púrpura
-    'Neurólogo': '#9b59b6', // Púrpura
-    'Laboratorio': '#34495e', // Gris oscuro
-    'Vacunación': '#16a085', // Verde azulado
-    'Enfermería': '#1abc9c', // Turquesa
-    'Dermatología': '#e67e22', // Naranja
-    'Oftalmología': '#3498db', // Azul claro
-    'Traumatología': '#95a5a6', // Gris
-    'Psicología': '#9b59b6', // Púrpura
-    'Radiología': '#34495e', // Gris oscuro
+// Función para obtener el icono y color del área desde la BD
+const getAreaIconFromDB = (area) => {
+  if (!area) {
+    return {
+      icon: FaHospital,
+      color: '#4A90E2'
+    };
+  }
+  
+  // Usar los datos de la BD si existen
+  const icon = area.s_icono ? getAreaIconComponent(area.s_icono) : FaHospital;
+  const color = area.s_color || '#4A90E2';
+  
+  return {
+    icon,
+    color
   };
-  return colorMap[areaName] || 'var(--primary-medical)';
 };
 
 // Función para obtener el icono del estado
@@ -229,15 +276,15 @@ const TurnHistory = () => {
   // Cargar datos al montar el componente
   useEffect(() => {
     setLoading(true);
-    setTimeout(() => {
-      loadData();
-    }, 500);
+    loadData();
   }, []);
 
-  // Cargar turnos cuando cambien los filtros
+  // Cargar turnos cuando cambien los filtros o cuando los datos estén disponibles
   useEffect(() => {
-    loadTurns();
-  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea, selectedConsultorio]);
+    if (consultorios.length > 0 && areas.length > 0) {
+      loadTurns();
+    }
+  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea, selectedConsultorio, consultorios, areas]);
 
   const loadData = async () => {
     try {
@@ -271,6 +318,12 @@ const TurnHistory = () => {
 
   const loadTurns = async () => {
     try {
+      // Asegurar que los datos de consultorios y áreas están cargados
+      if (consultorios.length === 0 || areas.length === 0) {
+        console.log('Esperando datos de consultorios y áreas...');
+        return;
+      }
+
       let turnsData;
       const filters = {};
 
@@ -280,17 +333,32 @@ const TurnHistory = () => {
 
       turnsData = await turnService.getTurnsByDateRange(selectedStartDate, selectedEndDate, filters);
       
+      console.log('Turnos cargados:', turnsData?.length);
+      console.log('Filtro área:', selectedArea);
+      console.log('Filtro consultorio:', selectedConsultorio);
+      
       // Filtrar por área después de cargar
-      if (selectedArea !== 'todas' && turnsData) {
+      if (selectedArea !== 'todas' && turnsData && turnsData.length > 0) {
+        const areaId = parseInt(selectedArea);
+        console.log('Filtrando por área ID:', areaId);
+        
         turnsData = turnsData.filter(turn => {
           const consultorio = consultorios.find(c => c.uk_consultorio === turn.uk_consultorio);
-          return consultorio && consultorio.uk_area === parseInt(selectedArea);
+          const match = consultorio && consultorio.uk_area === areaId;
+          return match;
         });
+        
+        console.log('Turnos después de filtrar por área:', turnsData.length);
       }
       
       // Filtrar por consultorio específico
-      if (selectedConsultorio !== 'todos' && turnsData) {
-        turnsData = turnsData.filter(turn => turn.uk_consultorio === parseInt(selectedConsultorio));
+      if (selectedConsultorio !== 'todos' && turnsData && turnsData.length > 0) {
+        const consultorioId = parseInt(selectedConsultorio);
+        console.log('Filtrando por consultorio ID:', consultorioId);
+        
+        turnsData = turnsData.filter(turn => turn.uk_consultorio === consultorioId);
+        
+        console.log('Turnos después de filtrar por consultorio:', turnsData.length);
       }
       
       // Ordenar por fecha de creación descendente (más recientes primero)
@@ -333,25 +401,35 @@ const TurnHistory = () => {
     return area ? area.s_nombre_area : '';
   };
 
+  const getAreaObject = (uk_consultorio) => {
+    const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
+    if (!consultorio) return null;
+    return areas.find(a => a.uk_area === consultorio.uk_area);
+  };
+
   const getAreasList = () => {
-    return areas.map(area => ({
-      id: area.uk_area,
-      name: area.s_nombre_area,
-      icon: getAreaIcon(area.s_nombre_area),
-      color: getAreaIconColor(area.s_nombre_area)
-    }));
+    return areas.map(area => {
+      const { icon, color } = getAreaIconFromDB(area);
+      return {
+        id: area.uk_area,
+        name: area.s_nombre_area,
+        icon: icon,
+        color: color
+      };
+    });
   };
 
   const getConsultoriosList = () => {
     return consultorios.map(consultorio => {
       const area = areas.find(a => a.uk_area === consultorio.uk_area);
+      const { icon, color } = getAreaIconFromDB(area);
       return {
         id: consultorio.uk_consultorio,
         numero: consultorio.i_numero_consultorio,
         name: `Consultorio ${consultorio.i_numero_consultorio}`,
         areaName: area ? area.s_nombre_area : '',
-        icon: area ? getAreaIcon(area.s_nombre_area) : FaHospital,
-        color: area ? getAreaIconColor(area.s_nombre_area) : 'var(--primary-medical)'
+        icon: icon,
+        color: color
       };
     });
   };
@@ -367,10 +445,11 @@ const TurnHistory = () => {
     
     const area = areas.find(a => a.uk_area === parseInt(selectedArea));
     if (area) {
+      const { icon, color } = getAreaIconFromDB(area);
       return {
-        icon: getAreaIcon(area.s_nombre_area),
+        icon: icon,
         displayName: area.s_nombre_area,
-        color: getAreaIconColor(area.s_nombre_area)
+        color: color
       };
     }
     
@@ -393,10 +472,11 @@ const TurnHistory = () => {
     const consultorio = consultorios.find(c => c.uk_consultorio === parseInt(selectedConsultorio));
     if (consultorio) {
       const area = areas.find(a => a.uk_area === consultorio.uk_area);
+      const { icon, color } = getAreaIconFromDB(area);
       return {
-        icon: area ? getAreaIcon(area.s_nombre_area) : FaHospital,
+        icon: icon,
         displayName: `Consultorio ${consultorio.i_numero_consultorio}`,
-        color: area ? getAreaIconColor(area.s_nombre_area) : 'var(--primary-medical)'
+        color: color
       };
     }
     
@@ -630,7 +710,7 @@ const TurnHistory = () => {
                 }}
               >
                 <div className="area-selected">
-                  <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0, color: getSelectedAreaInfo().color }}>
+                  <div className="area-icon" style={{ color: getSelectedAreaInfo().color }}>
                     {React.createElement(getSelectedAreaInfo().icon)}
                   </div>
                   <span>{getSelectedAreaInfo().displayName}</span>
@@ -663,7 +743,7 @@ const TurnHistory = () => {
                         setAreaDropdownOpen(false);
                       }}
                     >
-                      <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0 }}>
+                      <div className="area-icon">
                         <FaHospital />
                       </div>
                       <span>Todas las áreas</span>
@@ -677,7 +757,7 @@ const TurnHistory = () => {
                           setAreaDropdownOpen(false);
                         }}
                       >
-                        <div className="area-icon" style={{ background: 'none', border: 'none', padding: 0, color: area.color }}>
+                        <div className="area-icon" style={{ color: area.color }}>
                           {React.createElement(area.icon)}
                         </div>
                         <span>{area.name}</span>
@@ -709,7 +789,7 @@ const TurnHistory = () => {
                 }}
               >
                 <div className="consultorio-selected">
-                  <div className="consultorio-icon" style={{ background: 'none', border: 'none', padding: 0, color: getSelectedConsultorioInfo().color }}>
+                  <div className="consultorio-icon" style={{ color: getSelectedConsultorioInfo().color }}>
                     {React.createElement(getSelectedConsultorioInfo().icon)}
                   </div>
                   <span>{getSelectedConsultorioInfo().displayName}</span>
@@ -742,7 +822,7 @@ const TurnHistory = () => {
                         setConsultorioDropdownOpen(false);
                       }}
                     >
-                      <div className="consultorio-icon" style={{ background: 'none', border: 'none', padding: 0 }}>
+                      <div className="consultorio-icon">
                         <FaHospital />
                       </div>
                       <span>Todos los consultorios</span>
@@ -756,7 +836,7 @@ const TurnHistory = () => {
                           setConsultorioDropdownOpen(false);
                         }}
                       >
-                        <div className="consultorio-icon" style={{ background: 'none', border: 'none', padding: 0, color: consultorio.color }}>
+                        <div className="consultorio-icon" style={{ color: consultorio.color }}>
                           {React.createElement(consultorio.icon)}
                         </div>
                         <span>{consultorio.name} {consultorio.areaName && `(${consultorio.areaName})`}</span>
@@ -791,29 +871,8 @@ const TurnHistory = () => {
                 <div className="history-list-compact">
                   {currentTurns.map(turn => {
                     const areaName = getAreaInfo(turn.uk_consultorio);
-                    const AreaIcon = getAreaIcon(areaName);
-                    const iconColor = getAreaIconColor(areaName);
-                    
-                    // Validar y formatear fecha de creación
-                    let creationTimeDisplay = '--:--';
-                    if (turn.d_fecha_creacion) {
-                      const creationDate = new Date(turn.d_fecha_creacion);
-                      if (!isNaN(creationDate.getTime())) {
-                        creationTimeDisplay = creationDate.toLocaleTimeString('es-ES', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        });
-                      }
-                    }
-                    
-                    // Validar fecha del turno
-                    let turnDateDisplay = '';
-                    if (turn.d_fecha) {
-                      const turnDate = new Date(turn.d_fecha);
-                      if (!isNaN(turnDate.getTime())) {
-                        turnDateDisplay = turnDate.toLocaleDateString('es-ES');
-                      }
-                    }
+                    const areaObject = getAreaObject(turn.uk_consultorio);
+                    const { icon: AreaIcon, color: iconColor } = getAreaIconFromDB(areaObject);
 
                     return (
                       <div 
@@ -821,7 +880,6 @@ const TurnHistory = () => {
                         className="history-row"
                         onClick={() => handleViewDetails(turn)}
                       >
-                        <div className="history-time">{creationTimeDisplay}</div>
                         <div className="history-icon" style={{ color: iconColor }}>
                           <AreaIcon />
                         </div>
@@ -830,7 +888,7 @@ const TurnHistory = () => {
                             Turno #{turn.i_numero_turno} - {getPatientName(turn.uk_paciente)}
                           </span>
                           <span className="history-secondary-text">
-                            {areaName} • {turnDateDisplay} {turn.t_hora} • {turnStatuses.find(s => s.value === turn.s_estado)?.label}
+                            {areaName} • {turn.d_fecha} {turn.t_hora} • {turnStatuses.find(s => s.value === turn.s_estado)?.label}
                             {turn.uk_usuario_registro && ` • Admin ID: ${turn.uk_usuario_registro}`}
                           </span>
                         </div>
