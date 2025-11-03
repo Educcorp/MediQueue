@@ -99,7 +99,7 @@ const getAreaIcon = (areaName) => {
 const getStatusIcon = (status) => {
   const statusIconMap = {
     'EN_ESPERA': FaClock,
-    'EN_ATENCION': FaUserMd, // Cambio a FaUserMd que sí existe
+    'EN_ATENCION': FaUserMd,
     'ATENDIDO': FaCheck,
     'CANCELADO': FaTimes,
     'NO_PRESENTE': FaUserTimes,
@@ -162,7 +162,7 @@ const getAreaClass = (areaName) => {
   return classMap[areaName] || '';
 };
 
-const TurnManager = () => {
+const HistorialTurnos = () => {
   const [turns, setTurns] = useState([]);
   const [patients, setPatients] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
@@ -205,8 +205,6 @@ const TurnManager = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const [showModal, setShowModal] = useState(false);
-  const [editingTurn, setEditingTurn] = useState(null);
   // Función para obtener la fecha actual en formato YYYY-MM-DD
   const getCurrentDate = () => {
     const now = new Date();
@@ -216,7 +214,17 @@ const TurnManager = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const [selectedStartDate, setSelectedStartDate] = useState(getCurrentDate());
+  // Para el historial, configuramos las fechas con un rango mayor por defecto (último mes)
+  const getDefaultStartDate = () => {
+    const now = new Date();
+    now.setMonth(now.getMonth() - 1); // Un mes atrás
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [selectedStartDate, setSelectedStartDate] = useState(getDefaultStartDate());
   const [selectedEndDate, setSelectedEndDate] = useState(getCurrentDate());
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [selectedArea, setSelectedArea] = useState('todas');
@@ -227,16 +235,10 @@ const TurnManager = () => {
   
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const turnsPerPage = 5;
+  const turnsPerPage = 10; // Más turnos por página en el historial
   
   const statusButtonRef = useRef(null);
   const areaButtonRef = useRef(null);
-  
-  const [formData, setFormData] = useState({
-    uk_consultorio: '',
-    uk_paciente: '',
-    s_observaciones: ''
-  });
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -244,9 +246,10 @@ const TurnManager = () => {
   // Estados de turnos disponibles
   const turnStatuses = [
     { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
+    { value: 'EN_ATENCION', label: 'En atención', color: 'info', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
-
+    { value: 'NO_PRESENTE', label: 'No presente', color: 'warning', indicator: '#fd7e14' }
   ];
 
   // Cargar datos al montar el componente
@@ -262,49 +265,6 @@ const TurnManager = () => {
   useEffect(() => {
     loadTurns();
   }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea]);
-
-  // Efecto para actualizar la fecha automáticamente cada día
-  useEffect(() => {
-    // Función para actualizar la fecha si ha cambiado
-    const updateDateIfNeeded = () => {
-      const currentDate = getCurrentDate();
-      // Si ambas fechas son iguales y diferentes a la fecha actual, actualizarlas
-      if (selectedStartDate === selectedEndDate && selectedStartDate !== currentDate) {
-        setSelectedStartDate(currentDate);
-        setSelectedEndDate(currentDate);
-      }
-    };
-
-    // Verificar inmediatamente al cargar el componente
-    updateDateIfNeeded();
-
-    // Calcular cuánto tiempo falta hasta la próxima medianoche
-    const now = new Date();
-    const nextMidnight = new Date(now);
-    nextMidnight.setDate(now.getDate() + 1);
-    nextMidnight.setHours(0, 0, 0, 0);
-    const timeUntilMidnight = nextMidnight.getTime() - now.getTime();
-
-    // Establecer timeout para la primera actualización a medianoche
-    const midnightTimeout = setTimeout(() => {
-      updateDateIfNeeded();
-      
-      // Después de la primera actualización, establecer intervalo cada 24 horas
-      const dailyInterval = setInterval(updateDateIfNeeded, 24 * 60 * 60 * 1000);
-      
-      // Cleanup del intervalo
-      return () => clearInterval(dailyInterval);
-    }, timeUntilMidnight);
-
-    // Verificación cada minuto para asegurar que no se pierda el cambio de día
-    const minuteInterval = setInterval(updateDateIfNeeded, 60 * 1000);
-
-    // Cleanup
-    return () => {
-      clearTimeout(midnightTimeout);
-      clearInterval(minuteInterval);
-    };
-  }, []); // Solo se ejecuta una vez al montar el componente
 
   // Cerrar dropdowns al hacer scroll externo o resize
   useEffect(() => {
@@ -406,6 +366,15 @@ const TurnManager = () => {
       console.log('Received turnsData:', turnsData);
       console.log('Number of turns:', turnsData?.length || 0);
 
+      // Ordenar por fecha más reciente primero (útil en historial)
+      if (turnsData && turnsData.length > 0) {
+        turnsData.sort((a, b) => {
+          const dateA = new Date(a.d_fecha + ' ' + a.t_hora);
+          const dateB = new Date(b.d_fecha + ' ' + b.t_hora);
+          return dateB - dateA; // Orden descendente (más reciente primero)
+        });
+      }
+
       setTurns(turnsData || []);
     } catch (error) {
       setError('Error cargando turnos: ' + error.message);
@@ -414,132 +383,12 @@ const TurnManager = () => {
     }
   };
 
-  const handleAddNew = () => {
-    setEditingTurn(null);
-    setFormData({
-      uk_consultorio: '',
-      uk_paciente: '',
-      s_observaciones: ''
-    });
-    setShowModal(true);
-  };
-
-  const handleEdit = (turn) => {
-    setEditingTurn(turn);
-    setFormData({
-      uk_consultorio: turn.uk_consultorio,
-      uk_paciente: turn.uk_paciente || '',
-      s_observaciones: turn.s_observaciones || ''
-    });
-    setShowModal(true);
-  };
-
-  const handleDelete = async (turn) => {
-    if (window.confirm(`¿Estás seguro de eliminar el turno #${turn.i_numero_turno}?`)) {
-      try {
-        await turnService.deleteTurn(turn.uk_turno);
-        await loadTurns();
-        alert('Turno eliminado correctamente');
-      } catch (error) {
-        alert('Error eliminando turno: ' + error.message);
-        console.error('Error eliminando turno:', error);
-      }
-    }
-  };
-
-  const handleStatusChange = async (turn, newStatus) => {
-    try {
-      await turnService.updateTurnStatus(turn.uk_turno, newStatus);
-      await loadTurns();
-      alert(`Estado del turno #${turn.i_numero_turno} actualizado a "${turnStatuses.find(s => s.value === newStatus)?.label}"`);
-    } catch (error) {
-      alert('Error actualizando estado: ' + error.message);
-      console.error('Error actualizando estado:', error);
-    }
-  };
-
-  const handleMarkAsAttended = async (turn) => {
-    try {
-      await turnService.markTurnAsAttended(turn.uk_turno);
-      await loadTurns();
-      alert(`Turno #${turn.i_numero_turno} marcado como atendido`);
-    } catch (error) {
-      alert('Error marcando turno como atendido: ' + error.message);
-      console.error('Error marcando turno como atendido:', error);
-    }
-  };
-
-  const handleCancelTurn = async (turn) => {
-    if (window.confirm(`¿Estás seguro de cancelar el turno #${turn.i_numero_turno}?`)) {
-      try {
-        await turnService.cancelTurn(turn.uk_turno);
-        await loadTurns();
-        alert(`Turno #${turn.i_numero_turno} cancelado`);
-      } catch (error) {
-        alert('Error cancelando turno: ' + error.message);
-        console.error('Error cancelando turno:', error);
-      }
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.uk_consultorio) {
-      alert('Seleccione consultorio');
-      return;
-    }
-
-    try {
-      if (editingTurn) {
-        // Actualizar observaciones del turno
-        await turnService.updateTurnObservations(editingTurn.uk_turno, formData.s_observaciones);
-        alert('Turno actualizado correctamente');
-      } else {
-        // Crear nuevo turno
-        // Para asignar un paciente ya existente, usar el endpoint estándar /turnos
-        // con uk_consultorio y opcionalmente uk_paciente.
-        const payload = {
-          uk_consultorio: formData.uk_consultorio,
-          s_observaciones: formData.s_observaciones,
-          ...(formData.uk_paciente ? { uk_paciente: formData.uk_paciente } : {})
-        };
-        await turnService.createTurn(payload);
-      }
-
-      await loadTurns();
-      setShowModal(false);
-      setFormData({
-        uk_consultorio: '',
-        uk_paciente: '',
-        s_observaciones: ''
-      });
-    } catch (error) {
-      let errorMessage = 'Error guardando turno';
-      if (error.response && error.response.data) {
-        errorMessage += ': ' + error.response.data.message;
-      } else {
-        errorMessage += ': ' + error.message;
-      }
-      alert(errorMessage);
-      console.error('Error guardando turno:', error);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
   const getStatusLabel = (status) => {
     const statusObj = turnStatuses.find(s => s.value === status);
     return statusObj ? statusObj.label : status;
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColorClass = (status) => {
     const statusColorMap = {
       'EN_ESPERA': 'status-en-espera',
       'EN_ATENCION': 'status-en-atencion', 
@@ -645,7 +494,7 @@ const TurnManager = () => {
   }, [turns.length, currentTurns.length, currentPage, turnsPerPage]);
 
   if (loading) {
-    return <TestSpinner message="Cargando turnos..." />;
+    return <TestSpinner message="Cargando historial de turnos..." />;
   }
 
   return (
@@ -656,21 +505,21 @@ const TurnManager = () => {
         {/* Page Header */}
         <div className="page-header">
           <div className="page-header-icon">
-            <FaCalendarCheck />
+            <FaHistory />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Gestión de Turnos</h1>
+            <h1 className="page-title">Historial de Turnos</h1>
             <p className="page-subtitle">
-              Administra los turnos médicos del sistema - {turns.length} turnos encontrados
+              Consulta y revisa el historial completo de turnos - {turns.length} turnos encontrados
             </p>
           </div>
           <div className="page-actions">
             <button 
               className="btn btn-secondary" 
-              onClick={() => navigate('/admin/historial')}
-              title="Ver Historial de Turnos"
+              onClick={() => navigate('/admin/turns')}
+              title="Ir a Gestión de Turnos"
             >
-              <FaHistory /> Historial
+              <FaCalendarCheck /> Gestión de Turnos
             </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> Actualizar
@@ -697,9 +546,8 @@ const TurnManager = () => {
               <button
                 type="button"
                 onClick={() => {
-                  const today = getCurrentDate();
-                  setSelectedStartDate(today);
-                  setSelectedEndDate(today);
+                  setSelectedStartDate(getDefaultStartDate());
+                  setSelectedEndDate(getCurrentDate());
                 }}
                 className="btn btn-secondary"
                 style={{
@@ -709,7 +557,7 @@ const TurnManager = () => {
                   height: 'auto',
                   lineHeight: '1'
                 }}
-                title="Reiniciar a hoy"
+                title="Reiniciar a último mes"
               >
                 <FaSync style={{ fontSize: '10px' }} />
               </button>
@@ -979,8 +827,8 @@ const TurnManager = () => {
         <div className="content-card">
           <div className="card-header">
             <h3 className="card-title">
-              <FaClipboardList />
-              Lista de Turnos
+              <FaHistory />
+              Historial Completo
             </h3>
             <div className="card-actions">
             </div>
@@ -989,8 +837,8 @@ const TurnManager = () => {
           <div className="card-content" style={{ padding: 0 }}>
             {turns.length === 0 ? (
               <div className="empty-state">
-                <FaCalendarCheck />
-                <h3>No hay turnos registrados</h3>
+                <FaHistory />
+                <h3>No hay turnos en el historial</h3>
                 <p>No se encontraron turnos para los filtros seleccionados</p>
               </div>
             ) : (
@@ -1005,7 +853,7 @@ const TurnManager = () => {
                       <th>Estado</th>
                       <th>Consultorio</th>
                       <th>Área</th>
-                      <th>Acciones</th>
+                      <th>Observaciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1028,7 +876,7 @@ const TurnManager = () => {
                           </div>
                         </td>
                         <td>
-                          <span className={`status-badge ${getStatusColor(turn.s_estado)}`}>
+                          <span className={`status-badge ${getStatusColorClass(turn.s_estado)}`}>
                             {React.createElement(getStatusIcon(turn.s_estado), { 
                               className: 'status-icon-inline',
                               size: 12 
@@ -1044,29 +892,15 @@ const TurnManager = () => {
                         </td>
                         <td>{getAreaInfo(turn.uk_consultorio)}</td>
                         <td>
-                          <div style={{ display: 'flex', gap: '4px' }}>
-                            {turn.s_estado === 'EN_ESPERA' && (
-                              <>
-                                <button
-                                  onClick={() => handleMarkAsAttended(turn)}
-                                  className="btn btn-secondary"
-                                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                                  title="Marcar como atendido"
-                                >
-                                  <FaCheck />
-                                </button>
-                              </>
-                            )}
-                            {turn.s_estado !== 'CANCELADO' && turn.s_estado !== 'ATENDIDO' && (
-                              <button
-                                onClick={() => handleCancelTurn(turn)}
-                                className="btn btn-secondary"
-                                style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title="Cancelar turno"
-                              >
-                                <FaTimes />
-                              </button>
-                            )}
+                          <div style={{ 
+                            maxWidth: '200px', 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis', 
+                            whiteSpace: 'nowrap',
+                            color: 'var(--text-muted)',
+                            fontSize: '13px'
+                          }}>
+                            {turn.s_observaciones || '-'}
                           </div>
                         </td>
                       </tr>
@@ -1138,122 +972,10 @@ const TurnManager = () => {
         </div>
       </div>
 
-      {/* Modal para crear/editar */}
-      {showModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          backdropFilter: 'blur(4px)'
-        }}>
-          <div style={{
-            background: 'var(--bg-white)',
-            borderRadius: 'var(--border-radius)',
-            padding: 0,
-            maxWidth: '500px',
-            width: '90%',
-            maxHeight: '80vh',
-            overflow: 'hidden',
-            boxShadow: 'var(--shadow-xl)',
-            border: '1px solid var(--border-color)'
-          }}>
-            <div style={{
-              padding: '24px',
-              borderBottom: '1px solid var(--border-color)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-                {editingTurn ? 'Editar Turno' : 'Nuevo Turno'}
-              </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '18px',
-                  cursor: 'pointer',
-                  color: 'var(--text-muted)',
-                  padding: '4px'
-                }}
-              >
-                <FaTimes />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
-              <div className="form-group">
-                <label>Consultorio *</label>
-                <select
-                  name="uk_consultorio"
-                  value={formData.uk_consultorio}
-                  onChange={handleInputChange}
-                  className="form-control"
-                  required
-                >
-                  <option value="">Seleccionar consultorio</option>
-                  {consultorios.map(consultorio => (
-                    <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
-                      Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Paciente (opcional)</label>
-                <select
-                  name="uk_paciente"
-                  value={formData.uk_paciente}
-                  onChange={handleInputChange}
-                  className="form-control"
-                >
-                  <option value="">Sin paciente asignado</option>
-                  {patients.map(patient => (
-                    <option key={patient.uk_paciente} value={patient.uk_paciente}>
-                      {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Observaciones</label>
-                <textarea
-                  name="s_observaciones"
-                  value={formData.s_observaciones}
-                  onChange={handleInputChange}
-                  rows="3"
-                  className="form-control"
-                  placeholder="Observaciones adicionales..."
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
-                <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancelar
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingTurn ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       <AdminFooter isDarkMode={isDarkMode} />
       <Chatbot />
     </div>
   );
 };
 
-export default TurnManager;
+export default HistorialTurnos;

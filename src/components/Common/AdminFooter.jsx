@@ -93,6 +93,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               {[
                 { name: 'Dashboard', href: '/admin/dashboard' },
                 { name: 'Gestión de Turnos', href: '/admin/turns' },
+                { name: 'Historial de Turnos', href: '/admin/historial' },
                 { name: 'Pacientes', href: '/admin/patients' },
                 { name: 'Consultorios', href: '/admin/consultorios' },
                 { name: 'Estadísticas', href: '/admin/statistics' },

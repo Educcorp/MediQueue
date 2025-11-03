@@ -123,6 +123,12 @@ const AdminHeader = () => {
             icon: <FaCalendarCheck />
         },
         {
+            path: '/admin/historial',
+            label: 'Historial',
+            permission: 'supervisor',
+            icon: <FaHistory />
+        },
+        {
             path: '/admin/patients',
             label: 'Pacientes',
             permission: 'supervisor',
