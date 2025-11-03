@@ -665,9 +665,6 @@ const TurnManager = () => {
             </p>
           </div>
           <div className="page-actions">
-            <button className="btn btn-secondary" onClick={() => navigate('/admin/turn-history')}>
-              <FaHistory /> Ver Historial
-            </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> Actualizar
             </button>

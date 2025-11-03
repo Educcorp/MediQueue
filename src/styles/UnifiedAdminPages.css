@@ -2457,127 +2457,6 @@
     border: 2px solid rgba(158, 158, 158, 0.3);
 }
 
-/* ============================================
-   MINIMAL HISTORY ROW - Diseño sobrio y limpio
-   ============================================ */
-
-.history-row-minimal {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border-color);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    background: var(--bg-white);
-    gap: 20px;
-}
-
-.history-row-minimal:last-child {
-    border-bottom: none;
-}
-
-.history-row-minimal:hover {
-    background: var(--bg-card);
-    padding-left: 24px;
-}
-
-.history-left-section {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    min-width: 0;
-}
-
-.history-area-icon {
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    opacity: 0.85;
-}
-
-.history-info {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-    flex: 1;
-}
-
-.history-primary {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.turno-number {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--primary-medical);
-}
-
-.patient-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.history-secondary {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.detail-text {
-    font-weight: 500;
-}
-
-.separator {
-    color: var(--text-muted);
-    opacity: 0.5;
-}
-
-.status-badge-clean {
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.status-badge-clean.status-en-espera {
-    background: rgba(255, 193, 7, 0.1);
-    color: #f57c00;
-}
-
-.status-badge-clean.status-en-atencion {
-    background: rgba(33, 150, 243, 0.1);
-    color: #1976d2;
-}
-
-.status-badge-clean.status-atendido {
-    background: rgba(76, 175, 80, 0.1);
-    color: #388e3c;
-}
-
-.status-badge-clean.status-cancelado {
-    background: rgba(244, 67, 54, 0.1);
-    color: #d32f2f;
-}
-
-.status-badge-clean.status-no-presente {
-    background: rgba(158, 158, 158, 0.1);
-    color: #616161;
-}
-
 /* Info items para uso general si se necesitan */
 .info-item {
     display: flex;
@@ -2812,41 +2691,6 @@
     background: var(--bg-card);
 }
 
-/* Dark mode para minimal history row */
-[data-theme="dark"] .history-row-minimal {
-    background: var(--bg-white);
-    border-color: var(--border-color);
-}
-
-[data-theme="dark"] .history-row-minimal:hover {
-    background: var(--bg-card);
-}
-
-[data-theme="dark"] .status-badge-clean.status-en-espera {
-    background: rgba(255, 193, 7, 0.15);
-    color: #ffa726;
-}
-
-[data-theme="dark"] .status-badge-clean.status-en-atencion {
-    background: rgba(33, 150, 243, 0.15);
-    color: #42a5f5;
-}
-
-[data-theme="dark"] .status-badge-clean.status-atendido {
-    background: rgba(76, 175, 80, 0.15);
-    color: #66bb6a;
-}
-
-[data-theme="dark"] .status-badge-clean.status-cancelado {
-    background: rgba(244, 67, 54, 0.15);
-    color: #ef5350;
-}
-
-[data-theme="dark"] .status-badge-clean.status-no-presente {
-    background: rgba(158, 158, 158, 0.15);
-    color: #bdbdbd;
-}
-
 /* Responsive para historial compacto */
 @media (max-width: 768px) {
     .history-row {
@@ -2911,29 +2755,6 @@
     .detail-item {
         font-size: 11px;
     }
-
-    /* Minimal history responsive - mobile */
-    .history-row-minimal {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .history-left-section {
-        width: 100%;
-    }
-
-    .history-area-icon {
-        font-size: 20px;
-    }
-
-    .history-secondary {
-        font-size: 12px;
-    }
-
-    .status-badge-clean {
-        align-self: flex-start;
-    }
 }
 
 @media (max-width: 480px) {
@@ -2969,21 +2790,6 @@
 
     .history-area-icon {
         font-size: 18px;
-    }
-
-    .turno-number,
-    .patient-name {
-        font-size: 13px;
-    }
-
-    .history-secondary {
-        font-size: 11px;
-        gap: 6px;
-    }
-
-    .status-badge-clean {
-        font-size: 12px;
-        padding: 5px 12px;
     }
 
     .detail-row {
