@@ -183,44 +183,9 @@ const TurnHistory = () => {
   const [selectedTurn, setSelectedTurn] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
-  // Estados de filtros
-  const getCurrentDate = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  // Establecer rango de fecha de último mes por defecto
-  const getLastMonthDate = () => {
-    const now = new Date();
-    now.setMonth(now.getMonth() - 1);
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const [selectedStartDate, setSelectedStartDate] = useState(getLastMonthDate());
-  const [selectedEndDate, setSelectedEndDate] = useState(getCurrentDate());
-  const [selectedStatus, setSelectedStatus] = useState('todos');
-  const [selectedArea, setSelectedArea] = useState('todas');
-  const [selectedConsultorio, setSelectedConsultorio] = useState('todos');
-  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
-  const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
-  const [consultorioDropdownOpen, setConsultorioDropdownOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  const [consultorioDropdownPosition, setConsultorioDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
   const turnsPerPage = 10;
-  
-  const statusButtonRef = useRef(null);
-  const areaButtonRef = useRef(null);
-  const consultorioButtonRef = useRef(null);
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -255,42 +220,26 @@ const TurnHistory = () => {
     return () => observer.disconnect();
   }, [theme]);
 
-  // Cerrar dropdowns al hacer click fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.custom-status-select')) {
-        setStatusDropdownOpen(false);
-      }
-      if (!event.target.closest('.custom-area-select')) {
-        setAreaDropdownOpen(false);
-      }
-      if (!event.target.closest('.custom-consultorio-select')) {
-        setConsultorioDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
-
   // Cargar datos al montar el componente
   useEffect(() => {
     setLoading(true);
     loadData();
   }, []);
 
-  // Cargar turnos cuando cambien los filtros o cuando los datos estén disponibles
+  // Cargar datos iniciales
   useEffect(() => {
-    if (consultorios.length > 0 && areas.length > 0) {
-      loadTurns();
-    }
-  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea, selectedConsultorio, consultorios, areas]);
+    loadData();
+  }, []);
 
   const loadData = async () => {
     try {
       setError(null);
 
-      const [patientsData, consultoriosData, areasData] = await Promise.all([
+      const [turnsData, patientsData, consultoriosData, areasData] = await Promise.all([
+        turnService.getAllTurns().catch(err => {
+          console.warn('Error cargando turnos:', err);
+          return [];
+        }),
         patientService.getAllPatients().catch(err => {
           console.warn('Error cargando pacientes:', err);
           return [];
@@ -305,6 +254,16 @@ const TurnHistory = () => {
         })
       ]);
 
+      // Ordenar turnos por fecha de creación descendente (más recientes primero)
+      if (turnsData && turnsData.length > 0) {
+        turnsData.sort((a, b) => {
+          const dateA = new Date(a.d_fecha_creacion || a.d_fecha);
+          const dateB = new Date(b.d_fecha_creacion || b.d_fecha);
+          return dateB - dateA;
+        });
+      }
+
+      setTurns(turnsData || []);
       setPatients(patientsData);
       setConsultorios(consultoriosData);
       setAreas(areasData);
@@ -318,50 +277,8 @@ const TurnHistory = () => {
 
   const loadTurns = async () => {
     try {
-      // Asegurar que los datos de consultorios y áreas están cargados
-      if (consultorios.length === 0 || areas.length === 0) {
-        console.log('Esperando datos de consultorios y áreas...');
-        return;
-      }
-
-      let turnsData;
-      const filters = {};
-
-      if (selectedStatus !== 'todos') {
-        filters.estado = selectedStatus;
-      }
-
-      turnsData = await turnService.getTurnsByDateRange(selectedStartDate, selectedEndDate, filters);
+      const turnsData = await turnService.getAllTurns();
       
-      console.log('Turnos cargados:', turnsData?.length);
-      console.log('Filtro área:', selectedArea);
-      console.log('Filtro consultorio:', selectedConsultorio);
-      
-      // Filtrar por área después de cargar
-      if (selectedArea !== 'todas' && turnsData && turnsData.length > 0) {
-        const areaId = parseInt(selectedArea);
-        console.log('Filtrando por área ID:', areaId);
-        
-        turnsData = turnsData.filter(turn => {
-          const consultorio = consultorios.find(c => c.uk_consultorio === turn.uk_consultorio);
-          const match = consultorio && consultorio.uk_area === areaId;
-          return match;
-        });
-        
-        console.log('Turnos después de filtrar por área:', turnsData.length);
-      }
-      
-      // Filtrar por consultorio específico
-      if (selectedConsultorio !== 'todos' && turnsData && turnsData.length > 0) {
-        const consultorioId = parseInt(selectedConsultorio);
-        console.log('Filtrando por consultorio ID:', consultorioId);
-        
-        turnsData = turnsData.filter(turn => turn.uk_consultorio === consultorioId);
-        
-        console.log('Turnos después de filtrar por consultorio:', turnsData.length);
-      }
-      
-      // Ordenar por fecha de creación descendente (más recientes primero)
       if (turnsData && turnsData.length > 0) {
         turnsData.sort((a, b) => {
           const dateA = new Date(a.d_fecha_creacion || a.d_fecha);
@@ -407,92 +324,12 @@ const TurnHistory = () => {
     return areas.find(a => a.uk_area === consultorio.uk_area);
   };
 
-  const getAreasList = () => {
-    return areas.map(area => {
-      const { icon, color } = getAreaIconFromDB(area);
-      return {
-        id: area.uk_area,
-        name: area.s_nombre_area,
-        icon: icon,
-        color: color
-      };
-    });
-  };
-
-  const getConsultoriosList = () => {
-    return consultorios.map(consultorio => {
-      const area = areas.find(a => a.uk_area === consultorio.uk_area);
-      const { icon, color } = getAreaIconFromDB(area);
-      return {
-        id: consultorio.uk_consultorio,
-        numero: consultorio.i_numero_consultorio,
-        name: `Consultorio ${consultorio.i_numero_consultorio}`,
-        areaName: area ? area.s_nombre_area : '',
-        icon: icon,
-        color: color
-      };
-    });
-  };
-
-  const getSelectedAreaInfo = () => {
-    if (selectedArea === 'todas') {
-      return {
-        icon: FaHospital,
-        displayName: 'Todas las áreas',
-        color: 'var(--primary-medical)'
-      };
-    }
-    
-    const area = areas.find(a => a.uk_area === parseInt(selectedArea));
-    if (area) {
-      const { icon, color } = getAreaIconFromDB(area);
-      return {
-        icon: icon,
-        displayName: area.s_nombre_area,
-        color: color
-      };
-    }
-    
-    return {
-      icon: FaHospital,
-      displayName: 'Todas las áreas',
-      color: 'var(--primary-medical)'
-    };
-  };
-
-  const getSelectedConsultorioInfo = () => {
-    if (selectedConsultorio === 'todos') {
-      return {
-        icon: FaHospital,
-        displayName: 'Todos los consultorios',
-        color: 'var(--primary-medical)'
-      };
-    }
-    
-    const consultorio = consultorios.find(c => c.uk_consultorio === parseInt(selectedConsultorio));
-    if (consultorio) {
-      const area = areas.find(a => a.uk_area === consultorio.uk_area);
-      const { icon, color } = getAreaIconFromDB(area);
-      return {
-        icon: icon,
-        displayName: `Consultorio ${consultorio.i_numero_consultorio}`,
-        color: color
-      };
-    }
-    
-    return {
-      icon: FaHospital,
-      displayName: 'Todos los consultorios',
-      color: 'var(--primary-medical)'
-    };
-  };
-
   const handleViewDetails = (turn) => {
     setSelectedTurn(turn);
     setShowDetailModal(true);
   };
 
-  // Funciones de paginación
+  // Paginación
   const totalPages = Math.ceil(turns.length / turnsPerPage);
   const startIndex = (currentPage - 1) * turnsPerPage;
   const endIndex = startIndex + turnsPerPage;
@@ -502,11 +339,6 @@ const TurnHistory = () => {
   const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
   const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const goToLastPage = () => setCurrentPage(totalPages);
-
-  // Resetear a la primera página cuando cambian los filtros
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedStartDate, selectedEndDate, selectedStatus, selectedArea]);
 
   if (loading) {
     return <TestSpinner message="Cargando historial de turnos..." />;
@@ -529,7 +361,7 @@ const TurnHistory = () => {
             </p>
           </div>
           <div className="page-actions">
-            <button className="btn btn-secondary" onClick={loadTurns}>
+            <button className="btn btn-secondary" onClick={() => loadTurns()}>
               <FaSync /> Actualizar
             </button>
           </div>
@@ -546,310 +378,6 @@ const TurnHistory = () => {
           </div>
         )}
 
-        {/* Filters Section */}
-        <div className="filters-section">
-          <div className="filter-group date-range-filter">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label style={{ margin: 0 }}>Rango de Fechas</label>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedStartDate(getLastMonthDate());
-                  setSelectedEndDate(getCurrentDate());
-                }}
-                className="btn btn-secondary"
-                style={{
-                  padding: '4px 8px',
-                  fontSize: '11px',
-                  minHeight: 'auto',
-                  height: 'auto',
-                  lineHeight: '1'
-                }}
-                title="Último mes"
-              >
-                <FaSync style={{ fontSize: '10px' }} />
-              </button>
-            </div>
-            <div className="date-range-container" style={{
-              display: 'flex',
-              gap: '8px',
-              alignItems: 'center',
-              flexWrap: 'nowrap',
-              width: '100%'
-            }}>
-              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
-                <input
-                  type="date"
-                  value={selectedStartDate}
-                  onChange={(e) => {
-                    const newStartDate = e.target.value;
-                    setSelectedStartDate(newStartDate);
-                    if (newStartDate > selectedEndDate) {
-                      setSelectedEndDate(newStartDate);
-                    }
-                  }}
-                  className="form-control"
-                  style={{ width: '100%' }}
-                />
-              </div>
-              <span style={{ color: 'var(--text-muted)', fontSize: '13px', fontWeight: '500' }}>a</span>
-              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
-                <input
-                  type="date"
-                  value={selectedEndDate}
-                  onChange={(e) => {
-                    const newEndDate = e.target.value;
-                    setSelectedEndDate(newEndDate);
-                    if (newEndDate < selectedStartDate) {
-                      setSelectedStartDate(newEndDate);
-                    }
-                  }}
-                  min={selectedStartDate}
-                  className="form-control"
-                  style={{ width: '100%' }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="filter-group">
-            <label>Estado</label>
-            <div className="custom-status-select">
-              <div 
-                ref={statusButtonRef}
-                className="status-select-trigger"
-                onClick={() => {
-                  if (!statusDropdownOpen && statusButtonRef.current) {
-                    const rect = statusButtonRef.current.getBoundingClientRect();
-                    setDropdownPosition({
-                      top: rect.bottom + window.scrollY,
-                      left: rect.left + window.scrollX,
-                      width: rect.width
-                    });
-                  }
-                  setStatusDropdownOpen(!statusDropdownOpen);
-                }}
-              >
-                <div className="status-selected">
-                  <div className={`status-icon status-${selectedStatus.toLowerCase()}`}>
-                    {React.createElement(getStatusIcon(selectedStatus))}
-                  </div>
-                  <span>{selectedStatus === 'todos' ? 'Todos los estados' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
-                </div>
-                <div className="dropdown-arrow">
-                  <FaChevronDown />
-                </div>
-              </div>
-              
-              {statusDropdownOpen && createPortal(
-                <>
-                  <div 
-                    className="status-dropdown-overlay"
-                    onClick={() => setStatusDropdownOpen(false)}
-                  />
-                  <div 
-                    className="status-dropdown-menu"
-                    style={{
-                      position: 'absolute',
-                      top: `${dropdownPosition.top}px`,
-                      left: `${dropdownPosition.left}px`,
-                      width: `${dropdownPosition.width}px`,
-                      zIndex: 999999999
-                    }}
-                  >
-                    <div 
-                      className="status-option"
-                      onClick={() => {
-                        setSelectedStatus('todos');
-                        setStatusDropdownOpen(false);
-                      }}
-                    >
-                      <div className="status-icon status-todos">
-                        <FaList />
-                      </div>
-                      <span>Todos los estados</span>
-                    </div>
-                    {turnStatuses.map(status => (
-                      <div
-                        key={status.value}
-                        className="status-option"
-                        onClick={() => {
-                          setSelectedStatus(status.value);
-                          setStatusDropdownOpen(false);
-                        }}
-                      >
-                        <div className={`status-icon status-${status.value.toLowerCase()}`}>
-                          {React.createElement(getStatusIcon(status.value))}
-                        </div>
-                        <span>{status.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </>,
-                document.body
-              )}
-            </div>
-          </div>
-
-          <div className="filter-group">
-            <label>Área</label>
-            <div className="custom-area-select">
-              <div 
-                ref={areaButtonRef}
-                className="area-select-trigger"
-                onClick={() => {
-                  const rect = areaButtonRef.current?.getBoundingClientRect();
-                  if (rect) {
-                    setAreaDropdownPosition({
-                      top: rect.bottom + window.scrollY,
-                      left: rect.left + window.scrollX,
-                      width: rect.width
-                    });
-                  }
-                  setAreaDropdownOpen(!areaDropdownOpen);
-                }}
-              >
-                <div className="area-selected">
-                  <div className="area-icon" style={{ color: getSelectedAreaInfo().color }}>
-                    {React.createElement(getSelectedAreaInfo().icon)}
-                  </div>
-                  <span>{getSelectedAreaInfo().displayName}</span>
-                </div>
-                <div className="dropdown-arrow">
-                  <FaChevronDown />
-                </div>
-              </div>
-              
-              {areaDropdownOpen && createPortal(
-                <>
-                  <div 
-                    className="area-dropdown-overlay"
-                    onClick={() => setAreaDropdownOpen(false)}
-                  />
-                  <div 
-                    className="area-dropdown-menu"
-                    style={{
-                      position: 'absolute',
-                      top: `${areaDropdownPosition.top}px`,
-                      left: `${areaDropdownPosition.left}px`,
-                      width: `${areaDropdownPosition.width}px`,
-                      zIndex: 999999999
-                    }}
-                  >
-                    <div 
-                      className="area-option"
-                      onClick={() => {
-                        setSelectedArea('todas');
-                        setAreaDropdownOpen(false);
-                      }}
-                    >
-                      <div className="area-icon">
-                        <FaHospital />
-                      </div>
-                      <span>Todas las áreas</span>
-                    </div>
-                    {getAreasList().map(area => (
-                      <div
-                        key={`area-${area.id}`}
-                        className="area-option"
-                        onClick={() => {
-                          setSelectedArea(area.id.toString());
-                          setAreaDropdownOpen(false);
-                        }}
-                      >
-                        <div className="area-icon" style={{ color: area.color }}>
-                          {React.createElement(area.icon)}
-                        </div>
-                        <span>{area.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </>,
-                document.body
-              )}
-            </div>
-          </div>
-
-          <div className="filter-group">
-            <label>Consultorio</label>
-            <div className="custom-consultorio-select">
-              <div 
-                ref={consultorioButtonRef}
-                className="consultorio-select-trigger"
-                onClick={() => {
-                  const rect = consultorioButtonRef.current?.getBoundingClientRect();
-                  if (rect) {
-                    setConsultorioDropdownPosition({
-                      top: rect.bottom + window.scrollY,
-                      left: rect.left + window.scrollX,
-                      width: rect.width
-                    });
-                  }
-                  setConsultorioDropdownOpen(!consultorioDropdownOpen);
-                }}
-              >
-                <div className="consultorio-selected">
-                  <div className="consultorio-icon" style={{ color: getSelectedConsultorioInfo().color }}>
-                    {React.createElement(getSelectedConsultorioInfo().icon)}
-                  </div>
-                  <span>{getSelectedConsultorioInfo().displayName}</span>
-                </div>
-                <div className="dropdown-arrow">
-                  <FaChevronDown />
-                </div>
-              </div>
-              
-              {consultorioDropdownOpen && createPortal(
-                <>
-                  <div 
-                    className="consultorio-dropdown-overlay"
-                    onClick={() => setConsultorioDropdownOpen(false)}
-                  />
-                  <div 
-                    className="consultorio-dropdown-menu"
-                    style={{
-                      position: 'absolute',
-                      top: `${consultorioDropdownPosition.top}px`,
-                      left: `${consultorioDropdownPosition.left}px`,
-                      width: `${consultorioDropdownPosition.width}px`,
-                      zIndex: 999999999
-                    }}
-                  >
-                    <div 
-                      className="consultorio-option"
-                      onClick={() => {
-                        setSelectedConsultorio('todos');
-                        setConsultorioDropdownOpen(false);
-                      }}
-                    >
-                      <div className="consultorio-icon">
-                        <FaHospital />
-                      </div>
-                      <span>Todos los consultorios</span>
-                    </div>
-                    {getConsultoriosList().map(consultorio => (
-                      <div
-                        key={`consultorio-${consultorio.id}`}
-                        className="consultorio-option"
-                        onClick={() => {
-                          setSelectedConsultorio(consultorio.id.toString());
-                          setConsultorioDropdownOpen(false);
-                        }}
-                      >
-                        <div className="consultorio-icon" style={{ color: consultorio.color }}>
-                          {React.createElement(consultorio.icon)}
-                        </div>
-                        <span>{consultorio.name} {consultorio.areaName && `(${consultorio.areaName})`}</span>
-                      </div>
-                    ))}
-                  </div>
-                </>,
-                document.body
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* History List */}
         <div className="content-card">
           <div className="card-header">
@@ -864,7 +392,7 @@ const TurnHistory = () => {
               <div className="empty-state">
                 <FaHistory />
                 <h3>No hay registros</h3>
-                <p>No se encontraron turnos para los filtros seleccionados</p>
+                <p>No se encontraron turnos en el sistema</p>
               </div>
             ) : (
               <>
