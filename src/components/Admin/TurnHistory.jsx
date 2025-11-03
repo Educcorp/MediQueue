@@ -263,7 +263,7 @@ const TurnHistory = () => {
       setError(null);
 
       const [turnsData, patientsData, consultoriosData, areasData, adminsData] = await Promise.all([
-        turnService.getAllTurns().catch(err => {
+        turnService.getAllTurns({ all_dates: true }).catch(err => {
           console.warn('Error cargando turnos:', err);
           return [];
         }),
@@ -309,7 +309,7 @@ const TurnHistory = () => {
 
   const loadTurns = async () => {
     try {
-      const turnsData = await turnService.getAllTurns();
+      const turnsData = await turnService.getAllTurns({ all_dates: true });
       
       if (turnsData && turnsData.length > 0) {
         turnsData.sort((a, b) => {
@@ -338,9 +338,18 @@ const TurnHistory = () => {
     return patients.find(p => p.uk_paciente === uk_paciente);
   };
 
+  const getConsultorioObject = (uk_consultorio) => {
+    return consultorios.find(c => c.uk_consultorio === uk_consultorio);
+  };
+
   const getConsultorioInfo = (uk_consultorio) => {
     const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
     return consultorio ? `Consultorio ${consultorio.i_numero_consultorio}` : 'Consultorio no encontrado';
+  };
+
+  const getConsultorioNumber = (uk_consultorio) => {
+    const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
+    return consultorio ? consultorio.i_numero_consultorio : null;
   };
 
   const getAreaInfo = (uk_consultorio) => {
@@ -354,6 +363,20 @@ const TurnHistory = () => {
     const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
     if (!consultorio) return null;
     return areas.find(a => a.uk_area === consultorio.uk_area);
+  };
+
+  // Función para obtener icono y color del consultorio basado en su área
+  const getConsultorioIconFromArea = (uk_consultorio) => {
+    const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
+    if (!consultorio) {
+      return {
+        icon: FaHospital,
+        color: '#4A90E2'
+      };
+    }
+    
+    const area = areas.find(a => a.uk_area === consultorio.uk_area);
+    return getAreaIconFromDB(area);
   };
 
   const getAdminName = (uk_usuario) => {
@@ -437,15 +460,15 @@ const TurnHistory = () => {
     setCurrentPage(1);
   };
 
-  // Aplicar filtros a los turnos
+  // Aplicar filtros a los turnos - Lógica mejorada del TurnManager
   const getFilteredTurns = () => {
     let filtered = [...turns];
 
-    // Filtro de fecha
+    // Filtro de fecha con formato correcto
     if (filters.dateFrom) {
       filtered = filtered.filter(turn => {
         const turnDate = new Date(turn.d_fecha);
-        const fromDate = new Date(filters.dateFrom);
+        const fromDate = new Date(filters.dateFrom + 'T00:00:00');
         return turnDate >= fromDate;
       });
     }
@@ -453,7 +476,7 @@ const TurnHistory = () => {
     if (filters.dateTo) {
       filtered = filtered.filter(turn => {
         const turnDate = new Date(turn.d_fecha);
-        const toDate = new Date(filters.dateTo);
+        const toDate = new Date(filters.dateTo + 'T23:59:59');
         return turnDate <= toDate;
       });
     }
@@ -528,212 +551,290 @@ const TurnHistory = () => {
           </div>
         </div>
 
-        {/* Filtros */}
-        <div className="content-card filters-card" style={{ marginBottom: '1.5rem' }}>
-          <div className="filters-container">
-            <div className="filters-grid">
-              {/* Filtro de Rango de Fechas */}
-              <div className="filter-group" ref={dateRangeRef}>
-                <label className="filter-label">
-                  <FaCalendarAlt />
-                  Rango de Fechas
-                </label>
-                <button 
-                  className={`filter-button ${filters.dateFrom || filters.dateTo ? 'active' : ''}`}
-                  onClick={() => setShowDateRangeDropdown(!showDateRangeDropdown)}
-                >
-                  {filters.dateFrom || filters.dateTo 
-                    ? `${filters.dateFrom ? new Date(filters.dateFrom).toLocaleDateString('es-ES') : '...'} - ${filters.dateTo ? new Date(filters.dateTo).toLocaleDateString('es-ES') : '...'}`
-                    : 'Seleccionar fechas'
-                  }
-                  <FaChevronDown className={showDateRangeDropdown ? 'rotate' : ''} />
-                </button>
-                {showDateRangeDropdown && (
-                  <div className="filter-dropdown">
-                    <div className="filter-dropdown-section">
-                      <div className="date-presets">
-                        <button onClick={() => handleDatePreset('today')} className="preset-button">
-                          <FaCalendarDay /> Hoy
-                        </button>
-                        <button onClick={() => handleDatePreset('week')} className="preset-button">
-                          <FaCalendarWeek /> Última semana
-                        </button>
-                        <button onClick={() => handleDatePreset('month')} className="preset-button">
-                          <FaCalendarAlt /> Último mes
-                        </button>
-                        <button onClick={() => handleDatePreset('quarter')} className="preset-button">
-                          <FaChartLine /> Último trimestre
-                        </button>
-                      </div>
-                    </div>
-                    <div className="filter-dropdown-divider"></div>
-                    <div className="filter-dropdown-section">
-                      <label className="date-input-label">Desde:</label>
-                      <input
-                        type="date"
-                        className="date-input"
-                        value={filters.dateFrom}
-                        onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                      />
-                      <label className="date-input-label">Hasta:</label>
-                      <input
-                        type="date"
-                        className="date-input"
-                        value={filters.dateTo}
-                        onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                      />
-                    </div>
-                  </div>
-                )}
+        {/* Filtros - Diseño minimalista */}
+        <div className="filters-section">
+          <div className="filter-group date-range-filter">
+            <label>Rango de Fechas</label>
+            <div className="date-range-container" style={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+              flexWrap: 'nowrap',
+              width: '100%'
+            }}>
+              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
+                <input
+                  type="date"
+                  value={filters.dateFrom}
+                  onChange={(e) => {
+                    const newStartDate = e.target.value;
+                    handleFilterChange('dateFrom', newStartDate);
+                    if (newStartDate && filters.dateTo && newStartDate > filters.dateTo) {
+                      handleFilterChange('dateTo', newStartDate);
+                    }
+                  }}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  className="form-control"
+                  placeholder="Fecha inicial"
+                  title="Fecha inicial"
+                  style={{ width: '100%', minWidth: '0' }}
+                />
               </div>
+              <span style={{ 
+                color: 'var(--text-muted)', 
+                fontSize: '13px',
+                fontWeight: '500',
+                whiteSpace: 'nowrap',
+                padding: '0 6px',
+                flexShrink: 0
+              }}>a</span>
+              <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
+                <input
+                  type="date"
+                  value={filters.dateTo}
+                  onChange={(e) => {
+                    const newEndDate = e.target.value;
+                    handleFilterChange('dateTo', newEndDate);
+                    if (newEndDate && filters.dateFrom && newEndDate < filters.dateFrom) {
+                      handleFilterChange('dateFrom', newEndDate);
+                    }
+                  }}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  min={filters.dateFrom}
+                  className="form-control"
+                  placeholder="Fecha final"
+                  title="Fecha final"
+                  style={{ width: '100%', minWidth: '0' }}
+                />
+              </div>
+            </div>
+          </div>
 
-              {/* Filtro de Estado */}
-              <div className="filter-group" ref={statusRef}>
-                <label className="filter-label">
-                  <FaList />
-                  Estado
-                </label>
-                <button 
-                  className={`filter-button ${filters.status ? 'active' : ''}`}
-                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                >
-                  {filters.status 
-                    ? turnStatuses.find(s => s.value === filters.status)?.label || 'Seleccionar estado'
-                    : 'Todos'
-                  }
-                  <FaChevronDown className={showStatusDropdown ? 'rotate' : ''} />
-                </button>
-                {showStatusDropdown && (
-                  <div className="filter-dropdown">
-                    <button 
-                      className="filter-option"
+          <div className="filter-group" ref={statusRef}>
+            <label>Estado</label>
+            <div className="custom-status-select">
+              <div 
+                className="status-select-trigger"
+                onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+              >
+                <div className="status-selected">
+                  <div className={`status-icon status-${filters.status ? filters.status.toLowerCase() : 'todos'}`}>
+                    {React.createElement(getStatusIcon(filters.status || 'todos'))}
+                  </div>
+                  <span>{filters.status ? turnStatuses.find(s => s.value === filters.status)?.label : 'Todos los estados'}</span>
+                </div>
+                <div className="dropdown-arrow">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {showStatusDropdown && createPortal(
+                <>
+                  <div 
+                    className="status-dropdown-overlay"
+                    onClick={() => setShowStatusDropdown(false)}
+                  />
+                  <div 
+                    className="status-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${statusRef.current?.getBoundingClientRect().bottom + window.scrollY}px`,
+                      left: `${statusRef.current?.getBoundingClientRect().left + window.scrollX}px`,
+                      width: `${statusRef.current?.getBoundingClientRect().width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="status-option"
                       onClick={() => {
                         handleFilterChange('status', '');
                         setShowStatusDropdown(false);
                       }}
                     >
-                      <FaList />
-                      <span>Todos</span>
-                    </button>
-                    {turnStatuses.map(status => {
-                      const StatusIcon = getStatusIcon(status.value);
-                      return (
-                        <button
-                          key={status.value}
-                          className="filter-option"
-                          onClick={() => {
-                            handleFilterChange('status', status.value);
-                            setShowStatusDropdown(false);
-                          }}
-                        >
-                          <StatusIcon />
-                          <span>{status.label}</span>
-                          <span className={`status-badge-mini ${getStatusColor(status.value)}`}></span>
-                        </button>
-                      );
-                    })}
+                      <div className="status-icon status-todos">
+                        <FaList />
+                      </div>
+                      <span>Todos los estados</span>
+                    </div>
+                    {turnStatuses.map(status => (
+                      <div
+                        key={status.value}
+                        className="status-option"
+                        onClick={() => {
+                          handleFilterChange('status', status.value);
+                          setShowStatusDropdown(false);
+                        }}
+                      >
+                        <div className={`status-icon status-${status.value.toLowerCase()}`}>
+                          {React.createElement(getStatusIcon(status.value))}
+                        </div>
+                        <span>{status.label}</span>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
+                </>,
+                document.body
+              )}
+            </div>
+          </div>
 
-              {/* Filtro de Área */}
-              <div className="filter-group" ref={areaRef}>
-                <label className="filter-label">
-                  <FaHospital />
-                  Área
-                </label>
-                <button 
-                  className={`filter-button ${filters.area ? 'active' : ''}`}
-                  onClick={() => setShowAreaDropdown(!showAreaDropdown)}
-                >
-                  {filters.area 
-                    ? areas.find(a => a.uk_area === filters.area)?.s_nombre_area || 'Seleccionar área'
-                    : 'Todas las áreas'
-                  }
-                  <FaChevronDown className={showAreaDropdown ? 'rotate' : ''} />
-                </button>
-                {showAreaDropdown && (
-                  <div className="filter-dropdown">
-                    <button 
-                      className="filter-option"
+          <div className="filter-group" ref={areaRef}>
+            <label>Área</label>
+            <div className="custom-area-select">
+              <div 
+                className="area-select-trigger"
+                onClick={() => setShowAreaDropdown(!showAreaDropdown)}
+              >
+                <div className="area-selected">
+                  <div className="area-icon">
+                    {filters.area 
+                      ? React.createElement(getAreaIconFromDB(areas.find(a => a.uk_area === filters.area)).icon)
+                      : <FaHospital />
+                    }
+                  </div>
+                  <span>
+                    {filters.area 
+                      ? areas.find(a => a.uk_area === filters.area)?.s_nombre_area || 'Seleccionar área'
+                      : 'Todas las áreas'
+                    }
+                  </span>
+                </div>
+                <div className="dropdown-arrow">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {showAreaDropdown && createPortal(
+                <>
+                  <div 
+                    className="area-dropdown-overlay"
+                    onClick={() => setShowAreaDropdown(false)}
+                  />
+                  <div 
+                    className="area-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${areaRef.current?.getBoundingClientRect().bottom + window.scrollY}px`,
+                      left: `${areaRef.current?.getBoundingClientRect().left + window.scrollX}px`,
+                      width: `${areaRef.current?.getBoundingClientRect().width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="area-option"
                       onClick={() => {
                         handleFilterChange('area', '');
                         setShowAreaDropdown(false);
                       }}
                     >
-                      <FaHospital />
+                      <div className="area-icon">
+                        <FaHospital />
+                      </div>
                       <span>Todas las áreas</span>
-                    </button>
+                    </div>
                     {areas.map(area => {
                       const { icon: AreaIcon, color: iconColor } = getAreaIconFromDB(area);
                       return (
-                        <button
+                        <div
                           key={area.uk_area}
-                          className="filter-option"
+                          className="area-option"
                           onClick={() => {
                             handleFilterChange('area', area.uk_area);
                             setShowAreaDropdown(false);
                           }}
                         >
-                          <AreaIcon style={{ color: iconColor }} />
+                          <div className="area-icon">
+                            <AreaIcon style={{ color: iconColor }} />
+                          </div>
                           <span>{area.s_nombre_area}</span>
-                          <span 
-                            className="area-color-indicator" 
-                            style={{ backgroundColor: iconColor }}
-                          ></span>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
-                )}
-              </div>
+                </>,
+                document.body
+              )}
+            </div>
+          </div>
 
-              {/* Filtro de Consultorio */}
-              <div className="filter-group" ref={consultorioRef}>
-                <label className="filter-label">
-                  <FaHospital />
-                  Consultorio
-                </label>
-                <button 
-                  className={`filter-button ${filters.consultorio ? 'active' : ''}`}
-                  onClick={() => setShowConsultorioDropdown(!showConsultorioDropdown)}
-                >
-                  {filters.consultorio 
-                    ? `Consultorio ${consultorios.find(c => c.uk_consultorio === filters.consultorio)?.i_numero_consultorio || ''}`
-                    : 'Todos los consultorios'
-                  }
-                  <FaChevronDown className={showConsultorioDropdown ? 'rotate' : ''} />
-                </button>
-                {showConsultorioDropdown && (
-                  <div className="filter-dropdown">
-                    <button 
-                      className="filter-option"
+          <div className="filter-group" ref={consultorioRef}>
+            <label>Consultorio</label>
+            <div className="custom-area-select">
+              <div 
+                className="area-select-trigger"
+                onClick={() => setShowConsultorioDropdown(!showConsultorioDropdown)}
+              >
+                <div className="area-selected">
+                  <div className="area-icon">
+                    <FaHospital />
+                  </div>
+                  <span>
+                    {filters.consultorio 
+                      ? `Consultorio ${consultorios.find(c => c.uk_consultorio === filters.consultorio)?.i_numero_consultorio || ''}`
+                      : 'Todos los consultorios'
+                    }
+                  </span>
+                </div>
+                <div className="dropdown-arrow">
+                  <svg width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {showConsultorioDropdown && createPortal(
+                <>
+                  <div 
+                    className="area-dropdown-overlay"
+                    onClick={() => setShowConsultorioDropdown(false)}
+                  />
+                  <div 
+                    className="area-dropdown-menu"
+                    style={{
+                      position: 'absolute',
+                      top: `${consultorioRef.current?.getBoundingClientRect().bottom + window.scrollY}px`,
+                      left: `${consultorioRef.current?.getBoundingClientRect().left + window.scrollX}px`,
+                      width: `${consultorioRef.current?.getBoundingClientRect().width}px`,
+                      zIndex: 999999999
+                    }}
+                  >
+                    <div 
+                      className="area-option"
                       onClick={() => {
                         handleFilterChange('consultorio', '');
                         setShowConsultorioDropdown(false);
                       }}
                     >
-                      <FaHospital />
+                      <div className="area-icon">
+                        <FaHospital />
+                      </div>
                       <span>Todos los consultorios</span>
-                    </button>
+                    </div>
                     {consultorios
                       .sort((a, b) => a.i_numero_consultorio - b.i_numero_consultorio)
                       .map(consultorio => (
-                        <button
+                        <div
                           key={consultorio.uk_consultorio}
-                          className="filter-option"
+                          className="area-option"
                           onClick={() => {
                             handleFilterChange('consultorio', consultorio.uk_consultorio);
                             setShowConsultorioDropdown(false);
                           }}
                         >
-                          <FaHospital />
+                          <div className="area-icon">
+                            <FaHospital />
+                          </div>
                           <span>Consultorio {consultorio.i_numero_consultorio}</span>
-                        </button>
+                        </div>
                       ))}
                   </div>
-                )}
-              </div>
+                </>,
+                document.body
+              )}
             </div>
           </div>
         </div>
@@ -782,28 +883,44 @@ const TurnHistory = () => {
                     const areaName = getAreaInfo(turn.uk_consultorio);
                     const areaObject = getAreaObject(turn.uk_consultorio);
                     const { icon: AreaIcon, color: iconColor } = getAreaIconFromDB(areaObject);
-                    const adminName = getAdminName(turn.uk_usuario_registro);
+                    const consultorioNum = getConsultorioNumber(turn.uk_consultorio);
+                    
+                    // Formatear fecha de manera más simple
+                    const fechaTurno = new Date(turn.d_fecha);
+                    const fechaFormateada = fechaTurno.toLocaleDateString('es-ES', { 
+                      day: '2-digit', 
+                      month: 'short',
+                      year: 'numeric'
+                    });
 
                     return (
                       <div 
                         key={turn.uk_turno} 
-                        className="history-row"
+                        className="history-row-minimal"
                         onClick={() => handleViewDetails(turn)}
                       >
-                        <div className="history-icon" style={{ color: iconColor }}>
-                          <AreaIcon />
+                        <div className="history-left-section">
+                          <div className="history-area-icon" style={{ color: iconColor }}>
+                            <AreaIcon />
+                          </div>
+                          <div className="history-info">
+                            <div className="history-primary">
+                              <span className="turno-number">#{turn.i_numero_turno}</span>
+                              <span className="patient-name">{getPatientName(turn.uk_paciente)}</span>
+                            </div>
+                            <div className="history-secondary">
+                              <span className="detail-text">{areaName}</span>
+                              <span className="separator">•</span>
+                              <span className="detail-text">Consultorio {consultorioNum}</span>
+                              <span className="separator">•</span>
+                              <span className="detail-text">{fechaFormateada}</span>
+                              <span className="separator">•</span>
+                              <span className="detail-text">{turn.t_hora}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="history-content">
-                          <span className="history-main-text">
-                            Turno #{turn.i_numero_turno} - {getPatientName(turn.uk_paciente)}
-                          </span>
-                          <span className="history-secondary-text">
-                            {areaName} • {new Date(turn.d_fecha).toLocaleDateString('es-ES')} {turn.t_hora} • {turnStatuses.find(s => s.value === turn.s_estado)?.label}
-                            {turn.uk_usuario_registro && ` • Asignado por: ${adminName}`}
-                          </span>
-                        </div>
-                        <div className={`history-status-indicator status-${turn.s_estado.toLowerCase()}`}>
-                          {React.createElement(getStatusIcon(turn.s_estado), { size: 14 })}
+                        <div className={`status-badge-clean ${getStatusColor(turn.s_estado)}`}>
+                          <span className="status-text">{turnStatuses.find(s => s.value === turn.s_estado)?.label}</span>
                         </div>
                       </div>
                     );
