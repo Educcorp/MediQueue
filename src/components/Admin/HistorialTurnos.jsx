@@ -48,13 +48,65 @@ import {
   FaChevronRight,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
-  FaHistory
+  FaHistory,
+  FaStethoscope,
+  FaHeartbeat,
+  FaFemale,
+  FaMale,
+  FaProcedures,
+  FaDoorOpen,
+  FaAmbulance,
+  FaPrescriptionBottle,
+  FaXRay,
+  FaMicroscope,
+  FaLungs,
+  FaHandHoldingHeart,
+  FaWheelchair,
+  FaCrutch,
+  FaThermometer,
+  FaHeadSideCough,
+  FaVials
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
   MdPsychology
 } from 'react-icons/md';
 
+// Función para mapear nombres de React Icons a componentes (desde BD)
+const getIconComponent = (iconName) => {
+  const iconMap = {
+    'FaStethoscope': FaStethoscope,
+    'FaBaby': FaBaby,
+    'FaHeartbeat': FaHeartbeat,
+    'FaUserMd': FaUserMd,
+    'FaFemale': FaFemale,
+    'FaEye': FaEye,
+    'FaBone': FaBone,
+    'FaBrain': FaBrain,
+    'FaMale': FaMale,
+    'FaFlask': FaFlask,
+    'FaProcedures': FaProcedures,
+    'FaDoorOpen': FaDoorOpen,
+    'FaHospital': FaHospital,
+    'FaAmbulance': FaAmbulance,
+    'FaSyringe': FaSyringe,
+    'FaPrescriptionBottle': FaPrescriptionBottle,
+    'FaXRay': FaXRay,
+    'FaMicroscope': FaMicroscope,
+    'FaLungs': FaLungs,
+    'FaTooth': FaTooth,
+    'FaHandHoldingHeart': FaHandHoldingHeart,
+    'FaWheelchair': FaWheelchair,
+    'FaCrutch': FaCrutch,
+    'FaThermometer': FaThermometer,
+    'FaHeadSideCough': FaHeadSideCough,
+    'FaVials': FaVials,
+    'FaHeart': FaHeart,
+    'MdPregnantWoman': MdPregnantWoman,
+    'MdPsychology': MdPsychology
+  };
+  return iconMap[iconName] || FaHospital; // Fallback a hospital si no se encuentra
+};
 
 // Función para obtener el icono minimalista del área
 const getAreaIcon = (areaName) => {
@@ -821,18 +873,25 @@ const HistorialTurnos = () => {
           </div>
         </div>
 
-        {/* Turns Table */}
+        {/* Historial de Turnos - Lista con Tarjetas */}
         <div className="content-card">
           <div className="card-header">
             <h3 className="card-title">
-              <FaHistory />
-              Historial Completo
+              <FaClipboardList />
+              Registros de Turnos
             </h3>
             <div className="card-actions">
+              <span style={{ 
+                fontSize: '14px', 
+                color: 'var(--text-muted)',
+                fontWeight: 500
+              }}>
+                {turns.length} registro{turns.length !== 1 ? 's' : ''} encontrado{turns.length !== 1 ? 's' : ''}
+              </span>
             </div>
           </div>
 
-          <div className="card-content" style={{ padding: 0 }}>
+          <div className="card-content" style={{ padding: '20px' }}>
             {turns.length === 0 ? (
               <div className="empty-state">
                 <FaHistory />
@@ -840,87 +899,175 @@ const HistorialTurnos = () => {
                 <p>No se encontraron turnos para los filtros seleccionados</p>
               </div>
             ) : (
-              <div className="data-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th># Turno</th>
-                      <th>Paciente</th>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Estado</th>
-                      <th>Consultorio</th>
-                      <th>Área</th>
-                      <th>Observaciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentTurns.map(turn => (
-                      <tr key={turn.uk_turno}>
-                        <td>
-                          <strong>#{turn.i_numero_turno}</strong>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
-                            {getPatientName(turn.uk_paciente)}
-                          </div>
-                        </td>
-                        <td>{new Date(turn.d_fecha).toLocaleDateString('es-ES')}</td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <FaClock style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
-                            {turn.t_hora}
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`status-badge ${getStatusColorClass(turn.s_estado)}`}>
-                            {React.createElement(getStatusIcon(turn.s_estado), { 
-                              className: 'status-icon-inline',
-                              size: 12 
-                            })}
-                            {getStatusLabel(turn.s_estado)}
-                          </span>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <FaHospital style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
-                            {getConsultorioInfo(turn.uk_consultorio)}
-                          </div>
-                        </td>
-                        <td>{getAreaInfo(turn.uk_consultorio)}</td>
-                        <td>
-                          <div style={{ 
-                            maxWidth: '200px', 
-                            overflow: 'hidden', 
-                            textOverflow: 'ellipsis', 
-                            whiteSpace: 'nowrap',
-                            color: 'var(--text-muted)',
-                            fontSize: '13px'
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '16px' 
+              }}>
+                {currentTurns.map(turn => {
+                  // Obtener información del consultorio y área
+                  const consultorioData = consultorios.find(c => c.uk_consultorio === turn.uk_consultorio);
+                  const areaData = areas.find(a => a.uk_area === consultorioData?.uk_area);
+                  
+                  // Obtener color e icono desde la BD
+                  const areaColor = areaData?.s_color || '#4A90E2';
+                  const areaIconName = areaData?.s_icono || 'FaHospital';
+                  const areaName = areaData?.s_nombre_area || 'Área';
+                  const AreaIconComponent = getIconComponent(areaIconName);
+                  
+                  return (
+                    <div
+                      key={turn.uk_turno}
+                      style={{
+                        background: isDarkMode ? 'rgba(15, 27, 47, 0.5)' : 'rgba(255, 255, 255, 0.9)',
+                        border: isDarkMode ? '1px solid rgba(148, 163, 184, 0.12)' : '1px solid rgba(226, 232, 240, 0.8)',
+                        borderRadius: '12px',
+                        padding: '16px 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '20px',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        boxShadow: isDarkMode ? '0 2px 8px rgba(0, 0, 0, 0.2)' : '0 2px 8px rgba(0, 0, 0, 0.05)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = isDarkMode 
+                          ? '0 4px 16px rgba(0, 0, 0, 0.3)' 
+                          : '0 4px 16px rgba(0, 0, 0, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = isDarkMode 
+                          ? '0 2px 8px rgba(0, 0, 0, 0.2)' 
+                          : '0 2px 8px rgba(0, 0, 0, 0.05)';
+                      }}
+                    >
+                      {/* Icono del Área - Usando color e icono desde BD */}
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        minWidth: '56px',
+                        borderRadius: '50%',
+                        background: areaColor,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px',
+                        color: '#ffffff',
+                        border: `2px solid ${areaColor}`,
+                        boxShadow: `0 2px 8px ${areaColor}40`,
+                      }}>
+                        <AreaIconComponent />
+                      </div>
+
+                      {/* Información Principal */}
+                      <div style={{ 
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        minWidth: 0
+                      }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '12px',
+                          flexWrap: 'wrap'
+                        }}>
+                          <span style={{
+                            fontSize: '18px',
+                            fontWeight: 700,
+                            color: areaColor,
+                            letterSpacing: '0.5px'
                           }}>
-                            {turn.s_observaciones || '-'}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    
-                    {/* Filas vacías para mantener altura consistente en páginas 2+ */}
-                    {currentPage > 1 && currentTurns.length < turnsPerPage && 
-                      Array.from({ length: turnsPerPage - currentTurns.length }).map((_, index) => (
-                        <tr key={`empty-${index}`} style={{ height: '57px', opacity: 0 }}>
-                          <td>&nbsp;</td>
-                          <td>&nbsp;</td>
-                          <td>&nbsp;</td>
-                          <td>&nbsp;</td>
-                          <td>&nbsp;</td>
-                          <td>&nbsp;</td>
-                          <td>&nbsp;</td>
-                          <td>&nbsp;</td>
-                        </tr>
-                      ))
-                    }
-                  </tbody>
-                </table>
+                            #{turn.i_numero_turno}
+                          </span>
+                          <span style={{
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            color: isDarkMode ? '#e6edf3' : '#1e293b',
+                          }}>
+                            {getPatientName(turn.uk_paciente)}
+                          </span>
+                        </div>
+                        
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '16px',
+                          fontSize: '14px',
+                          color: isDarkMode ? 'rgba(203, 213, 225, 0.8)' : 'rgba(71, 85, 105, 0.8)',
+                          flexWrap: 'wrap'
+                        }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontWeight: 600, color: areaColor }}>{areaName}</span>
+                          </span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            • {getConsultorioInfo(turn.uk_consultorio)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Fecha y Hora */}
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        gap: '4px',
+                        minWidth: '140px'
+                      }}>
+                        <span style={{
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: isDarkMode ? '#cbd5e1' : '#475569',
+                        }}>
+                          {new Date(turn.d_fecha).toLocaleDateString('es-ES', { 
+                            day: '2-digit', 
+                            month: 'short', 
+                            year: 'numeric' 
+                          })}
+                        </span>
+                        <span style={{
+                          fontSize: '13px',
+                          color: isDarkMode ? 'rgba(203, 213, 225, 0.7)' : 'rgba(71, 85, 105, 0.7)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <FaClock size={11} />
+                          {turn.t_hora}
+                        </span>
+                      </div>
+
+                      {/* Estado */}
+                      <div style={{
+                        minWidth: '100px',
+                        display: 'flex',
+                        justifyContent: 'flex-end'
+                      }}>
+                        <span 
+                          className={`status-badge ${getStatusColorClass(turn.s_estado)}`}
+                          style={{
+                            padding: '6px 14px',
+                            borderRadius: '20px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {React.createElement(getStatusIcon(turn.s_estado), { 
+                            size: 12 
+                          })}
+                          {getStatusLabel(turn.s_estado)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
             
