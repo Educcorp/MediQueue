@@ -797,10 +797,12 @@ const HistorialTurnos = () => {
                       borderRadius: '0',
                       padding: '0',
                       boxShadow: 'none',
-                      color: getSelectedItemInfo().areaColor
+                      color: `${getSelectedItemInfo().areaColor} !important`
                     }}
                   >
-                    {React.createElement(getSelectedItemInfo().iconComponent)}
+                    <span style={{ color: getSelectedItemInfo().areaColor, display: 'flex', alignItems: 'center' }}>
+                      {React.createElement(getSelectedItemInfo().iconComponent)}
+                    </span>
                   </div>
                   <span>{getSelectedItemInfo().displayName}</span>
                 </div>
@@ -842,11 +844,12 @@ const HistorialTurnos = () => {
                           border: 'none',
                           borderRadius: '0',
                           padding: '0',
-                          boxShadow: 'none',
-                          color: '#4A90E2'
+                          boxShadow: 'none'
                         }}
                       >
-                        <FaHospital />
+                        <span style={{ color: '#4A90E2', display: 'flex', alignItems: 'center' }}>
+                          <FaHospital />
+                        </span>
                       </div>
                       <span>Todos los consultorios</span>
                     </div>
@@ -867,11 +870,12 @@ const HistorialTurnos = () => {
                             border: 'none',
                             borderRadius: '0',
                             padding: '0',
-                            boxShadow: 'none',
-                            color: item.areaColor
+                            boxShadow: 'none'
                           }}
                         >
-                          {React.createElement(item.icon)}
+                          <span style={{ color: item.areaColor, display: 'flex', alignItems: 'center' }}>
+                            {React.createElement(item.icon)}
+                          </span>
                         </div>
                         <span>{item.displayName}</span>
                       </div>
