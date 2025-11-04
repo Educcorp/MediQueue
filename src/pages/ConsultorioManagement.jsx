@@ -51,7 +51,9 @@ import {
   FaCrutch,
   FaThermometer,
   FaHeadSideCough,
-  FaVials
+  FaVials,
+  FaLock,
+  FaUnlock
 } from 'react-icons/fa';
 
 const ConsultorioManagement = () => {
@@ -134,11 +136,11 @@ const ConsultorioManagement = () => {
       setError(null);
 
       const [areasData, consultoriosData] = await Promise.all([
-        areaService.getAll().catch(err => {
+        areaService.getAllWithInactive().catch(err => {
           console.warn('Error cargando áreas:', err);
           return [];
         }),
-        consultorioService.getAll().catch(err => {
+        consultorioService.getAllWithInactive().catch(err => {
           console.warn('Error cargando consultorios:', err);
           return [];
         })
@@ -212,6 +214,23 @@ const ConsultorioManagement = () => {
     setShowConsultorioModal(true);
   };
 
+  const handleToggleAreaEstado = async (area) => {
+    const nuevoEstado = area.ck_estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+    const accion = nuevoEstado === 'ACTIVO' ? 'desbloquear' : 'bloquear';
+
+    if (window.confirm(`¿Estás seguro de ${accion} el área "${area.s_nombre_area}"?`)) {
+      try {
+        await areaService.toggleEstado(area.uk_area);
+        await loadData();
+        alert(`Área ${accion === 'bloquear' ? 'bloqueada' : 'desbloqueada'} correctamente`);
+      } catch (error) {
+        console.error('Error cambiando estado del área:', error);
+        const mensaje = error.response?.data?.message || error.message || 'Error desconocido al cambiar el estado del área';
+        alert('Error cambiando estado del área: ' + mensaje);
+      }
+    }
+  };
+
   const handleDeleteArea = async (area) => {
     const consultoriosEnArea = consultorios.filter(c => c.uk_area === area.uk_area);
     const mensaje = consultoriosEnArea.length > 0
@@ -237,6 +256,23 @@ const ConsultorioManagement = () => {
           const mensaje = error.response?.data?.message || error.message || 'Error desconocido al eliminar el área';
           alert('Error eliminando área: ' + mensaje);
         }
+      }
+    }
+  };
+
+  const handleToggleConsultorioEstado = async (consultorio) => {
+    const nuevoEstado = consultorio.ck_estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+    const accion = nuevoEstado === 'ACTIVO' ? 'desbloquear' : 'bloquear';
+
+    if (window.confirm(`¿Estás seguro de ${accion} el consultorio #${consultorio.i_numero_consultorio}?`)) {
+      try {
+        await consultorioService.toggleEstado(consultorio.uk_consultorio);
+        await loadData();
+        alert(`Consultorio ${accion === 'bloquear' ? 'bloqueado' : 'desbloqueado'} correctamente`);
+      } catch (error) {
+        console.error('Error cambiando estado del consultorio:', error);
+        const mensaje = error.response?.data?.message || error.message || 'Error desconocido al cambiar el estado del consultorio';
+        alert('Error cambiando estado del consultorio: ' + mensaje);
       }
     }
   };
@@ -659,8 +695,15 @@ const ConsultorioManagement = () => {
 
               const IconComponent = areaIconName ? getIconComponent(areaIconName) : getAreaIcon(area.s_nombre_area).icon;
 
+              // Estilos para áreas inactivas
+              const isInactive = area.ck_estado !== 'ACTIVO';
+
               return (
-                <div key={area.uk_area} className="content-card">
+                <div key={area.uk_area} className="content-card" style={{
+                  opacity: isInactive ? 0.7 : 1,
+                  position: 'relative',
+                  filter: isInactive ? 'grayscale(30%)' : 'none'
+                }}>
                   <div className="card-header" style={{
                     background: `linear-gradient(135deg, ${areaColor}20, ${areaColor}10)`,
                     borderBottom: `1px solid ${areaColor}30`,
@@ -675,7 +718,8 @@ const ConsultorioManagement = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'white'
+                        color: 'white',
+                        opacity: isInactive ? 0.6 : 1
                       }}>
                         <IconComponent />
                       </div>
@@ -698,6 +742,23 @@ const ConsultorioManagement = () => {
                               {area.s_letra}
                             </span>
                           )}
+                          {/* Mostrar estado del área */}
+                          {area.ck_estado !== 'ACTIVO' && (
+                            <span style={{
+                              background: 'var(--danger-color)',
+                              color: 'white',
+                              fontSize: '11px',
+                              fontWeight: 'bold',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <FaLock style={{ fontSize: '9px' }} />
+                              BLOQUEADA
+                            </span>
+                          )}
                         </div>
                         <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'var(--text-muted)' }}>
                           {areaConsultorios.length} consultorio{areaConsultorios.length !== 1 ? 's' : ''}
@@ -705,6 +766,14 @@ const ConsultorioManagement = () => {
                       </div>
                     </div>
                     <div className="card-actions">
+                      <button
+                        className="card-action"
+                        onClick={() => handleToggleAreaEstado(area)}
+                        title={area.ck_estado === 'ACTIVO' ? 'Bloquear área' : 'Desbloquear área'}
+                        style={{ color: area.ck_estado === 'ACTIVO' ? 'var(--warning-color)' : 'var(--success-color)' }}
+                      >
+                        {area.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
+                      </button>
                       <button
                         className="card-action"
                         onClick={() => handleEditArea(area)}
@@ -732,45 +801,73 @@ const ConsultorioManagement = () => {
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {areaConsultorios.map(consultorio => (
-                          <div key={consultorio.uk_consultorio} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '12px',
-                            background: 'var(--bg-glass)',
-                            borderRadius: 'var(--border-radius-sm)',
-                            border: '1px solid var(--border-color)'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <FaDoorOpen style={{ color: areaColor }} />
-                              <span style={{ fontWeight: '600' }}>
-                                Consultorio #{consultorio.i_numero_consultorio}
-                              </span>
-                              <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'success' : 'secondary'}`}>
-                                {RECORD_STATUS_LABELS[consultorio.ck_estado] || consultorio.ck_estado}
-                              </span>
+                        {areaConsultorios.map(consultorio => {
+                          const consultorioInactivo = consultorio.ck_estado !== 'ACTIVO';
+
+                          return (
+                            <div key={consultorio.uk_consultorio} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '12px',
+                              background: consultorioInactivo ? 'var(--bg-secondary)' : 'var(--bg-glass)',
+                              borderRadius: 'var(--border-radius-sm)',
+                              border: consultorioInactivo ? '1px solid var(--danger-color-light)' : '1px solid var(--border-color)',
+                              opacity: consultorioInactivo ? 0.7 : 1
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FaDoorOpen style={{
+                                  color: consultorioInactivo ? 'var(--text-muted)' : areaColor
+                                }} />
+                                <span style={{
+                                  fontWeight: '600',
+                                  textDecoration: consultorioInactivo ? 'line-through' : 'none'
+                                }}>
+                                  Consultorio #{consultorio.i_numero_consultorio}
+                                </span>
+                                <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'success' : 'danger'}`}>
+                                  {RECORD_STATUS_LABELS[consultorio.ck_estado] || consultorio.ck_estado}
+                                </span>
+                              </div>
+                              <div style={{ display: 'flex', gap: '4px' }}>
+                                <button
+                                  onClick={() => handleToggleConsultorioEstado(consultorio)}
+                                  className={consultorio.ck_estado === 'ACTIVO' ? 'btn btn-warning' : 'btn btn-success'}
+                                  style={{
+                                    padding: '4px 8px',
+                                    fontSize: '12px',
+                                    color: consultorio.ck_estado === 'ACTIVO' ? '#FFA000' : undefined
+                                  }}
+                                  title={consultorio.ck_estado === 'ACTIVO' ? 'Bloquear consultorio' : 'Desbloquear consultorio'}
+                                >
+                                  {consultorio.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
+                                </button>
+                                <button
+                                  onClick={() => handleEditConsultorio(consultorio)}
+                                  className="btn"
+                                  style={{ 
+                                    padding: '4px 8px', 
+                                    fontSize: '12px',
+                                    background: '#4299e1',
+                                    color: 'white',
+                                    border: '1px solid #4299e1'
+                                  }}
+                                  title="Editar consultorio"
+                                >
+                                  <FaEdit />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteConsultorio(consultorio)}
+                                  className="btn btn-danger"
+                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  title="Eliminar consultorio"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
                             </div>
-                            <div style={{ display: 'flex', gap: '4px' }}>
-                              <button
-                                onClick={() => handleEditConsultorio(consultorio)}
-                                className="btn btn-secondary"
-                                style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title="Editar consultorio"
-                              >
-                                <FaEdit />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteConsultorio(consultorio)}
-                                className="btn btn-danger"
-                                style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title="Eliminar consultorio"
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 

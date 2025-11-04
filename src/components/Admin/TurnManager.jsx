@@ -47,7 +47,8 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaAngleDoubleLeft,
-  FaAngleDoubleRight
+  FaAngleDoubleRight,
+  FaHistory
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -169,6 +170,14 @@ const TurnManager = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Estados para el modal de confirmación de cancelación
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [turnToCancel, setTurnToCancel] = useState(null);
+
+  // Estados para el modal de notificación de éxito
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [attendedTurn, setAttendedTurn] = useState(null);
+
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
   const isDarkMode = theme === 'dark';
@@ -243,7 +252,6 @@ const TurnManager = () => {
   // Estados de turnos disponibles
   const turnStatuses = [
     { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
-    { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
 
@@ -462,24 +470,52 @@ const TurnManager = () => {
     try {
       await turnService.markTurnAsAttended(turn.uk_turno);
       await loadTurns();
-      alert(`Turno #${turn.i_numero_turno} marcado como atendido`);
+      setAttendedTurn(turn);
+      setShowSuccessModal(true);
+      setError(null);
+      
+      // Auto-cerrar el modal después de 3 segundos
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        setAttendedTurn(null);
+      }, 3000);
     } catch (error) {
-      alert('Error marcando turno como atendido: ' + error.message);
+      setError('Error marcando turno como atendido: ' + error.message);
       console.error('Error marcando turno como atendido:', error);
     }
   };
 
-  const handleCancelTurn = async (turn) => {
-    if (window.confirm(`¿Estás seguro de cancelar el turno #${turn.i_numero_turno}?`)) {
-      try {
-        await turnService.cancelTurn(turn.uk_turno);
-        await loadTurns();
-        alert(`Turno #${turn.i_numero_turno} cancelado`);
-      } catch (error) {
-        alert('Error cancelando turno: ' + error.message);
-        console.error('Error cancelando turno:', error);
-      }
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    setAttendedTurn(null);
+  };
+
+  const handleCancelTurn = (turn) => {
+    setTurnToCancel(turn);
+    setShowCancelModal(true);
+  };
+
+  const confirmCancelTurn = async () => {
+    if (!turnToCancel) return;
+
+    try {
+      await turnService.cancelTurn(turnToCancel.uk_turno);
+      await loadTurns();
+      setShowCancelModal(false);
+      setTurnToCancel(null);
+      // Mostrar mensaje de éxito (opcional)
+      setError(null);
+    } catch (error) {
+      setError('Error cancelando turno: ' + error.message);
+      console.error('Error cancelando turno:', error);
+      setShowCancelModal(false);
+      setTurnToCancel(null);
     }
+  };
+
+  const cancelCancelTurn = () => {
+    setShowCancelModal(false);
+    setTurnToCancel(null);
   };
 
   const handleSubmit = async (e) => {
@@ -665,6 +701,13 @@ const TurnManager = () => {
             </p>
           </div>
           <div className="page-actions">
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => navigate('/admin/historial')}
+              title="Ver Historial de Turnos"
+            >
+              <FaHistory /> Historial
+            </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> Actualizar
             </button>
@@ -995,7 +1038,6 @@ const TurnManager = () => {
                       <th>Paciente</th>
                       <th>Fecha</th>
                       <th>Hora</th>
-                      <th>Fecha Creación</th>
                       <th>Estado</th>
                       <th>Consultorio</th>
                       <th>Área</th>
@@ -1019,20 +1061,6 @@ const TurnManager = () => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <FaClock style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
                             {turn.t_hora}
-                          </div>
-                        </td>
-                        <td>
-                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                            {turn.d_fecha_creacion ? 
-                              new Date(turn.d_fecha_creacion).toLocaleString('es-ES', {
-                                day: '2-digit',
-                                month: '2-digit', 
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              }) 
-                              : 'N/A'
-                            }
                           </div>
                         </td>
                         <td>
@@ -1254,6 +1282,350 @@ const TurnManager = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de notificación de éxito */}
+      {showSuccessModal && attendedTurn && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '420px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            {/* Contenido del modal */}
+            <div style={{ padding: '32px 24px' }}>
+              {/* Icono de éxito grande */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(40, 167, 69, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaCheck style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              {/* Título */}
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                ¡Éxito!
+              </h3>
+
+              {/* Mensaje principal */}
+              <p style={{ 
+                margin: '0 0 20px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '15px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                El turno <strong>#{attendedTurn.i_numero_turno}</strong> ha sido marcado como atendido correctamente
+              </p>
+              
+              {/* Información del turno */}
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
+                padding: '16px',
+                borderRadius: '12px',
+                marginBottom: '24px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.25)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FaUser style={{ color: '#77b8ce', fontSize: '14px' }} />
+                  </div>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                    {getPatientName(attendedTurn.uk_paciente)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FaHospital style={{ color: '#77b8ce', fontSize: '14px' }} />
+                  </div>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                    {getConsultorioInfo(attendedTurn.uk_consultorio)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FaClock style={{ color: '#77b8ce', fontSize: '14px' }} />
+                  </div>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                    {new Date(attendedTurn.d_fecha).toLocaleDateString('es-ES')} - {attendedTurn.t_hora}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Barra de progreso de auto-cierre */}
+            <div style={{
+              height: '4px',
+              background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+              borderRadius: '0 0 var(--border-radius) var(--border-radius)',
+              overflow: 'hidden',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                animation: 'autoCloseProgress 3s linear forwards'
+              }} />
+            </div>
+
+            {/* Botón de acción */}
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeSuccessModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(40, 167, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
+                }}
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para cancelar turno */}
+      {showCancelModal && turnToCancel && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            {/* Header del modal */}
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: isDarkMode ? 'rgba(234, 93, 75, 0.1)' : 'rgba(234, 93, 75, 0.05)'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(234, 93, 75, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ea5d4b',
+                fontSize: '20px'
+              }}>
+                <FaExclamationTriangle />
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                Confirmar Cancelación
+              </h3>
+            </div>
+
+            {/* Contenido del modal */}
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
+                fontSize: '16px',
+                lineHeight: '1.5'
+              }}>
+                ¿Estás seguro de cancelar el turno <strong>#{turnToCancel.i_numero_turno}</strong>?
+              </p>
+              
+              {/* Información del turno */}
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.2)' : 'rgba(119, 184, 206, 0.3)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Paciente:</strong> {getPatientName(turnToCancel.uk_paciente)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FaHospital style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Consultorio:</strong> {getConsultorioInfo(turnToCancel.uk_consultorio)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaClock style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Fecha y hora:</strong> {new Date(turnToCancel.d_fecha).toLocaleDateString('es-ES')} - {turnToCancel.t_hora}
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ 
+                margin: '0',
+                color: 'var(--text-muted)',
+                fontSize: '14px',
+                fontStyle: 'italic'
+              }}>
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+
+            {/* Botones de acción */}
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              gap: '12px', 
+              justifyContent: 'flex-end'
+            }}>
+              <button 
+                type="button" 
+                onClick={cancelCancelTurn} 
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                No, mantener turno
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmCancelTurn}
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: '#ea5d4b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(234, 93, 75, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#d94435';
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(234, 93, 75, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ea5d4b';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 8px rgba(234, 93, 75, 0.3)';
+                }}
+              >
+                Sí, cancelar turno
+              </button>
+            </div>
           </div>
         </div>
       )}
