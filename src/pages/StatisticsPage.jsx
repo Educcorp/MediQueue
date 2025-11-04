@@ -437,7 +437,6 @@ const StatisticsPage = () => {
                       'En espera': 'var(--info-color)',
                       'Atendido': 'var(--success-color)',
                       'Cancelado': 'var(--danger-color)',
-                      'En atención': 'var(--warning-color)'
                     };
                     const color = colors[status] || 'var(--primary-medical)';
 

@@ -47,7 +47,8 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaAngleDoubleLeft,
-  FaAngleDoubleRight
+  FaAngleDoubleRight,
+  FaHistory
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -251,7 +252,6 @@ const TurnManager = () => {
   // Estados de turnos disponibles
   const turnStatuses = [
     { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
-    { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
     { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
     { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
 
@@ -701,6 +701,13 @@ const TurnManager = () => {
             </p>
           </div>
           <div className="page-actions">
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => navigate('/admin/historial')}
+              title="Ver Historial de Turnos"
+            >
+              <FaHistory /> Historial
+            </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> Actualizar
             </button>
@@ -1031,7 +1038,6 @@ const TurnManager = () => {
                       <th>Paciente</th>
                       <th>Fecha</th>
                       <th>Hora</th>
-                      <th>Fecha Creación</th>
                       <th>Estado</th>
                       <th>Consultorio</th>
                       <th>Área</th>
@@ -1055,20 +1061,6 @@ const TurnManager = () => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <FaClock style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
                             {turn.t_hora}
-                          </div>
-                        </td>
-                        <td>
-                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                            {turn.d_fecha_creacion ? 
-                              new Date(turn.d_fecha_creacion).toLocaleString('es-ES', {
-                                day: '2-digit',
-                                month: '2-digit', 
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              }) 
-                              : 'N/A'
-                            }
                           </div>
                         </td>
                         <td>

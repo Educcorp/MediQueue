@@ -12,6 +12,7 @@ import ConsultorioManagement from './pages/ConsultorioManagement'
 import PatientManagement from './pages/PatientManagement'
 import StatisticsPage from './pages/StatisticsPage'
 import TurnManager from './components/Admin/TurnManager'
+import HistorialTurnos from './components/Admin/HistorialTurnos'
 import ProtectedRoute from './components/Common/ProtectedRoute'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import AboutPage from './pages/AboutPage'
@@ -70,6 +71,16 @@ function App() {
           element={
             <ProtectedRoute>
               <TurnManager />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta para historial de turnos */}
+        <Route
+          path="/admin/historial"
+          element={
+            <ProtectedRoute>
+              <HistorialTurnos />
             </ProtectedRoute>
           }
         />

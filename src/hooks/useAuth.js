@@ -45,6 +45,7 @@ export const usePermissions = () => {
         const routePermissions = {
             '/admin/dashboard': ['supervisor'],
             '/admin/turns': ['supervisor'],
+            '/admin/historial': ['supervisor'],
             '/admin/users': ['admin'],
             '/admin/areas': ['supervisor'],
             '/admin/consultorios': ['supervisor'],

@@ -16,7 +16,8 @@ import {
     FaSun,
     FaMoon,
     FaShieldAlt,
-    FaCookie
+    FaCookie,
+    FaHistory
 } from 'react-icons/fa';
 
 const AdminHeader = () => {
@@ -143,6 +144,12 @@ const AdminHeader = () => {
 
     // Items del panel lateral
     const sidebarItems = [
+        {
+            path: '/admin/historial',
+            label: 'Historial',
+            permission: 'supervisor',
+            icon: <FaHistory />
+        },
         {
             path: '/admin/users',
             label: 'Gestión de Usuarios',
