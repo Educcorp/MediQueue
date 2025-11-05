@@ -5,6 +5,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { MdCopyright } from 'react-icons/md';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
+
 const AdminFooter = ({ isDarkMode = false }) => {
   const { t } = useTranslation('common');
   const currentYear = new Date().getFullYear();
@@ -29,7 +30,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
           gap: '32px',
           marginBottom: '24px'
         }}>
-          
+
           {/* Brand Section */}
           <div>
             <div style={{
@@ -47,9 +48,9 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 justifyContent: 'center',
                 padding: '3px'
               }}>
-                <img 
-                  src="/images/favicon.png" 
-                  alt="MediQueue Logo" 
+                <img
+                  src="/images/favicon.png"
+                  alt="MediQueue Logo"
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
@@ -92,13 +93,14 @@ const AdminFooter = ({ isDarkMode = false }) => {
               gap: '8px'
             }}>
               {[
-                { name: t('navigation.dashboard'), href: '/admin/dashboard' },
-                { name: t('navigation.turns'), href: '/admin/turns' },
-                { name: t('navigation.patients'), href: '/admin/patients' },
-                { name: t('navigation.consultorios'), href: '/admin/consultorios' },
-                { name: t('navigation.statistics'), href: '/admin/statistics' },
-                { name: t('footer.links.about'), href: '/about' },
-                { name: t('footer.links.privacy'), href: '/privacy' }
+                { name: 'Dashboard', href: '/admin/dashboard' },
+                { name: 'Gestión de Turnos', href: '/admin/turns' },
+                { name: 'Historial de Turnos', href: '/admin/historial' },
+                { name: 'Pacientes', href: '/admin/patients' },
+                { name: 'Consultorios', href: '/admin/consultorios' },
+                { name: 'Estadísticas', href: '/admin/statistics' },
+                { name: 'Acerca de Nosotros', href: '/about' },
+                { name: 'Política de Privacidad', href: '/privacy' }
               ].map((link) => (
                 <a
                   key={link.name}
@@ -157,6 +159,8 @@ const AdminFooter = ({ isDarkMode = false }) => {
               </div>
               <div>{t('footer.version')}: 2.1.0</div>
               <div>{t('footer.system.lastUpdate')}: {t('footer.system.updateDate')}</div>
+              <div>Versión: 1.8.8</div>
+              <div>Última actualización: Octubre 2025</div>
             </div>
           </div>
 
@@ -180,27 +184,27 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 gap: '12px'
               }}>
                 {[
-                  { 
-                    icon: FaEnvelope, 
-                    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Soporte%20MediQueue&body=Hola,%20necesito%20ayuda%20con%20MediQueue.', 
+                  {
+                    icon: FaEnvelope,
+                    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Soporte%20MediQueue&body=Hola,%20necesito%20ayuda%20con%20MediQueue.',
                     color: '#e53e3e',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaGithub, 
-                    href: 'https://github.com/Educcorp/MediQueue', 
+                  {
+                    icon: FaGithub,
+                    href: 'https://github.com/Educcorp/MediQueue',
                     color: isDarkMode ? '#ffffff' : '#2d3748',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaLinkedin, 
-                    href: 'https://www.linkedin.com/in/educcorp-inc-158297356/', 
+                  {
+                    icon: FaLinkedin,
+                    href: 'https://www.linkedin.com/in/educcorp-inc-158297356/',
                     color: '#3182ce',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaXTwitter, 
-                    href: 'https://x.com/Educcorp', 
+                  {
+                    icon: FaXTwitter,
+                    href: 'https://x.com/Educcorp',
                     color: isDarkMode ? '#ffffff' : '#000000',
                     target: '_blank'
                   }

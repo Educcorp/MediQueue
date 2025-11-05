@@ -437,7 +437,6 @@ const StatisticsPage = () => {
                       'En espera': 'var(--info-color)',
                       'Atendido': 'var(--success-color)',
                       'Cancelado': 'var(--danger-color)',
-                      'En atención': 'var(--warning-color)'
                     };
                     const color = colors[status] || 'var(--primary-medical)';
 
@@ -775,88 +774,8 @@ const StatisticsPage = () => {
             </div>
           </div>
         )}
-
-        {/* Date Range Filters */}
-        <div className="filters-section">
-          <div className="filter-group">
-            <label>Fecha Inicio</label>
-            <input
-              type="date"
-              name="start"
-              value={dateRange.start}
-              onChange={handleDateRangeChange}
-              className="form-control"
-            />
-          </div>
-          <div className="filter-group">
-            <label>Fecha Fin</label>
-            <input
-              type="date"
-              name="end"
-              value={dateRange.end}
-              onChange={handleDateRangeChange}
-              className="form-control"
-            />
-          </div>
-          <div className="filter-group">
-            <button className="btn btn-secondary" onClick={refreshData}>
-              <FaFilter /> Aplicar Filtros
-            </button>
-          </div>
-        </div>
-
-        {/* Recent Turns */}
-        {recentTurns.length > 0 && (
-          <div className="content-card">
-            <div className="card-header">
-              <h3 className="card-title">
-                <FaClock />
-                Actividad Reciente
-              </h3>
-              <div className="card-actions">
-                <button className="card-action" title="Ver todos">
-                  <FaEye />
-                </button>
-              </div>
-            </div>
-            <div className="card-content" style={{ padding: 0 }}>
-              <div className="data-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th># Turno</th>
-                      <th>Consultorio</th>
-                      <th>Área</th>
-                      <th>Fecha</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentTurns.map(turn => (
-                      <tr key={turn.uk_turno}>
-                        <td>
-                          <strong>#{turn.i_numero_turno}</strong>
-                        </td>
-                        <td>{formatDate(turn.d_fecha)}</td>
-                        <td>
-                          <span className={`status-badge ${turn.s_estado === 'ATENDIDO' ? 'success' :
-                              turn.s_estado === 'EN_ESPERA' ? 'info' :
-                                turn.s_estado === 'CANCELADO' ? 'danger' : 'warning'
-                            }`}>
-                            {TURN_STATUS_LABELS?.[turn.s_estado] || turn.s_estado}
-                          </span>
-                        </td>
-                        <td>{turn.paciente_nombre || 'Invitado'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-      
+      </div>     
+              
       <AdminFooter isDarkMode={isDarkMode} />
       <Chatbot />
     </div>

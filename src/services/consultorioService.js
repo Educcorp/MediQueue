@@ -151,6 +151,17 @@ const consultorioService = {
         }
     },
 
+    // Toggle estado del consultorio (ACTIVO <-> INACTIVO)
+    async toggleEstado(uk_consultorio) {
+        try {
+            const response = await api.put(`/consultorios/${uk_consultorio}/toggle-estado`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error cambiando estado del consultorio:', error);
+            throw error;
+        }
+    },
+
     // Eliminar consultorio (hard delete)
     async remove(uk_consultorio) {
         try {

@@ -55,6 +55,7 @@ export const ROUTES = {
     ADMIN_LOGIN: '/admin',
     ADMIN_DASHBOARD: '/admin/dashboard',
     ADMIN_TURNS: '/admin/turns',
+    ADMIN_HISTORIAL: '/admin/historial',
     ADMIN_USERS: '/admin/users',
     ADMIN_AREAS: '/admin/areas',
     ADMIN_CONSULTORIOS: '/admin/consultorios',

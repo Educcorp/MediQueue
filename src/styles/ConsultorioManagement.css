@@ -853,3 +853,64 @@
         font-size: 11px;
     }
 }
+
+/* Estilos para áreas y consultorios inactivos */
+.area-card.inactive {
+    opacity: 0.7;
+    filter: grayscale(30%);
+}
+
+.area-card.inactive .area-header {
+    background: linear-gradient(135deg, rgba(150, 150, 150, 0.3) 0%, rgba(100, 100, 100, 0.2) 100%) !important;
+}
+
+.consultorio-item.inactive {
+    background: var(--bg-secondary, rgba(200, 200, 200, 0.3)) !important;
+    border: 1px solid var(--danger-color-light, rgba(244, 67, 54, 0.3)) !important;
+    opacity: 0.7;
+}
+
+.consultorio-item.inactive .consultorio-number {
+    text-decoration: line-through;
+    color: var(--text-muted, #999) !important;
+}
+
+.consultorio-item.inactive .consultorio-number i {
+    color: var(--text-muted, #999) !important;
+}
+
+.status-badge.danger {
+    background: linear-gradient(135deg, #F44336 0%, #d32f2f 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+.status-badge.success {
+    background: linear-gradient(135deg, #4CAF50 0%, #388e3c 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.status-badge.secondary {
+    background: linear-gradient(135deg, #9E9E9E 0%, #616161 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(158, 158, 158, 0.3);
+}

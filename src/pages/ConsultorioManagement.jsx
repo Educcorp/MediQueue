@@ -52,7 +52,9 @@ import {
   FaCrutch,
   FaThermometer,
   FaHeadSideCough,
-  FaVials
+  FaVials,
+  FaLock,
+  FaUnlock
 } from 'react-icons/fa';
 
 const ConsultorioManagement = () => {
@@ -136,11 +138,11 @@ const ConsultorioManagement = () => {
       setError(null);
 
       const [areasData, consultoriosData] = await Promise.all([
-        areaService.getAll().catch(err => {
+        areaService.getAllWithInactive().catch(err => {
           console.warn('Error cargando áreas:', err);
           return [];
         }),
-        consultorioService.getAll().catch(err => {
+        consultorioService.getAllWithInactive().catch(err => {
           console.warn('Error cargando consultorios:', err);
           return [];
         })
@@ -214,9 +216,26 @@ const ConsultorioManagement = () => {
     setShowConsultorioModal(true);
   };
 
+  const handleToggleAreaEstado = async (area) => {
+    const nuevoEstado = area.ck_estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+    const accion = nuevoEstado === 'ACTIVO' ? 'desbloquear' : 'bloquear';
+
+    if (window.confirm(`¿Estás seguro de ${accion} el área "${area.s_nombre_area}"?`)) {
+      try {
+        await areaService.toggleEstado(area.uk_area);
+        await loadData();
+        alert(`Área ${accion === 'bloquear' ? 'bloqueada' : 'desbloqueada'} correctamente`);
+      } catch (error) {
+        console.error('Error cambiando estado del área:', error);
+        const mensaje = error.response?.data?.message || error.message || 'Error desconocido al cambiar el estado del área';
+        alert('Error cambiando estado del área: ' + mensaje);
+      }
+    }
+  };
+
   const handleDeleteArea = async (area) => {
     const consultoriosEnArea = consultorios.filter(c => c.uk_area === area.uk_area);
-    const mensaje = consultoriosEnArea.length > 0 
+    const mensaje = consultoriosEnArea.length > 0
       ? `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?\n\nEsto eliminará también ${consultoriosEnArea.length} consultorio(s) y todos los turnos asociados.`
       : `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`;
 
@@ -228,7 +247,7 @@ const ConsultorioManagement = () => {
         alert('Área eliminada correctamente');
       } catch (error) {
         console.error('Error eliminando área:', error);
-        
+
         // Manejar diferentes tipos de errores
         if (error.response?.status === 404) {
           alert('El área no fue encontrada');
@@ -243,6 +262,23 @@ const ConsultorioManagement = () => {
     }
   };
 
+  const handleToggleConsultorioEstado = async (consultorio) => {
+    const nuevoEstado = consultorio.ck_estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+    const accion = nuevoEstado === 'ACTIVO' ? 'desbloquear' : 'bloquear';
+
+    if (window.confirm(`¿Estás seguro de ${accion} el consultorio #${consultorio.i_numero_consultorio}?`)) {
+      try {
+        await consultorioService.toggleEstado(consultorio.uk_consultorio);
+        await loadData();
+        alert(`Consultorio ${accion === 'bloquear' ? 'bloqueado' : 'desbloqueado'} correctamente`);
+      } catch (error) {
+        console.error('Error cambiando estado del consultorio:', error);
+        const mensaje = error.response?.data?.message || error.message || 'Error desconocido al cambiar el estado del consultorio';
+        alert('Error cambiando estado del consultorio: ' + mensaje);
+      }
+    }
+  };
+
   const handleDeleteConsultorio = async (consultorio) => {
     if (window.confirm(`¿Estás seguro de eliminar el consultorio #${consultorio.i_numero_consultorio}?\n\nEsto eliminará también todos los turnos asociados a este consultorio.`)) {
       try {
@@ -251,7 +287,7 @@ const ConsultorioManagement = () => {
         alert('Consultorio eliminado correctamente');
       } catch (error) {
         console.error('Error eliminando consultorio:', error);
-        
+
         // Manejar diferentes tipos de errores
         if (error.response?.status === 404) {
           alert('El consultorio no fue encontrado');
@@ -309,13 +345,13 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowAreaModal(false);
-      setFormData({ 
-        s_nombre_area: '', 
-        s_letra: '', 
-        s_color: '', 
-        s_icono: '', 
-        i_numero_consultorio: '', 
-        uk_area: '' 
+      setFormData({
+        s_nombre_area: '',
+        s_letra: '',
+        s_color: '',
+        s_icono: '',
+        i_numero_consultorio: '',
+        uk_area: ''
       });
       setLetraError('');
     } catch (error) {
@@ -355,13 +391,13 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowConsultorioModal(false);
-      setFormData({ 
-        s_nombre_area: '', 
-        s_letra: '', 
-        s_color: '', 
-        s_icono: '', 
-        i_numero_consultorio: '', 
-        uk_area: '' 
+      setFormData({
+        s_nombre_area: '',
+        s_letra: '',
+        s_color: '',
+        s_icono: '',
+        i_numero_consultorio: '',
+        uk_area: ''
       });
     } catch (error) {
       alert('Error guardando consultorio: ' + error.message);
@@ -371,7 +407,7 @@ const ConsultorioManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validación específica para número de consultorio
     if (name === 'i_numero_consultorio') {
       // Solo permitir números y limitar a 3 dígitos
@@ -382,7 +418,7 @@ const ConsultorioManagement = () => {
       }));
       return;
     }
-    
+
     // Validación específica para nombre de área
     if (name === 's_nombre_area') {
       // Limitar a 50 caracteres
@@ -393,20 +429,20 @@ const ConsultorioManagement = () => {
       }));
       return;
     }
-    
+
     // Validación específica para letra (máximo 2 letras)
     if (name === 's_letra') {
       // Solo permitir letras y limitar a 2 caracteres, convertir a mayúsculas
       const letterValue = value.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
-      
+
       // Verificar unicidad si hay valor
       if (letterValue) {
         // Verificar si la letra ya está en uso por otra área
-        const letraEnUso = areas.some(area => 
-          area.s_letra === letterValue && 
+        const letraEnUso = areas.some(area =>
+          area.s_letra === letterValue &&
           area.uk_area !== editingArea?.uk_area
         );
-        
+
         if (letraEnUso) {
           setLetraError(`La letra "${letterValue}" ya está en uso por otra área`);
         } else {
@@ -415,14 +451,14 @@ const ConsultorioManagement = () => {
       } else {
         setLetraError('');
       }
-      
+
       setFormData(prev => ({
         ...prev,
         [name]: letterValue
       }));
       return;
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -621,11 +657,11 @@ const ConsultorioManagement = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
             {filteredAreas.map(area => {
               const areaConsultorios = getConsultoriosByArea(area.uk_area);
-              
+
               // Usar los nuevos campos personalizados si están disponibles
               const areaColor = area.s_color || getAreaIcon(area.s_nombre_area).color;
               const areaIconName = area.s_icono;
-              
+
               // Función para obtener el componente de icono basado en el nombre
               const getIconComponent = (iconName) => {
                 const iconMap = {
@@ -658,11 +694,18 @@ const ConsultorioManagement = () => {
                 };
                 return iconMap[iconName] || getAreaIcon(area.s_nombre_area).icon;
               };
-              
+
               const IconComponent = areaIconName ? getIconComponent(areaIconName) : getAreaIcon(area.s_nombre_area).icon;
 
+              // Estilos para áreas inactivas
+              const isInactive = area.ck_estado !== 'ACTIVO';
+
               return (
-                <div key={area.uk_area} className="content-card">
+                <div key={area.uk_area} className="content-card" style={{
+                  opacity: isInactive ? 0.7 : 1,
+                  position: 'relative',
+                  filter: isInactive ? 'grayscale(30%)' : 'none'
+                }}>
                   <div className="card-header" style={{
                     background: `linear-gradient(135deg, ${areaColor}20, ${areaColor}10)`,
                     borderBottom: `1px solid ${areaColor}30`,
@@ -677,7 +720,8 @@ const ConsultorioManagement = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'white'
+                        color: 'white',
+                        opacity: isInactive ? 0.6 : 1
                       }}>
                         <IconComponent />
                       </div>
@@ -700,43 +744,38 @@ const ConsultorioManagement = () => {
                               {area.s_letra}
                             </span>
                           )}
+                          {/* Mostrar estado del área */}
+                          {area.ck_estado !== 'ACTIVO' && (
+                            <span style={{
+                              background: 'var(--danger-color)',
+                              color: 'white',
+                              fontSize: '11px',
+                              fontWeight: 'bold',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <FaLock style={{ fontSize: '9px' }} />
+                              BLOQUEADA
+                            </span>
+                          )}
                         </div>
                         <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'var(--text-muted)' }}>
-                          {t('consultorio:area.officesCount', { count: areaConsultorios.length })}
+                          {areaConsultorios.length} consultorio{areaConsultorios.length !== 1 ? 's' : ''}
                         </p>
-                        
-                        {/* Mostrar información de personalización */}
-                        {(area.s_color || area.s_icono) && (
-                          <div style={{ 
-                            marginTop: '8px', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '12px',
-                            fontSize: '12px',
-                            color: 'var(--text-secondary)'
-                          }}>
-                            {area.s_color && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <div style={{
-                                  width: '12px',
-                                  height: '12px',
-                                  backgroundColor: area.s_color,
-                                  borderRadius: '2px',
-                                  border: '1px solid rgba(0,0,0,0.1)'
-                                }}></div>
-                                <span>{area.s_color}</span>
-                              </div>
-                            )}
-                            {area.s_icono && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span>Icono: {area.s_icono}</span>
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="card-actions">
+                      <button
+                        className="card-action"
+                        onClick={() => handleToggleAreaEstado(area)}
+                        title={area.ck_estado === 'ACTIVO' ? 'Bloquear área' : 'Desbloquear área'}
+                        style={{ color: area.ck_estado === 'ACTIVO' ? 'var(--warning-color)' : 'var(--success-color)' }}
+                      >
+                        {area.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
+                      </button>
                       <button
                         className="card-action"
                         onClick={() => handleEditArea(area)}
@@ -764,45 +803,73 @@ const ConsultorioManagement = () => {
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {areaConsultorios.map(consultorio => (
-                          <div key={consultorio.uk_consultorio} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '12px',
-                            background: 'var(--bg-glass)',
-                            borderRadius: 'var(--border-radius-sm)',
-                            border: '1px solid var(--border-color)'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <FaDoorOpen style={{ color: areaColor }} />
-                              <span style={{ fontWeight: '600' }}>
-                                Consultorio #{consultorio.i_numero_consultorio}
-                              </span>
-                              <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'success' : 'secondary'}`}>
-                                {RECORD_STATUS_LABELS[consultorio.ck_estado] || consultorio.ck_estado}
-                              </span>
+                        {areaConsultorios.map(consultorio => {
+                          const consultorioInactivo = consultorio.ck_estado !== 'ACTIVO';
+
+                          return (
+                            <div key={consultorio.uk_consultorio} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '12px',
+                              background: consultorioInactivo ? 'var(--bg-secondary)' : 'var(--bg-glass)',
+                              borderRadius: 'var(--border-radius-sm)',
+                              border: consultorioInactivo ? '1px solid var(--danger-color-light)' : '1px solid var(--border-color)',
+                              opacity: consultorioInactivo ? 0.7 : 1
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FaDoorOpen style={{
+                                  color: consultorioInactivo ? 'var(--text-muted)' : areaColor
+                                }} />
+                                <span style={{
+                                  fontWeight: '600',
+                                  textDecoration: consultorioInactivo ? 'line-through' : 'none'
+                                }}>
+                                  Consultorio #{consultorio.i_numero_consultorio}
+                                </span>
+                                <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'success' : 'danger'}`}>
+                                  {RECORD_STATUS_LABELS[consultorio.ck_estado] || consultorio.ck_estado}
+                                </span>
+                              </div>
+                              <div style={{ display: 'flex', gap: '4px' }}>
+                                <button
+                                  onClick={() => handleToggleConsultorioEstado(consultorio)}
+                                  className={consultorio.ck_estado === 'ACTIVO' ? 'btn btn-warning' : 'btn btn-success'}
+                                  style={{
+                                    padding: '4px 8px',
+                                    fontSize: '12px',
+                                    color: consultorio.ck_estado === 'ACTIVO' ? '#FFA000' : undefined
+                                  }}
+                                  title={consultorio.ck_estado === 'ACTIVO' ? 'Bloquear consultorio' : 'Desbloquear consultorio'}
+                                >
+                                  {consultorio.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
+                                </button>
+                                <button
+                                  onClick={() => handleEditConsultorio(consultorio)}
+                                  className="btn"
+                                  style={{ 
+                                    padding: '4px 8px', 
+                                    fontSize: '12px',
+                                    background: '#4299e1',
+                                    color: 'white',
+                                    border: '1px solid #4299e1'
+                                  }}
+                                  title="Editar consultorio"
+                                >
+                                  <FaEdit />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteConsultorio(consultorio)}
+                                  className="btn btn-danger"
+                                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                                  title="Eliminar consultorio"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
                             </div>
-                            <div style={{ display: 'flex', gap: '4px' }}>
-                              <button
-                                onClick={() => handleEditConsultorio(consultorio)}
-                                className="btn btn-secondary"
-                                style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title={t('common:buttons.edit')}
-                              >
-                                <FaEdit />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteConsultorio(consultorio)}
-                                className="btn btn-danger"
-                                style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title={t('common:buttons.delete')}
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 
@@ -879,117 +946,117 @@ const ConsultorioManagement = () => {
               </button>
             </div>
 
-            <div style={{ 
-              flex: 1, 
-              overflowY: 'auto', 
-              maxHeight: 'calc(90vh - 120px)' 
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              maxHeight: 'calc(90vh - 120px)'
             }}>
               <form onSubmit={handleSubmitArea} style={{ padding: '24px' }}>
-              <div className="form-group">
-                <label>{t('consultorio:form.areaName')} *</label>
-                <input
-                  type="text"
-                  name="s_nombre_area"
-                  value={formData.s_nombre_area}
-                  onChange={handleInputChange}
-                  placeholder="Ej: Medicina General, Pediatría..."
-                  className="form-control"
-                  required
-                  maxLength={50}
-                />
-                <small style={{ 
-                  color: formData.s_nombre_area.length > 40 ? 'var(--warning)' : 'var(--text-muted)',
-                  fontSize: '12px',
-                  marginTop: '4px',
-                  display: 'block'
-                }}>
-                  {formData.s_nombre_area.length}/50 caracteres
-                </small>
-              </div>
-
-              {/* Campos de personalización */}
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-                gap: '20px',
-                marginTop: '20px' 
-              }}>
-                {/* Letra identificadora */}
                 <div className="form-group">
-                  <label>Letra Identificadora</label>
+                  <label>{t('consultorio:form.areaName')} *</label>
                   <input
                     type="text"
-                    name="s_letra"
-                    value={formData.s_letra}
+                    name="s_nombre_area"
+                    value={formData.s_nombre_area}
                     onChange={handleInputChange}
-                    placeholder="Ej: MG, PD..."
-                    className={`form-control ${letraError ? 'error' : ''}`}
-                    maxLength={2}
-                    style={{ textTransform: 'uppercase' }}
+                    placeholder="Ej: Medicina General, Pediatría..."
+                    className="form-control"
+                    required
+                    maxLength={50}
                   />
-                  {letraError ? (
-                    <small style={{ 
-                      color: 'var(--danger-color)',
-                      fontSize: '12px',
-                      marginTop: '4px',
-                      display: 'block'
-                    }}>
-                      {letraError}
-                    </small>
-                  ) : (
-                    <small style={{ 
-                      color: 'var(--text-muted)',
-                      fontSize: '12px',
-                      marginTop: '4px',
-                      display: 'block'
-                    }}>
-                      Máximo 2 letras para identificar el área
-                    </small>
-                  )}
+                  <small style={{
+                    color: formData.s_nombre_area.length > 40 ? 'var(--warning)' : 'var(--text-muted)',
+                    fontSize: '12px',
+                    marginTop: '4px',
+                    display: 'block'
+                  }}>
+                    {formData.s_nombre_area.length}/50 caracteres
+                  </small>
                 </div>
 
-                {/* Selector de color */}
-                <div className="form-group">
-                  <ColorSelector
-                    label="Color del Área"
-                    value={formData.s_color}
-                    onChange={handleColorChange}
+                {/* Campos de personalización */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: '20px',
+                  marginTop: '20px'
+                }}>
+                  {/* Letra identificadora */}
+                  <div className="form-group">
+                    <label>Letra Identificadora</label>
+                    <input
+                      type="text"
+                      name="s_letra"
+                      value={formData.s_letra}
+                      onChange={handleInputChange}
+                      placeholder="Ej: MG, PD..."
+                      className={`form-control ${letraError ? 'error' : ''}`}
+                      maxLength={2}
+                      style={{ textTransform: 'uppercase' }}
+                    />
+                    {letraError ? (
+                      <small style={{
+                        color: 'var(--danger-color)',
+                        fontSize: '12px',
+                        marginTop: '4px',
+                        display: 'block'
+                      }}>
+                        {letraError}
+                      </small>
+                    ) : (
+                      <small style={{
+                        color: 'var(--text-muted)',
+                        fontSize: '12px',
+                        marginTop: '4px',
+                        display: 'block'
+                      }}>
+                        Máximo 2 letras para identificar el área
+                      </small>
+                    )}
+                  </div>
+
+                  {/* Selector de color */}
+                  <div className="form-group">
+                    <ColorSelector
+                      label="Color del Área"
+                      value={formData.s_color}
+                      onChange={handleColorChange}
+                      disabled={false}
+                    />
+                  </div>
+                </div>
+
+                {/* Selector de icono */}
+                <div className="form-group" style={{ marginTop: '20px' }}>
+                  <IconSelector
+                    label="Icono del Área"
+                    value={formData.s_icono}
+                    onChange={handleIconChange}
                     disabled={false}
                   />
                 </div>
-              </div>
 
-              {/* Selector de icono */}
-              <div className="form-group" style={{ marginTop: '20px' }}>
-                <IconSelector
-                  label="Icono del Área"
-                  value={formData.s_icono}
-                  onChange={handleIconChange}
-                  disabled={false}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
-                <button 
-                  type="button" 
-                  onClick={() => {
-                    setShowAreaModal(false);
-                    setLetraError('');
-                  }} 
-                  className="btn btn-secondary"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={!!letraError}
-                >
-                  <FaCheck />
-                  {editingArea ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAreaModal(false);
+                      setLetraError('');
+                    }}
+                    className="btn btn-secondary"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={!!letraError}
+                  >
+                    <FaCheck />
+                    {editingArea ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -1047,37 +1114,37 @@ const ConsultorioManagement = () => {
               </button>
             </div>
 
-            <div style={{ 
-              flex: 1, 
-              overflowY: 'auto', 
-              maxHeight: 'calc(90vh - 120px)' 
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              maxHeight: 'calc(90vh - 120px)'
             }}>
               <form onSubmit={handleSubmitConsultorio} style={{ padding: '24px' }}>
-              <div className="form-group">
-                <label>{t('consultorio:form.officeNumber')} *</label>
-                <input
-                  type="text"
-                  name="i_numero_consultorio"
-                  value={formData.i_numero_consultorio}
-                  onChange={handleInputChange}
-                  placeholder="Ej: 101, 102, 103... (máx. 3 dígitos)"
-                  className="form-control"
-                  required
-                  maxLength="3"
-                  pattern="[0-9]{1,3}"
-                />
-              </div>
+                <div className="form-group">
+                  <label>{t('consultorio:form.officeNumber')} *</label>
+                  <input
+                    type="text"
+                    name="i_numero_consultorio"
+                    value={formData.i_numero_consultorio}
+                    onChange={handleInputChange}
+                    placeholder="Ej: 101, 102, 103... (máx. 3 dígitos)"
+                    className="form-control"
+                    required
+                    maxLength="3"
+                    pattern="[0-9]{1,3}"
+                  />
+                </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
-                <button type="button" onClick={() => setShowConsultorioModal(false)} className="btn btn-secondary">
-                  Cancelar
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  <FaCheck />
-                  {editingConsultorio ? 'Actualizar' : 'Crear'}
-                </button>
-              </div>
-            </form>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
+                  <button type="button" onClick={() => setShowConsultorioModal(false)} className="btn btn-secondary">
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    <FaCheck />
+                    {editingConsultorio ? 'Actualizar' : 'Crear'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

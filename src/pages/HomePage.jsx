@@ -216,6 +216,8 @@ const HomePage = () => {
                   >
                     <option value="">{t('home:header.selectArea')}</option>
                     <option value="general">{t('home:areaSelector.generalView')}</option>
+                    <option value="">Seleccionar área médica</option>
+                    <option value="general">General - Todas las áreas</option>
                     {areas.map((area) => (
                       <option 
                         key={area.uk_area || area.id} 
@@ -297,11 +299,19 @@ const HomePage = () => {
                 const areaLetter = areaObj?.s_letra || areaName?.charAt(0) || 'A';
                 const turnsArea = turnsByArea[areaName];
                 
-                // determinar próximo turno del área: 1) LLAMANDO; 2) EN_ESPERA por número
+                // Obtener turnos en espera y llamando
                 const calling = turnsArea.filter(t => (t.s_estado || t.estado) === 'LLAMANDO');
                 const waiting = turnsArea.filter(t => (t.s_estado || t.estado) === 'EN_ESPERA');
                 const sortByNum = (a, b) => (a.i_numero_turno || a.id || 0) - (b.i_numero_turno || b.id || 0);
-                const nextForArea = (calling.sort(sortByNum)[0]) || (waiting.sort(sortByNum)[0]) || null;
+                
+                // Combinar turnos llamando y en espera, ordenados
+                const allActiveTurns = [...calling, ...waiting].sort(sortByNum);
+                
+                // Obtener solo el turno actual (el primero)
+                const currentTurn = allActiveTurns[0] || null;
+                
+                // Contar turnos en espera (todos menos el actual)
+                const waitingCount = allActiveTurns.length > 0 ? allActiveTurns.length - 1 : 0;
 
                 return {
                   areaName,
@@ -309,7 +319,9 @@ const HomePage = () => {
                   areaIcon,
                   areaLetter,
                   turnsArea,
-                  nextForArea,
+                  currentTurn,
+                  waitingCount,
+                  totalTurns: turnsArea.length,
                   AreaIconComponent: getIconComponent(areaIcon)
                 };
               });
@@ -345,39 +357,34 @@ const HomePage = () => {
                           </div>
                           <div className="area-card-title">
                             <h3>{areaData.areaName}</h3>
-                            <span className="area-letter-badge" style={{ background: areaData.areaColor }}>
-                              {areaData.areaLetter}
-                            </span>
                           </div>
                         </div>
                         
                         <div className="area-card-content">
-                          {!areaData.nextForArea ? (
+                          {!areaData.currentTurn ? (
                             <div className="area-empty-state">
                               <i className="mdi mdi-check-circle" style={{ color: areaData.areaColor }}></i>
                               <p>{t('home:monitor.noTurnsWaiting')}</p>
+                              <p>Sin turnos activos</p>
                             </div>
                           ) : (
-                            <div className="area-current-turn">
-                              <div className="turn-display-small" style={{ 
-                                background: `linear-gradient(135deg, ${areaData.areaColor}, ${areaData.areaColor}dd)`
-                              }}>
-                                <span className="turn-number-small">
-                                  {areaData.areaLetter}{areaData.nextForArea.i_numero_turno || areaData.nextForArea.id}
+                            <div className={`area-current-turn ${(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? 'calling' : ''}`}>
+                              <div className="current-turn-badge">
+                                <span className="current-turn-id">
+                                  {areaData.areaLetter}{areaData.currentTurn.i_numero_turno || areaData.currentTurn.id}
                                 </span>
                               </div>
-                              <div className="turn-info-small">
-                                <div className="consultorio-small">
+                              <div className="current-turn-info">
+                                <div className="current-consultorio">
                                   <i className="mdi mdi-hospital-building"></i>
-                                  {t('home:monitor.office')} {areaData.nextForArea.i_numero_consultorio || areaData.nextForArea.consultorio}
+                                  {t('home:monitor.office')} {areaData.currentTurn.i_numero_consultorio || areaData.currentTurn.consultorio}
                                 </div>
-                                <div className="status-small" style={{ 
-                                  background: (areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' 
-                                    ? '#FF6B35' : areaData.areaColor
-                                }}>
-                                  {(areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' ? 
-                                    t('common:turnStatus.llamando').toUpperCase() : t('common:turnStatus.enEspera').toUpperCase()
-                                  }
+                                <div className={`current-status ${(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? 'calling' : 'waiting'}`}>
+                                  {(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? (
+                                    <><i className="mdi mdi-bell-ring"></i> LLAMANDO</>
+                                  ) : (
+                                    <><i className="mdi mdi-clock-outline"></i> EN ESPERA</>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -385,9 +392,11 @@ const HomePage = () => {
                         </div>
                         
                         <div className="area-card-footer">
-                          <span className="turns-count" style={{ color: areaData.areaColor }}>
-                            {areaData.turnsArea.length} {t('home:monitor.activeTurns')}
-                          </span>
+                          <div className="waiting-count">
+                            <i className="mdi mdi-account-multiple"></i>
+                            <span className="count-number">{areaData.waitingCount}</span>
+                            <span>{areaData.waitingCount === 1 ? 'turno en espera' : 'turnos en espera'}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -438,18 +447,7 @@ const HomePage = () => {
                         <p className="area-subtitle">{t('home:monitor.realTime')}</p>
                       </div>
                     </div>
-                    <div className="monitor-status">
-                      <div className="live-indicator">
-                        <div className="pulse-dot"></div>
-                        <span>{t('home:monitor.live')}</span>
-                      </div>
-                      <div className="area-badge-large" style={{ 
-                        background: areaColor,
-                        color: 'white'
-                      }}>
-                        {areaLetter}
-                      </div>
-                    </div>
+                    
                   </div>
                   
                   <div className="monitor-content">
@@ -465,6 +463,7 @@ const HomePage = () => {
                       <div className="monitor-current-turn">
                         <div className="current-turn-header">
                           <h2>{t('home:monitor.nextTurn')}</h2>
+                          <h2>TURNO ACTUAL</h2>
                         </div>
                         <div className="turn-display-container">
                           <div className="turn-display-large" style={{ 
@@ -489,6 +488,8 @@ const HomePage = () => {
                               {(nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' ? 
                                 <><i className="mdi mdi-bell-ring"></i> {t('home:turnDisplay.callingNow')}</> : 
                                 <><i className="mdi mdi-clock"></i> {t('home:turnDisplay.waiting')}</>
+                                <><i className="mdi mdi-bell-ring"></i> LLAMANDO AHORA</> : 
+                                <>PRÓXIMOS TURNOS <i className="mdi mdi-arrow-right-bold"></i></>
                               }
                             </div>
                           </div>
@@ -509,7 +510,7 @@ const HomePage = () => {
                       background: areaColor + '20',
                       color: areaColor 
                     }}>
-                      {turnsArea.length} {t('home:monitor.waiting')}
+                      {nextForArea ? turnsArea.length - 1 : turnsArea.length} {t('home:monitor.waiting')}
                     </div>
                   </div>
                   <div className="sidebar-content">
@@ -520,8 +521,12 @@ const HomePage = () => {
                       </div>
                     ) : (
                       <div className="turns-queue">
-                        {turnsArea.sort(sortByNum).map((t, idx) => {
-                          const isNext = nextForArea && (nextForArea.i_numero_turno || nextForArea.id) === (t.i_numero_turno || t.id);
+                        {turnsArea.sort(sortByNum).filter((t) => {
+                          // Excluir el turno actual (nextForArea) de la cola
+                          const isCurrentTurn = nextForArea && (nextForArea.i_numero_turno || nextForArea.id) === (t.i_numero_turno || t.id);
+                          return !isCurrentTurn;
+                        }).map((t, idx) => {
+                          const isNext = false; // Ya no hay "next" en la cola
                           const isCalling = (t.s_estado || t.estado) === 'LLAMANDO';
                           
                           return (
@@ -1492,6 +1497,450 @@ const HomePage = () => {
         .turns-list { list-style: none; padding: 0; margin: 0; width: 100%; }
         .turn-item { padding: 10px 12px; border-bottom: 1px dashed #e2e8f0; font-weight: 700; color: #2d3748; }
         .panel-empty { color: #718096; }
+
+        /* Vista general de áreas */
+        .general-monitor-layout {
+          width: 100%;
+          max-width: 1600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+
+        .general-empty-state {
+          text-align: center;
+          padding: 60px 20px;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state-content {
+          max-width: 500px;
+          margin: 0 auto;
+        }
+
+        .empty-state-icon {
+          font-size: 80px;
+          color: #4A90E2;
+          margin-bottom: 20px;
+          opacity: 0.6;
+        }
+
+        .empty-state-actions {
+          margin-top: 30px;
+        }
+
+        .refresh-button {
+          background: linear-gradient(135deg, #4A90E2, #2f97d1);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .refresh-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Grid de tarjetas de áreas - Optimizado para Full HD 1920x1080 */
+        .areas-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          padding: 24px;
+          max-width: 1840px;
+          margin: 0 auto;
+        }
+
+        .area-card {
+          background: white;
+          border-radius: 20px;
+          padding: 26px;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+          border: none;
+          transition: all 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          min-height: 300px;
+          max-height: 300px;
+          position: relative;
+          overflow: visible;
+        }
+
+        .area-card::before {
+          display: none !important;
+        }
+
+        .area-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .area-card-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 18px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          position: relative;
+          z-index: 1;
+        }
+
+        .area-card-icon {
+          width: 56px;
+          height: 56px;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          color: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          flex-shrink: 0;
+        }
+
+        .area-card-title {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .area-card-title h3 {
+          font-size: 21px;
+          font-weight: 800;
+          color: #2d3748;
+          margin: 0;
+          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .area-card-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 4px 0;
+          position: relative;
+          z-index: 1;
+        }
+
+        .area-empty-state {
+          text-align: center;
+          padding: 25px 15px;
+          color: #718096;
+        }
+
+        .area-empty-state i {
+          font-size: 40px;
+          margin-bottom: 10px;
+          opacity: 0.5;
+        }
+
+        .area-empty-state p {
+          font-size: 15px;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        /* Turno actual - Un solo turno destacado */
+        .area-current-turn {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          padding: 20px 22px;
+          background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+          border-radius: 16px;
+          border: none;
+          margin-bottom: 16px;
+          position: relative;
+          overflow: visible;
+          min-height: 110px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .area-current-turn.calling {
+          background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+          animation: calling-pulse-card 2s infinite;
+        }
+
+        .area-current-turn::before {
+          content: 'TURNO ACTUAL';
+          position: absolute;
+          top: -10px;
+          left: 22px;
+          background: transparent;
+          color: var(--area-color, #4A90E2);
+          padding: 0;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 1.2px;
+          border-radius: 0;
+          box-shadow: none;
+          z-index: 10;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .area-current-turn.calling::before {
+          color: #FF6B35;
+          content: 'LLAMANDO';
+          animation: pulse-text 1.5s infinite;
+        }
+
+        @keyframes pulse-text {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+        }
+
+        .current-turn-badge {
+          min-width: 80px;
+          height: 80px;
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          background: var(--area-color, #4A90E2);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+          flex-shrink: 0;
+          position: relative;
+        }
+
+        .area-current-turn.calling .current-turn-badge {
+          background: #FF6B35;
+        }
+
+        .current-turn-id {
+          font-size: 32px;
+          font-weight: 900;
+          letter-spacing: -1px;
+          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .current-turn-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          padding-top: 4px;
+          min-width: 0;
+        }
+
+        .current-consultorio {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 17px;
+          font-weight: 700;
+          color: #2d3748;
+          white-space: nowrap;
+        }
+
+        .current-consultorio i {
+          font-size: 20px;
+          color: var(--area-color, #4A90E2);
+          flex-shrink: 0;
+        }
+
+        .area-current-turn.calling .current-consultorio i {
+          color: #FF6B35;
+        }
+
+        .current-status {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          font-size: 13px;
+          font-weight: 700;
+          padding: 7px 15px;
+          border-radius: 12px;
+          width: fit-content;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(10px);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .current-status.calling {
+          color: #FF6B35;
+          background: rgba(255, 107, 53, 0.1);
+        }
+
+        .current-status.waiting {
+          color: var(--area-color, #4A90E2);
+          background: rgba(74, 144, 226, 0.1);
+        }
+
+        .current-status i {
+          font-size: 14px;
+        }
+
+        .area-card-footer {
+          margin-top: auto;
+          padding-top: 16px;
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .waiting-count {
+          font-size: 15px;
+          font-weight: 800;
+          color: var(--area-color, #4A90E2);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 20px;
+          background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(74, 144, 226, 0.05));
+          border-radius: 14px;
+          border: none;
+          white-space: nowrap;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        .waiting-count i {
+          font-size: 18px;
+        }
+
+        .count-number {
+          font-size: 22px;
+          font-weight: 900;
+        }
+
+        @keyframes calling-pulse-card {
+          0%, 100% {
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+          }
+          50% {
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.35);
+          }
+        }
+
+        /* Responsive para tarjetas optimizadas Full HD */
+        @media (min-width: 1600px) {
+          .areas-grid {
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1860px;
+          }
+        }
+
+        @media (max-width: 1400px) {
+          .areas-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+          }
+
+          .area-card {
+            min-height: 270px;
+            max-height: 270px;
+          }
+        }
+
+        @media (max-width: 1200px) {
+          .areas-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+          }
+
+          .area-card {
+            min-height: 300px;
+            max-height: 300px;
+            padding: 24px;
+          }
+
+          .area-card-icon {
+            width: 52px;
+            height: 52px;
+            font-size: 26px;
+          }
+
+          .area-card-title h3 {
+            font-size: 20px;
+          }
+
+          .current-turn-badge {
+            min-width: 80px;
+            height: 80px;
+          }
+
+          .current-turn-id {
+            font-size: 30px;
+          }
+
+          .current-consultorio {
+            font-size: 17px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .areas-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+            padding: 16px;
+          }
+
+          .area-card {
+            padding: 20px;
+            min-height: 280px;
+            max-height: none;
+          }
+
+          .area-card-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 24px;
+          }
+
+          .area-card-title h3 {
+            font-size: 18px;
+          }
+
+          .area-current-turn {
+            flex-direction: column;
+            padding: 16px;
+            gap: 12px;
+          }
+
+          .current-turn-badge {
+            min-width: 70px;
+            height: 70px;
+          }
+
+          .current-turn-id {
+            font-size: 26px;
+          }
+
+          .current-turn-info {
+            width: 100%;
+            align-items: center;
+            text-align: center;
+            padding-top: 8px;
+          }
+
+          .current-consultorio {
+            font-size: 16px;
+          }
+
+          .waiting-count {
+            font-size: 14px;
+          }
+
+          .count-number {
+            font-size: 18px;
+          }
+        }
         `}</style>
       </div>
   );

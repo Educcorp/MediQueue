@@ -52,75 +52,30 @@ const ColorSelector = ({ value, onChange, disabled = false, label = "Seleccionar
   return (
     <div className={`color-selector-container ${disabled ? 'disabled' : ''}`}>
       <label className="color-selector-label">{label}</label>
-      
-      {/* Botón principal con preview del color */}
+
+      {/* Input de color directo sin dropdown */}
       <div className="color-selector-button-wrapper">
-        <button
-          type="button"
-          className={`color-selector-button ${isOpen ? 'open' : ''}`}
-          onClick={toggleDropdown}
-          disabled={disabled}
-        >
-          <div 
+        <div className="color-input-display">
+          <div
             className="color-preview"
             style={{ backgroundColor: value || '#f0f0f0' }}
           />
           <span className="color-name">
             {value ? getCurrentColorName() : 'Sin seleccionar'}
           </span>
-          <span className="color-value">{value}</span>
-          <svg 
-            className={`dropdown-arrow ${isOpen ? 'rotated' : ''}`}
-            width="12" 
-            height="12" 
-            viewBox="0 0 12 12"
-          >
-            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" fill="none" />
-          </svg>
-        </button>
+          {value && <span className="color-value">{value}</span>}
+        </div>
 
-        {/* Input de color personalizado pequeño */}
+        {/* Input de color personalizado */}
         <input
           type="color"
           value={value || '#ffffff'}
           onChange={handleCustomColorChange}
           disabled={disabled}
-          className="custom-color-input"
-          title="Seleccionar color personalizado"
+          className="custom-color-input-main"
+          title="Seleccionar color"
         />
       </div>
-
-      {/* Dropdown con colores predefinidos */}
-      {isOpen && (
-        <div className="color-dropdown">
-          <div className="color-grid">
-            {predefinedColors.map((color, index) => (
-              <button
-                key={index}
-                type="button"
-                className={`color-option ${value === color.value ? 'selected' : ''}`}
-                style={{ backgroundColor: color.value }}
-                onClick={() => handleColorSelect(color.value)}
-                title={color.name}
-              />
-            ))}
-          </div>
-          
-          {/* Opción de limpiar selección */}
-          <div className="color-actions">
-            <button
-              type="button"
-              className="clear-color-button"
-              onClick={() => handleColorSelect('')}
-            >
-              Limpiar selección
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Overlay para cerrar dropdown */}
-      {isOpen && <div className="color-dropdown-overlay" onClick={() => setIsOpen(false)} />}
     </div>
   );
 };

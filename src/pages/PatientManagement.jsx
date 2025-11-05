@@ -76,6 +76,22 @@ const PatientManagement = () => {
     d_fecha_nacimiento: ''
   });
 
+  // Estados para modales de notificación
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalData, setErrorModalData] = useState({ message: '', details: '' });
+  
+  // Estados para modal de éxito
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successModalData, setSuccessModalData] = useState({ 
+    message: '', 
+    patientData: null, 
+    isUpdate: false 
+  });
+
+  // Estados para modal de confirmación de eliminación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState(null);
+
   useEffect(() => {
     // Mostrar spinner brevemente para mejor UX
     setLoading(true);
@@ -125,29 +141,82 @@ const PatientManagement = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (patient) => {
-    if (window.confirm(`¿Estás seguro de eliminar al paciente "${patient.s_nombre} ${patient.s_apellido}"?`)) {
-      try {
-        await patientService.deletePatient(patient.uk_paciente);
-        await loadPatients();
-        alert(t('admin:patients.messages.deleteSuccess'));
-      } catch (error) {
-        alert(t('common:messages.error') + ': ' + error.message);
-        console.error('Error eliminando paciente:', error);
-      }
+  const handleDelete = (patient) => {
+    setPatientToDelete(patient);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!patientToDelete) return;
+
+    try {
+      await patientService.deletePatient(patientToDelete.uk_paciente);
+      await loadPatients();
+      setShowDeleteModal(false);
+      
+      // Mostrar modal de éxito
+      setSuccessModalData({
+        message: 'Paciente eliminado correctamente',
+        patientData: {
+          nombre: patientToDelete.s_nombre,
+          apellido: patientToDelete.s_apellido,
+          telefono: patientToDelete.c_telefono,
+          email: patientToDelete.s_email || null,
+          fechaNacimiento: patientToDelete.d_fecha_nacimiento || null
+        },
+        isUpdate: false
+      });
+      setShowSuccessModal(true);
+      setPatientToDelete(null);
+      
+      // Auto-cerrar el modal después de 3 segundos
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 3000);
+    } catch (error) {
+      setShowDeleteModal(false);
+      setPatientToDelete(null);
+      
+      setErrorModalData({
+        message: 'No es posible eliminar el paciente',
+        details: ''
+      });
+      setShowErrorModal(true);
+      
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 4000);
+      
+      console.error('Error eliminando paciente:', error);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setPatientToDelete(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.s_nombre || !formData.s_apellido || !formData.c_telefono) {
-      alert(t('admin:patients.messages.validationError'));
+      setErrorModalData({
+        message: 'Por favor complete todos los campos requeridos',
+        details: ''
+      });
+      setShowErrorModal(true);
+      
+      // Auto-cerrar después de 4 segundos
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 4000);
       return;
     }
 
     try {
-      if (editingPatient) {
+      const isUpdate = !!editingPatient;
+      
+      if (isUpdate) {
         await patientService.updatePatient(editingPatient.uk_paciente, {
           s_nombre: formData.s_nombre.trim(),
           s_apellido: formData.s_apellido.trim(),
@@ -155,7 +224,6 @@ const PatientManagement = () => {
           s_email: formData.s_email.trim() || null,
           d_fecha_nacimiento: formData.d_fecha_nacimiento || null
         });
-        alert('Paciente actualizado correctamente');
       } else {
         await patientService.createPatient({
           s_nombre: formData.s_nombre.trim(),
@@ -164,11 +232,26 @@ const PatientManagement = () => {
           s_email: formData.s_email.trim() || null,
           d_fecha_nacimiento: formData.d_fecha_nacimiento || null
         });
-        alert('Paciente creado correctamente');
       }
 
       await loadPatients();
       setShowModal(false);
+      
+      // Mostrar modal de éxito
+      setSuccessModalData({
+        message: isUpdate ? 'Paciente actualizado correctamente' : 'Paciente creado correctamente',
+        patientData: {
+          nombre: formData.s_nombre.trim(),
+          apellido: formData.s_apellido.trim(),
+          telefono: formData.c_telefono.trim(),
+          email: formData.s_email.trim() || null,
+          fechaNacimiento: formData.d_fecha_nacimiento || null
+        },
+        isUpdate
+      });
+      setShowSuccessModal(true);
+      
+      // Limpiar formulario
       setFormData({
         s_nombre: '',
         s_apellido: '',
@@ -176,10 +259,40 @@ const PatientManagement = () => {
         s_email: '',
         d_fecha_nacimiento: ''
       });
+      
+      // Auto-cerrar el modal después de 3 segundos
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 3000);
     } catch (error) {
-      alert('Error guardando paciente: ' + error.message);
       console.error('Error guardando paciente:', error);
+      
+      // Mensaje simple y amigable
+      const errorMessage = editingPatient 
+        ? 'No es posible actualizar el paciente' 
+        : 'No es posible crear el paciente';
+
+      setErrorModalData({
+        message: errorMessage,
+        details: ''
+      });
+      setShowErrorModal(true);
+
+      // Auto-cerrar después de 4 segundos
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 4000);
     }
+  };
+
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
+    setErrorModalData({ message: '', details: '' });
+  };
+
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessModalData({ message: '', patientData: null, isUpdate: false });
   };
 
   const handleInputChange = (e) => {
@@ -661,6 +774,480 @@ const PatientManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para eliminar paciente */}
+      {showDeleteModal && patientToDelete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            {/* Header del modal */}
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: isDarkMode ? 'rgba(234, 93, 75, 0.1)' : 'rgba(234, 93, 75, 0.05)'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(234, 93, 75, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ea5d4b',
+                fontSize: '20px'
+              }}>
+                <FaExclamationTriangle />
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                Confirmar Eliminación
+              </h3>
+            </div>
+
+            {/* Contenido del modal */}
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
+                fontSize: '16px',
+                lineHeight: '1.5'
+              }}>
+                ¿Estás seguro de eliminar al paciente <strong>{patientToDelete.s_nombre} {patientToDelete.s_apellido}</strong>?
+              </p>
+              
+              {/* Información del paciente */}
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.2)' : 'rgba(119, 184, 206, 0.3)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Paciente:</strong> {patientToDelete.s_nombre} {patientToDelete.s_apellido}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: patientToDelete.s_email ? '8px' : '0' }}>
+                  <FaPhone style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Teléfono:</strong> {patientToDelete.c_telefono}
+                  </span>
+                </div>
+                {patientToDelete.s_email && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaEnvelope style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                      <strong>Email:</strong> {patientToDelete.s_email}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <p style={{ 
+                margin: '0',
+                color: 'var(--text-muted)',
+                fontSize: '14px',
+                fontStyle: 'italic'
+              }}>
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+
+            {/* Botones de acción */}
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              gap: '12px', 
+              justifyContent: 'flex-end'
+            }}>
+              <button 
+                type="button" 
+                onClick={cancelDelete} 
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmDelete}
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: '#ea5d4b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(234, 93, 75, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#d94435';
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(234, 93, 75, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ea5d4b';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 8px rgba(234, 93, 75, 0.3)';
+                }}
+              >
+                Sí, eliminar paciente
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de notificación de éxito */}
+      {showSuccessModal && successModalData.patientData && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '420px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            {/* Contenido del modal */}
+            <div style={{ padding: '32px 24px' }}>
+              {/* Icono de éxito grande */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(40, 167, 69, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaCheck style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              {/* Título */}
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                ¡Éxito!
+              </h3>
+
+              {/* Mensaje principal */}
+              <p style={{ 
+                margin: '0 0 20px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '15px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                {successModalData.message}
+              </p>
+              
+              {/* Información del paciente */}
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
+                padding: '16px',
+                borderRadius: '12px',
+                marginBottom: '24px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.25)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FaUser style={{ color: '#77b8ce', fontSize: '14px' }} />
+                  </div>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                    {successModalData.patientData.nombre} {successModalData.patientData.apellido}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: successModalData.patientData.email ? '10px' : '0' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FaPhone style={{ color: '#77b8ce', fontSize: '14px' }} />
+                  </div>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                    {successModalData.patientData.telefono}
+                  </span>
+                </div>
+                {successModalData.patientData.email && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FaEnvelope style={{ color: '#77b8ce', fontSize: '14px' }} />
+                    </div>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                      {successModalData.patientData.email}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Barra de progreso de auto-cierre */}
+            <div style={{
+              height: '4px',
+              background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+              borderRadius: '0 0 var(--border-radius) var(--border-radius)',
+              overflow: 'hidden',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                animation: 'autoCloseProgress 3s linear forwards'
+              }} />
+            </div>
+
+            {/* Botón de acción */}
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeSuccessModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(40, 167, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
+                }}
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de notificación de error */}
+      {showErrorModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            {/* Contenido del modal */}
+            <div style={{ padding: '32px 24px' }}>
+              {/* Icono de error grande */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(220, 53, 69, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaExclamationTriangle style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              {/* Título */}
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                Error
+              </h3>
+
+              {/* Mensaje principal */}
+              <p style={{ 
+                margin: '0 0 24px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '16px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                {errorModalData.message}
+              </p>
+            </div>
+
+            {/* Barra de progreso de auto-cierre */}
+            <div style={{
+              height: '4px',
+              background: isDarkMode ? 'rgba(220, 53, 69, 0.1)' : 'rgba(220, 53, 69, 0.15)',
+              borderRadius: '0 0 var(--border-radius) var(--border-radius)',
+              overflow: 'hidden',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                animation: 'autoCloseProgress 4s linear forwards'
+              }} />
+            </div>
+
+            {/* Botón de acción */}
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeErrorModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(220, 53, 69, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(220, 53, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+                }}
+              >
+                Aceptar
+              </button>
+            </div>
           </div>
         </div>
       )}

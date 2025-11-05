@@ -129,6 +129,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -153,6 +154,7 @@
     opacity: 0;
     transform: translateY(-30px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -474,26 +476,186 @@
   background: var(--text-secondary, #6c757d);
 }
 
-/* Dark mode */
+/* Dark mode - Complete styles */
+[data-theme="dark"] .icon-selector-label {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .icon-selector-button {
+  background: var(--bg-white);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .icon-selector-button:hover:not(:disabled) {
+  border-color: var(--primary-medical);
+  box-shadow: 0 2px 8px rgba(47, 151, 209, 0.3);
+}
+
+[data-theme="dark"] .icon-selector-button.open {
+  border-color: var(--primary-medical);
+  box-shadow: 0 2px 8px rgba(47, 151, 209, 0.3);
+}
+
+[data-theme="dark"] .icon-preview {
+  background: rgba(47, 151, 209, 0.15);
+  color: var(--primary-medical);
+}
+
+[data-theme="dark"] .icon-name {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .icon-code {
+  background: rgba(47, 151, 209, 0.1);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .dropdown-arrow {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .icon-popup-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
 [data-theme="dark"] .icon-popup-modal {
-  background: var(--card-background-dark, #1a1a1a);
-  border-color: var(--border-dark, #333);
+  background: var(--bg-white);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .icon-popup-header h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .icon-popup-close {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .icon-popup-close:hover {
+  background: rgba(47, 151, 209, 0.1);
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .search-input {
-  background: var(--bg-dark, #2a2a2a);
-  border-color: var(--border-dark, #333);
-  color: var(--text-primary-dark, #ffffff);
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .search-input:focus {
+  border-color: var(--primary-medical);
+  background: var(--bg-white);
+  box-shadow: 0 0 0 3px rgba(47, 151, 209, 0.2);
+}
+
+[data-theme="dark"] .search-icon {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .clear-search {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .clear-search:hover {
+  background: rgba(47, 151, 209, 0.1);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .category-title {
+  color: var(--primary-medical);
+  border-bottom-color: var(--primary-medical);
 }
 
 [data-theme="dark"] .icon-option {
-  background: var(--bg-dark, #2a2a2a);
-  color: var(--text-primary-dark, #ffffff);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .icon-option:hover {
+  background: var(--bg-white);
+  border-color: var(--primary-medical);
+  box-shadow: 0 4px 16px rgba(47, 151, 209, 0.3);
+}
+
+[data-theme="dark"] .icon-option.selected {
+  background: var(--primary-medical);
+  border-color: var(--primary-medical);
+  color: white;
+  box-shadow: 0 4px 16px rgba(47, 151, 209, 0.4);
+}
+
+[data-theme="dark"] .icon-wrapper {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary-medical);
+}
+
+[data-theme="dark"] .icon-option.selected .icon-wrapper {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+[data-theme="dark"] .icon-label {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .icon-option.selected .icon-label {
+  color: white;
+}
+
+[data-theme="dark"] .no-icons-found {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .no-icons-found h4 {
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .icon-popup-footer {
-  background: var(--bg-dark, #2a2a2a);
-  border-color: var(--border-dark, #333);
+  background: var(--bg-card);
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .clear-selection-btn {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .clear-selection-btn:hover {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+[data-theme="dark"] .cancel-btn {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .cancel-btn:hover {
+  background: rgba(47, 151, 209, 0.1);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .confirm-btn {
+  background: var(--primary-medical);
+}
+
+[data-theme="dark"] .confirm-btn:hover {
+  background: #1e7ba8;
+  box-shadow: 0 4px 12px rgba(47, 151, 209, 0.4);
+}
+
+[data-theme="dark"] .icon-popup-content::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .icon-popup-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
+[data-theme="dark"] .icon-popup-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
 /* Responsive */
@@ -502,12 +664,12 @@
     max-width: 95%;
     max-height: 85vh;
   }
-  
+
   .icon-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
   }
-  
+
   .icon-popup-header h3 {
     font-size: 18px;
   }
@@ -517,14 +679,14 @@
   .icon-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
-  
+
   .icon-popup-header,
   .icon-popup-search,
   .icon-popup-footer {
     padding-left: 16px;
     padding-right: 16px;
   }
-  
+
   .icon-popup-content {
     padding: 0 16px;
   }
