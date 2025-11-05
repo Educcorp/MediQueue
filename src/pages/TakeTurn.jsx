@@ -262,7 +262,30 @@ const TakeTurn = () => {
 
     } catch (error) {
       console.error('Error generando turno:', error);
-      setError(error.response?.data?.message || t('takeTurn:errors.generatingError'));
+      
+      // Manejar específicamente el error de cooldown (429)
+      if (error.response?.status === 429) {
+        const errorData = error.response?.data;
+        const timeRemaining = errorData?.data?.timeRemaining;
+        
+        // Mensaje personalizado para cooldown
+        let cooldownMessage = error.response?.data?.message || 
+          'Por favor espera antes de solicitar otro turno';
+        
+        if (timeRemaining) {
+          const minutes = Math.floor(timeRemaining / 60);
+          const seconds = timeRemaining % 60;
+          if (minutes > 0) {
+            cooldownMessage = `⏳ Debes esperar ${minutes} minuto${minutes > 1 ? 's' : ''} y ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
+          } else {
+            cooldownMessage = `⏳ Debes esperar ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
+          }
+        }
+        
+        setError(cooldownMessage);
+      } else {
+        setError(error.response?.data?.message || t('takeTurn:errors.generatingError'));
+      }
     } finally {
       setLoading(false);
     }
