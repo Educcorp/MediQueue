@@ -480,8 +480,8 @@ const TakeTurn = () => {
             ) : (
               <>
                 <div className="areas-instruction">
-                  <h2>{t('takeTurn:areas.selectArea')}</h2>
-                  <p>{t('takeTurn:areas.tapToSelect')}</p>
+                  <h2>{t('takeTurn:')}</h2>
+                  <p>{t('takeTurn:')}</p>
                 </div>
                 
                 <div className="areas-grid-touch">
