@@ -92,7 +92,7 @@ const getAreaIcon = (areaName) => {
     'Psicologia': MdPsychology, // Sin tilde
     'Radiologia': FaCamera    // Sin tilde
   };
-  
+
   return iconMap[areaName] || FaHospital;
 };
 
@@ -106,7 +106,7 @@ const getStatusIcon = (status) => {
     'NO_PRESENTE': FaUserTimes,
     'todos': FaList
   };
-  
+
   return statusIconMap[status] || FaList;
 };
 
@@ -114,13 +114,13 @@ const getStatusIcon = (status) => {
 const getStatusColor = (status) => {
   const statusColorMap = {
     'EN_ESPERA': '#ffc107',
-    'EN_ATENCION': '#17a2b8', 
+    'EN_ATENCION': '#17a2b8',
     'ATENDIDO': '#28a745',
     'CANCELADO': '#dc3545',
     'NO_PRESENTE': '#fd7e14',
     'todos': '#6c757d'
   };
-  
+
   return statusColorMap[status] || '#6c757d';
 };
 
@@ -159,7 +159,7 @@ const getAreaClass = (areaName) => {
     'Psicologia': 'psicologia',
     'Radiologia': 'radiologia'
   };
-  
+
   return classMap[areaName] || '';
 };
 
@@ -234,14 +234,14 @@ const TurnManager = () => {
   const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  
+
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
   const turnsPerPage = 5;
-  
+
   const statusButtonRef = useRef(null);
   const areaButtonRef = useRef(null);
-  
+
   const [formData, setFormData] = useState({
     uk_consultorio: '',
     uk_paciente: '',
@@ -298,10 +298,10 @@ const TurnManager = () => {
     // Establecer timeout para la primera actualización a medianoche
     const midnightTimeout = setTimeout(() => {
       updateDateIfNeeded();
-      
+
       // Después de la primera actualización, establecer intervalo cada 24 horas
       const dailyInterval = setInterval(updateDateIfNeeded, 24 * 60 * 60 * 1000);
-      
+
       // Cleanup del intervalo
       return () => clearInterval(dailyInterval);
     }, timeUntilMidnight);
@@ -321,20 +321,20 @@ const TurnManager = () => {
     const handleScroll = (e) => {
       // Verificar si el target y los métodos existen antes de usarlos
       if (!e.target) return;
-      
+
       // No cerrar si el scroll es dentro del dropdown
       try {
-        if ((e.target.classList && e.target.classList.contains('status-dropdown-menu')) || 
-            (e.target.classList && e.target.classList.contains('area-dropdown-menu')) ||
-            (e.target.closest && e.target.closest('.status-dropdown-menu')) ||
-            (e.target.closest && e.target.closest('.area-dropdown-menu'))) {
+        if ((e.target.classList && e.target.classList.contains('status-dropdown-menu')) ||
+          (e.target.classList && e.target.classList.contains('area-dropdown-menu')) ||
+          (e.target.closest && e.target.closest('.status-dropdown-menu')) ||
+          (e.target.closest && e.target.closest('.area-dropdown-menu'))) {
           return;
         }
       } catch (error) {
         // Si hay error en la detección, simplemente continuar
         console.warn('Error in scroll detection:', error);
       }
-      
+
       // Cerrar dropdowns solo si es scroll externo
       if (statusDropdownOpen || areaDropdownOpen) {
         setStatusDropdownOpen(false);
@@ -352,7 +352,7 @@ const TurnManager = () => {
     if (statusDropdownOpen || areaDropdownOpen) {
       document.addEventListener('scroll', handleScroll, true);
       window.addEventListener('resize', handleResize);
-      
+
       return () => {
         document.removeEventListener('scroll', handleScroll, true);
         window.removeEventListener('resize', handleResize);
@@ -412,7 +412,7 @@ const TurnManager = () => {
 
       console.log('Using getTurnsByDateRange with filters:', filters);
       turnsData = await turnService.getTurnsByDateRange(selectedStartDate, selectedEndDate, filters);
-      
+
       console.log('Received turnsData:', turnsData);
       console.log('Number of turns:', turnsData?.length || 0);
 
@@ -475,7 +475,7 @@ const TurnManager = () => {
       setAttendedTurn(turn);
       setShowSuccessModal(true);
       setError(null);
-      
+
       // Auto-cerrar el modal después de 3 segundos
       setTimeout(() => {
         setShowSuccessModal(false);
@@ -580,12 +580,12 @@ const TurnManager = () => {
   const getStatusColor = (status) => {
     const statusColorMap = {
       'EN_ESPERA': 'status-en-espera',
-      'EN_ATENCION': 'status-en-atencion', 
+      'EN_ATENCION': 'status-en-atencion',
       'ATENDIDO': 'status-atendido',
       'CANCELADO': 'status-cancelado',
       'NO_PRESENTE': 'status-no-presente'
     };
-    
+
     return statusColorMap[status] || 'status-default';
   };
 
@@ -639,10 +639,10 @@ const TurnManager = () => {
         displayName: t('admin:turns.filters.allOffices')
       };
     }
-    
+
     const combined = getCombinedAreaConsultorioList();
     const selected = combined.find(item => item.id === selectedArea);
-    
+
     if (selected) {
       return {
         icon: selected.icon,
@@ -650,7 +650,7 @@ const TurnManager = () => {
         displayName: selected.displayName
       };
     }
-    
+
     // Fallback
     return {
       icon: FaHospital,
@@ -703,8 +703,8 @@ const TurnManager = () => {
             </p>
           </div>
           <div className="page-actions">
-            <button 
-              className="btn btn-secondary" 
+            <button
+              className="btn btn-secondary"
               onClick={() => navigate('/admin/historial')}
               title="Ver Historial de Turnos"
             >
@@ -782,8 +782,8 @@ const TurnManager = () => {
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
-              <span style={{ 
-                color: 'var(--text-muted)', 
+              <span style={{
+                color: 'var(--text-muted)',
                 fontSize: '13px',
                 fontWeight: '500',
                 whiteSpace: 'nowrap',
@@ -818,7 +818,7 @@ const TurnManager = () => {
           <div className="filter-group">
             <label>Estado</label>
             <div className="custom-status-select">
-              <div 
+              <div
                 ref={statusButtonRef}
                 className="status-select-trigger"
                 onClick={() => {
@@ -841,18 +841,18 @@ const TurnManager = () => {
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
-                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none" />
                   </svg>
                 </div>
               </div>
-              
+
               {statusDropdownOpen && createPortal(
                 <>
-                  <div 
+                  <div
                     className="status-dropdown-overlay"
                     onClick={() => setStatusDropdownOpen(false)}
                   />
-                  <div 
+                  <div
                     className="status-dropdown-menu"
                     style={{
                       position: 'absolute',
@@ -862,7 +862,7 @@ const TurnManager = () => {
                       zIndex: 999999999
                     }}
                   >
-                    <div 
+                    <div
                       className="status-option"
                       onClick={() => {
                         setSelectedStatus('todos');
@@ -898,7 +898,7 @@ const TurnManager = () => {
           <div className="filter-group">
             <label>{t('admin:turns.filters.areaAndOffice')}</label>
             <div className="custom-area-select">
-              <div 
+              <div
                 ref={areaButtonRef}
                 className="area-select-trigger"
                 onClick={() => {
@@ -915,7 +915,7 @@ const TurnManager = () => {
                 }}
               >
                 <div className="area-selected">
-                  <div 
+                  <div
                     className={`area-icon ${getSelectedItemInfo().className}`}
                     style={{
                       background: 'none',
@@ -932,18 +932,18 @@ const TurnManager = () => {
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
-                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none" />
                   </svg>
                 </div>
               </div>
-              
+
               {areaDropdownOpen && createPortal(
                 <>
-                  <div 
+                  <div
                     className="area-dropdown-overlay"
                     onClick={() => setAreaDropdownOpen(false)}
                   />
-                  <div 
+                  <div
                     className="area-dropdown-menu"
                     style={{
                       position: 'absolute',
@@ -953,16 +953,16 @@ const TurnManager = () => {
                       zIndex: 999999999
                     }}
                   >
-                    <div 
+                    <div
                       className="area-option"
                       onClick={() => {
                         setSelectedArea('todas');
                         setAreaDropdownOpen(false);
                       }}
                     >
-                      <div 
+                      <div
                         className="area-icon"
-                        style={{ 
+                        style={{
                           background: 'none',
                           backgroundColor: 'transparent',
                           border: 'none',
@@ -984,9 +984,9 @@ const TurnManager = () => {
                           setAreaDropdownOpen(false);
                         }}
                       >
-                        <div 
+                        <div
                           className={`area-icon ${item.className}`}
-                          style={{ 
+                          style={{
                             background: 'none',
                             backgroundColor: 'transparent',
                             border: 'none',
@@ -1067,9 +1067,9 @@ const TurnManager = () => {
                         </td>
                         <td>
                           <span className={`status-badge ${getStatusColor(turn.s_estado)}`}>
-                            {React.createElement(getStatusIcon(turn.s_estado), { 
+                            {React.createElement(getStatusIcon(turn.s_estado), {
                               className: 'status-icon-inline',
-                              size: 12 
+                              size: 12
                             })}
                             {getStatusLabel(turn.s_estado)}
                           </span>
@@ -1109,9 +1109,9 @@ const TurnManager = () => {
                         </td>
                       </tr>
                     ))}
-                    
+
                     {/* Filas vacías para mantener altura consistente en páginas 2+ */}
-                    {currentPage > 1 && currentTurns.length < turnsPerPage && 
+                    {currentPage > 1 && currentTurns.length < turnsPerPage &&
                       Array.from({ length: turnsPerPage - currentTurns.length }).map((_, index) => (
                         <tr key={`empty-${index}`} style={{ height: '57px', opacity: 0 }}>
                           <td>&nbsp;</td>
@@ -1129,7 +1129,7 @@ const TurnManager = () => {
                 </table>
               </div>
             )}
-            
+
             {/* Barra de paginación */}
             {turns.length > turnsPerPage && (
               <div className="pagination-bar">
@@ -1338,7 +1338,7 @@ const TurnManager = () => {
               </div>
 
               {/* Título */}
-              <h3 style={{ 
+              <h3 style={{
                 margin: '0 0 12px 0',
                 color: 'var(--text-primary)',
                 fontSize: '22px',
@@ -1349,7 +1349,7 @@ const TurnManager = () => {
               </h3>
 
               {/* Mensaje principal */}
-              <p style={{ 
+              <p style={{
                 margin: '0 0 20px 0',
                 color: 'var(--text-secondary)',
                 fontSize: '15px',
@@ -1358,7 +1358,7 @@ const TurnManager = () => {
               }}>
                 El turno <strong>#{attendedTurn.i_numero_turno}</strong> ha sido marcado como atendido correctamente
               </p>
-              
+
               {/* Información del turno */}
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
@@ -1434,13 +1434,13 @@ const TurnManager = () => {
             </div>
 
             {/* Botón de acción */}
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
+              display: 'flex',
               justifyContent: 'center'
             }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={closeSuccessModal}
                 style={{
                   padding: '12px 32px',
@@ -1520,8 +1520,8 @@ const TurnManager = () => {
               }}>
                 <FaExclamationTriangle />
               </div>
-              <h3 style={{ 
-                margin: 0, 
+              <h3 style={{
+                margin: 0,
                 color: 'var(--text-primary)',
                 fontSize: '18px',
                 fontWeight: '600'
@@ -1532,7 +1532,7 @@ const TurnManager = () => {
 
             {/* Contenido del modal */}
             <div style={{ padding: '24px' }}>
-              <p style={{ 
+              <p style={{
                 margin: '0 0 16px 0',
                 color: 'var(--text-primary)',
                 fontSize: '16px',
@@ -1540,7 +1540,7 @@ const TurnManager = () => {
               }}>
                 ¿Estás seguro de cancelar el turno <strong>#{turnToCancel.i_numero_turno}</strong>?
               </p>
-              
+
               {/* Información del turno */}
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
@@ -1569,7 +1569,7 @@ const TurnManager = () => {
                 </div>
               </div>
 
-              <p style={{ 
+              <p style={{
                 margin: '0',
                 color: 'var(--text-muted)',
                 fontSize: '14px',
@@ -1580,15 +1580,15 @@ const TurnManager = () => {
             </div>
 
             {/* Botones de acción */}
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
-              gap: '12px', 
+              display: 'flex',
+              gap: '12px',
               justifyContent: 'flex-end'
             }}>
-              <button 
-                type="button" 
-                onClick={cancelCancelTurn} 
+              <button
+                type="button"
+                onClick={cancelCancelTurn}
                 className="btn btn-secondary"
                 style={{
                   padding: '10px 24px',
@@ -1599,8 +1599,8 @@ const TurnManager = () => {
               >
                 No, mantener turno
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={confirmCancelTurn}
                 style={{
                   padding: '10px 24px',
