@@ -15,6 +15,7 @@
   
   "monitor": {
     "nextTurn": "NEXT APPOINTMENT",
+    "currentTurn": "CURRENT TURN",
     "turnQueue": "Appointment Queue",
     "realTime": "Real-time appointments",
     "live": "LIVE",
@@ -24,6 +25,7 @@
     "waiting": "waiting",
     "activeTurns": "active appointments",
     "noActiveTurns": "No active appointments",
+    "noActiveAppointments": "No active appointments",
     "allAreasEmpty": "All medical areas have no waiting appointments at this time",
     "oneTurnWaiting": "appointment waiting",
     "turnsWaiting": "appointments waiting"
@@ -31,8 +33,9 @@
   
   "turnDisplay": {
     "callingNow": "CALLING NOW",
-    "waiting": "WAITING",
     "calling": "Calling",
+    "callingLabel": "CALLING",
+    "waiting": "WAITING",
     "office": "Office"
   },
   

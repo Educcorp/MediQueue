@@ -217,8 +217,8 @@ const HomePage = () => {
                     value={selectedArea || ''}
                     onChange={(e) => setSelectedArea(e.target.value || null)}
                   >
-                    <option value="">Seleccionar área médica</option>
-                    <option value="general">General - Todas las áreas</option>
+                    <option value="">{t('home:areaSelector.selectPlaceholder')}</option>
+                    <option value="general">{t('home:areaSelector.generalView')}</option>
                     {areas.map((area) => (
                       <option
                         key={area.uk_area || area.id}
@@ -365,10 +365,14 @@ const HomePage = () => {
                             {!areaData.currentTurn ? (
                               <div className="area-empty-state">
                                 <i className="mdi mdi-check-circle" style={{ color: areaData.areaColor }}></i>
-                                <p>Sin turnos activos</p>
+                                <p>{t('home:monitor.noActiveAppointments')}</p>
                               </div>
                             ) : (
-                              <div className={`area-current-turn ${(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? 'calling' : ''}`}>
+                              <div 
+                                className={`area-current-turn ${(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? 'calling' : ''}`}
+                                data-label-current={t('home:monitor.currentTurn')}
+                                data-label-calling={t('home:turnDisplay.callingLabel')}
+                              >
                                 <div className="current-turn-badge">
                                   <span className="current-turn-id">
                                     {areaData.areaLetter}{areaData.currentTurn.i_numero_turno || areaData.currentTurn.id}
@@ -381,9 +385,9 @@ const HomePage = () => {
                                   </div>
                                   <div className={`current-status ${(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? 'calling' : 'waiting'}`}>
                                     {(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? (
-                                      <><i className="mdi mdi-bell-ring"></i> LLAMANDO</>
+                                      <><i className="mdi mdi-bell-ring"></i> {t('home:turnDisplay.callingLabel')}</>
                                     ) : (
-                                      <><i className="mdi mdi-clock-outline"></i> EN ESPERA</>
+                                      <><i className="mdi mdi-clock-outline"></i> {t('home:turnDisplay.waiting')}</>
                                     )}
                                   </div>
                                 </div>
@@ -395,7 +399,7 @@ const HomePage = () => {
                             <div className="waiting-count">
                               <i className="mdi mdi-account-multiple"></i>
                               <span className="count-number">{areaData.waitingCount}</span>
-                              <span>{areaData.waitingCount === 1 ? 'turno en espera' : 'turnos en espera'}</span>
+                              <span>{areaData.waitingCount === 1 ? t('home:monitor.oneTurnWaiting') : t('home:monitor.turnsWaiting')}</span>
                             </div>
                           </div>
                         </div>
@@ -462,7 +466,7 @@ const HomePage = () => {
                     ) : (
                       <div className="monitor-current-turn">
                         <div className="current-turn-header">
-                          <h2>TURNO ACTUAL</h2>
+                          <h2>{t('home:monitor.currentTurn')}</h2>
                         </div>
                         <div className="turn-display-container">
                           <div className="turn-display-large" style={{
@@ -485,8 +489,8 @@ const HomePage = () => {
                               color: 'white'
                             }}>
                               {(nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' ?
-                                <><i className="mdi mdi-bell-ring"></i> LLAMANDO AHORA</> :
-                                <>PRÓXIMOS TURNOS <i className="mdi mdi-arrow-right-bold"></i></>
+                                <><i className="mdi mdi-bell-ring"></i> {t('home:turnDisplay.callingNow')}</> :
+                                <>{t('home:monitor.nextTurn')} <i className="mdi mdi-arrow-right-bold"></i></>
                               }
                             </div>
                           </div>
@@ -1671,7 +1675,7 @@ const HomePage = () => {
         }
 
         .area-current-turn::before {
-          content: 'TURNO ACTUAL';
+          content: attr(data-label-current);
           position: absolute;
           top: -10px;
           left: 22px;
@@ -1689,7 +1693,7 @@ const HomePage = () => {
 
         .area-current-turn.calling::before {
           color: #FF6B35;
-          content: 'LLAMANDO';
+          content: attr(data-label-calling);
           animation: pulse-text 1.5s infinite;
         }
 

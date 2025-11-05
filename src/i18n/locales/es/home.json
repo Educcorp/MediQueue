@@ -15,6 +15,7 @@
   
   "monitor": {
     "nextTurn": "PRÓXIMO TURNO",
+    "currentTurn": "TURNO ACTUAL",
     "turnQueue": "Cola de Turnos",
     "realTime": "Turnos en tiempo real",
     "live": "EN VIVO",
@@ -24,6 +25,7 @@
     "waiting": "en espera",
     "activeTurns": "turnos activos",
     "noActiveTurns": "No hay turnos activos",
+    "noActiveAppointments": "Sin turnos activos",
     "allAreasEmpty": "Todas las áreas médicas están sin turnos en espera en este momento",
     "oneTurnWaiting": "turno en espera",
     "turnsWaiting": "turnos en espera"
@@ -31,8 +33,9 @@
   
   "turnDisplay": {
     "callingNow": "LLAMANDO AHORA",
-    "waiting": "EN ESPERA",
     "calling": "Llamando",
+    "callingLabel": "LLAMANDO",
+    "waiting": "EN ESPERA",
     "office": "Consultorio"
   },
   
