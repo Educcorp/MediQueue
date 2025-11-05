@@ -24,7 +24,9 @@
     "waiting": "waiting",
     "activeTurns": "active appointments",
     "noActiveTurns": "No active appointments",
-    "allAreasEmpty": "All medical areas have no waiting appointments at this time"
+    "allAreasEmpty": "All medical areas have no waiting appointments at this time",
+    "oneTurnWaiting": "appointment waiting",
+    "turnsWaiting": "appointments waiting"
   },
   
   "turnDisplay": {

@@ -33,7 +33,8 @@
     "login": "Login",
     "next": "Next",
     "previous": "Previous",
-    "retry": "Retry"
+    "retry": "Retry",
+    "actions": "Actions"
   },
   
   "messages": {
@@ -166,6 +167,7 @@
     "quickLinks": "Quick Links",
     "links": {
       "takeTurn": "Get Appointment",
+      "turnHistory": "Turn History",
       "about": "About Us",
       "privacy": "Privacy Policy"
     },

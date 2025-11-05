@@ -293,9 +293,12 @@
       "medicalNotesPlaceholder": "Notas adicionales"
     },
     "messages": {
-      "createSuccess": "Paciente registrado exitosamente",
-      "updateSuccess": "Paciente actualizado exitosamente",
-      "deleteSuccess": "Paciente eliminado exitosamente",
+      "createSuccess": "Paciente creado correctamente",
+      "createError": "No es posible crear el paciente",
+      "updateSuccess": "Paciente actualizado correctamente",
+      "updateError": "No es posible actualizar el paciente",
+      "deleteSuccess": "Paciente eliminado correctamente",
+      "deleteError": "No es posible eliminar el paciente",
       "deleteConfirm": "¿Está seguro de eliminar este paciente?",
       "validationError": "Por favor complete todos los campos requeridos"
     },

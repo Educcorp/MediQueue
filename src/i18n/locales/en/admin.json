@@ -293,9 +293,12 @@
       "medicalNotesPlaceholder": "Additional notes"
     },
     "messages": {
-      "createSuccess": "Patient registered successfully",
+      "createSuccess": "Patient created successfully",
+      "createError": "Unable to create patient",
       "updateSuccess": "Patient updated successfully",
+      "updateError": "Unable to update patient",
       "deleteSuccess": "Patient deleted successfully",
+      "deleteError": "Unable to delete patient",
       "deleteConfirm": "Are you sure you want to delete this patient?",
       "validationError": "Please complete all required fields"
     },

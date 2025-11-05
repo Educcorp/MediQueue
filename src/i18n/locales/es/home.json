@@ -24,7 +24,9 @@
     "waiting": "en espera",
     "activeTurns": "turnos activos",
     "noActiveTurns": "No hay turnos activos",
-    "allAreasEmpty": "Todas las áreas médicas están sin turnos en espera en este momento"
+    "allAreasEmpty": "Todas las áreas médicas están sin turnos en espera en este momento",
+    "oneTurnWaiting": "turno en espera",
+    "turnsWaiting": "turnos en espera"
   },
   
   "turnDisplay": {
