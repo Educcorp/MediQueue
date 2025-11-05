@@ -1,0 +1,52 @@
+{
+  "header": {
+    "title": "MediQueue®",
+    "takeTurnButton": "Tomar turnos",
+    "selectArea": "Seleccionar área médica",
+    "loadingAreas": "Cargando áreas..."
+  },
+  
+  "areaSelector": {
+    "title": "Área Médica",
+    "selectPlaceholder": "Seleccionar área médica",
+    "generalView": "📊 General - Todas las áreas",
+    "noAreasAvailable": "No hay áreas médicas disponibles"
+  },
+  
+  "monitor": {
+    "nextTurn": "PRÓXIMO TURNO",
+    "turnQueue": "Cola de Turnos",
+    "realTime": "Turnos en tiempo real",
+    "live": "EN VIVO",
+    "noTurnsWaiting": "No hay turnos en espera",
+    "allTurnsAttended": "Todos los turnos han sido atendidos en esta área",
+    "office": "Consultorio",
+    "waiting": "en espera",
+    "activeTurns": "turnos activos",
+    "noActiveTurns": "No hay turnos activos",
+    "allAreasEmpty": "Todas las áreas médicas están sin turnos en espera en este momento",
+    "oneTurnWaiting": "turno en espera",
+    "turnsWaiting": "turnos en espera"
+  },
+  
+  "turnDisplay": {
+    "callingNow": "LLAMANDO AHORA",
+    "waiting": "EN ESPERA",
+    "calling": "Llamando",
+    "office": "Consultorio"
+  },
+  
+  "emptyState": {
+    "title": "No hay turnos activos",
+    "description": "Todas las áreas médicas están sin turnos en espera en este momento",
+    "selectAreaTitle": "Seleccione un área médica",
+    "selectAreaDescription": "Use el selector en el encabezado para ver los turnos de un área específica"
+  },
+  
+  "errors": {
+    "loadingError": "Error cargando información de turnos",
+    "retry": "Reintentar",
+    "noAreasError": "No se pudieron cargar las áreas"
+  }
+}
+

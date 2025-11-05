@@ -1,0 +1,32 @@
+{
+  "required": "Este campo es requerido",
+  "email": "Debe ser un correo electrónico válido",
+  "phone": "Debe ser un número de teléfono válido",
+  "minLength": "Debe tener al menos {{min}} caracteres",
+  "maxLength": "No puede exceder {{max}} caracteres",
+  "min": "Debe ser mayor o igual a {{min}}",
+  "max": "Debe ser menor o igual a {{max}}",
+  "numeric": "Solo se permiten números",
+  "alphanumeric": "Solo se permiten letras y números",
+  "password": {
+    "tooShort": "La contraseña debe tener al menos {{min}} caracteres",
+    "tooLong": "La contraseña no puede exceder {{max}} caracteres",
+    "requireSpecialChars": "La contraseña debe contener al menos un carácter especial",
+    "requireNumber": "La contraseña debe contener al menos un número",
+    "requireUppercase": "La contraseña debe contener al menos una mayúscula",
+    "requireLowercase": "La contraseña debe contener al menos una minúscula",
+    "mismatch": "Las contraseñas no coinciden"
+  },
+  "date": {
+    "invalid": "Fecha inválida",
+    "futureOnly": "La fecha debe ser futura",
+    "pastOnly": "La fecha debe ser pasada",
+    "range": "La fecha debe estar entre {{min}} y {{max}}"
+  },
+  "file": {
+    "tooLarge": "El archivo es demasiado grande (máximo {{max}}MB)",
+    "invalidType": "Tipo de archivo no permitido",
+    "required": "Debe seleccionar un archivo"
+  }
+}
+

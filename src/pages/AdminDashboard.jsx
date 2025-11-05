@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -51,6 +52,7 @@ import {
 } from 'react-icons/lu';
 
 const AdminDashboard = () => {
+  const { t } = useTranslation(['admin', 'common']);
   const { user, logout, getEstadisticas } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -106,7 +108,7 @@ const AdminDashboard = () => {
       });
     } catch (error) {
       console.error('Error cargando datos del dashboard:', error);
-      setError('Error cargando datos del dashboard');
+      setError(t('admin:dashboard.loadError'));
     } finally {
       setLoading(false);
     }
@@ -145,7 +147,7 @@ const AdminDashboard = () => {
               animation: 'spin 1s linear infinite',
               margin: '0 auto 20px auto'
             }}></div>
-            <p>Cargando dashboard...</p>
+            <p>{t('admin:dashboard.loading')}</p>
           </div>
         </div>
         <style>
@@ -196,7 +198,7 @@ const AdminDashboard = () => {
           <div className="error-banner">
             <span>⚠️ {error}</span>
             <button onClick={refreshData} className="retry-btn">
-              Reintentar
+              {t('common:buttons.retry')}
             </button>
           </div>
         )}
@@ -210,10 +212,10 @@ const AdminDashboard = () => {
               </div>
               <div className="stat-content">
                 <h3>{stats.totalTurns}</h3>
-                <p>Total Turnos</p>
+                <p>{t('admin:dashboard.stats.totalTurns')}</p>
                 <div className="stat-trend">
                   <LuTrendingUp />
-                  <span>+1% este mes</span>
+                  <span>{t('admin:dashboard.stats.thisMonth', { percentage: '+1%' })}</span>
                 </div>
               </div>
             </div>
@@ -223,10 +225,10 @@ const AdminDashboard = () => {
               </div>
               <div className="stat-content">
                 <h3>{stats.activeTurns}</h3>
-                <p>Turnos Activos</p>
+                <p>{t('admin:dashboard.stats.activeTurns')}</p>
                 <div className="stat-trend">
                   <FaCheckCircle />
-                  <span>En tiempo real</span>
+                  <span>{t('admin:dashboard.stats.realTime')}</span>
                 </div>
               </div>
             </div>
@@ -236,10 +238,10 @@ const AdminDashboard = () => {
               </div>
               <div className="stat-content">
                 <h3>{stats.totalPatients}</h3>
-                <p>Pacientes</p>
+                <p>{t('admin:dashboard.stats.patients')}</p>
                 <div className="stat-trend">
                   <LuTrendingUp />
-                  <span>+8% este mes</span>
+                  <span>{t('admin:dashboard.stats.thisMonth', { percentage: '+8%' })}</span>
                 </div>
               </div>
             </div>
@@ -249,10 +251,10 @@ const AdminDashboard = () => {
               </div>
               <div className="stat-content">
                 <h3>{stats.totalConsultorios}</h3>
-                <p>Consultorios</p>
+                <p>{t('admin:dashboard.stats.offices')}</p>
                 <div className="stat-trend">
                   <FaCheckCircle />
-                  <span>Disponibles</span>
+                  <span>{t('admin:dashboard.stats.available')}</span>
                 </div>
               </div>
             </div>
@@ -262,10 +264,10 @@ const AdminDashboard = () => {
               </div>
               <div className="stat-content">
                 <h3>{stats.totalAreas}</h3>
-                <p>Áreas</p>
+                <p>{t('admin:dashboard.stats.areas')}</p>
                 <div className="stat-trend">
                   <FaCheckCircle />
-                  <span>Configuradas</span>
+                  <span>{t('admin:dashboard.stats.configured')}</span>
                 </div>
               </div>
             </div>
@@ -275,10 +277,10 @@ const AdminDashboard = () => {
               </div>
               <div className="stat-content">
                 <h3>{stats.totalAdmins}</h3>
-                <p>Administradores</p>
+                <p>{t('admin:dashboard.stats.admins')}</p>
                 <div className="stat-trend">
                   <FaCheckCircle />
-                  <span>Activos</span>
+                  <span>{t('admin:dashboard.stats.active')}</span>
                 </div>
               </div>
             </div>
@@ -295,23 +297,23 @@ const AdminDashboard = () => {
                   <FaCalendarCheck />
                 </div>
                 <div className="card-title">
-                  <h2>Gestionar Turnos</h2>
-                  <p>Administrar el sistema de turnos médicos</p>
+                  <h2>{t('admin:dashboard.cards.turns.title')}</h2>
+                  <p>{t('admin:dashboard.cards.turns.description')}</p>
                 </div>
               </div>
               <div className="card-stats">
                 <div className="stat-item">
                   <FaClock />
-                  <span>{stats.activeTurns} activos</span>
+                  <span>{stats.activeTurns} {t('admin:dashboard.cards.turns.active')}</span>
                 </div>
                 <div className="stat-item">
                   <MdToday />
-                  <span>{stats.todayTurns} hoy</span>
+                  <span>{stats.todayTurns} {t('admin:dashboard.cards.turns.today')}</span>
                 </div>
               </div>
               <Link to="/admin/turns" className="dashboard-link">
                 <FaArrowRight />
-                Ver Turnos
+                {t('admin:dashboard.cards.turns.viewButton')}
               </Link>
             </div>
 
@@ -321,19 +323,19 @@ const AdminDashboard = () => {
                   <FaUserInjured />
                 </div>
                 <div className="card-title">
-                  <h2>Gestionar Pacientes</h2>
-                  <p>Administrar información de pacientes</p>
+                  <h2>{t('admin:dashboard.cards.patients.title')}</h2>
+                  <p>{t('admin:dashboard.cards.patients.description')}</p>
                 </div>
               </div>
               <div className="card-stats">
                 <div className="stat-item">
                   <FaUserCheck />
-                  <span>{stats.totalPatients} registrados</span>
+                  <span>{stats.totalPatients} {t('admin:dashboard.cards.patients.registered')}</span>
                 </div>
               </div>
               <Link to="/admin/patients" className="dashboard-link">
                 <FaArrowRight />
-                Ver Pacientes
+                {t('admin:dashboard.cards.patients.viewButton')}
               </Link>
             </div>
 
@@ -343,23 +345,23 @@ const AdminDashboard = () => {
                   <FaHospital />
                 </div>
                 <div className="card-title">
-                  <h2>Consultorios</h2>
-                  <p>Gestión de consultorios y áreas médicas</p>
+                  <h2>{t('admin:dashboard.cards.offices.title')}</h2>
+                  <p>{t('admin:dashboard.cards.offices.description')}</p>
                 </div>
               </div>
               <div className="card-stats">
                 <div className="stat-item">
                   <FaBuilding />
-                  <span>{stats.totalConsultorios} consultorios</span>
+                  <span>{stats.totalConsultorios} {t('admin:dashboard.cards.offices.officesCount')}</span>
                 </div>
                 <div className="stat-item">
                   <HiOutlineOfficeBuilding />
-                  <span>{stats.totalAreas} áreas</span>
+                  <span>{stats.totalAreas} {t('admin:dashboard.cards.offices.areas')}</span>
                 </div>
               </div>
               <Link to="/admin/consultorios" className="dashboard-link">
                 <FaArrowRight />
-                Ver Consultorios
+                {t('admin:dashboard.cards.offices.viewButton')}
               </Link>
             </div>
 
@@ -369,19 +371,19 @@ const AdminDashboard = () => {
                   <FaUsersCog />
                 </div>
                 <div className="card-title">
-                  <h2>Gestionar Usuarios</h2>
-                  <p>Crear, editar y eliminar usuarios administradores</p>
+                  <h2>{t('admin:dashboard.cards.users.title')}</h2>
+                  <p>{t('admin:dashboard.cards.users.description')}</p>
                 </div>
               </div>
               <div className="card-stats">
                 <div className="stat-item">
                   <FaUserShield />
-                  <span>{stats.totalAdmins} administradores</span>
+                  <span>{stats.totalAdmins} {t('admin:dashboard.cards.users.admins')}</span>
                 </div>
               </div>
               <Link to="/admin/users" className="dashboard-link">
                 <FaArrowRight />
-                Ver Usuarios
+                {t('admin:dashboard.cards.users.viewButton')}
               </Link>
             </div>
 
@@ -391,19 +393,19 @@ const AdminDashboard = () => {
                   <FaChartLine />
                 </div>
                 <div className="card-title">
-                  <h2>Estadísticas</h2>
-                  <p>Reportes y análisis del sistema de turnos</p>
+                  <h2>{t('admin:dashboard.cards.statistics.title')}</h2>
+                  <p>{t('admin:dashboard.cards.statistics.description')}</p>
                 </div>
               </div>
               <div className="card-stats">
                 <div className="stat-item">
                   <FaCheckCircle />
-                  <span>{stats.completedTurns} atendidos</span>
+                  <span>{stats.completedTurns} {t('admin:dashboard.cards.statistics.completed')}</span>
                 </div>
               </div>
               <Link to="/admin/statistics" className="dashboard-link">
                 <FaArrowRight />
-                Ver Estadísticas
+                {t('admin:dashboard.cards.statistics.viewButton')}
               </Link>
             </div>
 
@@ -413,19 +415,19 @@ const AdminDashboard = () => {
                   <FaCog />
                 </div>
                 <div className="card-title">
-                  <h2>Configuración</h2>
-                  <p>Configuración del sistema y preferencias</p>
+                  <h2>{t('admin:dashboard.cards.settings.title')}</h2>
+                  <p>{t('admin:dashboard.cards.settings.description')}</p>
                 </div>
               </div>
               <div className="card-stats">
                 <div className="stat-item">
                   <FaCog />
-                  <span>Sistema</span>
+                  <span>{t('admin:dashboard.cards.settings.system')}</span>
                 </div>
               </div>
               <Link to="/admin/settings" className="dashboard-link">
                 <FaArrowRight />
-                Configurar
+                {t('admin:dashboard.cards.settings.configureButton')}
               </Link>
             </div>
           </div>
@@ -439,23 +441,23 @@ const AdminDashboard = () => {
               <div className="info-header">
                 <h3>
                   <FaInfoCircle />
-                  Información del Sistema
+                  {t('admin:dashboard.systemInfo.title')}
                 </h3>
               </div>
               <div className="info-content">
                 <div className="info-item">
-                  <span className="info-label">Versión:</span>
+                  <span className="info-label">{t('admin:dashboard.systemInfo.version')}:</span>
                   <span className="info-value">2.0.0</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">Última actualización:</span>
+                  <span className="info-label">{t('admin:dashboard.systemInfo.lastUpdate')}:</span>
                   <span className="info-value">{new Date().toLocaleDateString('es-ES')}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">Estado:</span>
+                  <span className="info-label">{t('admin:dashboard.systemInfo.status')}:</span>
                   <span className="info-value status-active">
                     <FaCheckCircle />
-                    Activo
+                    {t('admin:dashboard.systemInfo.active')}
                   </span>
                 </div>
               </div>

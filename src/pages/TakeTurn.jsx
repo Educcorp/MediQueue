@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
 import Footer from '../components/Footer';
@@ -30,6 +31,7 @@ import {
 } from 'react-icons/fa';
 
 const TakeTurn = () => {
+  const { t } = useTranslation(['takeTurn', 'common']);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -224,11 +226,11 @@ const TakeTurn = () => {
       setAreas(areasData || []);
 
       if (areasData.length === 0) {
-        setError('No hay áreas médicas configuradas en el sistema');
+        setError(t('takeTurn:areas.noAreas'));
       }
     } catch (error) {
       console.error('Error cargando datos:', error);
-      setError('Error al cargar los datos del sistema');
+      setError(t('common:messages.serverError'));
     } finally {
       setLoading(false);
     }
@@ -241,7 +243,7 @@ const TakeTurn = () => {
 
   const handleTakeAreaTurn = async () => {
     if (!selectedArea) {
-      setError('Por favor selecciona un área');
+      setError(t('takeTurn:errors.selectArea'));
       return;
     }
 
@@ -260,7 +262,7 @@ const TakeTurn = () => {
 
     } catch (error) {
       console.error('Error generando turno:', error);
-      setError(error.response?.data?.message || 'Error al generar el turno');
+      setError(error.response?.data?.message || t('takeTurn:errors.generatingError'));
     } finally {
       setLoading(false);
     }
@@ -297,7 +299,7 @@ const TakeTurn = () => {
               alt="MediQueue Logo"
               className="header-logo-image"
             />
-            <span className="header-title">MediQueue®</span>
+            <span className="header-title">{t('common:appNameFull')}</span>
           </div>
 
           {/* Title Section */}
@@ -305,7 +307,7 @@ const TakeTurn = () => {
             <div className="page-title-section">
               <h1 className="page-title">
                 <FaHandPaper className="title-icon" />
-                Tomar Turno
+                {t('takeTurn:header.title')}
               </h1>
               <p className="page-subtitle"></p>
             </div>
@@ -315,7 +317,7 @@ const TakeTurn = () => {
           <div className="header-right">
             <button onClick={handleGoHome} className="home-button-touch">
               <FaHome className="home-icon" />
-              <span>Inicio</span>
+              <span>{t('common:buttons.home')}</span>
             </button>
           </div>
         </div>
@@ -326,8 +328,8 @@ const TakeTurn = () => {
         {loading && (
           <div className="touch-loading">
             <div className="loading-circle"></div>
-            <h2>Procesando solicitud...</h2>
-            <p>Generando su turno, por favor espere</p>
+            <h2>{t('takeTurn:loading.processing')}</h2>
+            <p>{t('takeTurn:loading.pleaseWait')}</p>
           </div>
         )}
 
@@ -350,17 +352,17 @@ const TakeTurn = () => {
                       <IconComponent className="success-area-icon" />
                       <FaCheckCircle className="success-check-overlay" />
                     </div>
-                    <h1 style={{ color: areaIcon?.color || '#4A90E2' }}>¡Turno Generado Exitosamente!</h1>
+                    <h1 style={{ color: areaIcon?.color || '#4A90E2' }}>{t('takeTurn:success.title')}</h1>
                     
                     <div className="area-info-success">
-                      <h3>Área: {selectedArea?.s_nombre_area}</h3>
+                      <h3>{t('takeTurn:success.area')}: {selectedArea?.s_nombre_area}</h3>
                     </div>
                   </>
                 );
               })()}
               
               <div className="turn-number-display-compact">
-                <div className="turn-label">Su número de turno es:</div>
+                <div className="turn-label">{t('takeTurn:success.yourNumber')}</div>
                 <div className="turn-number-big" style={{
                   background: `linear-gradient(135deg, ${selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2'}, ${selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea).color : '#4A90E2'}dd)`
                 }}>
@@ -375,15 +377,15 @@ const TakeTurn = () => {
                     <div className="info-item-compact">
                       <FaHospital className="info-icon-small" />
                       <div className="info-text-compact">
-                        <strong>Consultorio:</strong>
+                        <strong>{t('takeTurn:success.office')}:</strong>
                         <span>#{turnResult.asignacion_automatica.consultorio_asignado.numero} - {turnResult.asignacion_automatica.consultorio_asignado.area}</span>
                       </div>
                     </div>
                     <div className="info-item-compact">
                       <FaClipboardList className="info-icon-small" />
                       <div className="info-text-compact">
-                        <strong>En espera:</strong>
-                        <span>{turnResult.asignacion_automatica.consultorio_asignado.turnos_en_espera || 0} turnos</span>
+                        <strong>{t('takeTurn:success.waiting')}:</strong>
+                        <span>{turnResult.asignacion_automatica.consultorio_asignado.turnos_en_espera || 0} {t('takeTurn:success.turns')}</span>
                       </div>
                     </div>
                   </div>
@@ -392,13 +394,13 @@ const TakeTurn = () => {
 
               <div className="redirect-info">
                 <p className="redirect-message">
-                  Su turno se mostrará en la pantalla de visualización de turnos
+                  {t('takeTurn:success.displayMessage')}
                 </p>
                 <div className="countdown-display">
                   <div className="countdown-circle">
                     <span className="countdown-number">{countdown}</span>
                   </div>
-                  <p className="countdown-text">Redirigiendo automáticamente...</p>
+                  <p className="countdown-text">{t('takeTurn:success.redirecting')}</p>
                 </div>
               </div>
             </div>
@@ -412,7 +414,7 @@ const TakeTurn = () => {
               <div className="back-button-container">
                 <button onClick={handleGoBack} className="back-button-touch">
                   <FaArrowLeft />
-                  Volver a Áreas
+                  {t('takeTurn:confirmation.backToAreas')}
                 </button>
               </div>
 
@@ -433,7 +435,7 @@ const TakeTurn = () => {
                       </div>
                       <div className="area-info-confirmation">
                         <h2 style={{ color: areaIcon.color }}>{selectedArea.s_nombre_area}</h2>
-                        <p>Se asignará automáticamente el consultorio más disponible de esta área</p>
+                        <p>{t('takeTurn:confirmation.autoAssign')}</p>
                       </div>
                     </>
                   );
@@ -452,12 +454,12 @@ const TakeTurn = () => {
                   {loading ? (
                     <>
                       <div className="button-spinner"></div>
-                      <span>Generando Turno...</span>
+                      <span>{t('takeTurn:confirmation.generating')}</span>
                     </>
                   ) : (
                     <>
                       <FaTicketAlt className="button-icon" />
-                      <span>Generar Turno</span>
+                      <span>{t('takeTurn:confirmation.generateButton')}</span>
                     </>
                   )}
                 </button>
@@ -472,14 +474,14 @@ const TakeTurn = () => {
             {areas.length === 0 ? (
               <div className="empty-state-touch">
                 <FaHospital className="empty-icon" />
-                <h3>No hay áreas médicas disponibles</h3>
-                <p>Actualmente no hay consultorios configurados en el sistema</p>
+                <h3>{t('takeTurn:areas.noAreas')}</h3>
+                <p>{t('takeTurn:areas.noOffices')}</p>
               </div>
             ) : (
               <>
                 <div className="areas-instruction">
-                  <h2>Seleccione el área médica</h2>
-                  <p>Toque el área médica para la cual desea tomar un turno</p>
+                  <h2>{t('takeTurn:areas.selectArea')}</h2>
+                  <p>{t('takeTurn:areas.tapToSelect')}</p>
                 </div>
                 
                 <div className="areas-grid-touch">
@@ -519,7 +521,7 @@ const TakeTurn = () => {
         {error && (
           <div className="error-message-touch">
             <div className="error-content">
-              <h3>⚠️ Error</h3>
+              <h3>⚠️ {t('common:messages.error')}</h3>
               <p>{error}</p>
             </div>
           </div>

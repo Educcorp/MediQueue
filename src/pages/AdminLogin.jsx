@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LoadingScreen from '../components/Common/LoadingScreen';
 import '../styles/AdminLogin.css';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const AdminLogin = () => {
+  const { t } = useTranslation(['admin', 'common']);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -76,13 +78,13 @@ const AdminLogin = () => {
 
     // Validaciones mejoradas
     if (!formData.email || !formData.password) {
-      setLocalError('Por favor, complete todos los campos');
+      setLocalError(t('admin:login.errors.fillAllFields'));
       return;
     }
 
     // Validar email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setLocalError('Por favor, ingrese un email válido');
+      setLocalError(t('admin:login.errors.invalidEmail'));
       return;
     }
 
@@ -95,10 +97,10 @@ const AdminLogin = () => {
       if (result.success) {
         navigate('/admin/dashboard');
       } else {
-        setLocalError(result.message || 'Error al iniciar sesión');
+        setLocalError(result.message || t('admin:login.errors.loginFailed'));
       }
     } catch (err) {
-      setLocalError('Error de conexión. Verifique que el servidor esté funcionando.');
+      setLocalError(t('admin:login.errors.connectionError'));
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +112,7 @@ const AdminLogin = () => {
   if (isLoading) {
     return (
       <LoadingScreen
-        message="Autenticando usuario"
+        message={t('admin:login.authenticating')}
         showProgress={false}
       />
     );
@@ -125,19 +127,19 @@ const AdminLogin = () => {
         <div className="title-section">
           <div className="main-title-wrapper">
             <img src="/images/mediqueue_logo.png" alt="MediQueue Logo" className="main-title-logo" />
-            <h1 className="main-title">MediQueue</h1>
+            <h1 className="main-title">{t('common:appName')}</h1>
           </div>
           <p className="subtitle">
-            Tu plataforma de gestión de turnos comienza aquí. <br />
-            Inicia sesión.
+            {t('admin:login.subtitle')} <br />
+            {t('admin:login.pleaseLogin')}
             <br />
           </p>
         </div>
         <div className="sidebar-menu">
-          <div className="menu-item">Gestionar Turnos</div>
-          <div className="menu-item">Gestión de consultorios</div>
-          <div className="menu-item">Gestión de pacientes</div>
-          <div className="menu-item">Gestión de estadísticas del sistema</div>
+          <div className="menu-item">{t('admin:login.menu.manageTurns')}</div>
+          <div className="menu-item">{t('admin:login.menu.manageOffices')}</div>
+          <div className="menu-item">{t('admin:login.menu.managePatients')}</div>
+          <div className="menu-item">{t('admin:login.menu.manageStats')}</div>
         </div>
       </div>
 
@@ -163,8 +165,8 @@ const AdminLogin = () => {
 
         {/* Welcome Messages */}
         <div className="welcome-messages">
-          <h2 className="admin-title">Panel de Administración</h2>
-          <p className="welcome-text">El Sistema les da la Bienvenida</p>
+          <h2 className="admin-title">{t('admin:login.title')}</h2>
+          <p className="welcome-text">{t('admin:login.welcome')}</p>
         </div>
 
 
@@ -186,7 +188,7 @@ const AdminLogin = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Correo"
+                placeholder={t('admin:login.emailPlaceholder')}
                 disabled={isLoading}
                 required
               />
@@ -201,7 +203,7 @@ const AdminLogin = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Contraseña"
+                placeholder={t('admin:login.passwordPlaceholder')}
                 disabled={isLoading}
                 required
               />
@@ -224,7 +226,7 @@ const AdminLogin = () => {
             <span></span>
             <span></span>
             <span></span>
-            {isLoading ? 'Iniciando...' : 'Iniciar sesión'}
+            {isLoading ? t('admin:login.loggingIn') : t('admin:login.loginButton')}
           </button>
         </form>
 

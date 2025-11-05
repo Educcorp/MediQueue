@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -34,6 +35,7 @@ import {
 } from 'react-icons/fa';
 
 const AdminUsersPage = () => {
+  const { t } = useTranslation(['admin', 'common']);
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -68,7 +70,7 @@ const AdminUsersPage = () => {
       setAdmins(administradores);
 
     } catch (error) {
-      setError('Error cargando administradores: ' + error.message);
+      setError(t('common:messages.error') + ': ' + error.message);
       console.error('Error cargando administradores:', error);
     } finally {
       setLoading(false);
@@ -105,17 +107,17 @@ const AdminUsersPage = () => {
 
   const handleDelete = async (admin) => {
     if (admin.uk_administrador === user?.uk_administrador) {
-      alert('No puedes eliminar tu propia cuenta');
+      alert(t('admin:users.messages.cannotDeleteSelf', 'No puedes eliminar tu propia cuenta'));
       return;
     }
 
-    if (window.confirm(`¿Estás seguro de eliminar al administrador "${admin.s_nombre} ${admin.s_apellido}"?`)) {
+    if (window.confirm(t('admin:users.messages.deleteConfirm'))) {
       try {
         await adminService.deleteAdmin(admin.uk_administrador);
         await loadAdmins();
-        alert('Administrador eliminado correctamente');
+        alert(t('admin:users.messages.deleteSuccess'));
       } catch (error) {
-        alert('Error eliminando administrador: ' + error.message);
+        alert(t('common:messages.error') + ': ' + error.message);
         console.error('Error eliminando administrador:', error);
       }
     }
@@ -125,7 +127,7 @@ const AdminUsersPage = () => {
     e.preventDefault();
 
     if (!formData.s_nombre || !formData.s_apellido || !formData.s_email || !formData.s_usuario) {
-      alert('Por favor complete todos los campos requeridos');
+      alert(t('admin:users.messages.validationError'));
       return;
     }
 
@@ -134,12 +136,12 @@ const AdminUsersPage = () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
 
     if (!editingAdmin && !passwordProvided) {
-      alert('La contraseña es requerida para crear un nuevo administrador');
+      alert(t('admin:users.messages.passwordRequired', 'La contraseña es requerida para crear un nuevo administrador'));
       return;
     }
 
     if (passwordProvided && !passwordRegex.test(formData.s_password)) {
-      alert('La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número');
+      alert(t('admin:users.messages.passwordFormat', 'La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número'));
       return;
     }
 
@@ -164,10 +166,10 @@ const AdminUsersPage = () => {
 
       if (editingAdmin) {
         await adminService.updateAdmin(editingAdmin.uk_administrador, adminData);
-        alert('Administrador actualizado correctamente');
+        alert(t('admin:users.messages.updateSuccess'));
       } else {
         await adminService.createAdmin(adminData);
-        alert('Administrador creado correctamente');
+        alert(t('admin:users.messages.createSuccess'));
       }
 
       await loadAdmins();
@@ -251,7 +253,7 @@ const AdminUsersPage = () => {
               animation: 'spin 1s linear infinite',
               margin: '0 auto 20px auto'
             }}></div>
-            <p>Cargando usuarios...</p>
+            <p>{t('admin:common.loading')}</p>
           </div>
         </div>
         <style>
@@ -277,17 +279,17 @@ const AdminUsersPage = () => {
             <FaUsersCog />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Gestión de Usuarios</h1>
+            <h1 className="page-title">{t('admin:users.title')}</h1>
             <p className="page-subtitle">
-              Administra los usuarios del sistema - {totalAdmins} administradores registrados
+              {t('admin:users.subtitle')} - {totalAdmins} {t('admin:users.registered', 'administradores registrados')}
             </p>
           </div>
           <div className="page-actions">
             <button className="btn btn-secondary" onClick={loadAdmins}>
-              <FaSync /> Actualizar
+              <FaSync /> {t('common:buttons.refresh')}
             </button>
             <button className="btn btn-primary" onClick={handleAddNew}>
-              <FaPlus /> Nuevo Usuario
+              <FaPlus /> {t('admin:users.addUser')}
             </button>
           </div>
         </div>
@@ -325,7 +327,7 @@ const AdminUsersPage = () => {
                   {totalAdmins}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Total Usuarios
+                  {t('admin:users.stats.totalUsers', 'Total Usuarios')}
                 </p>
               </div>
             </div>
@@ -351,7 +353,7 @@ const AdminUsersPage = () => {
                   {superAdmins}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Super Administradores
+                  {t('admin:users.stats.superAdmins', 'Super Administradores')}
                 </p>
               </div>
             </div>
@@ -377,7 +379,7 @@ const AdminUsersPage = () => {
                   {supervisors}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Supervisores
+                  {t('admin:users.stats.supervisors', 'Supervisores')}
                 </p>
               </div>
             </div>
@@ -387,11 +389,11 @@ const AdminUsersPage = () => {
         {/* Search Section */}
         <div className="filters-section">
           <div className="filter-group" style={{ flex: '1', maxWidth: '400px' }}>
-            <label>Buscar Usuarios</label>
+            <label>{t('admin:users.search')}</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
-                placeholder="Buscar por nombre, email o usuario..."
+                placeholder={t('admin:users.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearch}
                 className="form-control"
@@ -408,7 +410,7 @@ const AdminUsersPage = () => {
           </div>
           <div className="filter-group">
             <button className="btn btn-secondary">
-              <FaFilter /> Aplicar Filtros
+              <FaFilter /> {t('common:buttons.filter')}
             </button>
           </div>
         </div>
@@ -418,13 +420,13 @@ const AdminUsersPage = () => {
           <div className="card-header">
             <h3 className="card-title">
               <FaUsersCog />
-              Lista de Usuarios Administrativos
+              {t('admin:users.listTitle', 'Lista de Usuarios Administrativos')}
             </h3>
             <div className="card-actions">
-              <button className="card-action" title="Ver detalles">
+              <button className="card-action" title={t('common:buttons.view')}>
                 <FaEye />
               </button>
-              <button className="card-action" title="Filtros">
+              <button className="card-action" title={t('common:buttons.filter')}>
                 <FaFilter />
               </button>
             </div>
@@ -434,14 +436,14 @@ const AdminUsersPage = () => {
             {filteredAdmins.length === 0 ? (
               <div className="empty-state">
                 <FaUsersCog />
-                <h3>No hay usuarios registrados</h3>
+                <h3>{t('admin:users.noUsers')}</h3>
                 <p>
                   {searchTerm
-                    ? 'No se encontraron usuarios con los filtros aplicados'
-                    : 'No hay usuarios administrativos en el sistema'}
+                    ? t('admin:users.noUsersForFilters', 'No se encontraron usuarios con los filtros aplicados')
+                    : t('admin:users.noUsersInSystem', 'No hay usuarios administrativos en el sistema')}
                 </p>
                 <button className="btn btn-primary" onClick={handleAddNew}>
-                  <FaPlus /> Crear Primer Usuario
+                  <FaPlus /> {t('admin:users.createFirstUser')}
                 </button>
               </div>
             ) : (
@@ -449,13 +451,13 @@ const AdminUsersPage = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Usuario</th>
-                      <th>Nombre Completo</th>
-                      <th>Email</th>
-                      <th>Teléfono</th>
-                      <th>Tipo</th>
-                      <th>Fecha Registro</th>
-                      <th>Acciones</th>
+                      <th>{t('admin:users.table.username', 'Usuario')}</th>
+                      <th>{t('admin:users.table.fullName', 'Nombre Completo')}</th>
+                      <th>{t('admin:users.table.email', 'Email')}</th>
+                      <th>{t('admin:users.table.phone', 'Teléfono')}</th>
+                      <th>{t('admin:users.table.type', 'Tipo')}</th>
+                      <th>{t('admin:users.table.registrationDate', 'Fecha Registro')}</th>
+                      <th>{t('common:buttons.actions', 'Acciones')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -499,7 +501,7 @@ const AdminUsersPage = () => {
                               <span style={{ fontFamily: 'monospace' }}>{admin.c_telefono}</span>
                             </div>
                           ) : (
-                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No registrado</span>
+                            <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>{t('admin:users.noPhone', 'No registrado')}</span>
                           )}
                         </td>
                         <td>
@@ -507,12 +509,12 @@ const AdminUsersPage = () => {
                             {admin.tipo_usuario === 1 ? (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <FaCrown style={{ fontSize: '10px' }} />
-                                Admin
+                                {t('common:roles.admin')}
                               </div>
                             ) : (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <FaUserShield style={{ fontSize: '10px' }} />
-                                Supervisor
+                                {t('common:roles.supervisor')}
                               </div>
                             )}
                           </span>
@@ -521,7 +523,7 @@ const AdminUsersPage = () => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <FaCalendarAlt style={{ color: 'var(--text-muted)', fontSize: '12px' }} />
                             <span style={{ fontSize: '14px' }}>
-                              {admin.d_fecha_creacion ? new Date(admin.d_fecha_creacion).toLocaleDateString('es-ES') : 'No disponible'}
+                              {admin.d_fecha_creacion ? new Date(admin.d_fecha_creacion).toLocaleDateString('es-ES') : t('common:messages.noData', 'No disponible')}
                             </span>
                           </div>
                         </td>
@@ -531,7 +533,7 @@ const AdminUsersPage = () => {
                               onClick={() => handleEdit(admin)}
                               className="btn btn-secondary"
                               style={{ padding: '4px 8px', fontSize: '12px' }}
-                              title="Editar usuario"
+                              title={t('common:buttons.edit')}
                             >
                               <FaEdit />
                             </button>
@@ -540,7 +542,7 @@ const AdminUsersPage = () => {
                                 onClick={() => handleDelete(admin)}
                                 className="btn btn-danger"
                                 style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title="Eliminar usuario"
+                                title={t('common:buttons.delete')}
                               >
                                 <FaTrash />
                               </button>
@@ -591,7 +593,7 @@ const AdminUsersPage = () => {
               justifyContent: 'space-between'
             }}>
               <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-                {editingAdmin ? 'Editar Usuario' : 'Nuevo Usuario Administrativo'}
+                {editingAdmin ? t('admin:users.editUser') : t('admin:users.newUser', 'Nuevo Usuario Administrativo')}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -611,26 +613,26 @@ const AdminUsersPage = () => {
             <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Nombre *</label>
+                  <label>{t('admin:users.form.name')} *</label>
                   <input
                     type="text"
                     name="s_nombre"
                     value={formData.s_nombre}
                     onChange={handleInputChange}
-                    placeholder="Nombre"
+                    placeholder={t('admin:users.form.namePlaceholder')}
                     className="form-control"
                     required
                     maxLength={50}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Apellido *</label>
+                  <label>{t('admin:users.form.lastName', 'Apellido')} *</label>
                   <input
                     type="text"
                     name="s_apellido"
                     value={formData.s_apellido}
                     onChange={handleInputChange}
-                    placeholder="Apellido"
+                    placeholder={t('admin:users.form.lastNamePlaceholder', 'Apellido')}
                     className="form-control"
                     required
                     maxLength={50}
@@ -640,26 +642,26 @@ const AdminUsersPage = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Email *</label>
+                  <label>{t('admin:users.form.email')} *</label>
                   <input
                     type="email"
                     name="s_email"
                     value={formData.s_email}
                     onChange={handleInputChange}
-                    placeholder="email@ejemplo.com"
+                    placeholder={t('admin:users.form.emailPlaceholder')}
                     className="form-control"
                     required
                     maxLength={100}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Teléfono</label>
+                  <label>{t('admin:users.form.phone', 'Teléfono')}</label>
                   <input
                     type="tel"
                     name="c_telefono"
                     value={formData.c_telefono}
                     onChange={handleInputChange}
-                    placeholder="+57 300 123 4567"
+                    placeholder={t('admin:users.form.phonePlaceholder', '+57 300 123 4567')}
                     className="form-control"
                     maxLength={15}
                   />
@@ -668,20 +670,20 @@ const AdminUsersPage = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Usuario *</label>
+                  <label>{t('admin:users.form.username', 'Usuario')} *</label>
                   <input
                     type="text"
                     name="s_usuario"
                     value={formData.s_usuario}
                     onChange={handleInputChange}
-                    placeholder="nombre_usuario"
+                    placeholder={t('admin:users.form.usernamePlaceholder', 'nombre_usuario')}
                     className="form-control"
                     required
                     maxLength={30}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Tipo de Usuario *</label>
+                  <label>{t('admin:users.form.userType', 'Tipo de Usuario')} *</label>
                   <select
                     name="tipo_usuario"
                     value={formData.tipo_usuario}
@@ -689,15 +691,15 @@ const AdminUsersPage = () => {
                     className="form-control"
                     required
                   >
-                    <option value={2}>Supervisor</option>
-                    <option value={1}>Super Administrador</option>
+                    <option value={2}>{t('common:roles.supervisor')}</option>
+                    <option value={1}>{t('common:roles.admin')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="form-group">
                 <label>
-                  {editingAdmin ? 'Nueva Contraseña (opcional)' : 'Contraseña *'}
+                  {editingAdmin ? t('admin:users.form.newPasswordOptional', 'Nueva Contraseña (opcional)') : t('admin:users.form.password') + ' *'}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -705,7 +707,7 @@ const AdminUsersPage = () => {
                     name="s_password"
                     value={formData.s_password}
                     onChange={handleInputChange}
-                    placeholder={editingAdmin ? 'Dejar vacío para no cambiar' : 'Contraseña segura'}
+                    placeholder={editingAdmin ? t('admin:users.form.passwordEmptyToKeep', 'Dejar vacío para no cambiar') : t('admin:users.form.passwordPlaceholder')}
                     className="form-control"
                     style={{ paddingRight: '40px' }}
                     required={!editingAdmin}
@@ -732,11 +734,11 @@ const AdminUsersPage = () => {
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancelar
+                  {t('common:buttons.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary">
                   <FaCheck />
-                  {editingAdmin ? 'Actualizar' : 'Crear'}
+                  {editingAdmin ? t('common:buttons.update') : t('common:buttons.create')}
                 </button>
               </div>
             </form>

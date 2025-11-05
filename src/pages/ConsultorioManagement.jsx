@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -57,6 +58,7 @@ import {
 } from 'react-icons/fa';
 
 const ConsultorioManagement = () => {
+  const { t } = useTranslation(['consultorio', 'common']);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [areas, setAreas] = useState([]);
@@ -150,7 +152,7 @@ const ConsultorioManagement = () => {
       setConsultorios(consultoriosData);
     } catch (error) {
       console.error('Error cargando datos:', error);
-      setError('Error cargando datos del sistema');
+      setError(t('consultorio:errors.loadingData'));
     } finally {
       // Delay mínimo para transición suave del spinner
       setTimeout(() => {
@@ -508,9 +510,9 @@ const ConsultorioManagement = () => {
             <FaHospital />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Gestión de Consultorios</h1>
+            <h1 className="page-title">{t('consultorio:title')}</h1>
             <p className="page-subtitle">
-              Administra áreas médicas y consultorios del sistema - {totalAreas} áreas, {totalConsultorios} consultorios
+              {t('consultorio:subtitle', { areas: totalAreas, consultorios: totalConsultorios })}
             </p>
           </div>
           <div className="page-actions">
@@ -556,7 +558,7 @@ const ConsultorioManagement = () => {
                   {totalAreas}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Áreas Médicas
+                  {t('consultorio:stats.areas')}
                 </p>
               </div>
             </div>
@@ -582,7 +584,7 @@ const ConsultorioManagement = () => {
                   {totalConsultorios}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Total Consultorios
+                  {t('consultorio:stats.totalOffices')}
                 </p>
               </div>
             </div>
@@ -608,7 +610,7 @@ const ConsultorioManagement = () => {
                   {activeConsultorios}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Consultorios Activos
+                  {t('consultorio:stats.activeOffices')}
                 </p>
               </div>
             </div>
@@ -618,7 +620,7 @@ const ConsultorioManagement = () => {
         {/* Search Section */}
         <div className="filters-section">
           <div className="filter-group" style={{ flex: '1', maxWidth: '400px' }}>
-            <label>Buscar Áreas Médicas</label>
+            <label>{t('consultorio:search.label')}</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
@@ -777,14 +779,14 @@ const ConsultorioManagement = () => {
                       <button
                         className="card-action"
                         onClick={() => handleEditArea(area)}
-                        title="Editar área"
+                        title={t('common:buttons.edit')}
                       >
                         <FaEdit />
                       </button>
                       <button
                         className="card-action"
                         onClick={() => handleDeleteArea(area)}
-                        title="Eliminar área"
+                        title={t('common:buttons.delete')}
                         style={{ color: 'var(--danger-color)' }}
                       >
                         <FaTrash />
@@ -878,7 +880,7 @@ const ConsultorioManagement = () => {
                         onClick={() => handleAddConsultorio(area)}
                         style={{ width: '100%' }}
                       >
-                        <FaPlus /> Agregar Consultorio
+                        <FaPlus /> {t('consultorio:buttons.addOffice')}
                       </button>
                     </div>
                   </div>
@@ -924,7 +926,7 @@ const ConsultorioManagement = () => {
               justifyContent: 'space-between'
             }}>
               <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-                {editingArea ? 'Editar Área Médica' : 'Nueva Área Médica'}
+                {editingArea ? t('consultorio:modal.editArea') : t('consultorio:modal.newArea')}
               </h3>
               <button
                 onClick={() => {
@@ -951,7 +953,7 @@ const ConsultorioManagement = () => {
             }}>
               <form onSubmit={handleSubmitArea} style={{ padding: '24px' }}>
                 <div className="form-group">
-                  <label>Nombre del Área Médica *</label>
+                  <label>{t('consultorio:form.areaName')} *</label>
                   <input
                     type="text"
                     name="s_nombre_area"
@@ -1095,7 +1097,7 @@ const ConsultorioManagement = () => {
               justifyContent: 'space-between'
             }}>
               <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-                {editingConsultorio ? 'Editar Consultorio' : `Nuevo Consultorio - ${selectedAreaForConsultorio?.s_nombre_area}`}
+                {editingConsultorio ? t('consultorio:modal.editOffice') : `${t('consultorio:modal.newOffice')} - ${selectedAreaForConsultorio?.s_nombre_area}`}
               </h3>
               <button
                 onClick={() => setShowConsultorioModal(false)}
@@ -1119,7 +1121,7 @@ const ConsultorioManagement = () => {
             }}>
               <form onSubmit={handleSubmitConsultorio} style={{ padding: '24px' }}>
                 <div className="form-group">
-                  <label>Número del Consultorio *</label>
+                  <label>{t('consultorio:form.officeNumber')} *</label>
                   <input
                     type="text"
                     name="i_numero_consultorio"

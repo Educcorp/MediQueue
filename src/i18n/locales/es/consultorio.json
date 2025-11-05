@@ -1,0 +1,87 @@
+{
+  "title": "Gestión de Consultorios",
+  "subtitle": "Administra áreas médicas y consultorios del sistema",
+  "loading": "Cargando consultorios...",
+  
+  "stats": {
+    "medicalAreas": "Áreas Médicas",
+    "totalOffices": "Total Consultorios",
+    "totalConsultorios": "Total Consultorios",
+    "activeConsultorios": "Consultorios Activos",
+    "activeOffices": "Consultorios Activos",
+    "consultorios": "consultorios",
+    "areas": "áreas"
+  },
+  
+  "area": {
+    "officesCount": "{{count}} consultorio",
+    "officesCount_plural": "{{count}} consultorios"
+  },
+
+  "areas": {
+    "title": "Áreas Médicas",
+    "newArea": "Nueva Área",
+    "editArea": "Editar Área Médica",
+    "createArea": "Nueva Área Médica",
+    "deleteArea": "Eliminar Área",
+    "noAreas": "No hay áreas médicas registradas",
+    "createFirstArea": "Crear Primera Área",
+    "searchPlaceholder": "Buscar áreas médicas...",
+    "confirmDelete": "¿Estás seguro de eliminar el área \"{{areaName}}\"?",
+    "confirmDeleteWithOffices": "¿Estás seguro de eliminar el área \"{{areaName}}\"?\n\nEsto eliminará también {{count}} consultorio(s) y todos los turnos asociados.",
+    "deletedSuccessfully": "Área eliminada correctamente",
+    "createdSuccessfully": "Área creada correctamente",
+    "updatedSuccessfully": "Área actualizada correctamente",
+    "noOffices": "No hay consultorios en esta área"
+  },
+  
+  "form": {
+    "areaName": "Nombre del Área Médica",
+    "areaNamePlaceholder": "Ej: Medicina General, Pediatría...",
+    "letterIdentifier": "Letra Identificadora",
+    "letterPlaceholder": "Ej: MG, PD...",
+    "letterMaxLength": "Máximo 2 letras para identificar el área",
+    "letterInUse": "La letra \"{{letter}}\" ya está en uso por otra área",
+    "areaColor": "Color del Área",
+    "areaIcon": "Icono del Área",
+    "officeNumber": "Número del Consultorio",
+    "officeNumberPlaceholder": "Ej: 101, 102, 103... (máx. 3 dígitos)",
+    "required": "requerido",
+    "charactersCount": "{{count}}/50 caracteres",
+    "areaNameRequired": "El nombre del área es requerido",
+    "areaNameMaxLength": "El nombre del área no puede exceder los 50 caracteres",
+    "officeNumberRequired": "El número del consultorio es requerido",
+    "officeNumberRange": "El número del consultorio debe estar entre 1 y 999 (máximo 3 dígitos)"
+  },
+  
+  "offices": {
+    "title": "Consultorios",
+    "addOffice": "Agregar Consultorio",
+    "newOffice": "Nuevo Consultorio",
+    "editOffice": "Editar Consultorio",
+    "deleteOffice": "Eliminar Consultorio",
+    "officeNumber": "Consultorio #{{number}}",
+    "confirmDelete": "¿Estás seguro de eliminar el consultorio #{{number}}?\n\nEsto eliminará también todos los turnos asociados a este consultorio.",
+    "deletedSuccessfully": "Consultorio eliminado correctamente",
+    "createdSuccessfully": "Consultorio creado correctamente",
+    "updatedSuccessfully": "Consultorio actualizado correctamente",
+    "newOfficeInArea": "Nuevo Consultorio - {{areaName}}"
+  },
+  
+  "errors": {
+    "savingArea": "Error guardando área",
+    "savingOffice": "Error guardando consultorio",
+    "deletingArea": "Error eliminando área",
+    "deletingOffice": "Error eliminando consultorio",
+    "notFound": "no fue encontrado/a",
+    "noPermission": "No tienes permisos para realizar esta acción",
+    "unknownError": "Error desconocido"
+  },
+  
+  "customization": {
+    "title": "Personalización",
+    "colorLabel": "Color",
+    "iconLabel": "Icono"
+  }
+}
+

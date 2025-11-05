@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -33,6 +34,7 @@ import {
 } from 'react-icons/fa';
 
 const PatientManagement = () => {
+  const { t } = useTranslation(['admin', 'common']);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
@@ -342,17 +344,17 @@ const PatientManagement = () => {
             <FaUsers />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Gestión de Pacientes</h1>
+            <h1 className="page-title">{t('admin:patients.title')}</h1>
             <p className="page-subtitle">
-              Administra la base de datos de pacientes - {patients.length} registros encontrados
+              {t('admin:patients.subtitle')} - {patients.length} {t('admin:patients.recordsFound', 'registros encontrados')}
             </p>
           </div>
           <div className="page-actions">
             <button className="btn btn-secondary" onClick={loadPatients}>
-              <FaSync /> Actualizar
+              <FaSync /> {t('common:buttons.refresh')}
             </button>
             <button className="btn btn-primary" onClick={handleAddNew}>
-              <FaPlus /> Nuevo Paciente
+              <FaPlus /> {t('admin:patients.addPatient')}
             </button>
           </div>
         </div>
@@ -390,7 +392,7 @@ const PatientManagement = () => {
                   {patients.length}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Total Pacientes
+                  {t('admin:patients.stats.total')}
                 </p>
               </div>
             </div>
@@ -416,7 +418,7 @@ const PatientManagement = () => {
                   {activePatients}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Pacientes Activos
+                  {t('admin:patients.stats.active')}
                 </p>
               </div>
             </div>
@@ -442,7 +444,7 @@ const PatientManagement = () => {
                   {inactivePatients}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Pacientes Inactivos
+                  {t('admin:patients.stats.inactive', 'Pacientes Inactivos')}
                 </p>
               </div>
             </div>
@@ -468,7 +470,7 @@ const PatientManagement = () => {
                   {patientsWithEmail}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Con Email
+                  {t('admin:patients.stats.withEmail', 'Con Email')}
                 </p>
               </div>
             </div>
@@ -478,11 +480,11 @@ const PatientManagement = () => {
         {/* Filters Section */}
         <div className="filters-section">
           <div className="filter-group" style={{ flex: '1', maxWidth: '400px' }}>
-            <label>Buscar Pacientes</label>
+            <label>{t('admin:patients.search')}</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
-                placeholder="Buscar por nombre, teléfono o email..."
+                placeholder={t('admin:patients.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearch}
                 className="form-control"
@@ -498,20 +500,20 @@ const PatientManagement = () => {
             </div>
           </div>
           <div className="filter-group">
-            <label>Estado</label>
+            <label>{t('common:status.status', 'Estado')}</label>
             <select
               value={statusFilter}
               onChange={handleStatusFilter}
               className="form-control"
             >
-              <option value="todos">Todos los estados</option>
-              <option value="ACTIVO">Activos</option>
-              <option value="INACTIVO">Inactivos</option>
+              <option value="todos">{t('admin:patients.filters.all')}</option>
+              <option value="ACTIVO">{t('admin:patients.filters.active')}</option>
+              <option value="INACTIVO">{t('admin:patients.filters.inactive')}</option>
             </select>
           </div>
           <div className="filter-group">
             <button className="btn btn-secondary">
-              <FaFilter /> Aplicar Filtros
+              <FaFilter /> {t('common:buttons.filter')}
             </button>
           </div>
         </div>
@@ -521,7 +523,7 @@ const PatientManagement = () => {
           <div className="card-header">
             <h3 className="card-title">
               <FaUsers />
-              Lista de Pacientes
+              {t('admin:patients.listTitle', 'Lista de Pacientes')}
             </h3>
             <div className="card-actions">
               <button className="card-action" title="Ver detalles">
@@ -537,14 +539,14 @@ const PatientManagement = () => {
             {filteredPatients.length === 0 ? (
               <div className="empty-state">
                 <FaUsers />
-                <h3>No hay pacientes registrados</h3>
+                <h3>{t('admin:patients.empty')}</h3>
                 <p>
                   {searchTerm || statusFilter !== 'todos'
-                    ? 'No se encontraron pacientes con los filtros aplicados'
-                    : 'No hay pacientes registrados en el sistema'}
+                    ? t('admin:patients.noResults', 'No se encontraron pacientes con los filtros aplicados')
+                    : t('admin:patients.noPatients')}
                 </p>
                 <button className="btn btn-primary" onClick={handleAddNew}>
-                  <FaPlus /> Registrar Primer Paciente
+                  <FaPlus /> {t('admin:patients.createFirstPatient')}
                 </button>
               </div>
             ) : (
@@ -552,13 +554,13 @@ const PatientManagement = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Nombre</th>
-                      <th>Teléfono</th>
-                      <th>Email</th>
-                      <th>Edad</th>
-                      <th>Estado</th>
-                      <th>Fecha Registro</th>
-                      <th>Acciones</th>
+                      <th>{t('admin:patients.table.name')}</th>
+                      <th>{t('admin:patients.table.phone')}</th>
+                      <th>{t('admin:patients.table.email')}</th>
+                      <th>{t('admin:patients.table.age', 'Edad')}</th>
+                      <th>{t('admin:patients.table.status')}</th>
+                      <th>{t('admin:patients.table.registrationDate', 'Fecha Registro')}</th>
+                      <th>{t('common:buttons.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -675,7 +677,7 @@ const PatientManagement = () => {
               justifyContent: 'space-between'
             }}>
               <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-                {editingPatient ? 'Editar Paciente' : 'Nuevo Paciente'}
+                {editingPatient ? t('admin:patients.editPatient') : t('admin:patients.addPatient')}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -695,20 +697,20 @@ const PatientManagement = () => {
             <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Nombre *</label>
+                  <label>{t('admin:patients.form.firstName')} *</label>
                   <input
                     type="text"
                     name="s_nombre"
                     value={formData.s_nombre}
                     onChange={handleInputChange}
-                    placeholder="Nombre del paciente"
+                    placeholder={t('admin:patients.form.firstNamePlaceholder')}
                     className="form-control"
                     required
                     maxLength={50}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Apellido *</label>
+                  <label>{t('admin:patients.form.lastName')} *</label>
                   <input
                     type="text"
                     name="s_apellido"
@@ -724,7 +726,7 @@ const PatientManagement = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Teléfono *</label>
+                  <label>{t('admin:patients.form.phone')} *</label>
                   <input
                     type="tel"
                     name="c_telefono"
@@ -737,7 +739,7 @@ const PatientManagement = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Email</label>
+                  <label>{t('admin:patients.form.email')}</label>
                   <input
                     type="email"
                     name="s_email"
@@ -751,7 +753,7 @@ const PatientManagement = () => {
               </div>
 
               <div className="form-group">
-                <label>Fecha de Nacimiento</label>
+                <label>{t('admin:patients.form.birthDate')}</label>
                 <input
                   type="date"
                   name="d_fecha_nacimiento"
@@ -764,11 +766,11 @@ const PatientManagement = () => {
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancelar
+                  {t('common:buttons.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary">
                   <FaCheck />
-                  {editingPatient ? 'Actualizar' : 'Crear'}
+                  {editingPatient ? t('common:buttons.update') : t('common:buttons.create')}
                 </button>
               </div>
             </form>

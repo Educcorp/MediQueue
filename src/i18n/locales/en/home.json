@@ -1,0 +1,52 @@
+{
+  "header": {
+    "title": "MediQueue®",
+    "takeTurnButton": "Get Appointment",
+    "selectArea": "Select medical area",
+    "loadingAreas": "Loading areas..."
+  },
+  
+  "areaSelector": {
+    "title": "Medical Area",
+    "selectPlaceholder": "Select medical area",
+    "generalView": "📊 General - All areas",
+    "noAreasAvailable": "No medical areas available"
+  },
+  
+  "monitor": {
+    "nextTurn": "NEXT APPOINTMENT",
+    "turnQueue": "Appointment Queue",
+    "realTime": "Real-time appointments",
+    "live": "LIVE",
+    "noTurnsWaiting": "No appointments waiting",
+    "allTurnsAttended": "All appointments have been attended in this area",
+    "office": "Office",
+    "waiting": "waiting",
+    "activeTurns": "active appointments",
+    "noActiveTurns": "No active appointments",
+    "allAreasEmpty": "All medical areas have no waiting appointments at this time",
+    "oneTurnWaiting": "appointment waiting",
+    "turnsWaiting": "appointments waiting"
+  },
+  
+  "turnDisplay": {
+    "callingNow": "CALLING NOW",
+    "waiting": "WAITING",
+    "calling": "Calling",
+    "office": "Office"
+  },
+  
+  "emptyState": {
+    "title": "No active appointments",
+    "description": "All medical areas have no waiting appointments at this time",
+    "selectAreaTitle": "Select a medical area",
+    "selectAreaDescription": "Use the selector in the header to view appointments for a specific area"
+  },
+  
+  "errors": {
+    "loadingError": "Error loading appointment information",
+    "retry": "Retry",
+    "noAreasError": "Could not load areas"
+  }
+}
+

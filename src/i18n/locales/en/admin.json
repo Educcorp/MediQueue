@@ -1,0 +1,448 @@
+{
+    "common": {
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success",
+      "noData": "No data available",
+      "confirmDelete": "Are you sure you want to delete this item?",
+      "actions": "Actions"
+    },
+    "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Welcome to the medical appointment management system",
+    "loadingDashboard": "Loading dashboard...",
+    "welcome": "Welcome",
+    "administrator": "Administrator",
+    "summary": "MediQueue system general overview",
+    "loading": "Loading dashboard...",
+    "loadError": "Error loading dashboard data",
+    "viewDetails": "View details",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions",
+    "turn": "Appointment",
+    "patient": "Patient",
+    "office": "Office",
+    "noRecentActivity": "No recent activity",
+    "systemStatus": "System Status",
+    "configure": "Configure",
+    "stats": {
+      "totalTurns": "Total Appointments",
+      "activeTurns": "Active Appointments",
+      "patients": "Total Patients",
+      "patientsSubtitle": "Registered in the system",
+      "offices": "Offices",
+      "areas": "Areas",
+      "admins": "Administrators",
+      "turnsToday": "Appointments Today",
+      "scheduledToday": "Scheduled for today",
+      "activeNow": "{{count}} active now",
+      "avgWaitTime": "~{{time}}min average",
+      "available": "Available",
+      "configured": "Configured",
+      "active": "Active",
+      "realTime": "Real time",
+      "thisMonth": "{{percentage}} this month"
+    },
+    "quickActions": {
+      "managePatients": "Manage Patients",
+      "viewAndManage": "View and manage patients",
+      "scheduleTurns": "Schedule Appointments",
+      "createNewTurns": "Create new appointments",
+      "offices": "Offices",
+      "manageSpaces": "Manage spaces",
+      "viewStatistics": "View Statistics",
+      "reportsAndMetrics": "Reports and metrics"
+    },
+    "metrics": {
+      "turnsCompleted": "Appointments Completed",
+      "officesBusy": "Offices Busy",
+      "patientSatisfaction": "Patient Satisfaction"
+    },
+    "cards": {
+      "turns": {
+        "title": "Manage Appointments",
+        "description": "Manage the medical appointment system",
+        "viewButton": "View Appointments",
+        "manageButton": "Manage Appointments",
+        "active": "active",
+        "today": "today"
+      },
+      "patients": {
+        "title": "Manage Patients",
+        "description": "Manage patient information",
+        "viewButton": "View Patients",
+        "registered": "registered"
+      },
+      "offices": {
+        "title": "Offices",
+        "description": "Management of offices and medical areas",
+        "viewButton": "View Offices",
+        "officesCount": "offices",
+        "areas": "areas"
+      },
+      "users": {
+        "title": "Manage Users",
+        "description": "Create, edit and delete administrator users",
+        "viewButton": "View Users",
+        "admins": "administrators"
+      },
+      "statistics": {
+        "title": "Statistics",
+        "description": "Reports and analysis of the appointment system",
+        "viewButton": "View Statistics",
+        "completed": "attended"
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "System configuration and preferences",
+        "configureButton": "Configure",
+        "system": "System"
+      }
+    },
+    "systemInfo": {
+      "title": "System Information",
+      "version": "Version",
+      "lastUpdate": "Last update",
+      "status": "Status",
+      "active": "Active"
+    }
+  },
+  
+  "stats": {
+    "totalTurns": "Total Appointments",
+    "activeTurns": "Active Appointments",
+    "patients": "Patients",
+    "consultorios": "Offices",
+    "areas": "Areas",
+    "administrators": "Administrators",
+    "todayTurns": "Appointments Today",
+    "completedTurns": "Completed Appointments",
+    "active": "active",
+    "today": "today",
+    "attended": "attended",
+    "available": "Available",
+    "configured": "Configured",
+    "registered": "registered",
+    "realTime": "Real time",
+    "thisMonth": "+1% this month",
+    "increase": "+8% this month"
+  },
+  
+  "cards": {
+    "manageTurns": {
+      "title": "Manage Appointments",
+      "description": "Manage the medical appointment system",
+      "viewTurns": "View Appointments"
+    },
+    "managePatients": {
+      "title": "Manage Patients",
+      "description": "Manage patient information",
+      "viewPatients": "View Patients"
+    },
+    "consultorios": {
+      "title": "Offices",
+      "description": "Management of offices and medical areas",
+      "viewConsultorios": "View Offices"
+    },
+    "manageUsers": {
+      "title": "Manage Users",
+      "description": "Create, edit and delete administrator users",
+      "viewUsers": "View Users"
+    },
+    "statistics": {
+      "title": "Statistics",
+      "description": "Reports and analysis of the appointment system",
+      "viewStatistics": "View Statistics"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "System configuration and preferences",
+      "configure": "Configure"
+    }
+  },
+  
+  "systemInfo": {
+    "title": "System Information",
+    "version": "Version",
+    "lastUpdate": "Last update",
+    "status": "Status",
+    "active": "Active",
+    "system": "System"
+  },
+  
+  "errors": {
+    "loadingError": "Error loading dashboard data",
+    "retry": "Retry"
+  },
+  
+  "turns": {
+    "title": "Appointment Management",
+    "subtitle": "Manage all system appointments - {{count}} appointments found",
+    "createTurn": "Create Appointment",
+    "editTurn": "Edit Appointment",
+    "deleteTurn": "Delete Appointment",
+    "viewTurn": "View Appointment",
+    "turnNumber": "Appointment Number",
+    "patient": "Patient",
+    "area": "Area",
+    "office": "Office",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "actions": "Actions",
+    "noTurns": "No appointments registered",
+    "createFirstTurn": "Create First Appointment",
+    "filter": "Filter",
+    "search": "Search appointments...",
+    "all": "All",
+    "confirmDelete": "Are you sure you want to delete this appointment?",
+    "filters": {
+      "dates": "Dates",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "areaAndOffice": "Area and Office",
+      "allOffices": "All offices",
+      "applyFilters": "Apply Filters"
+    },
+    "table": {
+      "turn": "Appointment",
+      "patient": "Patient",
+      "area": "Area",
+      "office": "Office",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "statusActions": {
+      "call": "Call",
+      "attend": "Attend",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "noPresent": "Not Present"
+    },
+    "messages": {
+      "updateSuccess": "Appointment updated successfully",
+      "callSuccess": "Patient called successfully",
+      "noTurnsFound": "No appointments registered",
+      "noTurnsForFilters": "No appointments found for the selected filters"
+    },
+    "empty": {
+      "title": "No appointments registered",
+      "subtitle": "No appointments found for the selected filters"
+    }
+  },
+  
+  "patients": {
+    "title": "Patient Management",
+    "subtitle": "Manage patient information",
+    "createPatient": "Create Patient",
+    "addPatient": "Add Patient",
+    "editPatient": "Edit Patient",
+    "deletePatient": "Delete Patient",
+    "viewPatient": "View Patient",
+    "searchPlaceholder": "Search by name, document or phone...",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "email": "Email",
+    "birthDate": "Birth Date",
+    "noPatients": "No patients registered",
+    "createFirstPatient": "Create First Patient",
+    "search": "Search patients...",
+    "confirmDelete": "Are you sure you want to delete this patient?",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "document": "Document",
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "turns": "Appointments",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "form": {
+      "documentType": "Document Type",
+      "documentNumber": "Document Number",
+      "documentPlaceholder": "Enter document number",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter last name",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter phone number",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "address": "Address",
+      "addressPlaceholder": "Enter full address",
+      "birthDate": "Birth Date",
+      "gender": "Gender",
+      "selectGender": "Select gender",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "bloodType": "Blood Type",
+      "allergies": "Allergies",
+      "allergiesPlaceholder": "Enter known allergies",
+      "medicalNotes": "Medical Notes",
+      "medicalNotesPlaceholder": "Additional notes"
+    },
+    "messages": {
+      "createSuccess": "Patient created successfully",
+      "createError": "Unable to create patient",
+      "updateSuccess": "Patient updated successfully",
+      "updateError": "Unable to update patient",
+      "deleteSuccess": "Patient deleted successfully",
+      "deleteError": "Unable to delete patient",
+      "deleteConfirm": "Are you sure you want to delete this patient?",
+      "validationError": "Please complete all required fields"
+    },
+    "stats": {
+      "total": "Total Patients",
+      "active": "Active",
+      "newThisMonth": "New this month"
+    },
+    "empty": "No patients registered"
+  },
+  
+  "users": {
+    "title": "User Management",
+    "subtitle": "Manage system administrator users",
+    "createUser": "Create User",
+    "addUser": "Add User",
+    "newUser": "New Administrative User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "viewUser": "View User",
+    "searchPlaceholder": "Search users by name or email...",
+    "username": "Username",
+    "role": "Role",
+    "registered": "administrators registered",
+    "noUsers": "No users registered",
+    "noUsersForFilters": "No users found with the applied filters",
+    "noUsersInSystem": "No administrative users in the system",
+    "createFirstUser": "Create First User",
+    "listTitle": "List of Administrative Users",
+    "search": "Search users...",
+    "confirmDelete": "Are you sure you want to delete this user?",
+    "noPhone": "Not registered",
+    "stats": {
+      "totalUsers": "Total Users",
+      "superAdmins": "Super Administrators",
+      "supervisors": "Supervisors"
+    },
+    "table": {
+      "username": "Username",
+      "fullName": "Full Name",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "type": "Type",
+      "role": "Role",
+      "status": "Status",
+      "createdAt": "Creation Date",
+      "registrationDate": "Registration Date",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Name",
+      "lastName": "Last Name",
+      "namePlaceholder": "Enter full name",
+      "lastNamePlaceholder": "Last Name",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+57 300 123 4567",
+      "username": "Username",
+      "usernamePlaceholder": "username",
+      "userType": "User Type",
+      "password": "Password",
+      "passwordPlaceholder": "Minimum 6 characters",
+      "newPasswordOptional": "New Password (optional)",
+      "passwordEmptyToKeep": "Leave empty to keep current",
+      "confirmPassword": "Confirm Password",
+      "role": "Role",
+      "selectRole": "Select role",
+      "status": "Status"
+    },
+    "messages": {
+      "createSuccess": "User created successfully",
+      "updateSuccess": "User updated successfully",
+      "deleteSuccess": "User deleted successfully",
+      "deleteConfirm": "Are you sure you want to delete this user?",
+      "cannotDeleteSelf": "You cannot delete your own account",
+      "validationError": "Please complete all required fields",
+      "passwordRequired": "Password is required to create a new administrator",
+      "passwordFormat": "Password must be at least 6 characters and include lowercase, uppercase and number",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "empty": "No users registered"
+  },
+
+  "statistics": {
+    "title": "System Statistics",
+    "subtitle": "Analysis and reports of the appointment system",
+    "overview": "General Overview",
+    "charts": "Charts",
+    "reports": "Reports",
+    "dateRange": "Date Range",
+    "from": "From",
+    "to": "To",
+    "generate": "Generate Report",
+    "export": "Export",
+    "exportPDF": "Export PDF",
+    "exportExcel": "Export Excel",
+    "metrics": {
+      "totalTurns": "Total Appointments",
+      "completedTurns": "Completed Appointments",
+      "cancelledTurns": "Cancelled Appointments",
+      "avgWaitTime": "Average Wait Time",
+      "patientSatisfaction": "Patient Satisfaction",
+      "officeUtilization": "Office Utilization"
+    },
+    "charts": {
+      "turnsByDay": "Appointments by Day",
+      "turnsByArea": "Appointments by Area",
+      "turnsByStatus": "Appointments by Status",
+      "turnsByOffice": "Appointments by Office",
+      "peakHours": "Peak Hours"
+    },
+    "periods": {
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month",
+      "year": "This Year",
+      "custom": "Custom"
+    },
+    "noData": "No data available for the selected period"
+  },
+  
+  "login": {
+    "title": "Administration Panel",
+    "welcome": "The System Welcomes You",
+    "subtitle": "Your appointment management platform starts here.",
+    "pleaseLogin": "Please login.",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "loginButton": "Login",
+    "loggingIn": "Logging in...",
+    "authenticating": "Authenticating user",
+    "errors": {
+      "fillAllFields": "Please fill in all fields",
+      "invalidEmail": "Please enter a valid email",
+      "loginFailed": "Login failed",
+      "connectionError": "Connection error. Verify that the server is running."
+    },
+    "menu": {
+      "manageTurns": "Manage Appointments",
+      "manageOffices": "Office Management",
+      "managePatients": "Patient Management",
+      "manageStats": "System Statistics Management"
+    }
+  }
+}

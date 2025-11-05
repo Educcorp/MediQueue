@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaHeart, FaCode, FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { MdCopyright } from 'react-icons/md';
@@ -6,6 +7,7 @@ import { HiOutlineExternalLink } from 'react-icons/hi';
 
 
 const AdminFooter = ({ isDarkMode = false }) => {
+  const { t } = useTranslation('common');
   const currentYear = new Date().getFullYear();
 
   return (
@@ -28,7 +30,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
           gap: '32px',
           marginBottom: '24px'
         }}>
-          
+
           {/* Brand Section */}
           <div>
             <div style={{
@@ -46,9 +48,9 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 justifyContent: 'center',
                 padding: '3px'
               }}>
-                <img 
-                  src="/images/favicon.png" 
-                  alt="MediQueue Logo" 
+                <img
+                  src="/images/favicon.png"
+                  alt="MediQueue Logo"
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
@@ -62,7 +64,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 fontWeight: '600',
                 color: isDarkMode ? '#ffffff' : '#2d3748'
               }}>
-                MediQueue®
+                {t('appNameFull')}
               </h3>
             </div>
             <p style={{
@@ -71,7 +73,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               lineHeight: '1.6',
               maxWidth: '280px'
             }}>
-              Sistema integral de gestión de turnos médicos. Optimizando la experiencia de pacientes y profesionales de la salud.
+              {t('footer.description')}
             </p>
           </div>
 
@@ -83,7 +85,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Enlaces Rápidos
+              {t('footer.quickLinks')}
             </h4>
             <div style={{
               display: 'flex',
@@ -134,7 +136,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Sistema
+              {t('navigation.settings')}
             </h4>
             <div style={{
               display: 'flex',
@@ -153,8 +155,10 @@ const AdminFooter = ({ isDarkMode = false }) => {
                   backgroundColor: '#48bb78',
                   borderRadius: '50%'
                 }}></div>
-                <span>Estado: Operativo</span>
+                <span>{t('common:status.active')}: {t('footer.system.operative')}</span>
               </div>
+              <div>{t('footer.version')}: 2.1.0</div>
+              <div>{t('footer.system.lastUpdate')}: {t('footer.system.updateDate')}</div>
               <div>Versión: 1.8.8</div>
               <div>Última actualización: Octubre 2025</div>
             </div>
@@ -168,7 +172,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Soporte & Contacto
+              {t('footer.socialTitle')}
             </h4>
             <div style={{
               display: 'flex',
@@ -180,27 +184,27 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 gap: '12px'
               }}>
                 {[
-                  { 
-                    icon: FaEnvelope, 
-                    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Soporte%20MediQueue&body=Hola,%20necesito%20ayuda%20con%20MediQueue.', 
+                  {
+                    icon: FaEnvelope,
+                    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Soporte%20MediQueue&body=Hola,%20necesito%20ayuda%20con%20MediQueue.',
                     color: '#e53e3e',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaGithub, 
-                    href: 'https://github.com/Educcorp/MediQueue', 
+                  {
+                    icon: FaGithub,
+                    href: 'https://github.com/Educcorp/MediQueue',
                     color: isDarkMode ? '#ffffff' : '#2d3748',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaLinkedin, 
-                    href: 'https://www.linkedin.com/in/educcorp-inc-158297356/', 
+                  {
+                    icon: FaLinkedin,
+                    href: 'https://www.linkedin.com/in/educcorp-inc-158297356/',
                     color: '#3182ce',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaXTwitter, 
-                    href: 'https://x.com/Educcorp', 
+                  {
+                    icon: FaXTwitter,
+                    href: 'https://x.com/Educcorp',
                     color: isDarkMode ? '#ffffff' : '#000000',
                     target: '_blank'
                   }
@@ -228,7 +232,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 fontSize: '12px',
                 color: isDarkMode ? '#718096' : '#a0aec0'
               }}>
-                Soporte técnico disponible 24/7
+                {t('footer.support24')}
               </div>
             </div>
           </div>
@@ -252,7 +256,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
             fontSize: '14px'
           }}>
             <MdCopyright size={16} />
-            <span>{currentYear} MediQueue. Todos los derechos reservados.</span>
+            <span>{currentYear} {t('appName')}. {t('footer.copyright')}</span>
           </div>
 
           <div style={{
@@ -261,11 +265,11 @@ const AdminFooter = ({ isDarkMode = false }) => {
             gap: '4px',
             fontSize: '14px'
           }}>
-            <span>Desarrollado con</span>
+            <span>{t('footer.developedWith')}</span>
             <FaHeart style={{ color: '#e53e3e', fontSize: '12px' }} />
-            <span>y</span>
+            <span>{t('footer.and')}</span>
             <FaCode style={{ color: '#77b8ce', fontSize: '12px' }} />
-            <span>por EducCorp</span>
+            <span>{t('footer.byEduccorp')}</span>
           </div>
         </div>
 

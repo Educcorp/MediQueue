@@ -1,0 +1,52 @@
+{
+  "header": {
+    "title": "Tomar Turno",
+    "subtitle": ""
+  },
+  
+  "instructions": {
+    "title": "Seleccione el área médica",
+    "description": "Toque el área médica para la cual desea tomar un turno"
+  },
+  
+  "confirmation": {
+    "backToAreas": "Volver a Áreas",
+    "autoAssignment": "Se asignará automáticamente el consultorio más disponible de esta área",
+    "generateTurn": "Generar Turno",
+    "generatingTurn": "Generando Turno..."
+  },
+  
+  "success": {
+    "title": "¡Turno Generado Exitosamente!",
+    "yourTurnNumber": "Su número de turno es:",
+    "area": "Área",
+    "office": "Consultorio",
+    "waitingTurns": "En espera",
+    "turns": "turnos",
+    "displayMessage": "Su turno se mostrará en la pantalla de visualización de turnos",
+    "redirecting": "Redirigiendo automáticamente..."
+  },
+  
+  "loading": {
+    "processing": "Procesando solicitud...",
+    "generating": "Generando su turno, por favor espere"
+  },
+  
+  "emptyState": {
+    "title": "No hay áreas médicas disponibles",
+    "description": "Actualmente no hay consultorios configurados en el sistema"
+  },
+  
+  "errors": {
+    "selectArea": "Por favor selecciona un área",
+    "generatingError": "Error al generar el turno",
+    "tryAgain": "Intenta nuevamente"
+  },
+  
+  "assignment": {
+    "office": "Consultorio",
+    "waiting": "En espera",
+    "turnsWaiting": "turnos en espera"
+  }
+}
+
