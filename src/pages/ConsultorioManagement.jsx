@@ -105,6 +105,26 @@ const ConsultorioManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [letraError, setLetraError] = useState('');
 
+  // Estados para modales de notificación
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successModalData, setSuccessModalData] = useState({ 
+    message: '', 
+    data: null,
+    type: '' // 'area', 'consultorio'
+  });
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalData, setErrorModalData] = useState({ message: '' });
+
+  // Estados para modales de confirmación
+  const [showDeleteAreaModal, setShowDeleteAreaModal] = useState(false);
+  const [areaToDelete, setAreaToDelete] = useState(null);
+  const [showDeleteConsultorioModal, setShowDeleteConsultorioModal] = useState(false);
+  const [consultorioToDelete, setConsultorioToDelete] = useState(null);
+  const [showToggleAreaModal, setShowToggleAreaModal] = useState(false);
+  const [areaToToggle, setAreaToToggle] = useState(null);
+  const [showToggleConsultorioModal, setShowToggleConsultorioModal] = useState(false);
+  const [consultorioToToggle, setConsultorioToToggle] = useState(null);
+
   // Mapa de iconos y colores por nombre de área médica
   const getAreaIcon = (areaName) => {
     const iconMap = {
@@ -216,118 +236,229 @@ const ConsultorioManagement = () => {
     setShowConsultorioModal(true);
   };
 
-  const handleToggleAreaEstado = async (area) => {
-    const nuevoEstado = area.ck_estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
-    const accion = nuevoEstado === 'ACTIVO' ? 'desbloquear' : 'bloquear';
+  const handleToggleAreaEstado = (area) => {
+    setAreaToToggle(area);
+    setShowToggleAreaModal(true);
+  };
 
-    if (window.confirm(`¿Estás seguro de ${accion} el área "${area.s_nombre_area}"?`)) {
-      try {
-        await areaService.toggleEstado(area.uk_area);
-        await loadData();
-        alert(`Área ${accion === 'bloquear' ? 'bloqueada' : 'desbloqueada'} correctamente`);
-      } catch (error) {
-        console.error('Error cambiando estado del área:', error);
-        const mensaje = error.response?.data?.message || error.message || 'Error desconocido al cambiar el estado del área';
-        alert('Error cambiando estado del área: ' + mensaje);
-      }
+  const confirmToggleArea = async () => {
+    if (!areaToToggle) return;
+
+    try {
+      await areaService.toggleEstado(areaToToggle.uk_area);
+      await loadData();
+      setShowToggleAreaModal(false);
+      
+      const accion = areaToToggle.ck_estado === 'ACTIVO' ? 'bloqueada' : 'desbloqueada';
+      
+      setSuccessModalData({
+        message: `Área ${accion} correctamente`,
+        data: {
+          nombre: areaToToggle.s_nombre_area,
+          accion: accion
+        },
+        type: 'area-toggle'
+      });
+      setShowSuccessModal(true);
+      setAreaToToggle(null);
+      
+      setTimeout(() => setShowSuccessModal(false), 3000);
+    } catch (error) {
+      setShowToggleAreaModal(false);
+      setAreaToToggle(null);
+      
+      setErrorModalData({
+        message: 'No es posible cambiar el estado del área'
+      });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
+      
+      console.error('Error cambiando estado del área:', error);
     }
   };
 
-  const handleDeleteArea = async (area) => {
-    const consultoriosEnArea = consultorios.filter(c => c.uk_area === area.uk_area);
-    const mensaje = consultoriosEnArea.length > 0
-      ? `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?\n\nEsto eliminará también ${consultoriosEnArea.length} consultorio(s) y todos los turnos asociados.`
-      : `¿Estás seguro de eliminar el área "${area.s_nombre_area}"?`;
+  const cancelToggleArea = () => {
+    setShowToggleAreaModal(false);
+    setAreaToToggle(null);
+  };
 
-    if (window.confirm(mensaje)) {
-      try {
-        // Nota: el servicio expone "remove" para eliminación hard.
-        await areaService.remove(area.uk_area);
-        await loadData();
-        alert('Área eliminada correctamente');
-      } catch (error) {
-        console.error('Error eliminando área:', error);
+  const handleDeleteArea = (area) => {
+    setAreaToDelete(area);
+    setShowDeleteAreaModal(true);
+  };
 
-        // Manejar diferentes tipos de errores
-        if (error.response?.status === 404) {
-          alert('El área no fue encontrada');
-        } else if (error.response?.status === 403) {
-          alert('No tienes permisos para eliminar esta área');
-        } else {
-          // Error genérico
-          const mensaje = error.response?.data?.message || error.message || 'Error desconocido al eliminar el área';
-          alert('Error eliminando área: ' + mensaje);
-        }
+  const confirmDeleteArea = async () => {
+    if (!areaToDelete) return;
+
+    try {
+      await areaService.remove(areaToDelete.uk_area);
+      await loadData();
+      setShowDeleteAreaModal(false);
+      
+      setSuccessModalData({
+        message: 'Área eliminada correctamente',
+        data: {
+          nombre: areaToDelete.s_nombre_area
+        },
+        type: 'area-delete'
+      });
+      setShowSuccessModal(true);
+      setAreaToDelete(null);
+      
+      setTimeout(() => setShowSuccessModal(false), 3000);
+    } catch (error) {
+      setShowDeleteAreaModal(false);
+      setAreaToDelete(null);
+      
+      // Manejar diferentes tipos de errores
+      let mensaje = 'No es posible eliminar el área';
+      if (error.response?.status === 404) {
+        mensaje = 'El área no fue encontrada';
+      } else if (error.response?.status === 403) {
+        mensaje = 'No tienes permisos para eliminar esta área';
       }
+      
+      setErrorModalData({ message: mensaje });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
+      
+      console.error('Error eliminando área:', error);
     }
   };
 
-  const handleToggleConsultorioEstado = async (consultorio) => {
-    const nuevoEstado = consultorio.ck_estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
-    const accion = nuevoEstado === 'ACTIVO' ? 'desbloquear' : 'bloquear';
+  const cancelDeleteArea = () => {
+    setShowDeleteAreaModal(false);
+    setAreaToDelete(null);
+  };
 
-    if (window.confirm(`¿Estás seguro de ${accion} el consultorio #${consultorio.i_numero_consultorio}?`)) {
-      try {
-        await consultorioService.toggleEstado(consultorio.uk_consultorio);
-        await loadData();
-        alert(`Consultorio ${accion === 'bloquear' ? 'bloqueado' : 'desbloqueado'} correctamente`);
-      } catch (error) {
-        console.error('Error cambiando estado del consultorio:', error);
-        const mensaje = error.response?.data?.message || error.message || 'Error desconocido al cambiar el estado del consultorio';
-        alert('Error cambiando estado del consultorio: ' + mensaje);
-      }
+  const handleToggleConsultorioEstado = (consultorio) => {
+    setConsultorioToToggle(consultorio);
+    setShowToggleConsultorioModal(true);
+  };
+
+  const confirmToggleConsultorio = async () => {
+    if (!consultorioToToggle) return;
+
+    try {
+      await consultorioService.toggleEstado(consultorioToToggle.uk_consultorio);
+      await loadData();
+      setShowToggleConsultorioModal(false);
+      
+      const accion = consultorioToToggle.ck_estado === 'ACTIVO' ? 'bloqueado' : 'desbloqueado';
+      
+      setSuccessModalData({
+        message: `Consultorio ${accion} correctamente`,
+        data: {
+          numero: consultorioToToggle.i_numero_consultorio,
+          accion: accion
+        },
+        type: 'consultorio-toggle'
+      });
+      setShowSuccessModal(true);
+      setConsultorioToToggle(null);
+      
+      setTimeout(() => setShowSuccessModal(false), 3000);
+    } catch (error) {
+      setShowToggleConsultorioModal(false);
+      setConsultorioToToggle(null);
+      
+      setErrorModalData({
+        message: 'No es posible cambiar el estado del consultorio'
+      });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
+      
+      console.error('Error cambiando estado del consultorio:', error);
     }
   };
 
-  const handleDeleteConsultorio = async (consultorio) => {
-    if (window.confirm(`¿Estás seguro de eliminar el consultorio #${consultorio.i_numero_consultorio}?\n\nEsto eliminará también todos los turnos asociados a este consultorio.`)) {
-      try {
-        await consultorioService.remove(consultorio.uk_consultorio);
-        await loadData();
-        alert('Consultorio eliminado correctamente');
-      } catch (error) {
-        console.error('Error eliminando consultorio:', error);
+  const cancelToggleConsultorio = () => {
+    setShowToggleConsultorioModal(false);
+    setConsultorioToToggle(null);
+  };
 
-        // Manejar diferentes tipos de errores
-        if (error.response?.status === 404) {
-          alert('El consultorio no fue encontrado');
-        } else if (error.response?.status === 403) {
-          alert('No tienes permisos para eliminar este consultorio');
-        } else {
-          // Error genérico
-          const mensaje = error.response?.data?.message || error.message || 'Error desconocido al eliminar el consultorio';
-          alert('Error eliminando consultorio: ' + mensaje);
-        }
+  const handleDeleteConsultorio = (consultorio) => {
+    setConsultorioToDelete(consultorio);
+    setShowDeleteConsultorioModal(true);
+  };
+
+  const confirmDeleteConsultorio = async () => {
+    if (!consultorioToDelete) return;
+
+    try {
+      await consultorioService.remove(consultorioToDelete.uk_consultorio);
+      await loadData();
+      setShowDeleteConsultorioModal(false);
+      
+      setSuccessModalData({
+        message: 'Consultorio eliminado correctamente',
+        data: {
+          numero: consultorioToDelete.i_numero_consultorio
+        },
+        type: 'consultorio-delete'
+      });
+      setShowSuccessModal(true);
+      setConsultorioToDelete(null);
+      
+      setTimeout(() => setShowSuccessModal(false), 3000);
+    } catch (error) {
+      setShowDeleteConsultorioModal(false);
+      setConsultorioToDelete(null);
+      
+      // Manejar diferentes tipos de errores
+      let mensaje = 'No es posible eliminar el consultorio';
+      if (error.response?.status === 404) {
+        mensaje = 'El consultorio no fue encontrado';
+      } else if (error.response?.status === 403) {
+        mensaje = 'No tienes permisos para eliminar este consultorio';
       }
+      
+      setErrorModalData({ message: mensaje });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
+      
+      console.error('Error eliminando consultorio:', error);
     }
+  };
+
+  const cancelDeleteConsultorio = () => {
+    setShowDeleteConsultorioModal(false);
+    setConsultorioToDelete(null);
   };
 
   const handleSubmitArea = async (e) => {
     e.preventDefault();
 
     if (!formData.s_nombre_area.trim()) {
-      alert('El nombre del área es requerido');
+      setErrorModalData({ message: 'Por favor complete todos los campos requeridos' });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
       return;
     }
 
     if (formData.s_nombre_area.trim().length > 50) {
-      alert('El nombre del área no puede exceder los 50 caracteres');
+      setErrorModalData({ message: 'El nombre del área no puede exceder los 50 caracteres' });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
       return;
     }
 
-    // Validar letra si se proporciona
     if (letraError) {
-      alert('Por favor corrige el error en la letra identificadora');
+      setErrorModalData({ message: 'Por favor corrige el error en la letra identificadora' });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
       return;
     }
 
-    // Validación adicional de color
     if (formData.s_color && !/^#[0-9A-Fa-f]{6}$/.test(formData.s_color)) {
-      alert('El formato del color no es válido');
+      setErrorModalData({ message: 'El formato del color no es válido' });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
       return;
     }
 
     try {
+      const isUpdate = !!editingArea;
       const areaData = {
         s_nombre_area: formData.s_nombre_area.trim(),
         s_letra: formData.s_letra || null,
@@ -335,16 +466,27 @@ const ConsultorioManagement = () => {
         s_icono: formData.s_icono || null
       };
 
-      if (editingArea) {
+      if (isUpdate) {
         await areaService.update(editingArea.uk_area, areaData);
-        alert('Área actualizada correctamente');
       } else {
         await areaService.create(areaData);
-        alert('Área creada correctamente');
       }
 
       await loadData();
       setShowAreaModal(false);
+      
+      setSuccessModalData({
+        message: isUpdate ? 'Área actualizada correctamente' : 'Área creada correctamente',
+        data: {
+          nombre: formData.s_nombre_area.trim(),
+          letra: formData.s_letra || null,
+          color: formData.s_color || null,
+          icono: formData.s_icono || null
+        },
+        type: 'area'
+      });
+      setShowSuccessModal(true);
+      
       setFormData({
         s_nombre_area: '',
         s_letra: '',
@@ -354,43 +496,77 @@ const ConsultorioManagement = () => {
         uk_area: ''
       });
       setLetraError('');
+      
+      setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
-      alert('Error guardando área: ' + error.message);
+      const errorMessage = editingArea 
+        ? 'No es posible actualizar el área' 
+        : 'No es posible crear el área';
+      
+      setErrorModalData({ message: errorMessage });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
+      
       console.error('Error guardando área:', error);
     }
+  };
+
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessModalData({ message: '', data: null, type: '' });
+  };
+
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
+    setErrorModalData({ message: '' });
   };
 
   const handleSubmitConsultorio = async (e) => {
     e.preventDefault();
 
     if (!formData.i_numero_consultorio) {
-      alert('El número del consultorio es requerido');
+      setErrorModalData({ message: 'El número del consultorio es requerido' });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
       return;
     }
 
     const numeroConsultorio = parseInt(formData.i_numero_consultorio);
     if (numeroConsultorio < 1 || numeroConsultorio > 999) {
-      alert('El número del consultorio debe estar entre 1 y 999 (máximo 3 dígitos)');
+      setErrorModalData({ message: 'El número del consultorio debe estar entre 1 y 999' });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
       return;
     }
 
     try {
-      if (editingConsultorio) {
+      const isUpdate = !!editingConsultorio;
+      
+      if (isUpdate) {
         await consultorioService.update(editingConsultorio.uk_consultorio, {
           i_numero_consultorio: parseInt(formData.i_numero_consultorio),
           uk_area: formData.uk_area
         });
-        alert('Consultorio actualizado correctamente');
       } else {
         await consultorioService.create({
           uk_area: formData.uk_area,
           i_numero_consultorio: parseInt(formData.i_numero_consultorio)
         });
-        alert('Consultorio creado correctamente');
       }
 
       await loadData();
       setShowConsultorioModal(false);
+      
+      setSuccessModalData({
+        message: isUpdate ? 'Consultorio actualizado correctamente' : 'Consultorio creado correctamente',
+        data: {
+          numero: parseInt(formData.i_numero_consultorio),
+          areaName: selectedAreaForConsultorio?.s_nombre_area || ''
+        },
+        type: 'consultorio'
+      });
+      setShowSuccessModal(true);
+      
       setFormData({
         s_nombre_area: '',
         s_letra: '',
@@ -399,8 +575,17 @@ const ConsultorioManagement = () => {
         i_numero_consultorio: '',
         uk_area: ''
       });
+      
+      setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
-      alert('Error guardando consultorio: ' + error.message);
+      const errorMessage = editingConsultorio 
+        ? 'No es posible actualizar el consultorio' 
+        : 'No es posible crear el consultorio';
+      
+      setErrorModalData({ message: errorMessage });
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 4000);
+      
       console.error('Error guardando consultorio:', error);
     }
   };
@@ -1145,6 +1330,901 @@ const ConsultorioManagement = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para bloquear/desbloquear área */}
+      {showToggleAreaModal && areaToToggle && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: isDarkMode ? 'rgba(255, 193, 7, 0.1)' : 'rgba(255, 193, 7, 0.05)'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(255, 193, 7, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffc107',
+                fontSize: '20px'
+              }}>
+                {areaToToggle.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                {areaToToggle.ck_estado === 'ACTIVO' ? 'Bloquear Área' : 'Desbloquear Área'}
+              </h3>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
+                fontSize: '16px',
+                lineHeight: '1.5'
+              }}>
+                ¿Estás seguro de {areaToToggle.ck_estado === 'ACTIVO' ? 'bloquear' : 'desbloquear'} el área <strong>{areaToToggle.s_nombre_area}</strong>?
+              </p>
+              
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.2)' : 'rgba(119, 184, 206, 0.3)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaBuilding style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Área:</strong> {areaToToggle.s_nombre_area}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              gap: '12px', 
+              justifyContent: 'flex-end'
+            }}>
+              <button 
+                type="button" 
+                onClick={cancelToggleArea} 
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmToggleArea}
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: areaToToggle.ck_estado === 'ACTIVO' ? '#ffc107' : '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: areaToToggle.ck_estado === 'ACTIVO' ? '0 2px 8px rgba(255, 193, 7, 0.3)' : '0 2px 8px rgba(40, 167, 69, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = areaToToggle.ck_estado === 'ACTIVO' ? '0 4px 12px rgba(255, 193, 7, 0.4)' : '0 4px 12px rgba(40, 167, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = areaToToggle.ck_estado === 'ACTIVO' ? '0 2px 8px rgba(255, 193, 7, 0.3)' : '0 2px 8px rgba(40, 167, 69, 0.3)';
+                }}
+              >
+                Sí, {areaToToggle.ck_estado === 'ACTIVO' ? 'bloquear' : 'desbloquear'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para eliminar área */}
+      {showDeleteAreaModal && areaToDelete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: isDarkMode ? 'rgba(234, 93, 75, 0.1)' : 'rgba(234, 93, 75, 0.05)'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(234, 93, 75, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ea5d4b',
+                fontSize: '20px'
+              }}>
+                <FaExclamationTriangle />
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                Confirmar Eliminación
+              </h3>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
+                fontSize: '16px',
+                lineHeight: '1.5'
+              }}>
+                ¿Estás seguro de eliminar el área <strong>{areaToDelete.s_nombre_area}</strong>?
+              </p>
+              
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.2)' : 'rgba(119, 184, 206, 0.3)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaBuilding style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Área:</strong> {areaToDelete.s_nombre_area}
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ 
+                margin: '0',
+                color: 'var(--text-muted)',
+                fontSize: '14px',
+                fontStyle: 'italic'
+              }}>
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              gap: '12px', 
+              justifyContent: 'flex-end'
+            }}>
+              <button 
+                type="button" 
+                onClick={cancelDeleteArea} 
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmDeleteArea}
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: '#ea5d4b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(234, 93, 75, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#d94435';
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(234, 93, 75, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ea5d4b';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 8px rgba(234, 93, 75, 0.3)';
+                }}
+              >
+                Sí, eliminar área
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para bloquear/desbloquear consultorio */}
+      {showToggleConsultorioModal && consultorioToToggle && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: isDarkMode ? 'rgba(255, 193, 7, 0.1)' : 'rgba(255, 193, 7, 0.05)'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(255, 193, 7, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffc107',
+                fontSize: '20px'
+              }}>
+                {consultorioToToggle.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                {consultorioToToggle.ck_estado === 'ACTIVO' ? 'Bloquear Consultorio' : 'Desbloquear Consultorio'}
+              </h3>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
+                fontSize: '16px',
+                lineHeight: '1.5'
+              }}>
+                ¿Estás seguro de {consultorioToToggle.ck_estado === 'ACTIVO' ? 'bloquear' : 'desbloquear'} el consultorio <strong>#{consultorioToToggle.i_numero_consultorio}</strong>?
+              </p>
+              
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.2)' : 'rgba(119, 184, 206, 0.3)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaDoorOpen style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Consultorio:</strong> #{consultorioToToggle.i_numero_consultorio}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              gap: '12px', 
+              justifyContent: 'flex-end'
+            }}>
+              <button 
+                type="button" 
+                onClick={cancelToggleConsultorio} 
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmToggleConsultorio}
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: consultorioToToggle.ck_estado === 'ACTIVO' ? '#ffc107' : '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: consultorioToToggle.ck_estado === 'ACTIVO' ? '0 2px 8px rgba(255, 193, 7, 0.3)' : '0 2px 8px rgba(40, 167, 69, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = consultorioToToggle.ck_estado === 'ACTIVO' ? '0 4px 12px rgba(255, 193, 7, 0.4)' : '0 4px 12px rgba(40, 167, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = consultorioToToggle.ck_estado === 'ACTIVO' ? '0 2px 8px rgba(255, 193, 7, 0.3)' : '0 2px 8px rgba(40, 167, 69, 0.3)';
+                }}
+              >
+                Sí, {consultorioToToggle.ck_estado === 'ACTIVO' ? 'bloquear' : 'desbloquear'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para eliminar consultorio */}
+      {showDeleteConsultorioModal && consultorioToDelete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: isDarkMode ? 'rgba(234, 93, 75, 0.1)' : 'rgba(234, 93, 75, 0.05)'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(234, 93, 75, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ea5d4b',
+                fontSize: '20px'
+              }}>
+                <FaExclamationTriangle />
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                Confirmar Eliminación
+              </h3>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
+                fontSize: '16px',
+                lineHeight: '1.5'
+              }}>
+                ¿Estás seguro de eliminar el consultorio <strong>#{consultorioToDelete.i_numero_consultorio}</strong>?
+              </p>
+              
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.2)' : 'rgba(119, 184, 206, 0.3)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaDoorOpen style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Consultorio:</strong> #{consultorioToDelete.i_numero_consultorio}
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ 
+                margin: '0',
+                color: 'var(--text-muted)',
+                fontSize: '14px',
+                fontStyle: 'italic'
+              }}>
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              gap: '12px', 
+              justifyContent: 'flex-end'
+            }}>
+              <button 
+                type="button" 
+                onClick={cancelDeleteConsultorio} 
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmDeleteConsultorio}
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: '#ea5d4b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(234, 93, 75, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#d94435';
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(234, 93, 75, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ea5d4b';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 8px rgba(234, 93, 75, 0.3)';
+                }}
+              >
+                Sí, eliminar consultorio
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de notificación de éxito */}
+      {showSuccessModal && successModalData.data && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '420px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{ padding: '32px 24px' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(40, 167, 69, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaCheck style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                ¡Éxito!
+              </h3>
+
+              <p style={{ 
+                margin: '0 0 20px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '15px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                {successModalData.message}
+              </p>
+              
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
+                padding: '16px',
+                borderRadius: '12px',
+                marginBottom: '24px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.25)'}`
+              }}>
+                {successModalData.type === 'area' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FaBuilding style={{ color: '#77b8ce', fontSize: '14px' }} />
+                    </div>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                      {successModalData.data.nombre}
+                    </span>
+                  </div>
+                )}
+                {successModalData.type === 'consultorio' && (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <FaDoorOpen style={{ color: '#77b8ce', fontSize: '14px' }} />
+                      </div>
+                      <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                        Consultorio #{successModalData.data.numero}
+                      </span>
+                    </div>
+                    {successModalData.data.areaName && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <FaBuilding style={{ color: '#77b8ce', fontSize: '14px' }} />
+                        </div>
+                        <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                          {successModalData.data.areaName}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+                {successModalData.type === 'area-toggle' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FaBuilding style={{ color: '#77b8ce', fontSize: '14px' }} />
+                    </div>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                      {successModalData.data.nombre}
+                    </span>
+                  </div>
+                )}
+                {(successModalData.type === 'area-delete' || successModalData.type === 'consultorio-delete' || successModalData.type === 'consultorio-toggle') && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {successModalData.type.includes('area') ? <FaBuilding style={{ color: '#77b8ce', fontSize: '14px' }} /> : <FaDoorOpen style={{ color: '#77b8ce', fontSize: '14px' }} />}
+                    </div>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                      {successModalData.data.nombre || `Consultorio #${successModalData.data.numero}`}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{
+              height: '4px',
+              background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+              borderRadius: '0 0 var(--border-radius) var(--border-radius)',
+              overflow: 'hidden',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                animation: 'autoCloseProgress 3s linear forwards'
+              }} />
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeSuccessModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(40, 167, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
+                }}
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de notificación de error */}
+      {showErrorModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{ padding: '32px 24px' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(220, 53, 69, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaExclamationTriangle style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                Error
+              </h3>
+
+              <p style={{ 
+                margin: '0 0 24px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '16px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                {errorModalData.message}
+              </p>
+            </div>
+
+            <div style={{
+              height: '4px',
+              background: isDarkMode ? 'rgba(220, 53, 69, 0.1)' : 'rgba(220, 53, 69, 0.15)',
+              borderRadius: '0 0 var(--border-radius) var(--border-radius)',
+              overflow: 'hidden',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                animation: 'autoCloseProgress 4s linear forwards'
+              }} />
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeErrorModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(220, 53, 69, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(220, 53, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+                }}
+              >
+                Aceptar
+              </button>
             </div>
           </div>
         </div>
