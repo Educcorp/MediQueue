@@ -169,7 +169,7 @@
       "about": "About Us",
       "privacy": "Privacy Policy"
     },
-    "socialTitle": "Follow Us & Support",
+    "socialTitle": "Support & Contact",
     "support24": "24/7 technical support available",
     "copyright": "All rights reserved",
     "developedWith": "Developed with",
@@ -179,7 +179,12 @@
     "version": "Version",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "contact": "Contact"
+    "contact": "Contact",
+    "system": {
+      "operative": "Operative",
+      "lastUpdate": "Last update",
+      "updateDate": "October 2025"
+    }
   },
   
   "language": {

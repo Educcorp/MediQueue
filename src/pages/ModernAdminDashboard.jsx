@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -36,6 +37,7 @@ import {
 } from 'react-icons/hi';
 
 const ModernAdminDashboard = () => {
+    const { t } = useTranslation(['admin', 'common']);
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -134,40 +136,40 @@ const ModernAdminDashboard = () => {
 
     const statCards = [
         {
-            id: 'f',
-            title: 'Total Pacientes',
+            id: 'patients',
+            title: t('admin:dashboard.stats.patients'),
             value: stats.totalPatients,
             icon: FaUsers,
             color: 'primary',
             growth: quickStats.patientsGrowth,
-            subtitle: 'Registrados en el sistema'
+            subtitle: t('admin:dashboard.stats.patientsSubtitle')
         },
         {
             id: 'turns',
-            title: 'Turnos Hoy',
+            title: t('admin:dashboard.stats.turnsToday'),
             value: stats.todayTurns,
             icon: FaCalendarCheck,
             color: 'success',
             growth: quickStats.todayGrowth,
-            subtitle: 'Programados para hoy'
+            subtitle: t('admin:dashboard.stats.scheduledToday')
         },
         {
             id: 'consultorios',
-            title: 'Consultorios',
+            title: t('admin:dashboard.stats.offices'),
             value: stats.totalConsultorios,
             icon: FaHospital,
             color: 'info',
             growth: 0,
-            subtitle: `${quickStats.consultoriosActive} activos ahora`
+            subtitle: t('admin:dashboard.stats.activeNow', { count: quickStats.consultoriosActive })
         },
         {
             id: 'active',
-            title: 'Turnos Activos',
+            title: t('admin:dashboard.stats.activeTurns'),
             value: stats.activeTurns,
             icon: FaClock,
             color: 'warning',
             growth: 0,
-            subtitle: `~${quickStats.avgWaitTime}min promedio`
+            subtitle: t('admin:dashboard.stats.avgWaitTime', { time: quickStats.avgWaitTime })
         }
     ];
 
@@ -180,10 +182,10 @@ const ModernAdminDashboard = () => {
                 <div className="welcome-section">
                     <div className="welcome-content">
                         <h1 className="dashboard-title">
-                            Bienvenido, {user?.s_nombre || 'Administrador'}
+                            {t('admin:dashboard.welcome')}, {user?.s_nombre || t('admin:dashboard.administrator')}
                         </h1>
                         <p className="dashboard-subtitle">
-                            Resumen general del sistema MediQueue - {new Date().toLocaleDateString('es-ES', {
+                            {t('admin:dashboard.summary')} - {new Date().toLocaleDateString('es-ES', {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -193,7 +195,7 @@ const ModernAdminDashboard = () => {
                     </div>
                     <div className="welcome-actions">
                         <button className="action-btn primary" onClick={() => navigate('/admin/turns')}>
-                            <FaCalendarCheck /> Administrar Turnos
+                            <FaCalendarCheck /> {t('admin:dashboard.cards.turns.manageButton')}
                         </button>
                     </div>
                 </div>
@@ -220,7 +222,7 @@ const ModernAdminDashboard = () => {
                             </div>
                             <div className="stat-footer">
                                 <button className="stat-action" onClick={() => navigate(`/admin/${card.id}`)}>
-                                    Ver detalles <FaArrowUp />
+                                    {t('admin:dashboard.viewDetails')} <FaArrowUp />
                                 </button>
                             </div>
                         </div>
@@ -234,7 +236,7 @@ const ModernAdminDashboard = () => {
                         <div className="card-header">
                             <h3 className="card-title">
                                 <HiOutlineCalendar />
-                                Actividad Reciente
+                                {t('admin:dashboard.recentActivity')}
                             </h3>
                             <div className="card-actions">
                                 <button className="card-action">
@@ -254,22 +256,22 @@ const ModernAdminDashboard = () => {
                                         </div>
                                         <div className="activity-content">
                                             <p className="activity-title">
-                                                Turno #{turn.id || (index + 1)} - {turn.paciente || 'Paciente'}
+                                                {t('admin:dashboard.turn')} #{turn.id || (index + 1)} - {turn.paciente || t('admin:dashboard.patient')}
                                             </p>
                                             <p className="activity-subtitle">
-                                                {turn.consultorio || 'Consultorio'} • {turn.fecha || 'Hoy'}
+                                                {turn.consultorio || t('admin:dashboard.office')} • {turn.fecha || t('common:time.today')}
                                             </p>
                                         </div>
                                         <div className="activity-status">
                                             <span className={`status-badge ${turn.estado || 'pending'}`}>
-                                                {turn.estado === 'completado' ? 'Completado' : 'Pendiente'}
+                                                {turn.estado === 'completado' ? t('common:status.completed') : t('common:status.pending')}
                                             </span>
                                         </div>
                                     </div>
                                 )) : (
                                     <div className="empty-state">
                                         <FaClock />
-                                        <p>No hay actividad reciente</p>
+                                        <p>{t('admin:dashboard.noRecentActivity')}</p>
                                     </div>
                                 )}
                             </div>
@@ -281,7 +283,7 @@ const ModernAdminDashboard = () => {
                         <div className="card-header">
                             <h3 className="card-title">
                                 <HiOutlineChartBar />
-                                Acciones Rápidas
+                                {t('admin:dashboard.quickActions')}
                             </h3>
                         </div>
                         <div className="card-content">
@@ -294,8 +296,8 @@ const ModernAdminDashboard = () => {
                                         <FaUsers />
                                     </div>
                                     <div className="quick-action-content">
-                                        <h4>Gestionar Pacientes</h4>
-                                        <p>Ver y administrar pacientes</p>
+                                        <h4>{t('admin:dashboard.quickActions.managePatients')}</h4>
+                                        <p>{t('admin:dashboard.quickActions.viewAndManage')}</p>
                                     </div>
                                 </button>
 
@@ -307,8 +309,8 @@ const ModernAdminDashboard = () => {
                                         <FaCalendarCheck />
                                     </div>
                                     <div className="quick-action-content">
-                                        <h4>Programar Turnos</h4>
-                                        <p>Crear nuevos turnos</p>
+                                        <h4>{t('admin:dashboard.quickActions.scheduleTurns')}</h4>
+                                        <p>{t('admin:dashboard.quickActions.createNewTurns')}</p>
                                     </div>
                                 </button>
 
@@ -320,8 +322,8 @@ const ModernAdminDashboard = () => {
                                         <FaHospital />
                                     </div>
                                     <div className="quick-action-content">
-                                        <h4>Consultorios</h4>
-                                        <p>Administrar espacios</p>
+                                        <h4>{t('admin:dashboard.quickActions.offices')}</h4>
+                                        <p>{t('admin:dashboard.quickActions.manageSpaces')}</p>
                                     </div>
                                 </button>
 
@@ -333,8 +335,8 @@ const ModernAdminDashboard = () => {
                                         <FaChartLine />
                                     </div>
                                     <div className="quick-action-content">
-                                        <h4>Ver Estadísticas</h4>
-                                        <p>Reportes y métricas</p>
+                                        <h4>{t('admin:dashboard.quickActions.viewStatistics')}</h4>
+                                        <p>{t('admin:dashboard.quickActions.reportsAndMetrics')}</p>
                                     </div>
                                 </button>
                             </div>
@@ -346,32 +348,32 @@ const ModernAdminDashboard = () => {
                         <div className="card-header">
                             <h3 className="card-title">
                                 <HiOutlineUsers />
-                                Estado del Sistema
+                                {t('admin:dashboard.systemStatus')}
                             </h3>
                             <div className="card-actions">
                                 <button className="card-action primary">
-                                    <FaEdit /> Configurar
+                                    <FaEdit /> {t('admin:dashboard.configure')}
                                 </button>
                             </div>
                         </div>
                         <div className="card-content">
                             <div className="system-metrics">
                                 <div className="metric-item">
-                                    <div className="metric-label">Turnos Completados</div>
+                                    <div className="metric-label">{t('admin:dashboard.metrics.turnsCompleted')}</div>
                                     <div className="metric-bar">
                                         <div className="metric-progress" style={{ width: '75%' }}></div>
                                     </div>
                                     <div className="metric-value">75% (12/16)</div>
                                 </div>
                                 <div className="metric-item">
-                                    <div className="metric-label">Consultorios Ocupados</div>
+                                    <div className="metric-label">{t('admin:dashboard.metrics.officesBusy')}</div>
                                     <div className="metric-bar">
                                         <div className="metric-progress secondary" style={{ width: '60%' }}></div>
                                     </div>
                                     <div className="metric-value">60% (3/5)</div>
                                 </div>
                                 <div className="metric-item">
-                                    <div className="metric-label">Satisfacción Pacientes</div>
+                                    <div className="metric-label">{t('admin:dashboard.metrics.patientSatisfaction')}</div>
                                     <div className="metric-bar">
                                         <div className="metric-progress success" style={{ width: '92%' }}></div>
                                     </div>

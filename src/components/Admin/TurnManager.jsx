@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import AdminHeader from '../Common/AdminHeader';
 import AdminFooter from '../Common/AdminFooter';
@@ -162,6 +163,7 @@ const getAreaClass = (areaName) => {
 };
 
 const TurnManager = () => {
+  const { t } = useTranslation(['admin', 'common']);
   const [turns, setTurns] = useState([]);
   const [patients, setPatients] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
@@ -242,10 +244,10 @@ const TurnManager = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
-    { value: 'EN_ATENCION', label: 'En atención', color: 'warning', indicator: '#17a2b8' },
-    { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
-    { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
+    { value: 'EN_ESPERA', label: t('common:turnStatus.enEspera'), color: 'info', indicator: '#ffc107' },
+    { value: 'EN_ATENCION', label: t('common:status.attending'), color: 'warning', indicator: '#17a2b8' },
+    { value: 'ATENDIDO', label: t('common:status.attended'), color: 'success', indicator: '#28a745' },
+    { value: 'CANCELADO', label: t('common:status.cancelled'), color: 'danger', indicator: '#dc3545' },
 
   ];
 
@@ -494,7 +496,7 @@ const TurnManager = () => {
       if (editingTurn) {
         // Actualizar observaciones del turno
         await turnService.updateTurnObservations(editingTurn.uk_turno, formData.s_observaciones);
-        alert('Turno actualizado correctamente');
+        alert(t('admin:turns.messages.updateSuccess'));
       } else {
         // Crear nuevo turno
         // Para asignar un paciente ya existente, usar el endpoint estándar /turnos
@@ -598,7 +600,7 @@ const TurnManager = () => {
       return {
         icon: FaHospital,
         className: '',
-        displayName: 'Todos los consultorios'
+        displayName: t('admin:turns.filters.allOffices')
       };
     }
     
@@ -645,7 +647,7 @@ const TurnManager = () => {
   }, [turns.length, currentTurns.length, currentPage, turnsPerPage]);
 
   if (loading) {
-    return <TestSpinner message="Cargando turnos..." />;
+    return <TestSpinner message={t('admin:common.loading')} />;
   }
 
   return (
@@ -659,14 +661,14 @@ const TurnManager = () => {
             <FaCalendarCheck />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Gestión de Turnos</h1>
+            <h1 className="page-title">{t('admin:turns.title')}</h1>
             <p className="page-subtitle">
-              Administra los turnos médicos del sistema - {turns.length} turnos encontrados
+              {t('admin:turns.subtitle', { count: turns.length })}
             </p>
           </div>
           <div className="page-actions">
             <button className="btn btn-secondary" onClick={loadTurns}>
-              <FaSync /> Actualizar
+              <FaSync /> {t('common:buttons.refresh')}
             </button>
           </div>
         </div>
@@ -792,7 +794,7 @@ const TurnManager = () => {
                   <div className={`status-icon status-${selectedStatus.toLowerCase()}`}>
                     {React.createElement(getStatusIcon(selectedStatus))}
                   </div>
-                  <span>{selectedStatus === 'todos' ? 'Todos los estados' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
+                  <span>{selectedStatus === 'todos' ? t('admin:turns.filters.allStatuses') : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -827,7 +829,7 @@ const TurnManager = () => {
                       <div className="status-icon status-todos">
                         <FaList />
                       </div>
-                      <span>Todos los estados</span>
+                      <span>{t('admin:turns.filters.allStatuses')}</span>
                     </div>
                     {turnStatuses.map(status => (
                       <div
@@ -851,7 +853,7 @@ const TurnManager = () => {
             </div>
           </div>
           <div className="filter-group">
-            <label>ÁREA Y CONSULTORIO</label>
+            <label>{t('admin:turns.filters.areaAndOffice')}</label>
             <div className="custom-area-select">
               <div 
                 ref={areaButtonRef}
@@ -928,7 +930,7 @@ const TurnManager = () => {
                       >
                         <FaHospital />
                       </div>
-                      <span>Todos los consultorios</span>
+                      <span>{t('admin:turns.filters.allOffices')}</span>
                     </div>
                     {getCombinedAreaConsultorioList().map(item => (
                       <div
@@ -963,7 +965,7 @@ const TurnManager = () => {
           </div>
           <div className="filter-group">
             <button className="btn btn-secondary">
-              <FaFilter /> Aplicar Filtros
+              <FaFilter /> {t('admin:turns.filters.applyFilters')}
             </button>
           </div>
         </div>
@@ -973,7 +975,7 @@ const TurnManager = () => {
           <div className="card-header">
             <h3 className="card-title">
               <FaClipboardList />
-              Lista de Turnos
+              {t('admin:turns.listTitle', 'Lista de Turnos')}
             </h3>
             <div className="card-actions">
             </div>
@@ -983,23 +985,23 @@ const TurnManager = () => {
             {turns.length === 0 ? (
               <div className="empty-state">
                 <FaCalendarCheck />
-                <h3>No hay turnos registrados</h3>
-                <p>No se encontraron turnos para los filtros seleccionados</p>
+                <h3>{t('admin:turns.messages.noTurnsFound')}</h3>
+                <p>{t('admin:turns.messages.noTurnsForFilters')}</p>
               </div>
             ) : (
               <div className="data-table">
                 <table>
                   <thead>
                     <tr>
-                      <th># Turno</th>
-                      <th>Paciente</th>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Fecha Creación</th>
-                      <th>Estado</th>
-                      <th>Consultorio</th>
-                      <th>Área</th>
-                      <th>Acciones</th>
+                      <th>{t('admin:turns.table.turn')}</th>
+                      <th>{t('admin:turns.table.patient')}</th>
+                      <th>{t('admin:turns.table.date')}</th>
+                      <th>{t('admin:turns.table.time')}</th>
+                      <th>{t('admin:turns.table.creationDate', 'Fecha Creación')}</th>
+                      <th>{t('admin:turns.table.status')}</th>
+                      <th>{t('admin:turns.table.office')}</th>
+                      <th>{t('admin:turns.table.area')}</th>
+                      <th>{t('common:buttons.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1247,10 +1249,10 @@ const TurnManager = () => {
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancelar
+                  {t('common:buttons.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  {editingTurn ? 'Actualizar' : 'Crear'}
+                  {editingTurn ? t('common:buttons.update') : t('common:buttons.create')}
                 </button>
               </div>
             </form>

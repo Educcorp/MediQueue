@@ -5,12 +5,19 @@
   
   "stats": {
     "medicalAreas": "Medical Areas",
+    "totalOffices": "Total Offices",
     "totalConsultorios": "Total Offices",
     "activeConsultorios": "Active Offices",
+    "activeOffices": "Active Offices",
     "consultorios": "offices",
     "areas": "areas"
   },
   
+  "area": {
+    "officesCount": "{{count}} office",
+    "officesCount_plural": "{{count}} offices"
+  },
+
   "areas": {
     "title": "Medical Areas",
     "newArea": "New Area",

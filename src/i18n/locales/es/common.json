@@ -169,7 +169,7 @@
       "about": "Acerca de Nosotros",
       "privacy": "Política de Privacidad"
     },
-    "socialTitle": "Síguenos & Soporte",
+    "socialTitle": "Soporte & Contacto",
     "support24": "Soporte técnico disponible 24/7",
     "copyright": "Todos los derechos reservados",
     "developedWith": "Desarrollado con",
@@ -179,7 +179,12 @@
     "version": "Versión",
     "privacyPolicy": "Política de Privacidad",
     "termsOfService": "Términos de Servicio",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "system": {
+      "operative": "Operativo",
+      "lastUpdate": "Última actualización",
+      "updateDate": "Octubre 2025"
+    }
   },
   
   "language": {

@@ -1,8 +1,111 @@
 {
-  "dashboard": {
+    "common": {
+      "loading": "Cargando...",
+      "error": "Error",
+      "success": "Éxito",
+      "noData": "No hay datos disponibles",
+      "confirmDelete": "¿Está seguro de eliminar este elemento?",
+      "actions": "Acciones"
+    },
+    "dashboard": {
     "title": "Panel de Control",
     "subtitle": "Bienvenido al sistema de gestión de turnos médicos",
-    "loadingDashboard": "Cargando dashboard..."
+    "loadingDashboard": "Cargando dashboard...",
+    "welcome": "Bienvenido",
+    "administrator": "Administrador",
+    "summary": "Resumen general del sistema MediQueue",
+    "loading": "Cargando dashboard...",
+    "loadError": "Error cargando datos del dashboard",
+    "viewDetails": "Ver detalles",
+    "recentActivity": "Actividad Reciente",
+    "quickActions": "Acciones Rápidas",
+    "turn": "Turno",
+    "patient": "Paciente",
+    "office": "Consultorio",
+    "noRecentActivity": "No hay actividad reciente",
+    "systemStatus": "Estado del Sistema",
+    "configure": "Configurar",
+    "stats": {
+      "totalTurns": "Total Turnos",
+      "activeTurns": "Turnos Activos",
+      "patients": "Total Pacientes",
+      "patientsSubtitle": "Registrados en el sistema",
+      "offices": "Consultorios",
+      "areas": "Áreas",
+      "admins": "Administradores",
+      "turnsToday": "Turnos Hoy",
+      "scheduledToday": "Programados para hoy",
+      "activeNow": "{{count}} activos ahora",
+      "avgWaitTime": "~{{time}}min promedio",
+      "available": "Disponibles",
+      "configured": "Configuradas",
+      "active": "Activos",
+      "realTime": "En tiempo real",
+      "thisMonth": "{{percentage}} este mes"
+    },
+    "quickActions": {
+      "managePatients": "Gestionar Pacientes",
+      "viewAndManage": "Ver y administrar pacientes",
+      "scheduleTurns": "Programar Turnos",
+      "createNewTurns": "Crear nuevos turnos",
+      "offices": "Consultorios",
+      "manageSpaces": "Administrar espacios",
+      "viewStatistics": "Ver Estadísticas",
+      "reportsAndMetrics": "Reportes y métricas"
+    },
+    "metrics": {
+      "turnsCompleted": "Turnos Completados",
+      "officesBusy": "Consultorios Ocupados",
+      "patientSatisfaction": "Satisfacción Pacientes"
+    },
+    "cards": {
+      "turns": {
+        "title": "Gestionar Turnos",
+        "description": "Administrar el sistema de turnos médicos",
+        "viewButton": "Ver Turnos",
+        "manageButton": "Administrar Turnos",
+        "active": "activos",
+        "today": "hoy"
+      },
+      "patients": {
+        "title": "Gestionar Pacientes",
+        "description": "Administrar información de pacientes",
+        "viewButton": "Ver Pacientes",
+        "registered": "registrados"
+      },
+      "offices": {
+        "title": "Consultorios",
+        "description": "Gestión de consultorios y áreas médicas",
+        "viewButton": "Ver Consultorios",
+        "officesCount": "consultorios",
+        "areas": "áreas"
+      },
+      "users": {
+        "title": "Gestionar Usuarios",
+        "description": "Crear, editar y eliminar usuarios administradores",
+        "viewButton": "Ver Usuarios",
+        "admins": "administradores"
+      },
+      "statistics": {
+        "title": "Estadísticas",
+        "description": "Reportes y análisis del sistema de turnos",
+        "viewButton": "Ver Estadísticas",
+        "completed": "atendidos"
+      },
+      "settings": {
+        "title": "Configuración",
+        "description": "Configuración del sistema y preferencias",
+        "configureButton": "Configurar",
+        "system": "Sistema"
+      }
+    },
+    "systemInfo": {
+      "title": "Información del Sistema",
+      "version": "Versión",
+      "lastUpdate": "Última actualización",
+      "status": "Estado",
+      "active": "Activo"
+    }
   },
   
   "stats": {
@@ -74,7 +177,7 @@
   
   "turns": {
     "title": "Gestión de Turnos",
-    "subtitle": "Administra todos los turnos del sistema",
+    "subtitle": "Administra todos los turnos del sistema - {{count}} turnos encontrados",
     "createTurn": "Crear Turno",
     "editTurn": "Editar Turno",
     "deleteTurn": "Eliminar Turno",
@@ -92,16 +195,53 @@
     "filter": "Filtrar",
     "search": "Buscar turnos...",
     "all": "Todos",
-    "confirmDelete": "¿Estás seguro de eliminar este turno?"
+    "confirmDelete": "¿Estás seguro de eliminar este turno?",
+    "filters": {
+      "dates": "Fechas",
+      "status": "Estado",
+      "allStatuses": "Todos los estados",
+      "areaAndOffice": "Área y Consultorio",
+      "allOffices": "Todos los consultorios",
+      "applyFilters": "Aplicar Filtros"
+    },
+    "table": {
+      "turn": "Turno",
+      "patient": "Paciente",
+      "area": "Área",
+      "office": "Consultorio",
+      "date": "Fecha",
+      "time": "Hora",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "statusActions": {
+      "call": "Llamar",
+      "attend": "Atender",
+      "complete": "Completar",
+      "cancel": "Cancelar",
+      "noPresent": "No Presente"
+    },
+    "messages": {
+      "updateSuccess": "Turno actualizado exitosamente",
+      "callSuccess": "Paciente llamado exitosamente",
+      "noTurnsFound": "No hay turnos registrados",
+      "noTurnsForFilters": "No se encontraron turnos para los filtros seleccionados"
+    },
+    "empty": {
+      "title": "No hay turnos registrados",
+      "subtitle": "No se encontraron turnos para los filtros seleccionados"
+    }
   },
   
   "patients": {
     "title": "Gestión de Pacientes",
     "subtitle": "Administra la información de los pacientes",
     "createPatient": "Crear Paciente",
+    "addPatient": "Agregar Paciente",
     "editPatient": "Editar Paciente",
     "deletePatient": "Eliminar Paciente",
     "viewPatient": "Ver Paciente",
+    "searchPlaceholder": "Buscar por nombre, documento o teléfono...",
     "firstName": "Nombre",
     "lastName": "Apellido",
     "phone": "Teléfono",
@@ -110,22 +250,196 @@
     "noPatients": "No hay pacientes registrados",
     "createFirstPatient": "Crear Primer Paciente",
     "search": "Buscar pacientes...",
-    "confirmDelete": "¿Estás seguro de eliminar este paciente?"
+    "confirmDelete": "¿Estás seguro de eliminar este paciente?",
+    "filters": {
+      "all": "Todos",
+      "active": "Activos",
+      "inactive": "Inactivos"
+    },
+    "table": {
+      "document": "Documento",
+      "name": "Nombre",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "address": "Dirección",
+      "turns": "Turnos",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "form": {
+      "documentType": "Tipo de Documento",
+      "documentNumber": "Número de Documento",
+      "documentPlaceholder": "Ingrese número de documento",
+      "firstName": "Nombre",
+      "firstNamePlaceholder": "Ingrese nombre",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Ingrese apellido",
+      "phone": "Teléfono",
+      "phonePlaceholder": "Ingrese teléfono",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "ejemplo@correo.com",
+      "address": "Dirección",
+      "addressPlaceholder": "Ingrese dirección completa",
+      "birthDate": "Fecha de Nacimiento",
+      "gender": "Género",
+      "selectGender": "Seleccionar género",
+      "male": "Masculino",
+      "female": "Femenino",
+      "other": "Otro",
+      "bloodType": "Tipo de Sangre",
+      "allergies": "Alergias",
+      "allergiesPlaceholder": "Ingrese alergias conocidas",
+      "medicalNotes": "Notas Médicas",
+      "medicalNotesPlaceholder": "Notas adicionales"
+    },
+    "messages": {
+      "createSuccess": "Paciente registrado exitosamente",
+      "updateSuccess": "Paciente actualizado exitosamente",
+      "deleteSuccess": "Paciente eliminado exitosamente",
+      "deleteConfirm": "¿Está seguro de eliminar este paciente?",
+      "validationError": "Por favor complete todos los campos requeridos"
+    },
+    "stats": {
+      "total": "Total Pacientes",
+      "active": "Activos",
+      "newThisMonth": "Nuevos este mes"
+    },
+    "empty": "No hay pacientes registrados"
   },
   
   "users": {
     "title": "Gestión de Usuarios",
     "subtitle": "Administra los usuarios administradores del sistema",
     "createUser": "Crear Usuario",
+    "addUser": "Agregar Usuario",
+    "newUser": "Nuevo Usuario Administrativo",
     "editUser": "Editar Usuario",
     "deleteUser": "Eliminar Usuario",
     "viewUser": "Ver Usuario",
+    "searchPlaceholder": "Buscar usuarios por nombre o email...",
     "username": "Usuario",
     "role": "Rol",
+    "registered": "administradores registrados",
     "noUsers": "No hay usuarios registrados",
+    "noUsersForFilters": "No se encontraron usuarios con los filtros aplicados",
+    "noUsersInSystem": "No hay usuarios administrativos en el sistema",
     "createFirstUser": "Crear Primer Usuario",
+    "listTitle": "Lista de Usuarios Administrativos",
     "search": "Buscar usuarios...",
-    "confirmDelete": "¿Estás seguro de eliminar este usuario?"
+    "confirmDelete": "¿Estás seguro de eliminar este usuario?",
+    "noPhone": "No registrado",
+    "stats": {
+      "totalUsers": "Total Usuarios",
+      "superAdmins": "Super Administradores",
+      "supervisors": "Supervisores"
+    },
+    "table": {
+      "username": "Usuario",
+      "fullName": "Nombre Completo",
+      "name": "Nombre",
+      "email": "Email",
+      "phone": "Teléfono",
+      "type": "Tipo",
+      "role": "Rol",
+      "status": "Estado",
+      "createdAt": "Fecha de Creación",
+      "registrationDate": "Fecha Registro",
+      "actions": "Acciones"
+    },
+    "form": {
+      "name": "Nombre",
+      "lastName": "Apellido",
+      "namePlaceholder": "Ingrese el nombre completo",
+      "lastNamePlaceholder": "Apellido",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "ejemplo@correo.com",
+      "phone": "Teléfono",
+      "phonePlaceholder": "+57 300 123 4567",
+      "username": "Usuario",
+      "usernamePlaceholder": "nombre_usuario",
+      "userType": "Tipo de Usuario",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Mínimo 6 caracteres",
+      "newPasswordOptional": "Nueva Contraseña (opcional)",
+      "passwordEmptyToKeep": "Dejar vacío para no cambiar",
+      "confirmPassword": "Confirmar Contraseña",
+      "role": "Rol",
+      "selectRole": "Seleccionar rol",
+      "status": "Estado"
+    },
+    "messages": {
+      "createSuccess": "Usuario creado exitosamente",
+      "updateSuccess": "Usuario actualizado exitosamente",
+      "deleteSuccess": "Usuario eliminado exitosamente",
+      "deleteConfirm": "¿Está seguro de eliminar este usuario?",
+      "cannotDeleteSelf": "No puedes eliminar tu propia cuenta",
+      "validationError": "Por favor complete todos los campos requeridos",
+      "passwordRequired": "La contraseña es requerida para crear un nuevo administrador",
+      "passwordFormat": "La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número",
+      "passwordMismatch": "Las contraseñas no coinciden"
+    },
+    "empty": "No hay usuarios registrados"
+  },
+
+  "statistics": {
+    "title": "Estadísticas del Sistema",
+    "subtitle": "Análisis y reportes del sistema de turnos",
+    "overview": "Resumen General",
+    "charts": "Gráficos",
+    "reports": "Reportes",
+    "dateRange": "Rango de Fechas",
+    "from": "Desde",
+    "to": "Hasta",
+    "generate": "Generar Reporte",
+    "export": "Exportar",
+    "exportPDF": "Exportar PDF",
+    "exportExcel": "Exportar Excel",
+    "metrics": {
+      "totalTurns": "Total de Turnos",
+      "completedTurns": "Turnos Completados",
+      "cancelledTurns": "Turnos Cancelados",
+      "avgWaitTime": "Tiempo Promedio de Espera",
+      "patientSatisfaction": "Satisfacción del Paciente",
+      "officeUtilization": "Utilización de Consultorios"
+    },
+    "charts": {
+      "turnsByDay": "Turnos por Día",
+      "turnsByArea": "Turnos por Área",
+      "turnsByStatus": "Turnos por Estado",
+      "turnsByOffice": "Turnos por Consultorio",
+      "peakHours": "Horas Pico"
+    },
+    "periods": {
+      "today": "Hoy",
+      "week": "Esta Semana",
+      "month": "Este Mes",
+      "year": "Este Año",
+      "custom": "Personalizado"
+    },
+    "noData": "No hay datos disponibles para el período seleccionado"
+  },
+  
+  "login": {
+    "title": "Panel de Administración",
+    "welcome": "El Sistema les da la Bienvenida",
+    "subtitle": "Tu plataforma de gestión de turnos comienza aquí.",
+    "pleaseLogin": "Inicia sesión.",
+    "emailPlaceholder": "Correo",
+    "passwordPlaceholder": "Contraseña",
+    "loginButton": "Iniciar sesión",
+    "loggingIn": "Iniciando...",
+    "authenticating": "Autenticando usuario",
+    "errors": {
+      "fillAllFields": "Por favor, complete todos los campos",
+      "invalidEmail": "Por favor, ingrese un email válido",
+      "loginFailed": "Error al iniciar sesión",
+      "connectionError": "Error de conexión. Verifique que el servidor esté funcionando."
+    },
+    "menu": {
+      "manageTurns": "Gestionar Turnos",
+      "manageOffices": "Gestión de consultorios",
+      "managePatients": "Gestión de pacientes",
+      "manageStats": "Gestión de estadísticas del sistema"
+    }
   }
 }
-

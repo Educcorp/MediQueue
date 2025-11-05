@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaHeart, FaCode, FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { MdCopyright } from 'react-icons/md';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
 const AdminFooter = ({ isDarkMode = false }) => {
+  const { t } = useTranslation('common');
   const currentYear = new Date().getFullYear();
 
   return (
@@ -61,7 +63,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 fontWeight: '600',
                 color: isDarkMode ? '#ffffff' : '#2d3748'
               }}>
-                MediQueue®
+                {t('appNameFull')}
               </h3>
             </div>
             <p style={{
@@ -70,7 +72,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               lineHeight: '1.6',
               maxWidth: '280px'
             }}>
-              Sistema integral de gestión de turnos médicos. Optimizando la experiencia de pacientes y profesionales de la salud.
+              {t('footer.description')}
             </p>
           </div>
 
@@ -82,7 +84,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Enlaces Rápidos
+              {t('footer.quickLinks')}
             </h4>
             <div style={{
               display: 'flex',
@@ -90,13 +92,13 @@ const AdminFooter = ({ isDarkMode = false }) => {
               gap: '8px'
             }}>
               {[
-                { name: 'Dashboard', href: '/admin/dashboard' },
-                { name: 'Gestión de Turnos', href: '/admin/turns' },
-                { name: 'Pacientes', href: '/admin/patients' },
-                { name: 'Consultorios', href: '/admin/consultorios' },
-                { name: 'Estadísticas', href: '/admin/statistics' },
-                { name: 'Acerca de Nosotros', href: '/about' },
-                { name: 'Política de Privacidad', href: '/privacy' }
+                { name: t('navigation.dashboard'), href: '/admin/dashboard' },
+                { name: t('navigation.turns'), href: '/admin/turns' },
+                { name: t('navigation.patients'), href: '/admin/patients' },
+                { name: t('navigation.consultorios'), href: '/admin/consultorios' },
+                { name: t('navigation.statistics'), href: '/admin/statistics' },
+                { name: t('footer.links.about'), href: '/about' },
+                { name: t('footer.links.privacy'), href: '/privacy' }
               ].map((link) => (
                 <a
                   key={link.name}
@@ -132,7 +134,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Sistema
+              {t('navigation.settings')}
             </h4>
             <div style={{
               display: 'flex',
@@ -151,10 +153,10 @@ const AdminFooter = ({ isDarkMode = false }) => {
                   backgroundColor: '#48bb78',
                   borderRadius: '50%'
                 }}></div>
-                <span>Estado: Operativo</span>
+                <span>{t('common:status.active')}: {t('footer.system.operative')}</span>
               </div>
-              <div>Versión: 2.1.0</div>
-              <div>Última actualización: Octubre 2025</div>
+              <div>{t('footer.version')}: 2.1.0</div>
+              <div>{t('footer.system.lastUpdate')}: {t('footer.system.updateDate')}</div>
             </div>
           </div>
 
@@ -166,7 +168,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Soporte & Contacto
+              {t('footer.socialTitle')}
             </h4>
             <div style={{
               display: 'flex',
@@ -226,7 +228,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
                 fontSize: '12px',
                 color: isDarkMode ? '#718096' : '#a0aec0'
               }}>
-                Soporte técnico disponible 24/7
+                {t('footer.support24')}
               </div>
             </div>
           </div>
@@ -250,7 +252,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
             fontSize: '14px'
           }}>
             <MdCopyright size={16} />
-            <span>{currentYear} MediQueue. Todos los derechos reservados.</span>
+            <span>{currentYear} {t('appName')}. {t('footer.copyright')}</span>
           </div>
 
           <div style={{
@@ -259,11 +261,11 @@ const AdminFooter = ({ isDarkMode = false }) => {
             gap: '4px',
             fontSize: '14px'
           }}>
-            <span>Desarrollado con</span>
+            <span>{t('footer.developedWith')}</span>
             <FaHeart style={{ color: '#e53e3e', fontSize: '12px' }} />
-            <span>y</span>
+            <span>{t('footer.and')}</span>
             <FaCode style={{ color: '#77b8ce', fontSize: '12px' }} />
-            <span>por EducCorp</span>
+            <span>{t('footer.byEduccorp')}</span>
           </div>
         </div>
 
