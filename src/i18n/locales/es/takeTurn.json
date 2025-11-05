@@ -4,24 +4,26 @@
     "subtitle": ""
   },
   
-  "instructions": {
-    "title": "Seleccione el área médica",
-    "description": "Toque el área médica para la cual desea tomar un turno"
+  "areas": {
+    "noAreas": "No hay áreas médicas disponibles",
+    "noOffices": "Actualmente no hay consultorios configurados en el sistema",
+    "selectArea": "Seleccione el área médica",
+    "tapToSelect": "Toque el área médica para la cual desea tomar un turno"
   },
   
   "confirmation": {
     "backToAreas": "Volver a Áreas",
-    "autoAssignment": "Se asignará automáticamente el consultorio más disponible de esta área",
-    "generateTurn": "Generar Turno",
-    "generatingTurn": "Generando Turno..."
+    "autoAssign": "Se asignará automáticamente el consultorio más disponible de esta área",
+    "generateButton": "Generar Turno",
+    "generating": "Generando Turno..."
   },
   
   "success": {
     "title": "¡Turno Generado Exitosamente!",
-    "yourTurnNumber": "Su número de turno es:",
+    "yourNumber": "Su número de turno es:",
     "area": "Área",
     "office": "Consultorio",
-    "waitingTurns": "En espera",
+    "waiting": "En espera",
     "turns": "turnos",
     "displayMessage": "Su turno se mostrará en la pantalla de visualización de turnos",
     "redirecting": "Redirigiendo automáticamente..."
@@ -29,24 +31,12 @@
   
   "loading": {
     "processing": "Procesando solicitud...",
-    "generating": "Generando su turno, por favor espere"
-  },
-  
-  "emptyState": {
-    "title": "No hay áreas médicas disponibles",
-    "description": "Actualmente no hay consultorios configurados en el sistema"
+    "pleaseWait": "Generando su turno, por favor espere"
   },
   
   "errors": {
-    "selectArea": "Por favor selecciona un área",
-    "generatingError": "Error al generar el turno",
-    "tryAgain": "Intenta nuevamente"
-  },
-  
-  "assignment": {
-    "office": "Consultorio",
-    "waiting": "En espera",
-    "turnsWaiting": "turnos en espera"
+    "selectArea": "Por favor seleccione un área",
+    "generatingError": "Error al generar el turno"
   }
 }
 
