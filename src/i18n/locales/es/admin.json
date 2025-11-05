@@ -1,0 +1,131 @@
+{
+  "dashboard": {
+    "title": "Panel de Control",
+    "subtitle": "Bienvenido al sistema de gestión de turnos médicos",
+    "loadingDashboard": "Cargando dashboard..."
+  },
+  
+  "stats": {
+    "totalTurns": "Total Turnos",
+    "activeTurns": "Turnos Activos",
+    "patients": "Pacientes",
+    "consultorios": "Consultorios",
+    "areas": "Áreas",
+    "administrators": "Administradores",
+    "todayTurns": "Turnos Hoy",
+    "completedTurns": "Turnos Completados",
+    "active": "activos",
+    "today": "hoy",
+    "attended": "atendidos",
+    "available": "Disponibles",
+    "configured": "Configuradas",
+    "registered": "registrados",
+    "realTime": "En tiempo real",
+    "thisMonth": "+1% este mes",
+    "increase": "+8% este mes"
+  },
+  
+  "cards": {
+    "manageTurns": {
+      "title": "Gestionar Turnos",
+      "description": "Administrar el sistema de turnos médicos",
+      "viewTurns": "Ver Turnos"
+    },
+    "managePatients": {
+      "title": "Gestionar Pacientes",
+      "description": "Administrar información de pacientes",
+      "viewPatients": "Ver Pacientes"
+    },
+    "consultorios": {
+      "title": "Consultorios",
+      "description": "Gestión de consultorios y áreas médicas",
+      "viewConsultorios": "Ver Consultorios"
+    },
+    "manageUsers": {
+      "title": "Gestionar Usuarios",
+      "description": "Crear, editar y eliminar usuarios administradores",
+      "viewUsers": "Ver Usuarios"
+    },
+    "statistics": {
+      "title": "Estadísticas",
+      "description": "Reportes y análisis del sistema de turnos",
+      "viewStatistics": "Ver Estadísticas"
+    },
+    "settings": {
+      "title": "Configuración",
+      "description": "Configuración del sistema y preferencias",
+      "configure": "Configurar"
+    }
+  },
+  
+  "systemInfo": {
+    "title": "Información del Sistema",
+    "version": "Versión",
+    "lastUpdate": "Última actualización",
+    "status": "Estado",
+    "active": "Activo",
+    "system": "Sistema"
+  },
+  
+  "errors": {
+    "loadingError": "Error cargando datos del dashboard",
+    "retry": "Reintentar"
+  },
+  
+  "turns": {
+    "title": "Gestión de Turnos",
+    "subtitle": "Administra todos los turnos del sistema",
+    "createTurn": "Crear Turno",
+    "editTurn": "Editar Turno",
+    "deleteTurn": "Eliminar Turno",
+    "viewTurn": "Ver Turno",
+    "turnNumber": "Número de Turno",
+    "patient": "Paciente",
+    "area": "Área",
+    "office": "Consultorio",
+    "status": "Estado",
+    "date": "Fecha",
+    "time": "Hora",
+    "actions": "Acciones",
+    "noTurns": "No hay turnos registrados",
+    "createFirstTurn": "Crear Primer Turno",
+    "filter": "Filtrar",
+    "search": "Buscar turnos...",
+    "all": "Todos",
+    "confirmDelete": "¿Estás seguro de eliminar este turno?"
+  },
+  
+  "patients": {
+    "title": "Gestión de Pacientes",
+    "subtitle": "Administra la información de los pacientes",
+    "createPatient": "Crear Paciente",
+    "editPatient": "Editar Paciente",
+    "deletePatient": "Eliminar Paciente",
+    "viewPatient": "Ver Paciente",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Teléfono",
+    "email": "Correo Electrónico",
+    "birthDate": "Fecha de Nacimiento",
+    "noPatients": "No hay pacientes registrados",
+    "createFirstPatient": "Crear Primer Paciente",
+    "search": "Buscar pacientes...",
+    "confirmDelete": "¿Estás seguro de eliminar este paciente?"
+  },
+  
+  "users": {
+    "title": "Gestión de Usuarios",
+    "subtitle": "Administra los usuarios administradores del sistema",
+    "createUser": "Crear Usuario",
+    "editUser": "Editar Usuario",
+    "deleteUser": "Eliminar Usuario",
+    "viewUser": "Ver Usuario",
+    "username": "Usuario",
+    "role": "Rol",
+    "noUsers": "No hay usuarios registrados",
+    "createFirstUser": "Crear Primer Usuario",
+    "search": "Buscar usuarios...",
+    "confirmDelete": "¿Estás seguro de eliminar este usuario?"
+  }
+}
+

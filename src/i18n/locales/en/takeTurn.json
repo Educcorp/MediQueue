@@ -1,0 +1,52 @@
+{
+  "header": {
+    "title": "Get Appointment",
+    "subtitle": ""
+  },
+  
+  "instructions": {
+    "title": "Select the medical area",
+    "description": "Touch the medical area for which you want to get an appointment"
+  },
+  
+  "confirmation": {
+    "backToAreas": "Back to Areas",
+    "autoAssignment": "The most available office in this area will be automatically assigned",
+    "generateTurn": "Generate Appointment",
+    "generatingTurn": "Generating Appointment..."
+  },
+  
+  "success": {
+    "title": "Appointment Generated Successfully!",
+    "yourTurnNumber": "Your appointment number is:",
+    "area": "Area",
+    "office": "Office",
+    "waitingTurns": "Waiting",
+    "turns": "appointments",
+    "displayMessage": "Your appointment will be displayed on the appointments display screen",
+    "redirecting": "Automatically redirecting..."
+  },
+  
+  "loading": {
+    "processing": "Processing request...",
+    "generating": "Generating your appointment, please wait"
+  },
+  
+  "emptyState": {
+    "title": "No medical areas available",
+    "description": "There are currently no offices configured in the system"
+  },
+  
+  "errors": {
+    "selectArea": "Please select an area",
+    "generatingError": "Error generating the appointment",
+    "tryAgain": "Try again"
+  },
+  
+  "assignment": {
+    "office": "Office",
+    "waiting": "Waiting",
+    "turnsWaiting": "appointments waiting"
+  }
+}
+

@@ -1,0 +1,82 @@
+{
+  "title": "Configuración del Sistema",
+  "subtitle": "Administra la configuración general y parámetros operacionales",
+  "saving": "Guardando configuración...",
+  
+  "tabs": {
+    "general": "General",
+    "operations": "Operaciones",
+    "notifications": "Notificaciones",
+    "maintenance": "Mantenimiento",
+    "security": "Seguridad"
+  },
+  
+  "general": {
+    "title": "Configuración General del Sistema",
+    "systemName": "Nombre del Sistema",
+    "systemNamePlaceholder": "Nombre del sistema",
+    "version": "Versión",
+    "versionPlaceholder": "Versión del sistema",
+    "timezone": "Zona Horaria",
+    "timezones": {
+      "colombia": "Colombia (GMT-5)",
+      "mexico": "México (GMT-6)",
+      "argentina": "Argentina (GMT-3)",
+      "peru": "Perú (GMT-5)"
+    },
+    "language": "Idioma",
+    "languages": {
+      "spanish": "Español",
+      "english": "English"
+    }
+  },
+  
+  "operations": {
+    "title": "Configuración Operacional",
+    "maxTurnsPerDay": "Máximo Turnos por Día",
+    "turnDuration": "Duración del Turno (minutos)",
+    "startTime": "Hora de Inicio",
+    "endTime": "Hora de Finalización",
+    "maxAdvanceDays": "Días Máximos de Anticipación",
+    "allowCancellation": "Permitir Cancelaciones",
+    "cancellationDeadline": "Límite de Cancelación (minutos antes)"
+  },
+  
+  "notifications": {
+    "title": "Configuración de Notificaciones",
+    "email": "Email",
+    "emailDescription": "Notificaciones por correo",
+    "sms": "SMS",
+    "smsDescription": "Mensajes de texto",
+    "push": "Push",
+    "pushDescription": "Notificaciones push",
+    "autoReminders": "Recordatorios Automáticos",
+    "hoursBeforeTurn": "Horas Antes del Turno"
+  },
+  
+  "maintenance": {
+    "title": "Configuración de Mantenimiento",
+    "maintenanceMode": "Modo Mantenimiento",
+    "currentlyInMaintenance": "Sistema actualmente en mantenimiento",
+    "normalOperation": "Sistema operativo normal",
+    "maintenanceMessage": "Mensaje de Mantenimiento",
+    "messagePlaceholder": "Mensaje que verán los usuarios durante el mantenimiento",
+    "scheduledTime": "Fecha y Hora Programada",
+    "estimatedDuration": "Duración Estimada (minutos)"
+  },
+  
+  "security": {
+    "title": "Configuración de Seguridad",
+    "sessionTimeout": "Tiempo de Sesión (minutos)",
+    "passwordMinLength": "Longitud Mínima de Contraseña",
+    "maxLoginAttempts": "Máximo Intentos de Login",
+    "lockoutDuration": "Duración de Bloqueo (minutos)",
+    "requireSpecialChars": "Requerir Caracteres Especiales en Contraseñas"
+  },
+  
+  "messages": {
+    "savedSuccessfully": "Configuración guardada exitosamente",
+    "errorSaving": "Error guardando la configuración"
+  }
+}
+

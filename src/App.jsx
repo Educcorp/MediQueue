@@ -16,6 +16,8 @@ import ProtectedRoute from './components/Common/ProtectedRoute'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import AboutPage from './pages/AboutPage'
 import CookieBanner from './components/Common/CookieBanner'
+import LanguageSwitcher from './components/Common/LanguageSwitcher'
+import './i18n' // Configuración de i18next
 import './styles/App.css'
 
 function App() {
@@ -135,6 +137,9 @@ function App() {
 
       {/* Cookie Banner - Se muestra globalmente */}
       <CookieBanner />
+
+      {/* Language Switcher - Botón flotante para cambiar idioma */}
+      <LanguageSwitcher />
     </div>
   )
 }

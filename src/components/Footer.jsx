@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaHeart, FaCode, FaGithub, FaLinkedin, FaEnvelope, FaPhone, FaMapMarkerAlt, FaInfoCircle, FaShieldAlt, FaTicketAlt } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { MdCopyright } from 'react-icons/md';
@@ -6,6 +7,7 @@ import { HiOutlineExternalLink } from 'react-icons/hi';
 import '../styles/Footer.css';
 
 const Footer = ({ isDarkMode = false }) => {
+  const { t } = useTranslation('common');
   const currentYear = new Date().getFullYear();
 
   return (
@@ -62,7 +64,7 @@ const Footer = ({ isDarkMode = false }) => {
                 fontWeight: '600',
                 color: isDarkMode ? '#ffffff' : '#2d3748'
               }}>
-                MediQueue®
+                {t('appNameFull')}
               </h3>
             </div>
             <p style={{
@@ -71,7 +73,7 @@ const Footer = ({ isDarkMode = false }) => {
               lineHeight: '1.6',
               maxWidth: '280px'
             }}>
-              Sistema integral de gestión de turnos médicos. Optimizando la experiencia de pacientes y profesionales de la salud.
+              {t('footer.description')}
             </p>
           </div>
 
@@ -83,7 +85,7 @@ const Footer = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Contacto & Horarios
+              {t('footer.contactTitle')}
             </h4>
             <div style={{
               display: 'flex',
@@ -113,12 +115,12 @@ const Footer = ({ isDarkMode = false }) => {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaMapMarkerAlt style={{ fontSize: '12px' }} />
-                <span>Av. Principal 123, Ciudad</span>
+                <span>{t('footer.address')}</span>
               </div>
               <div style={{ marginTop: '8px', fontSize: '15px' }}>
-                <div>Lunes - Viernes: 8:00 - 18:00</div>
-                <div>Sábados: 8:00 - 12:00</div>
-                <div>Domingos: Cerrado</div>
+                <div>{t('footer.schedule.weekdays')}</div>
+                <div>{t('footer.schedule.saturday')}</div>
+                <div>{t('footer.schedule.sunday')}</div>
               </div>
             </div>
           </div>
@@ -131,7 +133,7 @@ const Footer = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Enlaces Rápidos
+              {t('footer.quickLinks')}
             </h4>
             <div style={{
               display: 'flex',
@@ -139,9 +141,9 @@ const Footer = ({ isDarkMode = false }) => {
               gap: '8px'
             }}>
               {[
-                { name: 'Tomar Turnos', href: '/tomar-turno', icon: FaTicketAlt },
-                { name: 'Acerca de Nosotros', href: '/about', icon: FaInfoCircle },
-                { name: 'Política de Privacidad', href: '/privacy', icon: FaShieldAlt }
+                { name: t('footer.links.takeTurn'), href: '/tomar-turno', icon: FaTicketAlt },
+                { name: t('footer.links.about'), href: '/about', icon: FaInfoCircle },
+                { name: t('footer.links.privacy'), href: '/privacy', icon: FaShieldAlt }
               ].map((link) => (
                 <a
                   key={link.name}
@@ -177,7 +179,7 @@ const Footer = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              Síguenos & Soporte
+              {t('footer.socialTitle')}
             </h4>
             <div style={{
               display: 'flex',
@@ -237,7 +239,7 @@ const Footer = ({ isDarkMode = false }) => {
                 fontSize: '14px',
                 color: isDarkMode ? '#718096' : '#a0aec0'
               }}>
-                Soporte técnico disponible 24/7
+                {t('footer.support24')}
               </div>
             </div>
           </div>
@@ -261,7 +263,7 @@ const Footer = ({ isDarkMode = false }) => {
             fontSize: '16px'
           }}>
             <MdCopyright size={16} />
-            <span>{currentYear} MediQueue. Todos los derechos reservados.</span>
+            <span>{currentYear} {t('appName')}. {t('footer.copyright')}</span>
           </div>
 
           <div style={{
@@ -270,11 +272,11 @@ const Footer = ({ isDarkMode = false }) => {
             gap: '4px',
             fontSize: '16px'
           }}>
-            <span>Desarrollado con</span>
+            <span>{t('footer.developedWith')}</span>
             <FaHeart style={{ color: '#e53e3e', fontSize: '12px' }} />
-            <span>y</span>
+            <span>{t('footer.and')}</span>
             <FaCode style={{ color: '#77b8ce', fontSize: '12px' }} />
-            <span>por EducCorp</span>
+            <span>{t('footer.byEduccorp')}</span>
           </div>
         </div>
 

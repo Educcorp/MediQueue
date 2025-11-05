@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
@@ -16,6 +17,7 @@ import {
 } from 'react-icons/fa';
 
 const HomePage = () => {
+  const { t } = useTranslation(['home', 'common']);
   const [nextTurn, setNextTurn] = useState(null);
   const [activeTurns, setActiveTurns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -193,7 +195,7 @@ const HomePage = () => {
               alt="MediQueue Logo"
               className="header-logo-image"
             />
-            <span className="header-title">MediQueue®</span>
+            <span className="header-title">{t('common:appNameFull')}</span>
           </div>
 
           {/* Area Selector Section */}
@@ -204,7 +206,7 @@ const HomePage = () => {
                 {areasLoading ? (
                   <div className="selector-loading">
                     <div className="loading-spinner"></div>
-                    <span>Cargando áreas...</span>
+                    <span>{t('home:header.loadingAreas')}</span>
                   </div>
                 ) : (
                   <select
@@ -212,8 +214,8 @@ const HomePage = () => {
                     value={selectedArea || ''}
                     onChange={(e) => setSelectedArea(e.target.value || null)}
                   >
-                    <option value="">Seleccionar área médica</option>
-                    <option value="general">📊 General - Todas las áreas</option>
+                    <option value="">{t('home:header.selectArea')}</option>
+                    <option value="general">{t('home:areaSelector.generalView')}</option>
                     {areas.map((area) => (
                       <option 
                         key={area.uk_area || area.id} 
@@ -255,7 +257,7 @@ const HomePage = () => {
               e.target.style.boxShadow = '0 4px 12px rgba(74, 144, 226, 0.3)';
             }}>
               <FaTicketAlt style={{ fontSize: '18px' }} />
-              <span>Tomar turnos</span>
+              <span>{t('home:header.takeTurnButton')}</span>
             </a>
           </div>
         </div>
@@ -266,7 +268,7 @@ const HomePage = () => {
         <div className="error-banner">
           <span>⚠️ {error}</span>
           <button onClick={handleRefresh} className="retry-button">
-            Reintentar
+            {t('common:buttons.retry')}
           </button>
         </div>
       )}
@@ -320,15 +322,15 @@ const HomePage = () => {
                         <div className="empty-state-icon">
                           <FaHospital />
                         </div>
-                        <h2>No hay turnos activos</h2>
-                        <p>Todas las áreas médicas están sin turnos en espera en este momento</p>
+                        <h2>{t('home:emptyState.title')}</h2>
+                        <p>{t('home:emptyState.description')}</p>
                         <div className="empty-state-actions">
                           <button 
                             className="refresh-button"
                             onClick={handleRefresh}
                           >
                             <i className="mdi mdi-refresh"></i>
-                            Actualizar
+                            {t('common:buttons.refresh')}
                           </button>
                         </div>
                       </div>
@@ -353,7 +355,7 @@ const HomePage = () => {
                           {!areaData.nextForArea ? (
                             <div className="area-empty-state">
                               <i className="mdi mdi-check-circle" style={{ color: areaData.areaColor }}></i>
-                              <p>Sin turnos en espera</p>
+                              <p>{t('home:monitor.noTurnsWaiting')}</p>
                             </div>
                           ) : (
                             <div className="area-current-turn">
@@ -367,14 +369,14 @@ const HomePage = () => {
                               <div className="turn-info-small">
                                 <div className="consultorio-small">
                                   <i className="mdi mdi-hospital-building"></i>
-                                  Consultorio {areaData.nextForArea.i_numero_consultorio || areaData.nextForArea.consultorio}
+                                  {t('home:monitor.office')} {areaData.nextForArea.i_numero_consultorio || areaData.nextForArea.consultorio}
                                 </div>
                                 <div className="status-small" style={{ 
                                   background: (areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' 
                                     ? '#FF6B35' : areaData.areaColor
                                 }}>
                                   {(areaData.nextForArea.s_estado || areaData.nextForArea.estado) === 'LLAMANDO' ? 
-                                    'LLAMANDO' : 'EN ESPERA'
+                                    t('common:turnStatus.llamando').toUpperCase() : t('common:turnStatus.enEspera').toUpperCase()
                                   }
                                 </div>
                               </div>
@@ -384,7 +386,7 @@ const HomePage = () => {
                         
                         <div className="area-card-footer">
                           <span className="turns-count" style={{ color: areaData.areaColor }}>
-                            {areaData.turnsArea.length} turnos activos
+                            {areaData.turnsArea.length} {t('home:monitor.activeTurns')}
                           </span>
                         </div>
                       </div>
@@ -433,13 +435,13 @@ const HomePage = () => {
                         <h1 style={{ color: areaColor }}>
                           {areaName}
                         </h1>
-                        <p className="area-subtitle">Turnos en tiempo real</p>
+                        <p className="area-subtitle">{t('home:monitor.realTime')}</p>
                       </div>
                     </div>
                     <div className="monitor-status">
                       <div className="live-indicator">
                         <div className="pulse-dot"></div>
-                        <span>EN VIVO</span>
+                        <span>{t('home:monitor.live')}</span>
                       </div>
                       <div className="area-badge-large" style={{ 
                         background: areaColor,
@@ -456,13 +458,13 @@ const HomePage = () => {
                         <div className="empty-icon-large" style={{ color: areaColor }}>
                           <i className="mdi mdi-clock-outline"></i>
                         </div>
-                        <h2>No hay turnos en espera</h2>
-                        <p>Todos los turnos han sido atendidos en esta área</p>
+                        <h2>{t('home:monitor.noTurnsWaiting')}</h2>
+                        <p>{t('home:monitor.allTurnsAttended')}</p>
                       </div>
                     ) : (
                       <div className="monitor-current-turn">
                         <div className="current-turn-header">
-                          <h2>PRÓXIMO TURNO</h2>
+                          <h2>{t('home:monitor.nextTurn')}</h2>
                         </div>
                         <div className="turn-display-container">
                           <div className="turn-display-large" style={{ 
@@ -477,7 +479,7 @@ const HomePage = () => {
                           <div className="turn-info-large">
                             <div className="info-item-large">
                               <i className="mdi mdi-hospital-building" style={{ color: areaColor }}></i>
-                              <span>Consultorio {nextForArea.i_numero_consultorio || nextForArea.consultorio}</span>
+                              <span>{t('home:monitor.office')} {nextForArea.i_numero_consultorio || nextForArea.consultorio}</span>
                             </div>
                             <div className="status-display-large" style={{ 
                               background: (nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' 
@@ -485,8 +487,8 @@ const HomePage = () => {
                               color: 'white'
                             }}>
                               {(nextForArea.s_estado || nextForArea.estado) === 'LLAMANDO' ? 
-                                <><i className="mdi mdi-bell-ring"></i> LLAMANDO AHORA</> : 
-                                <><i className="mdi mdi-clock"></i> EN ESPERA</>
+                                <><i className="mdi mdi-bell-ring"></i> {t('home:turnDisplay.callingNow')}</> : 
+                                <><i className="mdi mdi-clock"></i> {t('home:turnDisplay.waiting')}</>
                               }
                             </div>
                           </div>
@@ -501,20 +503,20 @@ const HomePage = () => {
                   <div className="sidebar-header">
                     <h3>
                       <i className="mdi mdi-format-list-bulleted" style={{ color: areaColor }}></i>
-                      Cola de Turnos
+                      {t('home:monitor.turnQueue')}
                     </h3>
                     <div className="turns-counter" style={{ 
                       background: areaColor + '20',
                       color: areaColor 
                     }}>
-                      {turnsArea.length} en espera
+                      {turnsArea.length} {t('home:monitor.waiting')}
                     </div>
                   </div>
                   <div className="sidebar-content">
                     {turnsArea.length === 0 ? (
                       <div className="sidebar-empty-state">
                         <i className="mdi mdi-calendar-check" style={{ color: areaColor }}></i>
-                        <p>No hay turnos activos</p>
+                        <p>{t('home:monitor.noActiveTurns')}</p>
                       </div>
                     ) : (
                       <div className="turns-queue">
@@ -540,12 +542,12 @@ const HomePage = () => {
                               <div className="queue-info-right">
                                 <div className="consultorio-info">
                                   <i className="mdi mdi-hospital-building"></i>
-                                  Consultorio {t.i_numero_consultorio || t.consultorio}
+                                  {t('home:monitor.office')} {t.i_numero_consultorio || t.consultorio}
                                 </div>
                                 <div className={`queue-status ${isCalling ? 'calling' : 'waiting'}`}>
                                   {isCalling ? 
-                                    <><i className="mdi mdi-bell-ring"></i> Llamando</> : 
-                                    <><i className="mdi mdi-clock-outline"></i> En espera</>
+                                    <><i className="mdi mdi-bell-ring"></i> {t('home:turnDisplay.calling')}</> : 
+                                    <><i className="mdi mdi-clock-outline"></i> {t('common:turnStatus.enEspera')}</>
                                   }
                                 </div>
                               </div>
@@ -569,8 +571,8 @@ const HomePage = () => {
         <div className="area-selection-prompt">
           <div className="prompt-content">
             <FaHospital className="prompt-icon" />
-            <h2>Seleccione un área médica</h2>
-            <p>Use el selector en el encabezado para ver los turnos de un área específica</p>
+            <h2>{t('home:emptyState.selectAreaTitle')}</h2>
+            <p>{t('home:emptyState.selectAreaDescription')}</p>
           </div>
         </div>
       )}

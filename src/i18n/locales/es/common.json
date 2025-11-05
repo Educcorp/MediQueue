@@ -1,0 +1,194 @@
+{
+  "appName": "MediQueue",
+  "appNameFull": "MediQueue®",
+  "appDescription": "Sistema de Gestión de Turnos Médicos",
+  
+  "buttons": {
+    "create": "Crear",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "update": "Actualizar",
+    "refresh": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "back": "Volver",
+    "close": "Cerrar",
+    "add": "Agregar",
+    "remove": "Quitar",
+    "view": "Ver",
+    "download": "Descargar",
+    "upload": "Subir",
+    "import": "Importar",
+    "export": "Exportar",
+    "print": "Imprimir",
+    "submit": "Enviar",
+    "reset": "Restablecer",
+    "apply": "Aplicar",
+    "clear": "Limpiar",
+    "home": "Inicio",
+    "logout": "Cerrar Sesión",
+    "login": "Iniciar Sesión",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "retry": "Reintentar"
+  },
+  
+  "messages": {
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "processing": "Procesando...",
+    "deleting": "Eliminando...",
+    "updating": "Actualizando...",
+    "success": "Operación exitosa",
+    "error": "Ha ocurrido un error",
+    "noData": "No hay datos disponibles",
+    "noResults": "No se encontraron resultados",
+    "confirmDelete": "¿Estás seguro de eliminar este elemento?",
+    "confirmAction": "¿Estás seguro de realizar esta acción?",
+    "savedSuccessfully": "Guardado exitosamente",
+    "deletedSuccessfully": "Eliminado exitosamente",
+    "updatedSuccessfully": "Actualizado exitosamente",
+    "createdSuccessfully": "Creado exitosamente",
+    "operationSuccess": "Operación completada exitosamente",
+    "operationFailed": "La operación ha fallado",
+    "networkError": "Error de conexión. Verifica tu conexión a internet.",
+    "serverError": "Error del servidor. Inténtalo más tarde.",
+    "validationError": "Error de validación en los datos proporcionados",
+    "authError": "Error de autenticación. Verifica tus credenciales.",
+    "permissionError": "No tienes permisos para realizar esta acción.",
+    "notFound": "Recurso no encontrado.",
+    "conflict": "El recurso ya existe.",
+    "genericError": "Ha ocurrido un error inesperado.",
+    "requiredField": "Este campo es requerido",
+    "optionalField": "Este campo es opcional",
+    "selectOption": "Selecciona una opción"
+  },
+  
+  "status": {
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "pending": "Pendiente",
+    "completed": "Completado",
+    "cancelled": "Cancelado",
+    "inProgress": "En Progreso",
+    "waiting": "En espera",
+    "attending": "Atendiendo",
+    "attended": "Atendido",
+    "calling": "Llamando",
+    "notPresent": "No Presente"
+  },
+  
+  "turnStatus": {
+    "enEspera": "En espera",
+    "llamando": "Llamando",
+    "atendido": "Atendido",
+    "cancelado": "Cancelado",
+    "noPresente": "No Presente"
+  },
+  
+  "days": {
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo"
+  },
+  
+  "months": {
+    "january": "Enero",
+    "february": "Febrero",
+    "march": "Marzo",
+    "april": "Abril",
+    "may": "Mayo",
+    "june": "Junio",
+    "july": "Julio",
+    "august": "Agosto",
+    "september": "Septiembre",
+    "october": "Octubre",
+    "november": "Noviembre",
+    "december": "Diciembre"
+  },
+  
+  "time": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "tomorrow": "Mañana",
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "thisYear": "Este año",
+    "realTime": "En tiempo real",
+    "live": "EN VIVO",
+    "hour": "hora",
+    "hours": "horas",
+    "minute": "minuto",
+    "minutes": "minutos",
+    "second": "segundo",
+    "seconds": "segundos",
+    "day": "día",
+    "days": "días"
+  },
+  
+  "navigation": {
+    "home": "Inicio",
+    "dashboard": "Panel de Control",
+    "turns": "Turnos",
+    "patients": "Pacientes",
+    "consultorios": "Consultorios",
+    "areas": "Áreas",
+    "users": "Usuarios",
+    "statistics": "Estadísticas",
+    "settings": "Configuración",
+    "reports": "Reportes",
+    "help": "Ayuda",
+    "about": "Acerca de"
+  },
+  
+  "roles": {
+    "admin": "Administrador",
+    "supervisor": "Supervisor",
+    "user": "Usuario"
+  },
+  
+  "footer": {
+    "description": "Sistema integral de gestión de turnos médicos. Optimizando la experiencia de pacientes y profesionales de la salud.",
+    "contactTitle": "Contacto & Horarios",
+    "address": "Av. Principal 123, Ciudad",
+    "schedule": {
+      "weekdays": "Lunes - Viernes: 8:00 - 18:00",
+      "saturday": "Sábados: 8:00 - 12:00",
+      "sunday": "Domingos: Cerrado"
+    },
+    "quickLinks": "Enlaces Rápidos",
+    "links": {
+      "takeTurn": "Tomar Turnos",
+      "about": "Acerca de Nosotros",
+      "privacy": "Política de Privacidad"
+    },
+    "socialTitle": "Síguenos & Soporte",
+    "support24": "Soporte técnico disponible 24/7",
+    "copyright": "Todos los derechos reservados",
+    "developedWith": "Desarrollado con",
+    "and": "y",
+    "byEduccorp": "por EducCorp",
+    "allRightsReserved": "Todos los derechos reservados",
+    "version": "Versión",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio",
+    "contact": "Contacto"
+  },
+  
+  "language": {
+    "spanish": "Español",
+    "english": "English",
+    "es": "Español",
+    "en": "English",
+    "selectLanguage": "Seleccionar idioma",
+    "changeLanguage": "Cambiar idioma"
+  }
+}
+

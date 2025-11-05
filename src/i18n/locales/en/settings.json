@@ -1,0 +1,82 @@
+{
+  "title": "System Settings",
+  "subtitle": "Manage general configuration and operational parameters",
+  "saving": "Saving configuration...",
+  
+  "tabs": {
+    "general": "General",
+    "operations": "Operations",
+    "notifications": "Notifications",
+    "maintenance": "Maintenance",
+    "security": "Security"
+  },
+  
+  "general": {
+    "title": "General System Configuration",
+    "systemName": "System Name",
+    "systemNamePlaceholder": "System name",
+    "version": "Version",
+    "versionPlaceholder": "System version",
+    "timezone": "Timezone",
+    "timezones": {
+      "colombia": "Colombia (GMT-5)",
+      "mexico": "Mexico (GMT-6)",
+      "argentina": "Argentina (GMT-3)",
+      "peru": "Peru (GMT-5)"
+    },
+    "language": "Language",
+    "languages": {
+      "spanish": "Español",
+      "english": "English"
+    }
+  },
+  
+  "operations": {
+    "title": "Operational Configuration",
+    "maxTurnsPerDay": "Maximum Appointments per Day",
+    "turnDuration": "Appointment Duration (minutes)",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "maxAdvanceDays": "Maximum Advance Days",
+    "allowCancellation": "Allow Cancellations",
+    "cancellationDeadline": "Cancellation Deadline (minutes before)"
+  },
+  
+  "notifications": {
+    "title": "Notifications Configuration",
+    "email": "Email",
+    "emailDescription": "Email notifications",
+    "sms": "SMS",
+    "smsDescription": "Text messages",
+    "push": "Push",
+    "pushDescription": "Push notifications",
+    "autoReminders": "Automatic Reminders",
+    "hoursBeforeTurn": "Hours Before Appointment"
+  },
+  
+  "maintenance": {
+    "title": "Maintenance Configuration",
+    "maintenanceMode": "Maintenance Mode",
+    "currentlyInMaintenance": "System currently in maintenance",
+    "normalOperation": "Normal system operation",
+    "maintenanceMessage": "Maintenance Message",
+    "messagePlaceholder": "Message users will see during maintenance",
+    "scheduledTime": "Scheduled Date and Time",
+    "estimatedDuration": "Estimated Duration (minutes)"
+  },
+  
+  "security": {
+    "title": "Security Configuration",
+    "sessionTimeout": "Session Timeout (minutes)",
+    "passwordMinLength": "Minimum Password Length",
+    "maxLoginAttempts": "Maximum Login Attempts",
+    "lockoutDuration": "Lockout Duration (minutes)",
+    "requireSpecialChars": "Require Special Characters in Passwords"
+  },
+  
+  "messages": {
+    "savedSuccessfully": "Configuration saved successfully",
+    "errorSaving": "Error saving configuration"
+  }
+}
+

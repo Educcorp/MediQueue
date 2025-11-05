@@ -1,0 +1,131 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Welcome to the medical appointment management system",
+    "loadingDashboard": "Loading dashboard..."
+  },
+  
+  "stats": {
+    "totalTurns": "Total Appointments",
+    "activeTurns": "Active Appointments",
+    "patients": "Patients",
+    "consultorios": "Offices",
+    "areas": "Areas",
+    "administrators": "Administrators",
+    "todayTurns": "Today's Appointments",
+    "completedTurns": "Completed Appointments",
+    "active": "active",
+    "today": "today",
+    "attended": "attended",
+    "available": "Available",
+    "configured": "Configured",
+    "registered": "registered",
+    "realTime": "Real time",
+    "thisMonth": "+1% this month",
+    "increase": "+8% this month"
+  },
+  
+  "cards": {
+    "manageTurns": {
+      "title": "Manage Appointments",
+      "description": "Manage the medical appointment system",
+      "viewTurns": "View Appointments"
+    },
+    "managePatients": {
+      "title": "Manage Patients",
+      "description": "Manage patient information",
+      "viewPatients": "View Patients"
+    },
+    "consultorios": {
+      "title": "Offices",
+      "description": "Management of offices and medical areas",
+      "viewConsultorios": "View Offices"
+    },
+    "manageUsers": {
+      "title": "Manage Users",
+      "description": "Create, edit, and delete administrator users",
+      "viewUsers": "View Users"
+    },
+    "statistics": {
+      "title": "Statistics",
+      "description": "Reports and analysis of the appointment system",
+      "viewStatistics": "View Statistics"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "System configuration and preferences",
+      "configure": "Configure"
+    }
+  },
+  
+  "systemInfo": {
+    "title": "System Information",
+    "version": "Version",
+    "lastUpdate": "Last update",
+    "status": "Status",
+    "active": "Active",
+    "system": "System"
+  },
+  
+  "errors": {
+    "loadingError": "Error loading dashboard data",
+    "retry": "Retry"
+  },
+  
+  "turns": {
+    "title": "Appointment Management",
+    "subtitle": "Manage all system appointments",
+    "createTurn": "Create Appointment",
+    "editTurn": "Edit Appointment",
+    "deleteTurn": "Delete Appointment",
+    "viewTurn": "View Appointment",
+    "turnNumber": "Appointment Number",
+    "patient": "Patient",
+    "area": "Area",
+    "office": "Office",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "actions": "Actions",
+    "noTurns": "No appointments registered",
+    "createFirstTurn": "Create First Appointment",
+    "filter": "Filter",
+    "search": "Search appointments...",
+    "all": "All",
+    "confirmDelete": "Are you sure you want to delete this appointment?"
+  },
+  
+  "patients": {
+    "title": "Patient Management",
+    "subtitle": "Manage patient information",
+    "createPatient": "Create Patient",
+    "editPatient": "Edit Patient",
+    "deletePatient": "Delete Patient",
+    "viewPatient": "View Patient",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "email": "Email",
+    "birthDate": "Birth Date",
+    "noPatients": "No patients registered",
+    "createFirstPatient": "Create First Patient",
+    "search": "Search patients...",
+    "confirmDelete": "Are you sure you want to delete this patient?"
+  },
+  
+  "users": {
+    "title": "User Management",
+    "subtitle": "Manage system administrator users",
+    "createUser": "Create User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "viewUser": "View User",
+    "username": "Username",
+    "role": "Role",
+    "noUsers": "No users registered",
+    "createFirstUser": "Create First User",
+    "search": "Search users...",
+    "confirmDelete": "Are you sure you want to delete this user?"
+  }
+}
+

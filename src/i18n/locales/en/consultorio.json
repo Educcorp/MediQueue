@@ -1,0 +1,80 @@
+{
+  "title": "Office Management",
+  "subtitle": "Manage medical areas and system offices",
+  "loading": "Loading offices...",
+  
+  "stats": {
+    "medicalAreas": "Medical Areas",
+    "totalConsultorios": "Total Offices",
+    "activeConsultorios": "Active Offices",
+    "consultorios": "offices",
+    "areas": "areas"
+  },
+  
+  "areas": {
+    "title": "Medical Areas",
+    "newArea": "New Area",
+    "editArea": "Edit Medical Area",
+    "createArea": "New Medical Area",
+    "deleteArea": "Delete Area",
+    "noAreas": "No medical areas registered",
+    "createFirstArea": "Create First Area",
+    "searchPlaceholder": "Search medical areas...",
+    "confirmDelete": "Are you sure you want to delete the area \"{{areaName}}\"?",
+    "confirmDeleteWithOffices": "Are you sure you want to delete the area \"{{areaName}}\"?\n\nThis will also delete {{count}} office(s) and all associated appointments.",
+    "deletedSuccessfully": "Area deleted successfully",
+    "createdSuccessfully": "Area created successfully",
+    "updatedSuccessfully": "Area updated successfully",
+    "noOffices": "No offices in this area"
+  },
+  
+  "form": {
+    "areaName": "Medical Area Name",
+    "areaNamePlaceholder": "E.g.: General Medicine, Pediatrics...",
+    "letterIdentifier": "Letter Identifier",
+    "letterPlaceholder": "E.g.: GM, PD...",
+    "letterMaxLength": "Maximum 2 letters to identify the area",
+    "letterInUse": "The letter \"{{letter}}\" is already in use by another area",
+    "areaColor": "Area Color",
+    "areaIcon": "Area Icon",
+    "officeNumber": "Office Number",
+    "officeNumberPlaceholder": "E.g.: 101, 102, 103... (max. 3 digits)",
+    "required": "required",
+    "charactersCount": "{{count}}/50 characters",
+    "areaNameRequired": "Area name is required",
+    "areaNameMaxLength": "Area name cannot exceed 50 characters",
+    "officeNumberRequired": "Office number is required",
+    "officeNumberRange": "Office number must be between 1 and 999 (maximum 3 digits)"
+  },
+  
+  "offices": {
+    "title": "Offices",
+    "addOffice": "Add Office",
+    "newOffice": "New Office",
+    "editOffice": "Edit Office",
+    "deleteOffice": "Delete Office",
+    "officeNumber": "Office #{{number}}",
+    "confirmDelete": "Are you sure you want to delete office #{{number}}?\n\nThis will also delete all appointments associated with this office.",
+    "deletedSuccessfully": "Office deleted successfully",
+    "createdSuccessfully": "Office created successfully",
+    "updatedSuccessfully": "Office updated successfully",
+    "newOfficeInArea": "New Office - {{areaName}}"
+  },
+  
+  "errors": {
+    "savingArea": "Error saving area",
+    "savingOffice": "Error saving office",
+    "deletingArea": "Error deleting area",
+    "deletingOffice": "Error deleting office",
+    "notFound": "was not found",
+    "noPermission": "You don't have permission to perform this action",
+    "unknownError": "Unknown error"
+  },
+  
+  "customization": {
+    "title": "Customization",
+    "colorLabel": "Color",
+    "iconLabel": "Icon"
+  }
+}
+
