@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { usePermissions } from '../../hooks/useAuth';
 import {
@@ -21,6 +22,7 @@ import {
 } from 'react-icons/fa';
 
 const AdminHeader = () => {
+    const { t } = useTranslation(['admin', 'common']);
     const { user, logout } = useAuth();
     const { canAccess } = usePermissions();
     const navigate = useNavigate();
@@ -112,31 +114,31 @@ const AdminHeader = () => {
     const navigationItems = [
         {
             path: '/admin/dashboard',
-            label: 'Dashboard',
+            label: t('admin:dashboard.title'),
             permission: 'supervisor',
             icon: <FaTachometerAlt />
         },
         {
             path: '/admin/turns',
-            label: 'Turnos',
+            label: t('admin:turns.title').replace(' de Turnos', '').replace(' Management', ''),
             permission: 'supervisor',
             icon: <FaCalendarCheck />
         },
         {
             path: '/admin/patients',
-            label: 'Pacientes',
+            label: t('admin:patients.title').replace(' de Pacientes', '').replace(' Management', ''),
             permission: 'supervisor',
             icon: <FaUserInjured />
         },
         {
             path: '/admin/consultorios',
-            label: 'Consultorios',
+            label: t('common:navigation.consultorios'),
             permission: 'supervisor',
             icon: <FaHospital />
         },
         {
             path: '/admin/statistics',
-            label: 'Estadísticas',
+            label: t('admin:statistics.title').replace(' del Sistema', '').replace(' of the system', '').replace('System ', ''),
             permission: 'supervisor',
             icon: <FaChartLine />
         }
@@ -146,19 +148,19 @@ const AdminHeader = () => {
     const sidebarItems = [
         {
             path: '/admin/historial',
-            label: 'Historial',
+            label: t('admin:turns.history'),
             permission: 'supervisor',
             icon: <FaHistory />
         },
         {
             path: '/admin/users',
-            label: 'Gestión de Usuarios',
+            label: t('admin:users.title'),
             permission: 'admin',
             icon: <FaUserCog />
         },
         {
             path: '/admin/settings',
-            label: 'Configuración',
+            label: t('common:navigation.settings'),
             permission: 'admin',
             icon: <FaCog />
         }
