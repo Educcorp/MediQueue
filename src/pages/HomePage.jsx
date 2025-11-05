@@ -101,7 +101,10 @@ const HomePage = () => {
   // Cargar consultorios de la área seleccionada (público)
   useEffect(() => {
     const loadConsultoriosByArea = async () => {
-      if (!selectedArea) return;
+      if (!selectedArea || selectedArea === 'general') {
+        setConsultoriosArea([]);
+        return;
+      }
       try {
         const data = await consultorioService.getBasicsByArea(selectedArea);
         setConsultoriosArea(data || []);
@@ -515,13 +518,13 @@ const HomePage = () => {
                       </div>
                     ) : (
                       <div className="turns-queue">
-                        {turnsArea.sort(sortByNum).filter((t) => {
+                        {turnsArea.sort(sortByNum).filter((turn) => {
                           // Excluir el turno actual (nextForArea) de la cola
-                          const isCurrentTurn = nextForArea && (nextForArea.i_numero_turno || nextForArea.id) === (t.i_numero_turno || t.id);
+                          const isCurrentTurn = nextForArea && (nextForArea.i_numero_turno || nextForArea.id) === (turn.i_numero_turno || turn.id);
                           return !isCurrentTurn;
-                        }).map((t, idx) => {
+                        }).map((turn, idx) => {
                           const isNext = false; // Ya no hay "next" en la cola
-                          const isCalling = (t.s_estado || t.estado) === 'LLAMANDO';
+                          const isCalling = (turn.s_estado || turn.estado) === 'LLAMANDO';
 
                           return (
                             <div
@@ -536,12 +539,12 @@ const HomePage = () => {
                                 background: isNext ? areaColor : areaColor + '20',
                                 color: isNext ? 'white' : areaColor
                               }}>
-                                {areaLetter}{t.i_numero_turno || t.id}
+                                {areaLetter}{turn.i_numero_turno || turn.id}
                               </div>
                               <div className="queue-info-right">
                                 <div className="consultorio-info">
                                   <i className="mdi mdi-hospital-building"></i>
-                                  {t('home:monitor.office')} {t.i_numero_consultorio || t.consultorio}
+                                  {t('home:monitor.office')} {turn.i_numero_consultorio || turn.consultorio}
                                 </div>
                                 <div className={`queue-status ${isCalling ? 'calling' : 'waiting'}`}>
                                   {isCalling ?
