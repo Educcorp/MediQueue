@@ -257,4 +257,78 @@ export const getAvailablePatientsTutorialSteps = () => {
     });
 };
 
+/**
+ * Pasos del tutorial para el módulo de gestión de usuarios administrativos (Admin)
+ */
+export const adminUsersTutorialSteps = [
+    {
+        target: '.page-header',
+        title: 'Bienvenido a la Gestión de Usuarios',
+        content: 'Este módulo te permite administrar todos los usuarios administrativos del sistema. Aquí podrás crear, editar y gestionar super administradores y supervisores.',
+        position: 'bottom'
+    },
+    {
+        target: '.page-actions',
+        title: 'Acciones Principales',
+        content: 'Usa estos botones para actualizar la lista de usuarios o agregar un nuevo usuario administrativo al sistema.',
+        position: 'bottom'
+    },
+    {
+        target: '.stats-cards',
+        title: 'Estadísticas de Usuarios',
+        content: 'Aquí puedes ver las estadísticas generales: total de usuarios administrativos, super administradores y supervisores registrados en el sistema.',
+        position: 'bottom'
+    },
+    {
+        target: '.filters-section',
+        title: 'Búsqueda de Usuarios',
+        content: 'Utiliza la barra de búsqueda para encontrar usuarios por nombre de usuario, nombre completo, email o teléfono. La búsqueda se realiza en tiempo real.',
+        position: 'bottom'
+    },
+    {
+        target: '.filters-section input[type="text"]',
+        title: 'Búsqueda Rápida',
+        content: 'Escribe en este campo para buscar usuarios. La búsqueda filtra por nombre de usuario, nombre completo, email o número de teléfono.',
+        position: 'bottom'
+    },
+    {
+        target: '.users-table',
+        title: 'Tabla de Usuarios',
+        content: 'Aquí se muestra la lista completa de usuarios administrativos con toda su información: usuario, nombre, email, teléfono, tipo de usuario y fecha de registro.',
+        position: 'top'
+    },
+    {
+        target: '.users-table tbody tr:first-child',
+        title: 'Información del Usuario',
+        content: 'Cada fila muestra los datos completos del usuario administrativo. Puedes ver su nombre de usuario, datos de contacto y tipo de rol asignado.',
+        position: 'top'
+    },
+    {
+        target: '.users-table tbody tr:first-child .status-badge',
+        title: 'Tipo de Usuario',
+        content: 'El tipo de usuario se indica con colores y íconos: amarillo con corona para Super Administradores y verde con escudo para Supervisores.',
+        position: 'top'
+    },
+    {
+        target: '.users-table tbody tr:first-child .user-actions',
+        title: 'Acciones del Usuario',
+        content: 'Usa estos botones para editar la información del usuario o eliminar su cuenta del sistema. No puedes eliminar tu propia cuenta.',
+        position: 'left'
+    }
+];
+
+/**
+ * Función para obtener los pasos del tutorial de usuarios filtrando los que no tienen elemento target disponible
+ */
+export const getAvailableUsersTutorialSteps = () => {
+    return adminUsersTutorialSteps.filter(step => {
+        // Si es el paso de la primera fila de la tabla, verificar que exista al menos un usuario
+        if (step.target.includes('tbody tr:first-child')) {
+            const tableRows = document.querySelectorAll('.users-table tbody tr');
+            return tableRows.length > 0 && !tableRows[0].classList.contains('no-data-row');
+        }
+        return true;
+    });
+};
+
 export default adminTurnsTutorialSteps;
