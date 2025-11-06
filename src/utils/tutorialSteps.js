@@ -177,4 +177,84 @@ export const getAvailableConsultoriosTutorialSteps = () => {
     });
 };
 
+/**
+ * Pasos del tutorial para el módulo de gestión de pacientes (Admin)
+ */
+export const adminPatientsTutorialSteps = [
+    {
+        target: '.page-header',
+        title: 'Bienvenido a la Gestión de Pacientes',
+        content: 'Este módulo te permite administrar toda la información de los pacientes. Aquí podrás registrar, editar, buscar y gestionar el estado de cada paciente.',
+        position: 'bottom'
+    },
+    {
+        target: '.page-actions',
+        title: 'Acciones Principales',
+        content: 'Usa estos botones para actualizar la lista de pacientes o agregar un nuevo paciente al sistema.',
+        position: 'bottom'
+    },
+    {
+        target: '.stats-cards',
+        title: 'Estadísticas de Pacientes',
+        content: 'Aquí puedes ver las estadísticas generales: total de pacientes registrados, pacientes activos, inactivos y aquellos con correo electrónico.',
+        position: 'bottom'
+    },
+    {
+        target: '.filters-section',
+        title: 'Búsqueda y Filtros',
+        content: 'Utiliza la barra de búsqueda para encontrar pacientes por nombre, apellido, teléfono o email. También puedes filtrar por estado (activo/inactivo).',
+        position: 'bottom'
+    },
+    {
+        target: '.filters-section input[type="text"]',
+        title: 'Búsqueda Rápida',
+        content: 'Escribe en este campo para buscar pacientes. La búsqueda se realiza en tiempo real y filtra por nombre, apellido, teléfono o email.',
+        position: 'bottom'
+    },
+    {
+        target: '.filters-section select',
+        title: 'Filtrar por Estado',
+        content: 'Usa este selector para filtrar pacientes por su estado: todos, solo activos o solo inactivos.',
+        position: 'bottom'
+    },
+    {
+        target: '.patients-table',
+        title: 'Tabla de Pacientes',
+        content: 'Aquí se muestra la lista completa de pacientes con toda su información: nombre, teléfono, fecha de nacimiento, edad, email, estado y fecha de registro.',
+        position: 'top'
+    },
+    {
+        target: '.patients-table tbody tr:first-child',
+        title: 'Información del Paciente',
+        content: 'Cada fila muestra los datos completos del paciente. Puedes ver su nombre, contacto, edad calculada automáticamente y estado actual.',
+        position: 'top'
+    },
+    {
+        target: '.patients-table tbody tr:first-child .status-badge',
+        title: 'Estado del Paciente',
+        content: 'El estado del paciente se indica con colores: verde para activos y gris para inactivos. Esto te permite identificar rápidamente quiénes pueden recibir atención.',
+        position: 'top'
+    },
+    {
+        target: '.patients-table tbody tr:first-child .patient-actions',
+        title: 'Acciones del Paciente',
+        content: 'Usa estos botones para editar la información del paciente o eliminar su registro del sistema.',
+        position: 'left'
+    }
+];
+
+/**
+ * Función para obtener los pasos del tutorial de pacientes filtrando los que no tienen elemento target disponible
+ */
+export const getAvailablePatientsTutorialSteps = () => {
+    return adminPatientsTutorialSteps.filter(step => {
+        // Si es el paso de la primera fila de la tabla, verificar que exista al menos un paciente
+        if (step.target.includes('tbody tr:first-child')) {
+            const tableRows = document.querySelectorAll('.patients-table tbody tr');
+            return tableRows.length > 0 && !tableRows[0].classList.contains('no-data-row');
+        }
+        return true;
+    });
+};
+
 export default adminTurnsTutorialSteps;
