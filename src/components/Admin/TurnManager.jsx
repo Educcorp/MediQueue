@@ -7,10 +7,13 @@ import AdminHeader from '../Common/AdminHeader';
 import AdminFooter from '../Common/AdminFooter';
 import TestSpinner from '../Common/TestSpinner';
 import Chatbot from '../Common/Chatbot';
+import Tutorial from '../Common/Tutorial';
 import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
 import areaService from '../../services/areaService';
+import useTutorial from '../../hooks/useTutorial';
+import { getAvailableTutorialSteps } from '../../utils/tutorialSteps';
 import '../../styles/UnifiedAdminPages.css';
 
 // React Icons
@@ -250,6 +253,15 @@ const TurnManager = () => {
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Hook del tutorial
+  const {
+    showTutorial,
+    hasCompletedTutorial,
+    completeTutorial,
+    skipTutorial,
+    startTutorial
+  } = useTutorial('admin-turns');
 
   // Estados de turnos disponibles
   const turnStatuses = [
@@ -710,6 +722,13 @@ const TurnManager = () => {
             >
               <FaHistory /> Historial
             </button>
+            <button
+              className="btn btn-secondary"
+              onClick={startTutorial}
+              title="Ver tutorial interactivo"
+            >
+              <FaEye /> Tutorial
+            </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> {t('common:buttons.refresh')}
             </button>
@@ -1033,7 +1052,7 @@ const TurnManager = () => {
               </div>
             ) : (
               <div className="data-table">
-                <table>
+                <table className="turns-table">
                   <thead>
                     <tr>
                       <th># Turno</th>
@@ -1082,7 +1101,7 @@ const TurnManager = () => {
                         </td>
                         <td>{getAreaInfo(turn.uk_consultorio)}</td>
                         <td>
-                          <div style={{ display: 'flex', gap: '4px' }}>
+                          <div className="turn-actions" style={{ display: 'flex', gap: '4px' }}>
                             {turn.s_estado === 'EN_ESPERA' && (
                               <>
                                 <button
@@ -1634,6 +1653,14 @@ const TurnManager = () => {
 
       <AdminFooter isDarkMode={isDarkMode} />
       <Chatbot />
+
+      {/* Tutorial interactivo */}
+      <Tutorial
+        steps={getAvailableTutorialSteps()}
+        show={showTutorial}
+        onComplete={completeTutorial}
+        onSkip={skipTutorial}
+      />
     </div>
   );
 };
