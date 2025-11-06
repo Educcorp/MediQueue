@@ -31,7 +31,9 @@ import {
   FaUsers,
   FaCrown,
   FaEyeSlash,
-  FaKey
+  FaKey,
+  FaCheckCircle,
+  FaExclamationCircle
 } from 'react-icons/fa';
 
 const AdminUsersPage = () => {
@@ -169,7 +171,7 @@ const AdminUsersPage = () => {
         alert(t('admin:users.messages.updateSuccess'));
       } else {
         await adminService.createAdmin(adminData);
-        alert(t('admin:users.messages.createSuccess'));
+        alert(t('admin:users.messages.createSuccess') + '\n\n✉️ Se ha enviado un correo de verificación a ' + adminData.s_email + '.\nEl administrador debe verificar su correo antes de poder iniciar sesión.');
       }
 
       await loadAdmins();
@@ -489,9 +491,34 @@ const AdminUsersPage = () => {
                           </div>
                         </td>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
-                            <span style={{ color: 'var(--primary-medical)' }}>{admin.s_email}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
+                              <span style={{ color: 'var(--primary-medical)' }}>{admin.s_email}</span>
+                            </div>
+                            {admin.b_email_verified === false || admin.b_email_verified === 0 ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                                <FaExclamationCircle style={{ color: '#f39c12', fontSize: '11px' }} />
+                                <span style={{ 
+                                  fontSize: '11px', 
+                                  color: '#f39c12',
+                                  fontWeight: '500'
+                                }}>
+                                  Pendiente de verificación
+                                </span>
+                              </div>
+                            ) : admin.b_email_verified === true || admin.b_email_verified === 1 ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                                <FaCheckCircle style={{ color: '#27ae60', fontSize: '11px' }} />
+                                <span style={{ 
+                                  fontSize: '11px', 
+                                  color: '#27ae60',
+                                  fontWeight: '500'
+                                }}>
+                                  Email verificado
+                                </span>
+                              </div>
+                            ) : null}
                           </div>
                         </td>
                         <td>

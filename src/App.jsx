@@ -16,6 +16,7 @@ import HistorialTurnos from './components/Admin/HistorialTurnos'
 import ProtectedRoute from './components/Common/ProtectedRoute'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import AboutPage from './pages/AboutPage'
+import EmailVerification from './pages/EmailVerification'
 import CookieBanner from './components/Common/CookieBanner'
 import LanguageSwitcher from './components/Common/LanguageSwitcher'
 import './i18n' // Configuración de i18next
@@ -37,8 +38,12 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/equipo" element={<AboutPage />} />
 
+        {/* Ruta de verificación de email */}
+        <Route path="/verify-email" element={<EmailVerification />} />
+
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/demo" element={<DashboardDemo />} />
         <Route
           path="/admin/dashboard"
