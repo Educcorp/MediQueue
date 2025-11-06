@@ -91,4 +91,90 @@ export const getAvailableTutorialSteps = () => {
     });
 };
 
+/**
+ * Pasos del tutorial para el módulo de gestión de consultorios (Admin)
+ */
+export const adminConsultoriosTutorialSteps = [
+    {
+        target: '.page-header',
+        title: 'Bienvenido a la Gestión de Consultorios',
+        content: 'Este módulo te permite administrar las áreas médicas y sus consultorios. Aquí podrás crear, editar y organizar la estructura de tu centro médico.',
+        position: 'bottom'
+    },
+    {
+        target: '.page-actions',
+        title: 'Acciones Principales',
+        content: 'Usa estos botones para crear nuevas áreas médicas, agregar consultorios, ver el tutorial o actualizar la información.',
+        position: 'bottom'
+    },
+    {
+        target: '.search-filter-section',
+        title: 'Búsqueda y Filtros',
+        content: 'Busca áreas o consultorios específicos escribiendo en el campo de búsqueda. Los resultados se filtran en tiempo real.',
+        position: 'bottom'
+    },
+    {
+        target: '.areas-grid',
+        title: 'Áreas Médicas',
+        content: 'Aquí se muestran todas las áreas médicas de tu centro. Cada tarjeta representa un área con su color, ícono y consultorios asociados.',
+        position: 'top'
+    },
+    {
+        target: '.area-card:first-child',
+        title: 'Tarjeta de Área',
+        content: 'Cada área muestra su nombre, letra identificadora, número de consultorios y opciones para editar, eliminar o activar/desactivar.',
+        position: 'right'
+    },
+    {
+        target: '.area-card:first-child .area-header',
+        title: 'Encabezado del Área',
+        content: 'El encabezado muestra el ícono, color y nombre del área. El color y el ícono ayudan a identificar rápidamente cada especialidad.',
+        position: 'bottom'
+    },
+    {
+        target: '.area-card:first-child .consultorios-list',
+        title: 'Lista de Consultorios',
+        content: 'Aquí se listan todos los consultorios pertenecientes a esta área. Cada consultorio tiene su propio número identificador.',
+        position: 'bottom'
+    },
+    {
+        target: '.area-card:first-child .consultorio-item:first-child',
+        title: 'Consultorio Individual',
+        content: 'Cada consultorio muestra su número y opciones para editar, eliminar o cambiar su estado de activo/inactivo.',
+        position: 'right'
+    },
+    {
+        target: '.area-card:first-child .area-actions',
+        title: 'Acciones del Área',
+        content: 'Usa estos botones para editar el área, eliminar el área completa, o activar/desactivar su disponibilidad.',
+        position: 'left'
+    },
+    {
+        target: '.area-card:first-child .btn-add-consultorio',
+        title: 'Agregar Consultorio',
+        content: 'Haz clic en este botón para agregar un nuevo consultorio a esta área específica.',
+        position: 'bottom'
+    }
+];
+
+/**
+ * Función para obtener los pasos del tutorial de consultorios filtrando los que no tienen elemento target disponible
+ */
+export const getAvailableConsultoriosTutorialSteps = () => {
+    return adminConsultoriosTutorialSteps.filter(step => {
+        // Si es un paso de área específica, verificar que exista al menos un área
+        if (step.target.includes('.area-card:first-child')) {
+            const areaCards = document.querySelectorAll('.area-card');
+            if (areaCards.length === 0) return false;
+
+            // Si es un paso de consultorio específico, verificar que el área tenga consultorios
+            if (step.target.includes('.consultorio-item:first-child')) {
+                const consultorios = areaCards[0].querySelectorAll('.consultorio-item');
+                return consultorios.length > 0;
+            }
+        }
+        return true;
+    });
+};
+
 export default adminTurnsTutorialSteps;

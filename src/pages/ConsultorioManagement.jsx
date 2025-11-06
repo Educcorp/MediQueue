@@ -8,8 +8,11 @@ import Chatbot from '../components/Common/Chatbot';
 import TestSpinner from '../components/Common/TestSpinner';
 import ColorSelector from '../components/Common/ColorSelector';
 import IconSelector from '../components/Common/IconSelectorPopup';
+import Tutorial from '../components/Common/Tutorial';
 import areaService from '../services/areaService';
 import consultorioService from '../services/consultorioService';
+import useTutorial from '../hooks/useTutorial';
+import { getAvailableConsultoriosTutorialSteps } from '../utils/tutorialSteps';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
 import '../styles/UnifiedAdminPages.css';
 
@@ -61,6 +64,16 @@ const ConsultorioManagement = () => {
   const { t } = useTranslation(['consultorio', 'common']);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Hook del tutorial
+  const {
+    showTutorial,
+    hasCompletedTutorial,
+    completeTutorial,
+    skipTutorial,
+    startTutorial
+  } = useTutorial('admin-consultorios');
+
   const [areas, setAreas] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -107,8 +120,8 @@ const ConsultorioManagement = () => {
 
   // Estados para modales de notificación
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successModalData, setSuccessModalData] = useState({ 
-    message: '', 
+  const [successModalData, setSuccessModalData] = useState({
+    message: '',
     data: null,
     type: '' // 'area', 'consultorio'
   });
@@ -248,9 +261,9 @@ const ConsultorioManagement = () => {
       await areaService.toggleEstado(areaToToggle.uk_area);
       await loadData();
       setShowToggleAreaModal(false);
-      
+
       const accion = areaToToggle.ck_estado === 'ACTIVO' ? 'bloqueada' : 'desbloqueada';
-      
+
       setSuccessModalData({
         message: `Área ${accion} correctamente`,
         data: {
@@ -261,18 +274,18 @@ const ConsultorioManagement = () => {
       });
       setShowSuccessModal(true);
       setAreaToToggle(null);
-      
+
       setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
       setShowToggleAreaModal(false);
       setAreaToToggle(null);
-      
+
       setErrorModalData({
         message: 'No es posible cambiar el estado del área'
       });
       setShowErrorModal(true);
       setTimeout(() => setShowErrorModal(false), 4000);
-      
+
       console.error('Error cambiando estado del área:', error);
     }
   };
@@ -294,7 +307,7 @@ const ConsultorioManagement = () => {
       await areaService.remove(areaToDelete.uk_area);
       await loadData();
       setShowDeleteAreaModal(false);
-      
+
       setSuccessModalData({
         message: 'Área eliminada correctamente',
         data: {
@@ -304,12 +317,12 @@ const ConsultorioManagement = () => {
       });
       setShowSuccessModal(true);
       setAreaToDelete(null);
-      
+
       setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
       setShowDeleteAreaModal(false);
       setAreaToDelete(null);
-      
+
       // Manejar diferentes tipos de errores
       let mensaje = 'No es posible eliminar el área';
       if (error.response?.status === 404) {
@@ -317,11 +330,11 @@ const ConsultorioManagement = () => {
       } else if (error.response?.status === 403) {
         mensaje = 'No tienes permisos para eliminar esta área';
       }
-      
+
       setErrorModalData({ message: mensaje });
       setShowErrorModal(true);
       setTimeout(() => setShowErrorModal(false), 4000);
-      
+
       console.error('Error eliminando área:', error);
     }
   };
@@ -343,9 +356,9 @@ const ConsultorioManagement = () => {
       await consultorioService.toggleEstado(consultorioToToggle.uk_consultorio);
       await loadData();
       setShowToggleConsultorioModal(false);
-      
+
       const accion = consultorioToToggle.ck_estado === 'ACTIVO' ? 'bloqueado' : 'desbloqueado';
-      
+
       setSuccessModalData({
         message: `Consultorio ${accion} correctamente`,
         data: {
@@ -356,18 +369,18 @@ const ConsultorioManagement = () => {
       });
       setShowSuccessModal(true);
       setConsultorioToToggle(null);
-      
+
       setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
       setShowToggleConsultorioModal(false);
       setConsultorioToToggle(null);
-      
+
       setErrorModalData({
         message: 'No es posible cambiar el estado del consultorio'
       });
       setShowErrorModal(true);
       setTimeout(() => setShowErrorModal(false), 4000);
-      
+
       console.error('Error cambiando estado del consultorio:', error);
     }
   };
@@ -389,7 +402,7 @@ const ConsultorioManagement = () => {
       await consultorioService.remove(consultorioToDelete.uk_consultorio);
       await loadData();
       setShowDeleteConsultorioModal(false);
-      
+
       setSuccessModalData({
         message: 'Consultorio eliminado correctamente',
         data: {
@@ -399,12 +412,12 @@ const ConsultorioManagement = () => {
       });
       setShowSuccessModal(true);
       setConsultorioToDelete(null);
-      
+
       setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
       setShowDeleteConsultorioModal(false);
       setConsultorioToDelete(null);
-      
+
       // Manejar diferentes tipos de errores
       let mensaje = 'No es posible eliminar el consultorio';
       if (error.response?.status === 404) {
@@ -412,11 +425,11 @@ const ConsultorioManagement = () => {
       } else if (error.response?.status === 403) {
         mensaje = 'No tienes permisos para eliminar este consultorio';
       }
-      
+
       setErrorModalData({ message: mensaje });
       setShowErrorModal(true);
       setTimeout(() => setShowErrorModal(false), 4000);
-      
+
       console.error('Error eliminando consultorio:', error);
     }
   };
@@ -474,7 +487,7 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowAreaModal(false);
-      
+
       setSuccessModalData({
         message: isUpdate ? 'Área actualizada correctamente' : 'Área creada correctamente',
         data: {
@@ -486,7 +499,7 @@ const ConsultorioManagement = () => {
         type: 'area'
       });
       setShowSuccessModal(true);
-      
+
       setFormData({
         s_nombre_area: '',
         s_letra: '',
@@ -496,17 +509,17 @@ const ConsultorioManagement = () => {
         uk_area: ''
       });
       setLetraError('');
-      
+
       setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
-      const errorMessage = editingArea 
-        ? 'No es posible actualizar el área' 
+      const errorMessage = editingArea
+        ? 'No es posible actualizar el área'
         : 'No es posible crear el área';
-      
+
       setErrorModalData({ message: errorMessage });
       setShowErrorModal(true);
       setTimeout(() => setShowErrorModal(false), 4000);
-      
+
       console.error('Error guardando área:', error);
     }
   };
@@ -541,7 +554,7 @@ const ConsultorioManagement = () => {
 
     try {
       const isUpdate = !!editingConsultorio;
-      
+
       if (isUpdate) {
         await consultorioService.update(editingConsultorio.uk_consultorio, {
           i_numero_consultorio: parseInt(formData.i_numero_consultorio),
@@ -556,7 +569,7 @@ const ConsultorioManagement = () => {
 
       await loadData();
       setShowConsultorioModal(false);
-      
+
       setSuccessModalData({
         message: isUpdate ? 'Consultorio actualizado correctamente' : 'Consultorio creado correctamente',
         data: {
@@ -566,7 +579,7 @@ const ConsultorioManagement = () => {
         type: 'consultorio'
       });
       setShowSuccessModal(true);
-      
+
       setFormData({
         s_nombre_area: '',
         s_letra: '',
@@ -575,17 +588,17 @@ const ConsultorioManagement = () => {
         i_numero_consultorio: '',
         uk_area: ''
       });
-      
+
       setTimeout(() => setShowSuccessModal(false), 3000);
     } catch (error) {
-      const errorMessage = editingConsultorio 
-        ? 'No es posible actualizar el consultorio' 
+      const errorMessage = editingConsultorio
+        ? 'No es posible actualizar el consultorio'
         : 'No es posible crear el consultorio';
-      
+
       setErrorModalData({ message: errorMessage });
       setShowErrorModal(true);
       setTimeout(() => setShowErrorModal(false), 4000);
-      
+
       console.error('Error guardando consultorio:', error);
     }
   };
@@ -704,6 +717,13 @@ const ConsultorioManagement = () => {
             <button className="btn btn-secondary" onClick={loadData}>
               <FaSync /> Actualizar
             </button>
+            <button
+              className="btn btn-secondary"
+              onClick={startTutorial}
+              title="Ver tutorial interactivo"
+            >
+              <FaEye /> Tutorial
+            </button>
             <button className="btn btn-primary" onClick={handleAddArea}>
               <FaPlus /> Nueva Área
             </button>
@@ -803,7 +823,7 @@ const ConsultorioManagement = () => {
         </div>
 
         {/* Search Section */}
-        <div className="filters-section">
+        <div className="filters-section search-filter-section">
           <div className="filter-group" style={{ flex: '1', maxWidth: '400px' }}>
             <label>{t('consultorio:search.label')}</label>
             <div style={{ position: 'relative' }}>
@@ -839,7 +859,7 @@ const ConsultorioManagement = () => {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
+          <div className="areas-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '24px' }}>
             {filteredAreas.map(area => {
               const areaConsultorios = getConsultoriosByArea(area.uk_area);
 
@@ -886,12 +906,12 @@ const ConsultorioManagement = () => {
               const isInactive = area.ck_estado !== 'ACTIVO';
 
               return (
-                <div key={area.uk_area} className="content-card" style={{
+                <div key={area.uk_area} className="content-card area-card" style={{
                   opacity: isInactive ? 0.7 : 1,
                   position: 'relative',
                   filter: isInactive ? 'grayscale(30%)' : 'none'
                 }}>
-                  <div className="card-header" style={{
+                  <div className="card-header area-header" style={{
                     background: `linear-gradient(135deg, ${areaColor}20, ${areaColor}10)`,
                     borderBottom: `1px solid ${areaColor}30`,
                     position: 'relative'
@@ -952,7 +972,7 @@ const ConsultorioManagement = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="card-actions">
+                    <div className="card-actions area-actions">
                       <button
                         className="card-action"
                         onClick={() => handleToggleAreaEstado(area)}
@@ -987,12 +1007,12 @@ const ConsultorioManagement = () => {
                         <p>No hay consultorios en esta área</p>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="consultorios-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {areaConsultorios.map(consultorio => {
                           const consultorioInactivo = consultorio.ck_estado !== 'ACTIVO';
 
                           return (
-                            <div key={consultorio.uk_consultorio} style={{
+                            <div key={consultorio.uk_consultorio} className="consultorio-item" style={{
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
@@ -1032,8 +1052,8 @@ const ConsultorioManagement = () => {
                                 <button
                                   onClick={() => handleEditConsultorio(consultorio)}
                                   className="btn"
-                                  style={{ 
-                                    padding: '4px 8px', 
+                                  style={{
+                                    padding: '4px 8px',
                                     fontSize: '12px',
                                     background: '#4299e1',
                                     color: 'white',
@@ -1061,7 +1081,7 @@ const ConsultorioManagement = () => {
                     {/* Add Consultorio Button */}
                     <div style={{ marginTop: '16px', textAlign: 'center' }}>
                       <button
-                        className="btn btn-secondary"
+                        className="btn btn-secondary btn-add-consultorio"
                         onClick={() => handleAddConsultorio(area)}
                         style={{ width: '100%' }}
                       >
@@ -1382,8 +1402,8 @@ const ConsultorioManagement = () => {
               }}>
                 {areaToToggle.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
               </div>
-              <h3 style={{ 
-                margin: 0, 
+              <h3 style={{
+                margin: 0,
                 color: 'var(--text-primary)',
                 fontSize: '18px',
                 fontWeight: '600'
@@ -1393,7 +1413,7 @@ const ConsultorioManagement = () => {
             </div>
 
             <div style={{ padding: '24px' }}>
-              <p style={{ 
+              <p style={{
                 margin: '0 0 16px 0',
                 color: 'var(--text-primary)',
                 fontSize: '16px',
@@ -1401,7 +1421,7 @@ const ConsultorioManagement = () => {
               }}>
                 ¿Estás seguro de {areaToToggle.ck_estado === 'ACTIVO' ? 'bloquear' : 'desbloquear'} el área <strong>{areaToToggle.s_nombre_area}</strong>?
               </p>
-              
+
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
                 padding: '16px',
@@ -1418,15 +1438,15 @@ const ConsultorioManagement = () => {
               </div>
             </div>
 
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
-              gap: '12px', 
+              display: 'flex',
+              gap: '12px',
               justifyContent: 'flex-end'
             }}>
-              <button 
-                type="button" 
-                onClick={cancelToggleArea} 
+              <button
+                type="button"
+                onClick={cancelToggleArea}
                 className="btn btn-secondary"
                 style={{
                   padding: '10px 24px',
@@ -1437,8 +1457,8 @@ const ConsultorioManagement = () => {
               >
                 Cancelar
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={confirmToggleArea}
                 style={{
                   padding: '10px 24px',
@@ -1515,8 +1535,8 @@ const ConsultorioManagement = () => {
               }}>
                 <FaExclamationTriangle />
               </div>
-              <h3 style={{ 
-                margin: 0, 
+              <h3 style={{
+                margin: 0,
                 color: 'var(--text-primary)',
                 fontSize: '18px',
                 fontWeight: '600'
@@ -1526,7 +1546,7 @@ const ConsultorioManagement = () => {
             </div>
 
             <div style={{ padding: '24px' }}>
-              <p style={{ 
+              <p style={{
                 margin: '0 0 16px 0',
                 color: 'var(--text-primary)',
                 fontSize: '16px',
@@ -1534,7 +1554,7 @@ const ConsultorioManagement = () => {
               }}>
                 ¿Estás seguro de eliminar el área <strong>{areaToDelete.s_nombre_area}</strong>?
               </p>
-              
+
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
                 padding: '16px',
@@ -1550,7 +1570,7 @@ const ConsultorioManagement = () => {
                 </div>
               </div>
 
-              <p style={{ 
+              <p style={{
                 margin: '0',
                 color: 'var(--text-muted)',
                 fontSize: '14px',
@@ -1560,15 +1580,15 @@ const ConsultorioManagement = () => {
               </p>
             </div>
 
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
-              gap: '12px', 
+              display: 'flex',
+              gap: '12px',
               justifyContent: 'flex-end'
             }}>
-              <button 
-                type="button" 
-                onClick={cancelDeleteArea} 
+              <button
+                type="button"
+                onClick={cancelDeleteArea}
                 className="btn btn-secondary"
                 style={{
                   padding: '10px 24px',
@@ -1579,8 +1599,8 @@ const ConsultorioManagement = () => {
               >
                 Cancelar
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={confirmDeleteArea}
                 style={{
                   padding: '10px 24px',
@@ -1659,8 +1679,8 @@ const ConsultorioManagement = () => {
               }}>
                 {consultorioToToggle.ck_estado === 'ACTIVO' ? <FaLock /> : <FaUnlock />}
               </div>
-              <h3 style={{ 
-                margin: 0, 
+              <h3 style={{
+                margin: 0,
                 color: 'var(--text-primary)',
                 fontSize: '18px',
                 fontWeight: '600'
@@ -1670,7 +1690,7 @@ const ConsultorioManagement = () => {
             </div>
 
             <div style={{ padding: '24px' }}>
-              <p style={{ 
+              <p style={{
                 margin: '0 0 16px 0',
                 color: 'var(--text-primary)',
                 fontSize: '16px',
@@ -1678,7 +1698,7 @@ const ConsultorioManagement = () => {
               }}>
                 ¿Estás seguro de {consultorioToToggle.ck_estado === 'ACTIVO' ? 'bloquear' : 'desbloquear'} el consultorio <strong>#{consultorioToToggle.i_numero_consultorio}</strong>?
               </p>
-              
+
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
                 padding: '16px',
@@ -1695,15 +1715,15 @@ const ConsultorioManagement = () => {
               </div>
             </div>
 
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
-              gap: '12px', 
+              display: 'flex',
+              gap: '12px',
               justifyContent: 'flex-end'
             }}>
-              <button 
-                type="button" 
-                onClick={cancelToggleConsultorio} 
+              <button
+                type="button"
+                onClick={cancelToggleConsultorio}
                 className="btn btn-secondary"
                 style={{
                   padding: '10px 24px',
@@ -1714,8 +1734,8 @@ const ConsultorioManagement = () => {
               >
                 Cancelar
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={confirmToggleConsultorio}
                 style={{
                   padding: '10px 24px',
@@ -1792,8 +1812,8 @@ const ConsultorioManagement = () => {
               }}>
                 <FaExclamationTriangle />
               </div>
-              <h3 style={{ 
-                margin: 0, 
+              <h3 style={{
+                margin: 0,
                 color: 'var(--text-primary)',
                 fontSize: '18px',
                 fontWeight: '600'
@@ -1803,7 +1823,7 @@ const ConsultorioManagement = () => {
             </div>
 
             <div style={{ padding: '24px' }}>
-              <p style={{ 
+              <p style={{
                 margin: '0 0 16px 0',
                 color: 'var(--text-primary)',
                 fontSize: '16px',
@@ -1811,7 +1831,7 @@ const ConsultorioManagement = () => {
               }}>
                 ¿Estás seguro de eliminar el consultorio <strong>#{consultorioToDelete.i_numero_consultorio}</strong>?
               </p>
-              
+
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
                 padding: '16px',
@@ -1827,7 +1847,7 @@ const ConsultorioManagement = () => {
                 </div>
               </div>
 
-              <p style={{ 
+              <p style={{
                 margin: '0',
                 color: 'var(--text-muted)',
                 fontSize: '14px',
@@ -1837,15 +1857,15 @@ const ConsultorioManagement = () => {
               </p>
             </div>
 
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
-              gap: '12px', 
+              display: 'flex',
+              gap: '12px',
               justifyContent: 'flex-end'
             }}>
-              <button 
-                type="button" 
-                onClick={cancelDeleteConsultorio} 
+              <button
+                type="button"
+                onClick={cancelDeleteConsultorio}
                 className="btn btn-secondary"
                 style={{
                   padding: '10px 24px',
@@ -1856,8 +1876,8 @@ const ConsultorioManagement = () => {
               >
                 Cancelar
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={confirmDeleteConsultorio}
                 style={{
                   padding: '10px 24px',
@@ -1936,7 +1956,7 @@ const ConsultorioManagement = () => {
                 </div>
               </div>
 
-              <h3 style={{ 
+              <h3 style={{
                 margin: '0 0 12px 0',
                 color: 'var(--text-primary)',
                 fontSize: '22px',
@@ -1946,7 +1966,7 @@ const ConsultorioManagement = () => {
                 ¡Éxito!
               </h3>
 
-              <p style={{ 
+              <p style={{
                 margin: '0 0 20px 0',
                 color: 'var(--text-secondary)',
                 fontSize: '15px',
@@ -1955,7 +1975,7 @@ const ConsultorioManagement = () => {
               }}>
                 {successModalData.message}
               </p>
-              
+
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
                 padding: '16px',
@@ -2072,13 +2092,13 @@ const ConsultorioManagement = () => {
               }} />
             </div>
 
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
+              display: 'flex',
               justifyContent: 'center'
             }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={closeSuccessModal}
                 style={{
                   padding: '12px 32px',
@@ -2157,7 +2177,7 @@ const ConsultorioManagement = () => {
                 </div>
               </div>
 
-              <h3 style={{ 
+              <h3 style={{
                 margin: '0 0 12px 0',
                 color: 'var(--text-primary)',
                 fontSize: '22px',
@@ -2167,7 +2187,7 @@ const ConsultorioManagement = () => {
                 Error
               </h3>
 
-              <p style={{ 
+              <p style={{
                 margin: '0 0 24px 0',
                 color: 'var(--text-secondary)',
                 fontSize: '16px',
@@ -2192,13 +2212,13 @@ const ConsultorioManagement = () => {
               }} />
             </div>
 
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
+              display: 'flex',
               justifyContent: 'center'
             }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={closeErrorModal}
                 style={{
                   padding: '12px 32px',
@@ -2232,6 +2252,14 @@ const ConsultorioManagement = () => {
 
       <AdminFooter isDarkMode={isDarkMode} />
       <Chatbot />
+
+      {/* Tutorial Component */}
+      <Tutorial
+        steps={getAvailableConsultoriosTutorialSteps()}
+        show={showTutorial}
+        onComplete={completeTutorial}
+        onSkip={skipTutorial}
+      />
     </div>
   );
 };
