@@ -95,12 +95,15 @@ const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
 
             // Si aún así se sale por arriba, centrarlo verticalmente en el viewport
             if (top - window.scrollY < 10) {
-                top = window.scrollY + (viewportHeight / 2) - (tooltipHeight / 2);
+                top = window.scrollY + Math.max(10, (viewportHeight / 2) - (tooltipHeight / 2));
                 position = 'bottom'; // Usar flecha bottom como default
             }
         }
 
-        setTooltipPosition({ top, left });
+        // Asegurar que el tooltip nunca esté fuera del viewport verticalmente
+        const finalTop = Math.max(window.scrollY + 10, Math.min(top, window.scrollY + viewportHeight - tooltipHeight - 10));
+
+        setTooltipPosition({ top: finalTop, left });
         setArrowPosition(position);
 
         // Agregar clase de highlight al elemento target
@@ -109,8 +112,16 @@ const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
         });
         targetElement.classList.add('tutorial-highlight');
 
-        // Hacer scroll al elemento si no está visible
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Hacer scroll al elemento si no está visible de manera suave
+        const elementTop = rect.top + window.scrollY;
+        const elementBottom = rect.bottom + window.scrollY;
+        const viewportTop = window.scrollY;
+        const viewportBottom = window.scrollY + viewportHeight;
+
+        // Verificar si el elemento está completamente visible
+        if (elementTop < viewportTop || elementBottom > viewportBottom) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+        }
     };
 
     const handleNext = () => {
@@ -149,8 +160,8 @@ const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
 
     return (
         <>
-            {/* Overlay oscuro */}
-            <div className="tutorial-overlay" onClick={handleSkip} />
+            {/* Overlay oscuro - No se cierra al hacer clic para evitar cierres accidentales */}
+            <div className="tutorial-overlay" />
 
             {/* Tooltip flotante */}
             <div

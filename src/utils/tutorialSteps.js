@@ -331,4 +331,78 @@ export const getAvailableUsersTutorialSteps = () => {
     });
 };
 
+/**
+ * Pasos del tutorial para el módulo de historial de turnos (Admin)
+ */
+export const historialTurnosTutorialSteps = [
+    {
+        target: '.page-header',
+        title: 'Bienvenido al Historial de Turnos',
+        content: 'Este módulo te permite consultar y revisar el historial completo de turnos. Aquí podrás filtrar, buscar y analizar todos los turnos registrados en el sistema.',
+        position: 'bottom'
+    },
+    {
+        target: '.page-actions',
+        title: 'Acciones Principales',
+        content: 'Usa estos botones para volver a la gestión de turnos o actualizar la información del historial.',
+        position: 'bottom'
+    },
+    {
+        target: '.filters-section',
+        title: 'Filtros de Búsqueda',
+        content: 'Utiliza estos filtros para encontrar turnos específicos por fecha, estado del turno y área/consultorio. Los filtros se aplican automáticamente.',
+        position: 'bottom'
+    },
+    {
+        target: '.date-range-filter',
+        title: 'Filtrar por Rango de Fechas',
+        content: 'Selecciona las fechas de inicio y fin para ver turnos dentro de ese período. Usa el botón de reinicio para volver al rango predeterminado.',
+        position: 'bottom'
+    },
+    {
+        target: '.custom-status-select',
+        title: 'Filtrar por Estado',
+        content: 'Filtra los turnos según su estado: Todos, En espera, Atendido, Cancelado, No presente, etc. Los colores te ayudan a identificar cada estado.',
+        position: 'bottom'
+    },
+    {
+        target: '.custom-area-select',
+        title: 'Filtrar por Área o Consultorio',
+        content: 'Filtra los turnos por área médica específica o por consultorio individual. Puedes ver todos o seleccionar uno específico.',
+        position: 'bottom'
+    },
+    {
+        target: '.history-cards',
+        title: 'Tarjetas de Turnos',
+        content: 'Aquí se muestran todos los turnos en formato de tarjetas. Cada tarjeta contiene la información completa del turno: número, paciente, fecha, hora, área, consultorio y estado.',
+        position: 'top'
+    },
+    {
+        target: '.history-cards > div:first-child',
+        title: 'Información del Turno',
+        content: 'Cada tarjeta muestra el ícono y color del área, número de turno, nombre del paciente, fecha y hora de atención, consultorio asignado y estado actual con su color distintivo.',
+        position: 'top'
+    },
+    {
+        target: '.pagination-controls',
+        title: 'Controles de Paginación',
+        content: 'Usa estos controles para navegar entre páginas del historial. Puedes ir a la primera, anterior, siguiente o última página, y ver el total de páginas disponibles.',
+        position: 'top'
+    }
+];
+
+/**
+ * Función para obtener los pasos del tutorial de historial filtrando los que no tienen elemento target disponible
+ */
+export const getAvailableHistorialTutorialSteps = () => {
+    return historialTurnosTutorialSteps.filter(step => {
+        // Si es el paso de la primera tarjeta, verificar que exista al menos un turno
+        if (step.target.includes('.history-cards > div:first-child')) {
+            const cards = document.querySelectorAll('.history-cards > div');
+            return cards.length > 0;
+        }
+        return true;
+    });
+};
+
 export default adminTurnsTutorialSteps;

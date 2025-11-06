@@ -6,10 +6,13 @@ import AdminHeader from '../Common/AdminHeader';
 import AdminFooter from '../Common/AdminFooter';
 import TestSpinner from '../Common/TestSpinner';
 import Chatbot from '../Common/Chatbot';
+import Tutorial from '../Common/Tutorial';
 import turnService from '../../services/turnService';
 import patientService from '../../services/patientService';
 import consultorioService from '../../services/consultorioService';
 import areaService from '../../services/areaService';
+import useTutorial from '../../hooks/useTutorial';
+import { getAvailableHistorialTutorialSteps } from '../../utils/tutorialSteps';
 import '../../styles/UnifiedAdminPages.css';
 
 // React Icons
@@ -65,7 +68,8 @@ import {
   FaCrutch,
   FaThermometer,
   FaHeadSideCough,
-  FaVials
+  FaVials,
+  FaQuestionCircle
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -143,7 +147,7 @@ const getAreaIcon = (areaName) => {
     'Psicologia': MdPsychology, // Sin tilde
     'Radiologia': FaCamera    // Sin tilde
   };
-  
+
   return iconMap[areaName] || FaHospital;
 };
 
@@ -157,7 +161,7 @@ const getStatusIcon = (status) => {
     'NO_PRESENTE': FaUserTimes,
     'todos': FaList
   };
-  
+
   return statusIconMap[status] || FaList;
 };
 
@@ -165,13 +169,13 @@ const getStatusIcon = (status) => {
 const getStatusColor = (status) => {
   const statusColorMap = {
     'EN_ESPERA': '#ffc107',
-    'EN_ATENCION': '#17a2b8', 
+    'EN_ATENCION': '#17a2b8',
     'ATENDIDO': '#28a745',
     'CANCELADO': '#dc3545',
     'NO_PRESENTE': '#fd7e14',
     'todos': '#6c757d'
   };
-  
+
   return statusColorMap[status] || '#6c757d';
 };
 
@@ -210,17 +214,28 @@ const getAreaClass = (areaName) => {
     'Psicologia': 'psicologia',
     'Radiologia': 'radiologia'
   };
-  
+
   return classMap[areaName] || '';
 };
 
 const HistorialTurnos = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [turns, setTurns] = useState([]);
   const [patients, setPatients] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Tutorial hook
+  const {
+    showTutorial,
+    completeTutorial,
+    skipTutorial,
+    startTutorial
+  } = useTutorial('historial-turnos');
 
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
@@ -284,16 +299,13 @@ const HistorialTurnos = () => {
   const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [areaDropdownPosition, setAreaDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  
+
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
   const turnsPerPage = 10; // Más turnos por página en el historial
-  
+
   const statusButtonRef = useRef(null);
   const areaButtonRef = useRef(null);
-
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
 
   // Estados de turnos disponibles
   const turnStatuses = [
@@ -321,20 +333,20 @@ const HistorialTurnos = () => {
     const handleScroll = (e) => {
       // Verificar si el target y los métodos existen antes de usarlos
       if (!e.target) return;
-      
+
       // No cerrar si el scroll es dentro del dropdown
       try {
-        if ((e.target.classList && e.target.classList.contains('status-dropdown-menu')) || 
-            (e.target.classList && e.target.classList.contains('area-dropdown-menu')) ||
-            (e.target.closest && e.target.closest('.status-dropdown-menu')) ||
-            (e.target.closest && e.target.closest('.area-dropdown-menu'))) {
+        if ((e.target.classList && e.target.classList.contains('status-dropdown-menu')) ||
+          (e.target.classList && e.target.classList.contains('area-dropdown-menu')) ||
+          (e.target.closest && e.target.closest('.status-dropdown-menu')) ||
+          (e.target.closest && e.target.closest('.area-dropdown-menu'))) {
           return;
         }
       } catch (error) {
         // Si hay error en la detección, simplemente continuar
         console.warn('Error in scroll detection:', error);
       }
-      
+
       // Cerrar dropdowns solo si es scroll externo
       if (statusDropdownOpen || areaDropdownOpen) {
         setStatusDropdownOpen(false);
@@ -352,7 +364,7 @@ const HistorialTurnos = () => {
     if (statusDropdownOpen || areaDropdownOpen) {
       document.addEventListener('scroll', handleScroll, true);
       window.addEventListener('resize', handleResize);
-      
+
       return () => {
         document.removeEventListener('scroll', handleScroll, true);
         window.removeEventListener('resize', handleResize);
@@ -412,7 +424,7 @@ const HistorialTurnos = () => {
 
       console.log('Using getTurnsByDateRange with filters:', filters);
       turnsData = await turnService.getTurnsByDateRange(selectedStartDate, selectedEndDate, filters);
-      
+
       console.log('Received turnsData:', turnsData);
       console.log('Number of turns:', turnsData?.length || 0);
 
@@ -441,12 +453,12 @@ const HistorialTurnos = () => {
   const getStatusColorClass = (status) => {
     const statusColorMap = {
       'EN_ESPERA': 'status-en-espera',
-      'EN_ATENCION': 'status-en-atencion', 
+      'EN_ATENCION': 'status-en-atencion',
       'ATENDIDO': 'status-atendido',
       'CANCELADO': 'status-cancelado',
       'NO_PRESENTE': 'status-no-presente'
     };
-    
+
     return statusColorMap[status] || 'status-default';
   };
 
@@ -480,7 +492,7 @@ const HistorialTurnos = () => {
         const areaColor = area.s_color || '#4A90E2';
         const areaIconName = area.s_icono || 'FaHospital';
         const AreaIconComponent = getIconComponent(areaIconName);
-        
+
         combined.push({
           type: 'consultorio',
           id: consultorio.uk_consultorio,
@@ -509,10 +521,10 @@ const HistorialTurnos = () => {
         displayName: 'Todos los consultorios'
       };
     }
-    
+
     const combined = getCombinedAreaConsultorioList();
     const selected = combined.find(item => item.id === selectedArea);
-    
+
     if (selected) {
       return {
         icon: selected.icon,
@@ -522,7 +534,7 @@ const HistorialTurnos = () => {
         displayName: selected.displayName
       };
     }
-    
+
     // Fallback
     return {
       icon: FaHospital,
@@ -577,8 +589,16 @@ const HistorialTurnos = () => {
             </p>
           </div>
           <div className="page-actions">
-            <button 
-              className="btn btn-secondary" 
+            <button
+              className="btn btn-secondary"
+              onClick={startTutorial}
+              title="Ver tutorial"
+              style={{ padding: '8px 12px' }}
+            >
+              <FaQuestionCircle />
+            </button>
+            <button
+              className="btn btn-secondary"
               onClick={() => navigate('/admin/turns')}
               title="Ir a Gestión de Turnos"
             >
@@ -655,8 +675,8 @@ const HistorialTurnos = () => {
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
-              <span style={{ 
-                color: 'var(--text-muted)', 
+              <span style={{
+                color: 'var(--text-muted)',
                 fontSize: '13px',
                 fontWeight: '500',
                 whiteSpace: 'nowrap',
@@ -691,7 +711,7 @@ const HistorialTurnos = () => {
           <div className="filter-group">
             <label>Estado</label>
             <div className="custom-status-select">
-              <div 
+              <div
                 ref={statusButtonRef}
                 className="status-select-trigger"
                 onClick={() => {
@@ -714,18 +734,18 @@ const HistorialTurnos = () => {
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
-                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none" />
                   </svg>
                 </div>
               </div>
-              
+
               {statusDropdownOpen && createPortal(
                 <>
-                  <div 
+                  <div
                     className="status-dropdown-overlay"
                     onClick={() => setStatusDropdownOpen(false)}
                   />
-                  <div 
+                  <div
                     className="status-dropdown-menu"
                     style={{
                       position: 'absolute',
@@ -735,7 +755,7 @@ const HistorialTurnos = () => {
                       zIndex: 999999999
                     }}
                   >
-                    <div 
+                    <div
                       className="status-option"
                       onClick={() => {
                         setSelectedStatus('todos');
@@ -771,7 +791,7 @@ const HistorialTurnos = () => {
           <div className="filter-group">
             <label>ÁREA Y CONSULTORIO</label>
             <div className="custom-area-select">
-              <div 
+              <div
                 ref={areaButtonRef}
                 className="area-select-trigger"
                 onClick={() => {
@@ -788,7 +808,7 @@ const HistorialTurnos = () => {
                 }}
               >
                 <div className="area-selected">
-                  <div 
+                  <div
                     className="area-icon"
                     style={{
                       background: 'none',
@@ -808,18 +828,18 @@ const HistorialTurnos = () => {
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
-                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none" />
                   </svg>
                 </div>
               </div>
-              
+
               {areaDropdownOpen && createPortal(
                 <>
-                  <div 
+                  <div
                     className="area-dropdown-overlay"
                     onClick={() => setAreaDropdownOpen(false)}
                   />
-                  <div 
+                  <div
                     className="area-dropdown-menu"
                     style={{
                       position: 'absolute',
@@ -829,16 +849,16 @@ const HistorialTurnos = () => {
                       zIndex: 999999999
                     }}
                   >
-                    <div 
+                    <div
                       className="area-option"
                       onClick={() => {
                         setSelectedArea('todas');
                         setAreaDropdownOpen(false);
                       }}
                     >
-                      <div 
+                      <div
                         className="area-icon"
-                        style={{ 
+                        style={{
                           background: 'none',
                           backgroundColor: 'transparent',
                           border: 'none',
@@ -862,9 +882,9 @@ const HistorialTurnos = () => {
                           setAreaDropdownOpen(false);
                         }}
                       >
-                        <div 
+                        <div
                           className="area-icon"
-                          style={{ 
+                          style={{
                             background: 'none',
                             backgroundColor: 'transparent',
                             border: 'none',
@@ -901,8 +921,8 @@ const HistorialTurnos = () => {
               Registros de Turnos
             </h3>
             <div className="card-actions">
-              <span style={{ 
-                fontSize: '14px', 
+              <span style={{
+                fontSize: '14px',
                 color: 'var(--text-muted)',
                 fontWeight: 500
               }}>
@@ -919,22 +939,22 @@ const HistorialTurnos = () => {
                 <p>No se encontraron turnos para los filtros seleccionados</p>
               </div>
             ) : (
-              <div style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: '16px' 
+              <div className="history-cards" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
               }}>
                 {currentTurns.map(turn => {
                   // Obtener información del consultorio y área
                   const consultorioData = consultorios.find(c => c.uk_consultorio === turn.uk_consultorio);
                   const areaData = areas.find(a => a.uk_area === consultorioData?.uk_area);
-                  
+
                   // Obtener color e icono desde la BD
                   const areaColor = areaData?.s_color || '#4A90E2';
                   const areaIconName = areaData?.s_icono || 'FaHospital';
                   const areaName = areaData?.s_nombre_area || 'Área';
                   const AreaIconComponent = getIconComponent(areaIconName);
-                  
+
                   return (
                     <div
                       key={turn.uk_turno}
@@ -952,14 +972,14 @@ const HistorialTurnos = () => {
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = isDarkMode 
-                          ? '0 4px 16px rgba(0, 0, 0, 0.3)' 
+                        e.currentTarget.style.boxShadow = isDarkMode
+                          ? '0 4px 16px rgba(0, 0, 0, 0.3)'
                           : '0 4px 16px rgba(0, 0, 0, 0.1)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = isDarkMode 
-                          ? '0 2px 8px rgba(0, 0, 0, 0.2)' 
+                        e.currentTarget.style.boxShadow = isDarkMode
+                          ? '0 2px 8px rgba(0, 0, 0, 0.2)'
                           : '0 2px 8px rgba(0, 0, 0, 0.05)';
                       }}
                     >
@@ -982,16 +1002,16 @@ const HistorialTurnos = () => {
                       </div>
 
                       {/* Información Principal */}
-                      <div style={{ 
+                      <div style={{
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '4px',
                         minWidth: 0
                       }}>
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: '12px',
                           flexWrap: 'wrap'
                         }}>
@@ -1011,10 +1031,10 @@ const HistorialTurnos = () => {
                             {getPatientName(turn.uk_paciente)}
                           </span>
                         </div>
-                        
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
+
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: '16px',
                           fontSize: '14px',
                           color: isDarkMode ? 'rgba(203, 213, 225, 0.8)' : 'rgba(71, 85, 105, 0.8)',
@@ -1042,10 +1062,10 @@ const HistorialTurnos = () => {
                           fontWeight: 500,
                           color: isDarkMode ? '#cbd5e1' : '#475569',
                         }}>
-                          {new Date(turn.d_fecha).toLocaleDateString('es-ES', { 
-                            day: '2-digit', 
-                            month: 'short', 
-                            year: 'numeric' 
+                          {new Date(turn.d_fecha).toLocaleDateString('es-ES', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
                           })}
                         </span>
                         <span style={{
@@ -1066,7 +1086,7 @@ const HistorialTurnos = () => {
                         display: 'flex',
                         justifyContent: 'flex-end'
                       }}>
-                        <span 
+                        <span
                           className={`status-badge ${getStatusColorClass(turn.s_estado)}`}
                           style={{
                             padding: '6px 14px',
@@ -1079,8 +1099,8 @@ const HistorialTurnos = () => {
                             whiteSpace: 'nowrap'
                           }}
                         >
-                          {React.createElement(getStatusIcon(turn.s_estado), { 
-                            size: 12 
+                          {React.createElement(getStatusIcon(turn.s_estado), {
+                            size: 12
                           })}
                           {getStatusLabel(turn.s_estado)}
                         </span>
@@ -1090,7 +1110,7 @@ const HistorialTurnos = () => {
                 })}
               </div>
             )}
-            
+
             {/* Barra de paginación */}
             {turns.length > turnsPerPage && (
               <div className="pagination-bar">
@@ -1139,6 +1159,14 @@ const HistorialTurnos = () => {
 
       <AdminFooter isDarkMode={isDarkMode} />
       <Chatbot />
+
+      {/* Tutorial Component */}
+      <Tutorial
+        steps={getAvailableHistorialTutorialSteps()}
+        show={showTutorial}
+        onComplete={completeTutorial}
+        onSkip={skipTutorial}
+      />
     </div>
   );
 };

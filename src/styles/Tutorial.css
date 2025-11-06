@@ -7,9 +7,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     z-index: 9998;
     animation: fadeIn 0.3s ease-in-out;
+    backdrop-filter: blur(2px);
 }
 
 @keyframes fadeIn {
@@ -28,7 +29,7 @@
     width: 380px;
     max-width: 90vw;
     min-height: 260px;
-    max-height: 90vh;
+    max-height: min(90vh, 600px);
     background: var(--color-white, #ffffff);
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(84, 78, 82, 0.3);
@@ -38,6 +39,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    /* Asegurar que el tooltip siempre sea visible */
+    margin: 10px;
 }
 
 @keyframes tooltipSlideIn {
@@ -160,8 +163,32 @@
 .tutorial-body {
     margin-bottom: 16px;
     min-height: 50px;
+    max-height: 300px;
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    /* Estilos de scrollbar personalizados */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-medium-blue, #77b8ce) var(--color-light-blue, #d8f0f4);
+}
+
+/* Scrollbar personalizado para webkit browsers */
+.tutorial-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tutorial-body::-webkit-scrollbar-track {
+    background: var(--color-light-blue, #d8f0f4);
+    border-radius: 3px;
+}
+
+.tutorial-body::-webkit-scrollbar-thumb {
+    background: var(--color-medium-blue, #77b8ce);
+    border-radius: 3px;
+}
+
+.tutorial-body::-webkit-scrollbar-thumb:hover {
+    background: var(--color-dark-blue, #5a9fb0);
 }
 
 .tutorial-text {
@@ -324,6 +351,12 @@
     .tutorial-tooltip {
         width: calc(100vw - 32px);
         min-height: 220px;
+        max-height: min(85vh, 500px);
+        /* Asegurar que sea scrolleable en móviles */
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%);
     }
 
     .tutorial-content {
@@ -346,6 +379,10 @@
 
     .tutorial-text {
         font-size: 13px;
+    }
+
+    .tutorial-body {
+        max-height: 200px;
     }
 
     .tutorial-btn {
