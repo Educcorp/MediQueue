@@ -57,7 +57,8 @@ import {
   FaHeadSideCough,
   FaVials,
   FaLock,
-  FaUnlock
+  FaUnlock,
+  FaQuestionCircle
 } from 'react-icons/fa';
 
 const ConsultorioManagement = () => {
@@ -720,9 +721,10 @@ const ConsultorioManagement = () => {
             <button
               className="btn btn-secondary"
               onClick={startTutorial}
-              title="Ver tutorial interactivo"
+              title="Ver tutorial"
+              style={{ padding: '8px 12px' }}
             >
-              <FaEye /> Tutorial
+              <FaQuestionCircle />
             </button>
             <button className="btn btn-primary" onClick={handleAddArea}>
               <FaPlus /> Nueva Área

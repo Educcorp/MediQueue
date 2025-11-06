@@ -52,7 +52,8 @@ import {
   FaChevronRight,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
-  FaHistory
+  FaHistory,
+  FaQuestionCircle
 } from 'react-icons/fa';
 import {
   MdPregnantWoman,
@@ -725,9 +726,10 @@ const TurnManager = () => {
             <button
               className="btn btn-secondary"
               onClick={startTutorial}
-              title="Ver tutorial interactivo"
+              title="Ver tutorial"
+              style={{ padding: '8px 12px' }}
             >
-              <FaEye /> Tutorial
+              <FaQuestionCircle />
             </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
               <FaSync /> {t('common:buttons.refresh')}
