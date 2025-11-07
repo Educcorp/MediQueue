@@ -17,6 +17,8 @@ import settingsES from './locales/es/settings.json';
 import settingsEN from './locales/en/settings.json';
 import validationES from './locales/es/validation.json';
 import validationEN from './locales/en/validation.json';
+import aboutES from './locales/es/about.json';
+import aboutEN from './locales/en/about.json';
 
 // Recursos de traducción organizados por idioma y namespace
 const resources = {
@@ -27,7 +29,8 @@ const resources = {
     admin: adminES,
     consultorio: consultorioES,
     settings: settingsES,
-    validation: validationES
+    validation: validationES,
+    about: aboutES
   },
   en: {
     common: commonEN,
@@ -36,7 +39,8 @@ const resources = {
     admin: adminEN,
     consultorio: consultorioEN,
     settings: settingsEN,
-    validation: validationEN
+    validation: validationEN,
+    about: aboutEN
   }
 };
 
@@ -50,7 +54,7 @@ i18n
     resources,
     fallbackLng: 'es', // Idioma por defecto si no se detecta
     defaultNS: 'common', // Namespace por defecto
-    ns: ['common', 'home', 'takeTurn', 'admin', 'consultorio', 'settings', 'validation'],
+    ns: ['common', 'home', 'takeTurn', 'admin', 'consultorio', 'settings', 'validation', 'about'],
     
     detection: {
       // Orden de detección del idioma

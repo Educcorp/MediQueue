@@ -1,0 +1,90 @@
+{
+  "title": "Our Development Team",
+  "subtitle": "Meet the specialists who make MediQueue possible - Transforming medical care through technology",
+  "takeTurnButton": "Take Appointment",
+  
+  "stats": {
+    "teamMembers": {
+      "title": "Team Members",
+      "subtitle": "Medical technology specialists"
+    },
+    "projectsCompleted": {
+      "title": "Completed Projects",
+      "subtitle": "Implemented solutions"
+    },
+    "yearsExperience": {
+      "title": "Years of Experience",
+      "subtitle": "In medical software development"
+    },
+    "technologies": {
+      "title": "Technologies",
+      "subtitle": "Modern technology stack"
+    }
+  },
+  
+  "teamSection": {
+    "title": "Team Members",
+    "subtitle": "Specialists dedicated to excellence in medical technology",
+    "githubButton": "GitHub",
+    "contactButton": "Contact"
+  },
+  
+  "teamMembers": {
+    "damian": {
+      "role": "Systems Analyst & Methodologies",
+      "description": "Specialist in medical methodologies and hospital system analysis. Optimizes processes to improve patient experience."
+    },
+    "emmanuel": {
+      "role": "CTO & Lead Developer",
+      "description": "Software engineer specialized in healthcare systems and scalable architecture. Leads the platform's technological development."
+    },
+    "priscila": {
+      "role": "UX/UI Designer",
+      "description": "User experience specialist with a focus on intuitive medical interfaces. Designs user-centered solutions."
+    },
+    "yoselin": {
+      "role": "Data Architect",
+      "description": "Expert in medical databases and hospital information systems. Ensures data integrity and security."
+    },
+    "gregorio": {
+      "role": "Security Specialist",
+      "description": "Expert in medical cybersecurity and patient data protection. Ensures HIPAA compliance."
+    }
+  },
+  
+  "valuesSection": {
+    "title": "Our Values",
+    "subtitle": "The principles that guide our work in developing medical solutions"
+  },
+  
+  "values": {
+    "healthCommitment": {
+      "title": "Health Commitment",
+      "description": "We develop technology that positively impacts people's lives and improves medical care."
+    },
+    "continuousInnovation": {
+      "title": "Continuous Innovation",
+      "description": "We implement the latest technologies to create cutting-edge medical solutions."
+    },
+    "securityPrivacy": {
+      "title": "Security and Privacy",
+      "description": "We guarantee the highest security standards to protect sensitive medical information."
+    },
+    "universalAccess": {
+      "title": "Universal Access",
+      "description": "We create inclusive solutions that facilitate access to medical care for everyone."
+    }
+  },
+  
+  "techSection": {
+    "title": "Technology Stack",
+    "subtitle": "Modern technologies for robust and scalable medical solutions",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "database": "Database",
+      "devops": "DevOps & Tools"
+    }
+  }
+}
+
