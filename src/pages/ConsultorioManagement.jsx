@@ -1225,7 +1225,7 @@ const ConsultorioManagement = () => {
                   {/* Selector de color */}
                   <div className="form-group">
                     <ColorSelector
-                      label="Color del Área"
+                      label={t('consultorio:form.areaColor')}
                       value={formData.s_color}
                       onChange={handleColorChange}
                       disabled={false}
@@ -1236,7 +1236,7 @@ const ConsultorioManagement = () => {
                 {/* Selector de icono */}
                 <div className="form-group" style={{ marginTop: '20px' }}>
                   <IconSelector
-                    label="Icono del Área"
+                    label={t('consultorio:form.areaIcon')}
                     value={formData.s_icono}
                     onChange={handleIconChange}
                     disabled={false}
