@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -83,6 +84,7 @@ import {
 } from 'react-icons/lu';
 
 const AdminDashboardEnhanced = () => {
+    const { i18n } = useTranslation();
     const { user, logout, getEstadisticas } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -481,7 +483,7 @@ const AdminDashboardEnhanced = () => {
                                 </div>
                                 <div className="info-item">
                                     <span className="info-label">Última actualización:</span>
-                                    <span className="info-value">{new Date().toLocaleDateString('es-ES')}</span>
+                                    <span className="info-value">{new Date().toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES')}</span>
                                 </div>
                                 <div className="info-item">
                                     <span className="info-label">Estado:</span>

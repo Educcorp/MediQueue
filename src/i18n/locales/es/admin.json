@@ -18,7 +18,6 @@
     "loadError": "Error cargando datos del dashboard",
     "viewDetails": "Ver detalles",
     "recentActivity": "Actividad Reciente",
-    "quickActions": "Acciones Rápidas",
     "turn": "Turno",
     "patient": "Paciente",
     "office": "Consultorio",
@@ -44,6 +43,7 @@
       "thisMonth": "{{percentage}} este mes"
     },
     "quickActions": {
+      "title": "Acciones Rápidas",
       "managePatients": "Gestionar Pacientes",
       "viewAndManage": "Ver y administrar pacientes",
       "scheduleTurns": "Programar Turnos",

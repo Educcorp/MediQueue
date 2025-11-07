@@ -75,9 +75,10 @@ export const formatPhone = (phone) => {
  * Formatea una fecha para mostrar
  * @param {string|Date} date - Fecha a formatear
  * @param {string} format - Formato deseado ('short', 'long', 'time')
+ * @param {string} locale - Locale para el formato (ej: 'es-ES', 'en-US')
  * @returns {string} - Fecha formateada
  */
-export const formatDate = (date, format = 'short') => {
+export const formatDate = (date, format = 'short', locale = 'es-ES') => {
     if (!date) return '';
 
     const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -90,7 +91,7 @@ export const formatDate = (date, format = 'short') => {
         time: { hour: '2-digit', minute: '2-digit' }
     };
 
-    return dateObj.toLocaleDateString('es-ES', options[format] || options.short);
+    return dateObj.toLocaleDateString(locale, options[format] || options.short);
 };
 
 /**

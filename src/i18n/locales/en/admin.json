@@ -18,7 +18,6 @@
     "loadError": "Error loading dashboard data",
     "viewDetails": "View details",
     "recentActivity": "Recent Activity",
-    "quickActions": "Quick Actions",
     "turn": "Appointment",
     "patient": "Patient",
     "office": "Office",
@@ -44,6 +43,7 @@
       "thisMonth": "{{percentage}} this month"
     },
     "quickActions": {
+      "title": "Quick Actions",
       "managePatients": "Manage Patients",
       "viewAndManage": "View and manage patients",
       "scheduleTurns": "Schedule Appointments",

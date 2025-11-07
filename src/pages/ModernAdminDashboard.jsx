@@ -37,7 +37,7 @@ import {
 } from 'react-icons/hi';
 
 const ModernAdminDashboard = () => {
-    const { t } = useTranslation(['admin', 'common']);
+    const { t, i18n } = useTranslation(['admin', 'common']);
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -185,7 +185,7 @@ const ModernAdminDashboard = () => {
                             {t('admin:dashboard.welcome')}, {user?.s_nombre || t('admin:dashboard.administrator')}
                         </h1>
                         <p className="dashboard-subtitle">
-                            {t('admin:dashboard.summary')} - {new Date().toLocaleDateString('es-ES', {
+                            {t('admin:dashboard.summary')} - {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -283,7 +283,7 @@ const ModernAdminDashboard = () => {
                         <div className="card-header">
                             <h3 className="card-title">
                                 <HiOutlineChartBar />
-                                {t('admin:dashboard.quickActions')}
+                                {t('admin:dashboard.quickActions.title')}
                             </h3>
                         </div>
                         <div className="card-content">

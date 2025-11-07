@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -102,6 +103,7 @@ const getIconComponent = (iconName) => {
 };
 
 const StatisticsPage = () => {
+  const { i18n } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -604,7 +606,7 @@ const StatisticsPage = () => {
                     {stats.turns.thisMonth || 0}
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
-                    📆 {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
+                    📆 {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { month: 'long', year: 'numeric' })}
                   </div>
                 </div>
 
@@ -660,7 +662,7 @@ const StatisticsPage = () => {
                     {stats.turns.today || 0}
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
-                    🗓️ {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    🗓️ {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </div>
                 </div>
               </div>

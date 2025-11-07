@@ -52,7 +52,7 @@ import {
 } from 'react-icons/lu';
 
 const AdminDashboard = () => {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t, i18n } = useTranslation(['admin', 'common']);
   const { user, logout, getEstadisticas } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -451,7 +451,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="info-item">
                   <span className="info-label">{t('admin:dashboard.systemInfo.lastUpdate')}:</span>
-                  <span className="info-value">{new Date().toLocaleDateString('es-ES')}</span>
+                  <span className="info-value">{new Date().toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES')}</span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">{t('admin:dashboard.systemInfo.status')}:</span>
