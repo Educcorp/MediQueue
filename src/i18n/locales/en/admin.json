@@ -404,7 +404,10 @@
 
   "statistics": {
     "title": "System Statistics",
-    "subtitle": "Analysis and reports of the appointment system",
+    "subtitle": "Analysis and general metrics of the MediQueue system",
+    "refresh": "Refresh",
+    "loading": "Loading statistics...",
+    "errorLoading": "Error loading statistics",
     "overview": "General Overview",
     "charts": "Charts",
     "reports": "Reports",
@@ -415,6 +418,22 @@
     "export": "Export",
     "exportPDF": "Export PDF",
     "exportExcel": "Export Excel",
+    "totalAppointments": "Total Appointments",
+    "totalPatients": "Total Patients",
+    "today": "Today",
+    "appointmentsByStatus": "Appointments by Status",
+    "quickSummary": "Quick Summary",
+    "yearAppointments": "Year Appointments",
+    "monthAppointments": "Month Appointments",
+    "dayAppointments": "Day Appointments",
+    "officesByMedicalArea": "Offices by Medical Area",
+    "noAppointmentsData": "No appointment data",
+    "noAppointmentsInfo": "There is no appointment information to display",
+    "statuses": {
+      "waiting": "Waiting",
+      "attended": "Attended",
+      "cancelled": "Cancelled"
+    },
     "metrics": {
       "totalTurns": "Total Appointments",
       "completedTurns": "Completed Appointments",

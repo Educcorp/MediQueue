@@ -103,7 +103,7 @@ const getIconComponent = (iconName) => {
 };
 
 const StatisticsPage = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('admin');
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -209,20 +209,20 @@ const StatisticsPage = () => {
 
       // Procesar estadísticas de turnos - contar directamente desde los datos
       const turnsByStatus = {
-        'En espera': 0,
-        'Atendido': 0,
-        'Cancelado': 0,
+        'waiting': 0,
+        'attended': 0,
+        'cancelled': 0,
       };
 
       // Contar turnos por estado
       allTurns.forEach(turn => {
         const estado = turn.s_estado;
         if (estado === 'EN_ESPERA') {
-          turnsByStatus['En espera']++;
+          turnsByStatus['waiting']++;
         } else if (estado === 'ATENDIDO') {
-          turnsByStatus['Atendido']++;
+          turnsByStatus['attended']++;
         } else if (estado === 'CANCELADO') {
-          turnsByStatus['Cancelado']++;
+          turnsByStatus['cancelled']++;
         }
       });
 
@@ -289,7 +289,7 @@ const StatisticsPage = () => {
       setRecentTurns(recentTurnsData.slice(0, 10));
     } catch (error) {
       console.error('Error cargando estadísticas:', error);
-      setError('Error cargando estadísticas');
+      setError(t('statistics.errorLoading'));
     } finally {
       // Delay mínimo para transición suave del spinner
       setTimeout(() => {
@@ -316,7 +316,7 @@ const StatisticsPage = () => {
   };
 
   if (loading) {
-    return <TestSpinner message="Cargando estadísticas..." />;
+    return <TestSpinner message={t('statistics.loading')} />;
   }
 
   return (
@@ -330,14 +330,14 @@ const StatisticsPage = () => {
             <FaChartLine />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Estadísticas del Sistema</h1>
+            <h1 className="page-title">{t('statistics.title')}</h1>
             <p className="page-subtitle">
-              Análisis y métricas generales del sistema MediQueue
+              {t('statistics.subtitle')}
             </p>
           </div>
           <div className="page-actions">
                         <button className="btn btn-primary" onClick={refreshData}>
-              <FaSync /> Actualizar
+              <FaSync /> {t('statistics.refresh')}
             </button>
           </div>
         </div>
@@ -375,10 +375,10 @@ const StatisticsPage = () => {
                   {stats.turns.total}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Total Turnos
+                  {t('statistics.totalAppointments')}
                 </p>
                 <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Hoy: {stats.turns.today}
+                  {t('statistics.today')}: {stats.turns.today}
                 </p>
               </div>
             </div>
@@ -404,7 +404,7 @@ const StatisticsPage = () => {
                   {stats.patients.total}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  Total Pacientes
+                  {t('statistics.totalPatients')}
                 </p>
               </div>
             </div>
@@ -425,7 +425,7 @@ const StatisticsPage = () => {
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartPie />
-                Turnos por Estado
+                {t('statistics.appointmentsByStatus')}
               </h3>
               <div className="card-actions">
               </div>
@@ -436,9 +436,9 @@ const StatisticsPage = () => {
                   {Object.entries(stats.turns.byStatus).map(([status, count]) => {
                     const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
                     const colors = {
-                      'En espera': 'var(--info-color)',
-                      'Atendido': 'var(--success-color)',
-                      'Cancelado': 'var(--danger-color)',
+                      'waiting': 'var(--info-color)',
+                      'attended': 'var(--success-color)',
+                      'cancelled': 'var(--danger-color)',
                     };
                     const color = colors[status] || 'var(--primary-medical)';
 
@@ -453,7 +453,7 @@ const StatisticsPage = () => {
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                              {status}
+                              {t(`statistics.statuses.${status}`)}
                             </span>
                             <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
                               {count} ({percentage}%)
@@ -481,8 +481,8 @@ const StatisticsPage = () => {
               ) : (
                 <div className="empty-state" style={{ padding: '40px 20px' }}>
                   <FaChartPie />
-                  <h3>Sin datos de turnos</h3>
-                  <p>No hay información de turnos para mostrar</p>
+                  <h3>{t('statistics.noAppointmentsData')}</h3>
+                  <p>{t('statistics.noAppointmentsInfo')}</p>
                 </div>
               )}
             </div>
@@ -493,7 +493,7 @@ const StatisticsPage = () => {
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartBar />
-                Resumen Rápido
+                {t('statistics.quickSummary')}
               </h3>
             </div>
             <div className="card-content">
@@ -543,7 +543,7 @@ const StatisticsPage = () => {
                       }}>
                         <FaChartLine style={{ color: 'white', fontSize: '18px' }} />
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>Turnos del Año</span>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('statistics.yearAppointments')}</span>
                     </div>
                   </div>
                   <div style={{ fontSize: '36px', fontWeight: '900', color: '#2f97d1', marginBottom: '4px', position: 'relative' }}>
@@ -599,7 +599,7 @@ const StatisticsPage = () => {
                       }}>
                         <FaCalendarCheck style={{ color: 'white', fontSize: '18px' }} />
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>Turnos del Mes</span>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('statistics.monthAppointments')}</span>
                     </div>
                   </div>
                   <div style={{ fontSize: '36px', fontWeight: '900', color: '#28a745', marginBottom: '4px', position: 'relative' }}>
@@ -655,7 +655,7 @@ const StatisticsPage = () => {
                       }}>
                         <FaCalendarDay style={{ color: 'white', fontSize: '18px' }} />
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>Turnos del Día</span>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('statistics.dayAppointments')}</span>
                     </div>
                   </div>
                   <div style={{ fontSize: '36px', fontWeight: '900', color: '#17a2b8', marginBottom: '4px', position: 'relative' }}>
@@ -676,7 +676,7 @@ const StatisticsPage = () => {
             <div className="card-header">
               <h3 className="card-title">
                 <FaHospital />
-                Consultorios por Área Médica
+                {t('statistics.officesByMedicalArea')}
               </h3>
             </div>
             <div className="card-content">
