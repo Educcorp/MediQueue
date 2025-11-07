@@ -1,0 +1,90 @@
+{
+  "title": "Nuestro Equipo de Desarrollo",
+  "subtitle": "Conoce a los especialistas que hacen posible MediQueue - Transformando la atención médica a través de la tecnología",
+  "takeTurnButton": "Tomar Turno",
+  
+  "stats": {
+    "teamMembers": {
+      "title": "Miembros del Equipo",
+      "subtitle": "Especialistas en tecnología médica"
+    },
+    "projectsCompleted": {
+      "title": "Proyectos Completados",
+      "subtitle": "Soluciones implementadas"
+    },
+    "yearsExperience": {
+      "title": "Años de Experiencia",
+      "subtitle": "En desarrollo de software médico"
+    },
+    "technologies": {
+      "title": "Tecnologías",
+      "subtitle": "Stack tecnológico moderno"
+    }
+  },
+  
+  "teamSection": {
+    "title": "Miembros del Equipo",
+    "subtitle": "Especialistas dedicados a la excelencia en tecnología médica",
+    "githubButton": "GitHub",
+    "contactButton": "Contacto"
+  },
+  
+  "teamMembers": {
+    "damian": {
+      "role": "Analista de Sistemas & Metodologías",
+      "description": "Especialista en metodologías médicas y análisis de sistemas hospitalarios. Optimiza procesos para mejorar la experiencia del paciente."
+    },
+    "emmanuel": {
+      "role": "CTO & Desarrollador Principal",
+      "description": "Ingeniero de software especializado en sistemas de salud y arquitectura escalable. Dirige el desarrollo tecnológico de la plataforma."
+    },
+    "priscila": {
+      "role": "Diseñadora UX/UI",
+      "description": "Especialista en experiencia de usuario con enfoque en interfaces médicas intuitivas. Diseña soluciones centradas en el usuario."
+    },
+    "yoselin": {
+      "role": "Arquitecta de Datos",
+      "description": "Experta en bases de datos médicas y sistemas de información hospitalaria. Garantiza la integridad y seguridad de los datos."
+    },
+    "gregorio": {
+      "role": "Especialista en Seguridad",
+      "description": "Experto en ciberseguridad médica y protección de datos de pacientes. Asegura el cumplimiento de normativas HIPAA."
+    }
+  },
+  
+  "valuesSection": {
+    "title": "Nuestros Valores",
+    "subtitle": "Los principios que guían nuestro trabajo en el desarrollo de soluciones médicas"
+  },
+  
+  "values": {
+    "healthCommitment": {
+      "title": "Compromiso con la Salud",
+      "description": "Desarrollamos tecnología que impacta positivamente en la vida de las personas y mejora la atención médica."
+    },
+    "continuousInnovation": {
+      "title": "Innovación Continua",
+      "description": "Implementamos las últimas tecnologías para crear soluciones médicas de vanguardia."
+    },
+    "securityPrivacy": {
+      "title": "Seguridad y Privacidad",
+      "description": "Garantizamos los más altos estándares de seguridad para proteger la información médica sensible."
+    },
+    "universalAccess": {
+      "title": "Acceso Universal",
+      "description": "Creamos soluciones inclusivas que facilitan el acceso a la atención médica para todos."
+    }
+  },
+  
+  "techSection": {
+    "title": "Stack Tecnológico",
+    "subtitle": "Tecnologías modernas para soluciones médicas robustas y escalables",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "database": "Base de Datos",
+      "devops": "DevOps & Tools"
+    }
+  }
+}
+

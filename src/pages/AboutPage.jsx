@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AdminFooter from '../components/Common/AdminFooter';
 import TestSpinner from '../components/Common/TestSpinner';
 import './ModernAdminDashboard.css';
@@ -34,6 +35,7 @@ import {
 } from 'react-icons/hi';
 
 const AboutPage = () => {
+    const { t } = useTranslation('about');
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         teamMembers: 6,
@@ -79,10 +81,10 @@ const AboutPage = () => {
         {
             id: 1,
             name: 'Damián Valencia',
-            role: 'Analista de Sistemas & Metodologías',
+            role: t('teamMembers.damian.role'),
             image: '/images/team/damian.png',
             github: 'https://github.com/Dami-Val',
-            description: 'Especialista en metodologías médicas y análisis de sistemas hospitalarios. Optimiza procesos para mejorar la experiencia del paciente.',
+            description: t('teamMembers.damian.description'),
             specialties: ['Business Analysis', 'Process Optimization', 'Data Analytics'],
             icon: FaChartLine,
             color: 'warning'
@@ -90,10 +92,10 @@ const AboutPage = () => {
         {
             id: 3,
             name: 'Emmanuel Palacios',
-            role: 'CTO & Desarrollador Principal',
+            role: t('teamMembers.emmanuel.role'),
             image: '/images/team/emmanuel.png',
             github: 'https://github.com/Emma-Pal',
-            description: 'Ingeniero de software especializado en sistemas de salud y arquitectura escalable. Dirige el desarrollo tecnológico de la plataforma.',
+            description: t('teamMembers.emmanuel.description'),
             specialties: ['React.js', 'Node.js', 'MySQL'],
             icon: FaCode,
             color: 'success'
@@ -101,10 +103,10 @@ const AboutPage = () => {
         {
             id: 4,
             name: 'Priscila Justo',
-            role: 'Diseñadora UX/UI',
+            role: t('teamMembers.priscila.role'),
             image: '/images/team/priscila.png',
             github: 'https://github.com/pjusto930',
-            description: 'Especialista en experiencia de usuario con enfoque en interfaces médicas intuitivas. Diseña soluciones centradas en el usuario.',
+            description: t('teamMembers.priscila.description'),
             specialties: ['UX Design', 'UI Design', 'Prototyping'],
             icon: FaPalette,
             color: 'warning'
@@ -112,10 +114,10 @@ const AboutPage = () => {
         {
             id: 5,
             name: 'Yoselin Reynaga',
-            role: 'Arquitecta de Datos',
+            role: t('teamMembers.yoselin.role'),
             image: '/images/team/yoselin.png',
             github: 'https://github.com/yoselinRS',
-            description: 'Experta en bases de datos médicas y sistemas de información hospitalaria. Garantiza la integridad y seguridad de los datos.',
+            description: t('teamMembers.yoselin.description'),
             specialties: ['MySQL', 'Data Analysis', 'Database Security'],
             icon: FaDatabase,
             color: 'info'
@@ -123,10 +125,10 @@ const AboutPage = () => {
         {
             id: 6,
             name: 'Gregorio Sánchez',
-            role: 'Especialista en Seguridad',
+            role: t('teamMembers.gregorio.role'),
             image: '/images/team/gregorio.png',
             github: 'https://github.com/Gregorio-Yahir',
-            description: 'Experto en ciberseguridad médica y protección de datos de pacientes. Asegura el cumplimiento de normativas HIPAA.',
+            description: t('teamMembers.gregorio.description'),
             specialties: ['Cybersecurity', 'HIPAA Compliance', 'Data Protection'],
             icon: FaShieldAlt,
             color: 'info'
@@ -137,65 +139,65 @@ const AboutPage = () => {
     const statsCards = [
         {
             id: 'team',
-            title: 'Miembros del Equipo',
+            title: t('stats.teamMembers.title'),
             value: stats.teamMembers,
             icon: HiOutlineUsers,
             color: 'primary',
             growth: 0,
-            subtitle: 'Especialistas en tecnología médica'
+            subtitle: t('stats.teamMembers.subtitle')
         },
         {
             id: 'projects',
-            title: 'Proyectos Completados',
+            title: t('stats.projectsCompleted.title'),
             value: stats.projectsCompleted,
             icon: FaCalendarCheck,
             color: 'success',
             growth: 15,
-            subtitle: 'Soluciones implementadas'
+            subtitle: t('stats.projectsCompleted.subtitle')
         },
         {
             id: 'experience',
-            title: 'Años de Experiencia',
+            title: t('stats.yearsExperience.title'),
             value: stats.yearsExperience,
             icon: FaAward,
             color: 'info',
             growth: 0,
-            subtitle: 'En desarrollo de software médico'
+            subtitle: t('stats.yearsExperience.subtitle')
         },
         {
             id: 'technologies',
-            title: 'Tecnologías',
+            title: t('stats.technologies.title'),
             value: stats.technologiesUsed,
             icon: HiOutlineLightBulb,
             color: 'warning',
             growth: 8,
-            subtitle: 'Stack tecnológico moderno'
+            subtitle: t('stats.technologies.subtitle')
         }
     ];
 
     const companyValues = [
         {
             icon: FaHeart,
-            title: 'Compromiso con la Salud',
-            description: 'Desarrollamos tecnología que impacta positivamente en la vida de las personas y mejora la atención médica.',
+            title: t('values.healthCommitment.title'),
+            description: t('values.healthCommitment.description'),
             color: 'danger'
         },
         {
             icon: FaLightbulb,
-            title: 'Innovación Continua',
-            description: 'Implementamos las últimas tecnologías para crear soluciones médicas de vanguardia.',
+            title: t('values.continuousInnovation.title'),
+            description: t('values.continuousInnovation.description'),
             color: 'warning'
         },
         {
             icon: FaShieldAlt,
-            title: 'Seguridad y Privacidad',
-            description: 'Garantizamos los más altos estándares de seguridad para proteger la información médica sensible.',
+            title: t('values.securityPrivacy.title'),
+            description: t('values.securityPrivacy.description'),
             color: 'info'
         },
         {
             icon: FaGlobe,
-            title: 'Acceso Universal',
-            description: 'Creamos soluciones inclusivas que facilitan el acceso a la atención médica para todos.',
+            title: t('values.universalAccess.title'),
+            description: t('values.universalAccess.description'),
             color: 'success'
         }
     ];
@@ -218,15 +220,15 @@ const AboutPage = () => {
                 <div className="welcome-section">
                     <div className="welcome-content">
                         <h1 className="dashboard-title">
-                            Nuestro Equipo de Desarrollo
+                            {t('title')}
                         </h1>
                         <p className="dashboard-subtitle">
-                            Conoce a los especialistas que hacen posible MediQueue - Transformando la atención médica a través de la tecnología
+                            {t('subtitle')}
                         </p>
                     </div>
                     <div className="welcome-actions">
                         <button className="action-btn primary" onClick={() => navigate('/tomar-turno')}>
-                            <FaCalendarCheck /> Tomar Turno
+                            <FaCalendarCheck /> {t('takeTurnButton')}
                         </button>
                     </div>
                 </div>
@@ -264,10 +266,10 @@ const AboutPage = () => {
                     <div className="section-header">
                         <h2 className="section-title">
                             <FaUsers className="section-icon" />
-                            Miembros del Equipo
+                            {t('teamSection.title')}
                         </h2>
                         <p className="section-subtitle">
-                            Especialistas dedicados a la excelencia en tecnología médica
+                            {t('teamSection.subtitle')}
                         </p>
                     </div>
 
@@ -311,13 +313,13 @@ const AboutPage = () => {
                                                 rel="noopener noreferrer"
                                                 className="member-btn primary"
                                             >
-                                                <FaGithub /> GitHub
+                                                <FaGithub /> {t('teamSection.githubButton')}
                                             </a>
                                             <button 
                                                 className="member-btn secondary"
                                                 onClick={() => window.open(`mailto:${member.name.toLowerCase().replace(' ', '.')}@mediqueue.com`)}
                                             >
-                                                <FaEnvelope /> Contacto
+                                                <FaEnvelope /> {t('teamSection.contactButton')}
                                             </button>
                                         </div>
                                     </div>
@@ -332,10 +334,10 @@ const AboutPage = () => {
                     <div className="section-header">
                         <h2 className="section-title">
                             <FaAward className="section-icon" />
-                            Nuestros Valores
+                            {t('valuesSection.title')}
                         </h2>
                         <p className="section-subtitle">
-                            Los principios que guían nuestro trabajo en el desarrollo de soluciones médicas
+                            {t('valuesSection.subtitle')}
                         </p>
                     </div>
 
@@ -360,16 +362,16 @@ const AboutPage = () => {
                     <div className="section-header">
                         <h2 className="section-title">
                             <HiOutlineLightBulb className="section-icon" />
-                            Stack Tecnológico
+                            {t('techSection.title')}
                         </h2>
                         <p className="section-subtitle">
-                            Tecnologías modernas para soluciones médicas robustas y escalables
+                            {t('techSection.subtitle')}
                         </p>
                     </div>
 
                     <div className="tech-grid">
                         <div className="tech-category">
-                            <h4>Frontend</h4>
+                            <h4>{t('techSection.categories.frontend')}</h4>
                             <div className="tech-tags">
                                 <span className="tech-tag react">React.js</span>
                                 <span className="tech-tag">HTML5</span>
@@ -379,7 +381,7 @@ const AboutPage = () => {
                             </div>
                         </div>
                         <div className="tech-category">
-                            <h4>Backend</h4>
+                            <h4>{t('techSection.categories.backend')}</h4>
                             <div className="tech-tags">
                                 <span className="tech-tag node">Node.js</span>
                                 <span className="tech-tag">Express.js</span>
@@ -388,7 +390,7 @@ const AboutPage = () => {
                             </div>
                         </div>
                         <div className="tech-category">
-                            <h4>Base de Datos</h4>
+                            <h4>{t('techSection.categories.database')}</h4>
                             <div className="tech-tags">
                                 <span className="tech-tag mysql">MySQL</span>
                                 <span className="tech-tag">Sequelize ORM</span>
@@ -396,7 +398,7 @@ const AboutPage = () => {
                             </div>
                         </div>
                         <div className="tech-category">
-                            <h4>DevOps & Tools</h4>
+                            <h4>{t('techSection.categories.devops')}</h4>
                             <div className="tech-tags">
                                 <span className="tech-tag">Git</span>
                                 <span className="tech-tag">GitHub</span>
