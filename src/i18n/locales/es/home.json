@@ -9,7 +9,7 @@
   "areaSelector": {
     "title": "Área Médica",
     "selectPlaceholder": "Seleccionar área médica",
-    "generalView": "📊 General - Todas las áreas",
+    "generalView": " General - Todas las áreas",
     "noAreasAvailable": "No hay áreas médicas disponibles"
   },
   

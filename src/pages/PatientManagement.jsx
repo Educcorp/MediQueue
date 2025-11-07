@@ -5,8 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
 import Chatbot from '../components/Common/Chatbot';
+import Tutorial from '../components/Common/Tutorial';
 import TestSpinner from '../components/Common/TestSpinner';
 import patientService from '../services/patientService';
+import useTutorial from '../hooks/useTutorial';
+import { getAvailablePatientsTutorialSteps } from '../utils/tutorialSteps';
 import { RECORD_STATUS_LABELS } from '../utils/constants';
 import { formatDate, calculateAge, formatPhone } from '../utils/helpers';
 import '../styles/UnifiedAdminPages.css';
@@ -30,7 +33,8 @@ import {
   FaExclamationTriangle,
   FaTimes,
   FaCheck,
-  FaEye
+  FaEye,
+  FaQuestionCircle
 } from 'react-icons/fa';
 
 const PatientManagement = () => {
@@ -40,7 +44,15 @@ const PatientManagement = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
+  // Tutorial hook
+  const {
+    showTutorial,
+    completeTutorial,
+    skipTutorial,
+    startTutorial
+  } = useTutorial('admin-patients');
+
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
   const isDarkMode = theme === 'dark';
@@ -53,7 +65,7 @@ const PatientManagement = () => {
         setTheme(currentTheme);
       }
     });
-    
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme']
@@ -79,13 +91,13 @@ const PatientManagement = () => {
   // Estados para modales de notificación
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorModalData, setErrorModalData] = useState({ message: '', details: '' });
-  
+
   // Estados para modal de éxito
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successModalData, setSuccessModalData] = useState({ 
-    message: '', 
-    patientData: null, 
-    isUpdate: false 
+  const [successModalData, setSuccessModalData] = useState({
+    message: '',
+    patientData: null,
+    isUpdate: false
   });
 
   // Estados para modal de confirmación de eliminación
@@ -153,7 +165,7 @@ const PatientManagement = () => {
       await patientService.deletePatient(patientToDelete.uk_paciente);
       await loadPatients();
       setShowDeleteModal(false);
-      
+
       // Mostrar modal de éxito
       setSuccessModalData({
         message: 'Paciente eliminado correctamente',
@@ -168,7 +180,7 @@ const PatientManagement = () => {
       });
       setShowSuccessModal(true);
       setPatientToDelete(null);
-      
+
       // Auto-cerrar el modal después de 3 segundos
       setTimeout(() => {
         setShowSuccessModal(false);
@@ -176,17 +188,17 @@ const PatientManagement = () => {
     } catch (error) {
       setShowDeleteModal(false);
       setPatientToDelete(null);
-      
+
       setErrorModalData({
         message: 'No es posible eliminar el paciente',
         details: ''
       });
       setShowErrorModal(true);
-      
+
       setTimeout(() => {
         setShowErrorModal(false);
       }, 4000);
-      
+
       console.error('Error eliminando paciente:', error);
     }
   };
@@ -205,7 +217,7 @@ const PatientManagement = () => {
         details: ''
       });
       setShowErrorModal(true);
-      
+
       // Auto-cerrar después de 4 segundos
       setTimeout(() => {
         setShowErrorModal(false);
@@ -215,7 +227,7 @@ const PatientManagement = () => {
 
     try {
       const isUpdate = !!editingPatient;
-      
+
       if (isUpdate) {
         await patientService.updatePatient(editingPatient.uk_paciente, {
           s_nombre: formData.s_nombre.trim(),
@@ -236,7 +248,7 @@ const PatientManagement = () => {
 
       await loadPatients();
       setShowModal(false);
-      
+
       // Mostrar modal de éxito
       setSuccessModalData({
         message: isUpdate ? 'Paciente actualizado correctamente' : 'Paciente creado correctamente',
@@ -250,7 +262,7 @@ const PatientManagement = () => {
         isUpdate
       });
       setShowSuccessModal(true);
-      
+
       // Limpiar formulario
       setFormData({
         s_nombre: '',
@@ -259,17 +271,17 @@ const PatientManagement = () => {
         s_email: '',
         d_fecha_nacimiento: ''
       });
-      
+
       // Auto-cerrar el modal después de 3 segundos
       setTimeout(() => {
         setShowSuccessModal(false);
       }, 3000);
     } catch (error) {
       console.error('Error guardando paciente:', error);
-      
+
       // Mensaje simple y amigable
-      const errorMessage = editingPatient 
-        ? 'No es posible actualizar el paciente' 
+      const errorMessage = editingPatient
+        ? 'No es posible actualizar el paciente'
         : 'No es posible crear el paciente';
 
       setErrorModalData({
@@ -350,6 +362,14 @@ const PatientManagement = () => {
             </p>
           </div>
           <div className="page-actions">
+            <button
+              className="btn btn-secondary"
+              onClick={startTutorial}
+              title="Ver tutorial"
+              style={{ padding: '8px 12px' }}
+            >
+              <FaQuestionCircle />
+            </button>
             <button className="btn btn-secondary" onClick={loadPatients}>
               <FaSync /> {t('common:buttons.refresh')}
             </button>
@@ -371,7 +391,7 @@ const PatientManagement = () => {
         )}
 
         {/* Statistics Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+        <div className="stats-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
           <div className="content-card">
             <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{
@@ -550,7 +570,7 @@ const PatientManagement = () => {
                 </button>
               </div>
             ) : (
-              <div className="data-table">
+              <div className="data-table patients-table">
                 <table>
                   <thead>
                     <tr>
@@ -614,7 +634,7 @@ const PatientManagement = () => {
                           </div>
                         </td>
                         <td>
-                          <div style={{ display: 'flex', gap: '4px' }}>
+                          <div className="patient-actions" style={{ display: 'flex', gap: '4px' }}>
                             <button
                               onClick={() => handleEdit(patient)}
                               className="btn btn-secondary"
@@ -826,8 +846,8 @@ const PatientManagement = () => {
               }}>
                 <FaExclamationTriangle />
               </div>
-              <h3 style={{ 
-                margin: 0, 
+              <h3 style={{
+                margin: 0,
                 color: 'var(--text-primary)',
                 fontSize: '18px',
                 fontWeight: '600'
@@ -838,7 +858,7 @@ const PatientManagement = () => {
 
             {/* Contenido del modal */}
             <div style={{ padding: '24px' }}>
-              <p style={{ 
+              <p style={{
                 margin: '0 0 16px 0',
                 color: 'var(--text-primary)',
                 fontSize: '16px',
@@ -846,7 +866,7 @@ const PatientManagement = () => {
               }}>
                 ¿Estás seguro de eliminar al paciente <strong>{patientToDelete.s_nombre} {patientToDelete.s_apellido}</strong>?
               </p>
-              
+
               {/* Información del paciente */}
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
@@ -877,7 +897,7 @@ const PatientManagement = () => {
                 )}
               </div>
 
-              <p style={{ 
+              <p style={{
                 margin: '0',
                 color: 'var(--text-muted)',
                 fontSize: '14px',
@@ -888,15 +908,15 @@ const PatientManagement = () => {
             </div>
 
             {/* Botones de acción */}
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
-              gap: '12px', 
+              display: 'flex',
+              gap: '12px',
               justifyContent: 'flex-end'
             }}>
-              <button 
-                type="button" 
-                onClick={cancelDelete} 
+              <button
+                type="button"
+                onClick={cancelDelete}
                 className="btn btn-secondary"
                 style={{
                   padding: '10px 24px',
@@ -907,8 +927,8 @@ const PatientManagement = () => {
               >
                 Cancelar
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={confirmDelete}
                 style={{
                   padding: '10px 24px',
@@ -990,7 +1010,7 @@ const PatientManagement = () => {
               </div>
 
               {/* Título */}
-              <h3 style={{ 
+              <h3 style={{
                 margin: '0 0 12px 0',
                 color: 'var(--text-primary)',
                 fontSize: '22px',
@@ -1001,7 +1021,7 @@ const PatientManagement = () => {
               </h3>
 
               {/* Mensaje principal */}
-              <p style={{ 
+              <p style={{
                 margin: '0 0 20px 0',
                 color: 'var(--text-secondary)',
                 fontSize: '15px',
@@ -1010,7 +1030,7 @@ const PatientManagement = () => {
               }}>
                 {successModalData.message}
               </p>
-              
+
               {/* Información del paciente */}
               <div style={{
                 background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
@@ -1088,13 +1108,13 @@ const PatientManagement = () => {
             </div>
 
             {/* Botón de acción */}
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
+              display: 'flex',
               justifyContent: 'center'
             }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={closeSuccessModal}
                 style={{
                   padding: '12px 32px',
@@ -1176,7 +1196,7 @@ const PatientManagement = () => {
               </div>
 
               {/* Título */}
-              <h3 style={{ 
+              <h3 style={{
                 margin: '0 0 12px 0',
                 color: 'var(--text-primary)',
                 fontSize: '22px',
@@ -1187,7 +1207,7 @@ const PatientManagement = () => {
               </h3>
 
               {/* Mensaje principal */}
-              <p style={{ 
+              <p style={{
                 margin: '0 0 24px 0',
                 color: 'var(--text-secondary)',
                 fontSize: '16px',
@@ -1214,13 +1234,13 @@ const PatientManagement = () => {
             </div>
 
             {/* Botón de acción */}
-            <div style={{ 
+            <div style={{
               padding: '16px 24px 24px',
-              display: 'flex', 
+              display: 'flex',
               justifyContent: 'center'
             }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={closeErrorModal}
                 style={{
                   padding: '12px 32px',
@@ -1251,11 +1271,18 @@ const PatientManagement = () => {
           </div>
         </div>
       )}
-      
+
+
       <AdminFooter isDarkMode={isDarkMode} />
       <Chatbot />
+
+      {/* Tutorial Component */}
+      <Tutorial
+        steps={getAvailablePatientsTutorialSteps()}
+        show={showTutorial}
+        onComplete={completeTutorial}
+        onSkip={skipTutorial}
+      />
     </div>
   );
-};
-
-export default PatientManagement;
+}; export default PatientManagement;

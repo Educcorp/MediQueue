@@ -18,6 +18,25 @@
     "officesCount_plural": "{{count}} offices"
   },
 
+  "buttons": {
+    "refresh": "Refresh",
+    "newArea": "New Area",
+    "addOffice": "Add Office",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "accept": "Accept",
+    "blockArea": "Block area",
+    "unblockArea": "Unblock area",
+    "blockOffice": "Block office",
+    "unblockOffice": "Unblock office",
+    "yesBlock": "Yes, block",
+    "yesUnblock": "Yes, unblock",
+    "yesDelete": "Yes, delete",
+    "yesDeleteArea": "Yes, delete area",
+    "yesDeleteOffice": "Yes, delete office"
+  },
+
   "areas": {
     "title": "Medical Areas",
     "newArea": "New Area",
@@ -32,7 +51,17 @@
     "deletedSuccessfully": "Area deleted successfully",
     "createdSuccessfully": "Area created successfully",
     "updatedSuccessfully": "Area updated successfully",
-    "noOffices": "No offices in this area"
+    "noOffices": "No offices in this area",
+    "blocked": "BLOCKED",
+    "confirmBlock": "Are you sure you want to {{action}} the area {{areaName}}?",
+    "blockArea": "Block Area",
+    "unblockArea": "Unblock Area",
+    "blockedSuccessfully": "Area blocked successfully",
+    "unblockedSuccessfully": "Area unblocked successfully",
+    "cannotChangeStatus": "Cannot change area status",
+    "cannotDelete": "Cannot delete area",
+    "notFoundError": "Area was not found",
+    "noPermissionError": "You don't have permission to delete this area"
   },
   
   "form": {
@@ -51,7 +80,10 @@
     "areaNameRequired": "Area name is required",
     "areaNameMaxLength": "Area name cannot exceed 50 characters",
     "officeNumberRequired": "Office number is required",
-    "officeNumberRange": "Office number must be between 1 and 999 (maximum 3 digits)"
+    "officeNumberRange": "Office number must be between 1 and 999 (maximum 3 digits)",
+    "completeRequiredFields": "Please complete all required fields",
+    "fixLetterError": "Please fix the error in the letter identifier",
+    "invalidColorFormat": "Color format is invalid"
   },
   
   "offices": {
@@ -61,27 +93,124 @@
     "editOffice": "Edit Office",
     "deleteOffice": "Delete Office",
     "officeNumber": "Office #{{number}}",
+    "officeLabel": "Office",
     "confirmDelete": "Are you sure you want to delete office #{{number}}?\n\nThis will also delete all appointments associated with this office.",
     "deletedSuccessfully": "Office deleted successfully",
     "createdSuccessfully": "Office created successfully",
     "updatedSuccessfully": "Office updated successfully",
-    "newOfficeInArea": "New Office - {{areaName}}"
+    "newOfficeInArea": "New Office - {{areaName}}",
+    "confirmBlock": "Are you sure you want to {{action}} office #{{number}}?",
+    "blockOffice": "Block Office",
+    "unblockOffice": "Unblock Office",
+    "blockedSuccessfully": "Office blocked successfully",
+    "unblockedSuccessfully": "Office unblocked successfully",
+    "cannotChangeStatus": "Cannot change office status",
+    "cannotDelete": "Cannot delete office",
+    "notFoundError": "Office was not found",
+    "noPermissionError": "You don't have permission to delete this office",
+    "noOfficesInArea": "No offices in this area"
+  },
+  
+  "modal": {
+    "newArea": "New Medical Area",
+    "editArea": "Edit Medical Area",
+    "newOffice": "New Office",
+    "editOffice": "Edit Office",
+    "confirmDeletion": "Confirm Deletion",
+    "success": "Success!",
+    "error": "Error",
+    "actionBlock": "block",
+    "actionUnblock": "unblock",
+    "actionCannotBeUndone": "This action cannot be undone.",
+    "area": "Area"
+  },
+  
+  "search": {
+    "label": "Search",
+    "placeholder": "Search medical areas..."
   },
   
   "errors": {
+    "loadingData": "Error loading data",
     "savingArea": "Error saving area",
     "savingOffice": "Error saving office",
     "deletingArea": "Error deleting area",
     "deletingOffice": "Error deleting office",
     "notFound": "was not found",
     "noPermission": "You don't have permission to perform this action",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "cannotUpdateArea": "Cannot update area",
+    "cannotCreateArea": "Cannot create area",
+    "cannotUpdateOffice": "Cannot update office",
+    "cannotCreateOffice": "Cannot create office"
   },
   
   "customization": {
     "title": "Customization",
     "colorLabel": "Color",
     "iconLabel": "Icon"
+  },
+
+  "colorSelector": {
+    "label": "Area Color",
+    "customColor": "Custom color",
+    "notSelected": "Not selected",
+    "selectColor": "Select color"
+  },
+
+  "iconSelector": {
+    "label": "Area Icon",
+    "title": "Select Area Icon",
+    "searchPlaceholder": "Search icon...",
+    "notSelected": "Not selected",
+    "noIconsFound": "No icons found",
+    "tryOtherTerms": "Try other search terms",
+    "clearSelection": "Clear selection",
+    "categories": {
+      "general": "General Medicine",
+      "pediatria": "Pediatrics",
+      "cardiologia": "Cardiology",
+      "ginecologia": "Gynecology",
+      "oftalmologia": "Ophthalmology",
+      "ortopedia": "Orthopedics",
+      "neurologia": "Neurology",
+      "urologia": "Urology",
+      "laboratorio": "Laboratory",
+      "emergencias": "Emergency",
+      "farmacia": "Pharmacy",
+      "radiologia": "Radiology",
+      "neumologia": "Pulmonology",
+      "odontologia": "Dentistry",
+      "rehabilitacion": "Rehabilitation"
+    },
+    "icons": {
+      "stethoscope": "Stethoscope",
+      "baby": "Baby/Pediatrics",
+      "heartbeat": "Heartbeat/Cardiology",
+      "doctor": "Doctor",
+      "female": "Female/Gynecology",
+      "eye": "Eye/Ophthalmology",
+      "bone": "Bone/Orthopedics",
+      "brain": "Brain/Neurology",
+      "male": "Male/Urology",
+      "flask": "Laboratory",
+      "procedures": "Procedures",
+      "door": "Office/Door",
+      "hospital": "Hospital",
+      "ambulance": "Ambulance/Emergency",
+      "syringe": "Syringe/Vaccines",
+      "prescriptionBottle": "Medications",
+      "xray": "X-Ray/Radiology",
+      "microscope": "Microscope",
+      "lungs": "Lungs/Pulmonology",
+      "tooth": "Tooth/Dentistry",
+      "heartHolding": "Cardiac Care",
+      "wheelchair": "Wheelchair/Rehabilitation",
+      "crutch": "Crutch/Orthopedics",
+      "thermometer": "Thermometer",
+      "cough": "Cough/Respiratory",
+      "vials": "Vials/Analysis"
+    }
   }
 }
 

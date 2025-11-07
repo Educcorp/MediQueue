@@ -5,7 +5,10 @@ import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
 import Chatbot from '../components/Common/Chatbot';
+import Tutorial from '../components/Common/Tutorial';
 import adminService from '../services/adminService';
+import useTutorial from '../hooks/useTutorial';
+import { getAvailableUsersTutorialSteps } from '../utils/tutorialSteps';
 import { USER_TYPE_LABELS } from '../utils/constants';
 import '../styles/UnifiedAdminPages.css';
 
@@ -31,11 +34,15 @@ import {
   FaUsers,
   FaCrown,
   FaEyeSlash,
-  FaKey
+  FaKey,
+  FaQuestionCircle
 } from 'react-icons/fa';
 
 const AdminUsersPage = () => {
   const { t } = useTranslation(['admin', 'common']);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,8 +60,13 @@ const AdminUsersPage = () => {
     tipo_usuario: 2
   });
 
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  // Tutorial hook
+  const {
+    showTutorial,
+    completeTutorial,
+    skipTutorial,
+    startTutorial
+  } = useTutorial('admin-users');
 
   // Cargar administradores al montar el componente
   useEffect(() => {
@@ -285,6 +297,14 @@ const AdminUsersPage = () => {
             </p>
           </div>
           <div className="page-actions">
+            <button
+              className="btn btn-secondary"
+              onClick={startTutorial}
+              title="Ver tutorial"
+              style={{ padding: '8px 12px' }}
+            >
+              <FaQuestionCircle />
+            </button>
             <button className="btn btn-secondary" onClick={loadAdmins}>
               <FaSync /> {t('common:buttons.refresh')}
             </button>
@@ -306,7 +326,7 @@ const AdminUsersPage = () => {
         )}
 
         {/* Statistics Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+        <div className="stats-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
           <div className="content-card">
             <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{
@@ -447,7 +467,7 @@ const AdminUsersPage = () => {
                 </button>
               </div>
             ) : (
-              <div className="data-table">
+              <div className="data-table users-table">
                 <table>
                   <thead>
                     <tr>
@@ -528,7 +548,7 @@ const AdminUsersPage = () => {
                           </div>
                         </td>
                         <td>
-                          <div style={{ display: 'flex', gap: '4px' }}>
+                          <div className="user-actions" style={{ display: 'flex', gap: '4px' }}>
                             <button
                               onClick={() => handleEdit(admin)}
                               className="btn btn-secondary"
@@ -745,9 +765,17 @@ const AdminUsersPage = () => {
           </div>
         </div>
       )}
-      
+
       <AdminFooter />
       <Chatbot />
+
+      {/* Tutorial Component */}
+      <Tutorial
+        steps={getAvailableUsersTutorialSteps()}
+        show={showTutorial}
+        onComplete={completeTutorial}
+        onSkip={skipTutorial}
+      />
     </div>
   );
 };

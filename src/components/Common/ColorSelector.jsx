@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import './ColorSelector.css';
 
-const ColorSelector = ({ value, onChange, disabled = false, label = "Seleccionar Color" }) => {
+const ColorSelector = ({ value, onChange, disabled = false, label }) => {
+  const { t } = useTranslation(['consultorio']);
   const [isOpen, setIsOpen] = useState(false);
 
   // Paleta de colores predefinidos para áreas médicas
@@ -46,12 +48,12 @@ const ColorSelector = ({ value, onChange, disabled = false, label = "Seleccionar
 
   const getCurrentColorName = () => {
     const currentColor = predefinedColors.find(color => color.value === value);
-    return currentColor ? currentColor.name : 'Color personalizado';
+    return currentColor ? currentColor.name : t('consultorio:colorSelector.customColor');
   };
 
   return (
     <div className={`color-selector-container ${disabled ? 'disabled' : ''}`}>
-      <label className="color-selector-label">{label}</label>
+      <label className="color-selector-label">{label || t('consultorio:colorSelector.label')}</label>
 
       {/* Input de color directo sin dropdown */}
       <div className="color-selector-button-wrapper">
@@ -61,7 +63,7 @@ const ColorSelector = ({ value, onChange, disabled = false, label = "Seleccionar
             style={{ backgroundColor: value || '#f0f0f0' }}
           />
           <span className="color-name">
-            {value ? getCurrentColorName() : 'Sin seleccionar'}
+            {value ? getCurrentColorName() : t('consultorio:colorSelector.notSelected')}
           </span>
           {value && <span className="color-value">{value}</span>}
         </div>
@@ -73,7 +75,7 @@ const ColorSelector = ({ value, onChange, disabled = false, label = "Seleccionar
           onChange={handleCustomColorChange}
           disabled={disabled}
           className="custom-color-input-main"
-          title="Seleccionar color"
+          title={t('consultorio:colorSelector.selectColor')}
         />
       </div>
     </div>
