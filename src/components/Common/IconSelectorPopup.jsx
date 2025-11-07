@@ -118,11 +118,11 @@ const IconSelector = ({ value, onChange, disabled = false, label }) => {
       <div className="icon-popup-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header del popup */}
         <div className="icon-popup-header">
-          <h3>Seleccionar Icono del Área</h3>
+          <h3>{t('consultorio:iconSelector.title')}</h3>
           <button
             className="icon-popup-close"
             onClick={handleClose}
-            title="Cerrar"
+            title={t('common:buttons.close')}
           >
             <FaTimes />
           </button>
@@ -134,7 +134,7 @@ const IconSelector = ({ value, onChange, disabled = false, label }) => {
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Buscar icono..."
+              placeholder={t('consultorio:iconSelector.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -157,8 +157,8 @@ const IconSelector = ({ value, onChange, disabled = false, label }) => {
           {Object.keys(groupedIcons).length === 0 ? (
             <div className="no-icons-found">
               <FaSearch size={48} />
-              <h4>No se encontraron iconos</h4>
-              <p>Prueba con otros términos de búsqueda</p>
+              <h4>{t('consultorio:iconSelector.noIconsFound')}</h4>
+              <p>{t('consultorio:iconSelector.tryOtherTerms')}</p>
             </div>
           ) : (
             Object.entries(groupedIcons).map(([category, icons]) => (
