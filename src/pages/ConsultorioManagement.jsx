@@ -970,7 +970,7 @@ const ConsultorioManagement = () => {
                           )}
                         </div>
                         <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'var(--text-muted)' }}>
-                          {areaConsultorios.length} consultorio{areaConsultorios.length !== 1 ? 's' : ''}
+                          {t('consultorio:area.officesCount', { count: areaConsultorios.length })}
                         </p>
                       </div>
                     </div>
