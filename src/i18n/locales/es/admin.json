@@ -178,12 +178,21 @@
   "turns": {
     "title": "Gestión de Turnos",
     "subtitle": "Administra todos los turnos del sistema - {{count}} turnos encontrados",
+    "history": "Historial",
+    "historialTitle": "Ver Historial de Turnos",
+    "listTitle": "Lista de Turnos",
     "createTurn": "Crear Turno",
     "editTurn": "Editar Turno",
     "deleteTurn": "Eliminar Turno",
     "viewTurn": "Ver Turno",
     "turnNumber": "Número de Turno",
+    "hashTurn": "# Turno",
     "patient": "Paciente",
+    "guest": "Invitado",
+    "patientNotFound": "Paciente no encontrado",
+    "officeNotFound": "Consultorio no encontrado",
+    "markAsAttended": "Marcar como atendido",
+    "cancel": "Cancelar turno",
     "area": "Área",
     "office": "Consultorio",
     "status": "Estado",
@@ -198,11 +207,20 @@
     "confirmDelete": "¿Estás seguro de eliminar este turno?",
     "filters": {
       "dates": "Fechas",
+      "resetToToday": "Reiniciar a hoy",
+      "startDate": "Fecha inicial",
+      "endDate": "Fecha final",
+      "to": "a",
       "status": "Estado",
       "allStatuses": "Todos los estados",
       "areaAndOffice": "Área y Consultorio",
       "allOffices": "Todos los consultorios",
       "applyFilters": "Aplicar Filtros"
+    },
+    "statuses": {
+      "waiting": "En espera",
+      "attended": "Atendido",
+      "cancelled": "Cancelado"
     },
     "table": {
       "turn": "Turno",

@@ -266,9 +266,9 @@ const TurnManager = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
-    { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
-    { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
+    { value: 'EN_ESPERA', label: t('admin:turns.statuses.waiting'), color: 'info', indicator: '#ffc107' },
+    { value: 'ATENDIDO', label: t('admin:turns.statuses.attended'), color: 'success', indicator: '#28a745' },
+    { value: 'CANCELADO', label: t('admin:turns.statuses.cancelled'), color: 'danger', indicator: '#dc3545' },
 
   ];
 
@@ -603,14 +603,14 @@ const TurnManager = () => {
   };
 
   const getPatientName = (uk_paciente) => {
-    if (!uk_paciente) return 'Invitado';
+    if (!uk_paciente) return t('admin:turns.guest');
     const patient = patients.find(p => p.uk_paciente === uk_paciente);
-    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Paciente no encontrado';
+    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : t('admin:turns.patientNotFound');
   };
 
   const getConsultorioInfo = (uk_consultorio) => {
     const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
-    return consultorio ? `Consultorio ${consultorio.i_numero_consultorio}` : 'Consultorio no encontrado';
+    return consultorio ? `${t('admin:turns.office')} ${consultorio.i_numero_consultorio}` : t('admin:turns.officeNotFound');
   };
 
   const getAreaInfo = (uk_consultorio) => {
@@ -631,8 +631,8 @@ const TurnManager = () => {
         combined.push({
           type: 'consultorio',
           id: consultorio.uk_consultorio,
-          name: `Consultorio ${consultorio.i_numero_consultorio}`,
-          displayName: `Consultorio ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
+          name: `${t('admin:turns.office')} ${consultorio.i_numero_consultorio}`,
+          displayName: `${t('admin:turns.office')} ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
           areaName: area.s_nombre_area,
           icon: getAreaIcon(area.s_nombre_area),
           className: getAreaClass(area.s_nombre_area)
@@ -719,9 +719,9 @@ const TurnManager = () => {
             <button
               className="btn btn-secondary"
               onClick={() => navigate('/admin/historial')}
-              title="Ver Historial de Turnos"
+              title={t('admin:turns.historialTitle')}
             >
-              <FaHistory /> Historial
+              <FaHistory /> {t('admin:turns.history')}
             </button>
             <button
               className="btn btn-secondary"
@@ -752,7 +752,7 @@ const TurnManager = () => {
         <div className="filters-section">
           <div className="filter-group date-range-filter">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label style={{ margin: 0 }}>Fechas</label>
+              <label style={{ margin: 0 }}>{t('admin:turns.filters.dates')}</label>
               <button
                 type="button"
                 onClick={() => {
@@ -768,7 +768,7 @@ const TurnManager = () => {
                   height: 'auto',
                   lineHeight: '1'
                 }}
-                title="Reiniciar a hoy"
+                title={t('admin:turns.filters.resetToToday')}
               >
                 <FaSync style={{ fontSize: '10px' }} />
               </button>
@@ -798,8 +798,8 @@ const TurnManager = () => {
                     e.target.showPicker && e.target.showPicker();
                   }}
                   className="form-control"
-                  placeholder="Fecha inicial"
-                  title="Fecha inicial"
+                  placeholder={t('admin:turns.filters.startDate')}
+                  title={t('admin:turns.filters.startDate')}
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
@@ -810,7 +810,7 @@ const TurnManager = () => {
                 whiteSpace: 'nowrap',
                 padding: '0 6px',
                 flexShrink: 0
-              }}>a</span>
+              }}>{t('admin:turns.filters.to')}</span>
               <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
                 <input
                   type="date"
@@ -829,15 +829,15 @@ const TurnManager = () => {
                   }}
                   min={selectedStartDate}
                   className="form-control"
-                  placeholder="Fecha final"
-                  title="Fecha final"
+                  placeholder={t('admin:turns.filters.endDate')}
+                  title={t('admin:turns.filters.endDate')}
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
             </div>
           </div>
           <div className="filter-group">
-            <label>Estado</label>
+            <label>{t('admin:turns.filters.status')}</label>
             <div className="custom-status-select">
               <div
                 ref={statusButtonRef}
@@ -1057,14 +1057,14 @@ const TurnManager = () => {
                 <table className="turns-table">
                   <thead>
                     <tr>
-                      <th># Turno</th>
-                      <th>Paciente</th>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Estado</th>
-                      <th>Consultorio</th>
-                      <th>Área</th>
-                      <th>Acciones</th>
+                      <th>{t('admin:turns.hashTurn')}</th>
+                      <th>{t('admin:turns.table.patient')}</th>
+                      <th>{t('admin:turns.table.date')}</th>
+                      <th>{t('admin:turns.table.time')}</th>
+                      <th>{t('admin:turns.table.status')}</th>
+                      <th>{t('admin:turns.table.office')}</th>
+                      <th>{t('admin:turns.table.area')}</th>
+                      <th>{t('admin:turns.table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1110,7 +1110,7 @@ const TurnManager = () => {
                                   onClick={() => handleMarkAsAttended(turn)}
                                   className="btn btn-secondary"
                                   style={{ padding: '4px 8px', fontSize: '12px' }}
-                                  title="Marcar como atendido"
+                                  title={t('admin:turns.markAsAttended')}
                                 >
                                   <FaCheck />
                                 </button>
@@ -1121,7 +1121,7 @@ const TurnManager = () => {
                                 onClick={() => handleCancelTurn(turn)}
                                 className="btn btn-secondary"
                                 style={{ padding: '4px 8px', fontSize: '12px' }}
-                                title="Cancelar turno"
+                                title={t('admin:turns.cancel')}
                               >
                                 <FaTimes />
                               </button>

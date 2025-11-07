@@ -178,12 +178,21 @@
   "turns": {
     "title": "Appointment Management",
     "subtitle": "Manage all system appointments - {{count}} appointments found",
+    "history": "History",
+    "historialTitle": "View Appointment History",
+    "listTitle": "Appointment List",
     "createTurn": "Create Appointment",
     "editTurn": "Edit Appointment",
     "deleteTurn": "Delete Appointment",
     "viewTurn": "View Appointment",
     "turnNumber": "Appointment Number",
+    "hashTurn": "# Turn",
     "patient": "Patient",
+    "guest": "Guest",
+    "patientNotFound": "Patient not found",
+    "officeNotFound": "Office not found",
+    "markAsAttended": "Mark as attended",
+    "cancel": "Cancel appointment",
     "area": "Area",
     "office": "Office",
     "status": "Status",
@@ -198,11 +207,20 @@
     "confirmDelete": "Are you sure you want to delete this appointment?",
     "filters": {
       "dates": "Dates",
+      "resetToToday": "Reset to today",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "to": "to",
       "status": "Status",
       "allStatuses": "All statuses",
       "areaAndOffice": "Area and Office",
       "allOffices": "All offices",
       "applyFilters": "Apply Filters"
+    },
+    "statuses": {
+      "waiting": "Waiting",
+      "attended": "Attended",
+      "cancelled": "Cancelled"
     },
     "table": {
       "turn": "Appointment",
