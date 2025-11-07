@@ -437,7 +437,7 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
         container: {
             position: 'fixed',
             bottom: 24,
-            right: 24,
+            left: 24,
             zIndex: 9999,
             fontFamily: "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
         },
@@ -465,7 +465,7 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
         promoMessage: {
             position: 'absolute',
             bottom: 75,
-            right: 10,
+            left: 10,
             background: colors.cardBg,
             color: colors.textPrimary,
             padding: '12px 16px',
@@ -482,12 +482,12 @@ INSTRUCCIONES: Responde como asistente virtual de MediQueue. Considera el contex
             gap: '8px',
             cursor: 'pointer',
             transform: promoAnimation === 'slideOut'
-                ? 'translateX(100%) scale(0.9)'
+                ? 'translateX(-100%) scale(0.9)'
                 : promoAnimation === 'slideIn'
                     ? 'translateX(0) scale(1)'
-                    : 'translateX(100%) scale(0.9)',
+                    : 'translateX(-100%) scale(0.9)',
             opacity: promoAnimation === 'slideOut' ? 0 : 1,
-            transformOrigin: 'bottom right'
+            transformOrigin: 'bottom left'
         },
         promoHeader: {
             display: 'flex',
