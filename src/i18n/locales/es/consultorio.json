@@ -149,6 +149,68 @@
     "title": "Personalización",
     "colorLabel": "Color",
     "iconLabel": "Icono"
+  },
+
+  "colorSelector": {
+    "label": "Color del Área",
+    "customColor": "Color personalizado",
+    "notSelected": "Sin seleccionar",
+    "selectColor": "Seleccionar color"
+  },
+
+  "iconSelector": {
+    "label": "Icono del Área",
+    "title": "Seleccionar Icono del Área",
+    "searchPlaceholder": "Buscar icono...",
+    "notSelected": "Sin seleccionar",
+    "noIconsFound": "No se encontraron iconos",
+    "tryOtherTerms": "Prueba con otros términos de búsqueda",
+    "clearSelection": "Limpiar selección",
+    "categories": {
+      "general": "Medicina General",
+      "pediatria": "Pediatría",
+      "cardiologia": "Cardiología",
+      "ginecologia": "Ginecología",
+      "oftalmologia": "Oftalmología",
+      "ortopedia": "Ortopedia",
+      "neurologia": "Neurología",
+      "urologia": "Urología",
+      "laboratorio": "Laboratorio",
+      "emergencias": "Emergencias",
+      "farmacia": "Farmacia",
+      "radiologia": "Radiología",
+      "neumologia": "Neumología",
+      "odontologia": "Odontología",
+      "rehabilitacion": "Rehabilitación"
+    },
+    "icons": {
+      "stethoscope": "Estetoscopio",
+      "baby": "Bebé/Pediatría",
+      "heartbeat": "Latidos/Cardiología",
+      "doctor": "Doctor",
+      "female": "Mujer/Ginecología",
+      "eye": "Ojo/Oftalmología",
+      "bone": "Hueso/Ortopedia",
+      "brain": "Cerebro/Neurología",
+      "male": "Hombre/Urología",
+      "flask": "Laboratorio",
+      "procedures": "Procedimientos",
+      "door": "Consulta/Puerta",
+      "hospital": "Hospital",
+      "ambulance": "Ambulancia/Emergencias",
+      "syringe": "Jeringa/Vacunas",
+      "prescriptionBottle": "Medicamentos",
+      "xray": "Rayos X/Radiología",
+      "microscope": "Microscopio",
+      "lungs": "Pulmones/Neumología",
+      "tooth": "Diente/Odontología",
+      "heartHolding": "Cuidado Cardíaco",
+      "wheelchair": "Silla de Ruedas/Rehabilitación",
+      "crutch": "Muleta/Ortopedia",
+      "thermometer": "Termómetro",
+      "cough": "Tos/Respiratorio",
+      "vials": "Viales/Análisis"
+    }
   }
 }
 

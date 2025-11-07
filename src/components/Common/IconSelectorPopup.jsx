@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import './IconSelectorPopup.css';
 
 // Importar iconos de FontAwesome
@@ -14,40 +15,41 @@ import {
   FaSearch, FaCheck, FaTimes, FaPlus
 } from 'react-icons/fa';
 
-const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar Icono" }) => {
+const IconSelector = ({ value, onChange, disabled = false, label }) => {
+  const { t } = useTranslation(['consultorio']);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const buttonRef = useRef(null);
 
   // Mapa de iconos médicos disponibles
   const availableIcons = useMemo(() => [
-    { name: 'FaStethoscope', component: FaStethoscope, label: 'Estetoscopio', category: 'general' },
-    { name: 'FaBaby', component: FaBaby, label: 'Bebé/Pediatría', category: 'pediatria' },
-    { name: 'FaHeartbeat', component: FaHeartbeat, label: 'Latidos/Cardiología', category: 'cardiologia' },
-    { name: 'FaUserMd', component: FaUserMd, label: 'Doctor', category: 'general' },
-    { name: 'FaFemale', component: FaFemale, label: 'Mujer/Ginecología', category: 'ginecologia' },
-    { name: 'FaEye', component: FaEye, label: 'Ojo/Oftalmología', category: 'oftalmologia' },
-    { name: 'FaBone', component: FaBone, label: 'Hueso/Ortopedia', category: 'ortopedia' },
-    { name: 'FaBrain', component: FaBrain, label: 'Cerebro/Neurología', category: 'neurologia' },
-    { name: 'FaMale', component: FaMale, label: 'Hombre/Urología', category: 'urologia' },
-    { name: 'FaFlask', component: FaFlask, label: 'Laboratorio', category: 'laboratorio' },
-    { name: 'FaProcedures', component: FaProcedures, label: 'Procedimientos', category: 'general' },
-    { name: 'FaDoorOpen', component: FaDoorOpen, label: 'Consulta/Puerta', category: 'general' },
-    { name: 'FaHospital', component: FaHospital, label: 'Hospital', category: 'general' },
-    { name: 'FaAmbulance', component: FaAmbulance, label: 'Ambulancia/Emergencias', category: 'emergencias' },
-    { name: 'FaSyringe', component: FaSyringe, label: 'Jeringa/Vacunas', category: 'general' },
-    { name: 'FaPrescriptionBottle', component: FaPrescriptionBottle, label: 'Medicamentos', category: 'farmacia' },
-    { name: 'FaXRay', component: FaXRay, label: 'Rayos X/Radiología', category: 'radiologia' },
-    { name: 'FaMicroscope', component: FaMicroscope, label: 'Microscopio', category: 'laboratorio' },
-    { name: 'FaLungs', component: FaLungs, label: 'Pulmones/Neumología', category: 'neumologia' },
-    { name: 'FaTooth', component: FaTooth, label: 'Diente/Odontología', category: 'odontologia' },
-    { name: 'FaHandHoldingHeart', component: FaHandHoldingHeart, label: 'Cuidado Cardíaco', category: 'cardiologia' },
-    { name: 'FaWheelchair', component: FaWheelchair, label: 'Silla de Ruedas/Rehabilitación', category: 'rehabilitacion' },
-    { name: 'FaCrutch', component: FaCrutch, label: 'Muleta/Ortopedia', category: 'ortopedia' },
-    { name: 'FaThermometer', component: FaThermometer, label: 'Termómetro', category: 'general' },
-    { name: 'FaHeadSideCough', component: FaHeadSideCough, label: 'Tos/Respiratorio', category: 'neumologia' },
-    { name: 'FaVials', component: FaVials, label: 'Viales/Análisis', category: 'laboratorio' }
-  ], []);
+    { name: 'FaStethoscope', component: FaStethoscope, label: t('consultorio:iconSelector.icons.stethoscope'), category: 'general' },
+    { name: 'FaBaby', component: FaBaby, label: t('consultorio:iconSelector.icons.baby'), category: 'pediatria' },
+    { name: 'FaHeartbeat', component: FaHeartbeat, label: t('consultorio:iconSelector.icons.heartbeat'), category: 'cardiologia' },
+    { name: 'FaUserMd', component: FaUserMd, label: t('consultorio:iconSelector.icons.doctor'), category: 'general' },
+    { name: 'FaFemale', component: FaFemale, label: t('consultorio:iconSelector.icons.female'), category: 'ginecologia' },
+    { name: 'FaEye', component: FaEye, label: t('consultorio:iconSelector.icons.eye'), category: 'oftalmologia' },
+    { name: 'FaBone', component: FaBone, label: t('consultorio:iconSelector.icons.bone'), category: 'ortopedia' },
+    { name: 'FaBrain', component: FaBrain, label: t('consultorio:iconSelector.icons.brain'), category: 'neurologia' },
+    { name: 'FaMale', component: FaMale, label: t('consultorio:iconSelector.icons.male'), category: 'urologia' },
+    { name: 'FaFlask', component: FaFlask, label: t('consultorio:iconSelector.icons.flask'), category: 'laboratorio' },
+    { name: 'FaProcedures', component: FaProcedures, label: t('consultorio:iconSelector.icons.procedures'), category: 'general' },
+    { name: 'FaDoorOpen', component: FaDoorOpen, label: t('consultorio:iconSelector.icons.door'), category: 'general' },
+    { name: 'FaHospital', component: FaHospital, label: t('consultorio:iconSelector.icons.hospital'), category: 'general' },
+    { name: 'FaAmbulance', component: FaAmbulance, label: t('consultorio:iconSelector.icons.ambulance'), category: 'emergencias' },
+    { name: 'FaSyringe', component: FaSyringe, label: t('consultorio:iconSelector.icons.syringe'), category: 'general' },
+    { name: 'FaPrescriptionBottle', component: FaPrescriptionBottle, label: t('consultorio:iconSelector.icons.prescriptionBottle'), category: 'farmacia' },
+    { name: 'FaXRay', component: FaXRay, label: t('consultorio:iconSelector.icons.xray'), category: 'radiologia' },
+    { name: 'FaMicroscope', component: FaMicroscope, label: t('consultorio:iconSelector.icons.microscope'), category: 'laboratorio' },
+    { name: 'FaLungs', component: FaLungs, label: t('consultorio:iconSelector.icons.lungs'), category: 'neumologia' },
+    { name: 'FaTooth', component: FaTooth, label: t('consultorio:iconSelector.icons.tooth'), category: 'odontologia' },
+    { name: 'FaHandHoldingHeart', component: FaHandHoldingHeart, label: t('consultorio:iconSelector.icons.heartHolding'), category: 'cardiologia' },
+    { name: 'FaWheelchair', component: FaWheelchair, label: t('consultorio:iconSelector.icons.wheelchair'), category: 'rehabilitacion' },
+    { name: 'FaCrutch', component: FaCrutch, label: t('consultorio:iconSelector.icons.crutch'), category: 'ortopedia' },
+    { name: 'FaThermometer', component: FaThermometer, label: t('consultorio:iconSelector.icons.thermometer'), category: 'general' },
+    { name: 'FaHeadSideCough', component: FaHeadSideCough, label: t('consultorio:iconSelector.icons.cough'), category: 'neumologia' },
+    { name: 'FaVials', component: FaVials, label: t('consultorio:iconSelector.icons.vials'), category: 'laboratorio' }
+  ], [t]);
 
   // Filtrar iconos basado en el término de búsqueda
   const filteredIcons = useMemo(() => {
@@ -93,21 +95,21 @@ const IconSelector = ({ value, onChange, disabled = false, label = "Seleccionar 
   const IconComponent = currentIcon?.component;
 
   const categoryNames = {
-    general: 'Medicina General',
-    pediatria: 'Pediatría',
-    cardiologia: 'Cardiología',
-    ginecologia: 'Ginecología',
-    oftalmologia: 'Oftalmología',
-    ortopedia: 'Ortopedia',
-    neurologia: 'Neurología',
-    urologia: 'Urología',
-    laboratorio: 'Laboratorio',
-    emergencias: 'Emergencias',
-    farmacia: 'Farmacia',
-    radiologia: 'Radiología',
-    neumologia: 'Neumología',
-    odontologia: 'Odontología',
-    rehabilitacion: 'Rehabilitación'
+    general: t('consultorio:iconSelector.categories.general'),
+    pediatria: t('consultorio:iconSelector.categories.pediatria'),
+    cardiologia: t('consultorio:iconSelector.categories.cardiologia'),
+    ginecologia: t('consultorio:iconSelector.categories.ginecologia'),
+    oftalmologia: t('consultorio:iconSelector.categories.oftalmologia'),
+    ortopedia: t('consultorio:iconSelector.categories.ortopedia'),
+    neurologia: t('consultorio:iconSelector.categories.neurologia'),
+    urologia: t('consultorio:iconSelector.categories.urologia'),
+    laboratorio: t('consultorio:iconSelector.categories.laboratorio'),
+    emergencias: t('consultorio:iconSelector.categories.emergencias'),
+    farmacia: t('consultorio:iconSelector.categories.farmacia'),
+    radiologia: t('consultorio:iconSelector.categories.radiologia'),
+    neumologia: t('consultorio:iconSelector.categories.neumologia'),
+    odontologia: t('consultorio:iconSelector.categories.odontologia'),
+    rehabilitacion: t('consultorio:iconSelector.categories.rehabilitacion')
   };
 
   // Componente Modal Popup

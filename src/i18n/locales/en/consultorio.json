@@ -149,6 +149,68 @@
     "title": "Customization",
     "colorLabel": "Color",
     "iconLabel": "Icon"
+  },
+
+  "colorSelector": {
+    "label": "Area Color",
+    "customColor": "Custom color",
+    "notSelected": "Not selected",
+    "selectColor": "Select color"
+  },
+
+  "iconSelector": {
+    "label": "Area Icon",
+    "title": "Select Area Icon",
+    "searchPlaceholder": "Search icon...",
+    "notSelected": "Not selected",
+    "noIconsFound": "No icons found",
+    "tryOtherTerms": "Try other search terms",
+    "clearSelection": "Clear selection",
+    "categories": {
+      "general": "General Medicine",
+      "pediatria": "Pediatrics",
+      "cardiologia": "Cardiology",
+      "ginecologia": "Gynecology",
+      "oftalmologia": "Ophthalmology",
+      "ortopedia": "Orthopedics",
+      "neurologia": "Neurology",
+      "urologia": "Urology",
+      "laboratorio": "Laboratory",
+      "emergencias": "Emergency",
+      "farmacia": "Pharmacy",
+      "radiologia": "Radiology",
+      "neumologia": "Pulmonology",
+      "odontologia": "Dentistry",
+      "rehabilitacion": "Rehabilitation"
+    },
+    "icons": {
+      "stethoscope": "Stethoscope",
+      "baby": "Baby/Pediatrics",
+      "heartbeat": "Heartbeat/Cardiology",
+      "doctor": "Doctor",
+      "female": "Female/Gynecology",
+      "eye": "Eye/Ophthalmology",
+      "bone": "Bone/Orthopedics",
+      "brain": "Brain/Neurology",
+      "male": "Male/Urology",
+      "flask": "Laboratory",
+      "procedures": "Procedures",
+      "door": "Office/Door",
+      "hospital": "Hospital",
+      "ambulance": "Ambulance/Emergency",
+      "syringe": "Syringe/Vaccines",
+      "prescriptionBottle": "Medications",
+      "xray": "X-Ray/Radiology",
+      "microscope": "Microscope",
+      "lungs": "Lungs/Pulmonology",
+      "tooth": "Tooth/Dentistry",
+      "heartHolding": "Cardiac Care",
+      "wheelchair": "Wheelchair/Rehabilitation",
+      "crutch": "Crutch/Orthopedics",
+      "thermometer": "Thermometer",
+      "cough": "Cough/Respiratory",
+      "vials": "Vials/Analysis"
+    }
   }
 }
 
