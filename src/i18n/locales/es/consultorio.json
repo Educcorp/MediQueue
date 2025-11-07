@@ -18,6 +18,25 @@
     "officesCount_plural": "{{count}} consultorios"
   },
 
+  "buttons": {
+    "refresh": "Actualizar",
+    "newArea": "Nueva Área",
+    "addOffice": "Agregar Consultorio",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "accept": "Aceptar",
+    "blockArea": "Bloquear área",
+    "unblockArea": "Desbloquear área",
+    "blockOffice": "Bloquear consultorio",
+    "unblockOffice": "Desbloquear consultorio",
+    "yesBlock": "Sí, bloquear",
+    "yesUnblock": "Sí, desbloquear",
+    "yesDelete": "Sí, eliminar",
+    "yesDeleteArea": "Sí, eliminar área",
+    "yesDeleteOffice": "Sí, eliminar consultorio"
+  },
+
   "areas": {
     "title": "Áreas Médicas",
     "newArea": "Nueva Área",
@@ -32,7 +51,17 @@
     "deletedSuccessfully": "Área eliminada correctamente",
     "createdSuccessfully": "Área creada correctamente",
     "updatedSuccessfully": "Área actualizada correctamente",
-    "noOffices": "No hay consultorios en esta área"
+    "noOffices": "No hay consultorios en esta área",
+    "blocked": "BLOQUEADA",
+    "confirmBlock": "¿Estás seguro de {{action}} el área {{areaName}}?",
+    "blockArea": "Bloquear Área",
+    "unblockArea": "Desbloquear Área",
+    "blockedSuccessfully": "Área bloqueada correctamente",
+    "unblockedSuccessfully": "Área desbloqueada correctamente",
+    "cannotChangeStatus": "No es posible cambiar el estado del área",
+    "cannotDelete": "No es posible eliminar el área",
+    "notFoundError": "El área no fue encontrada",
+    "noPermissionError": "No tienes permisos para eliminar esta área"
   },
   
   "form": {
@@ -51,7 +80,10 @@
     "areaNameRequired": "El nombre del área es requerido",
     "areaNameMaxLength": "El nombre del área no puede exceder los 50 caracteres",
     "officeNumberRequired": "El número del consultorio es requerido",
-    "officeNumberRange": "El número del consultorio debe estar entre 1 y 999 (máximo 3 dígitos)"
+    "officeNumberRange": "El número del consultorio debe estar entre 1 y 999 (máximo 3 dígitos)",
+    "completeRequiredFields": "Por favor complete todos los campos requeridos",
+    "fixLetterError": "Por favor corrige el error en la letra identificadora",
+    "invalidColorFormat": "El formato del color no es válido"
   },
   
   "offices": {
@@ -61,21 +93,56 @@
     "editOffice": "Editar Consultorio",
     "deleteOffice": "Eliminar Consultorio",
     "officeNumber": "Consultorio #{{number}}",
+    "officeLabel": "Consultorio",
     "confirmDelete": "¿Estás seguro de eliminar el consultorio #{{number}}?\n\nEsto eliminará también todos los turnos asociados a este consultorio.",
     "deletedSuccessfully": "Consultorio eliminado correctamente",
     "createdSuccessfully": "Consultorio creado correctamente",
     "updatedSuccessfully": "Consultorio actualizado correctamente",
-    "newOfficeInArea": "Nuevo Consultorio - {{areaName}}"
+    "newOfficeInArea": "Nuevo Consultorio - {{areaName}}",
+    "confirmBlock": "¿Estás seguro de {{action}} el consultorio #{{number}}?",
+    "blockOffice": "Bloquear Consultorio",
+    "unblockOffice": "Desbloquear Consultorio",
+    "blockedSuccessfully": "Consultorio bloqueado correctamente",
+    "unblockedSuccessfully": "Consultorio desbloqueado correctamente",
+    "cannotChangeStatus": "No es posible cambiar el estado del consultorio",
+    "cannotDelete": "No es posible eliminar el consultorio",
+    "notFoundError": "El consultorio no fue encontrado",
+    "noPermissionError": "No tienes permisos para eliminar este consultorio",
+    "noOfficesInArea": "No hay consultorios en esta área"
+  },
+  
+  "modal": {
+    "newArea": "Nueva Área Médica",
+    "editArea": "Editar Área Médica",
+    "newOffice": "Nuevo Consultorio",
+    "editOffice": "Editar Consultorio",
+    "confirmDeletion": "Confirmar Eliminación",
+    "success": "¡Éxito!",
+    "error": "Error",
+    "actionBlock": "bloquear",
+    "actionUnblock": "desbloquear",
+    "actionCannotBeUndone": "Esta acción no se puede deshacer.",
+    "area": "Área"
+  },
+  
+  "search": {
+    "label": "Búsqueda",
+    "placeholder": "Buscar áreas médicas..."
   },
   
   "errors": {
+    "loadingData": "Error cargando datos",
     "savingArea": "Error guardando área",
     "savingOffice": "Error guardando consultorio",
     "deletingArea": "Error eliminando área",
     "deletingOffice": "Error eliminando consultorio",
     "notFound": "no fue encontrado/a",
     "noPermission": "No tienes permisos para realizar esta acción",
-    "unknownError": "Error desconocido"
+    "unknownError": "Error desconocido",
+    "cannotUpdateArea": "No es posible actualizar el área",
+    "cannotCreateArea": "No es posible crear el área",
+    "cannotUpdateOffice": "No es posible actualizar el consultorio",
+    "cannotCreateOffice": "No es posible crear el consultorio"
   },
   
   "customization": {
