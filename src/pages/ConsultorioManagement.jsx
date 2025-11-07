@@ -1034,9 +1034,22 @@ const ConsultorioManagement = () => {
                                 }}>
                                   {t('consultorio:offices.officeLabel')} #{consultorio.i_numero_consultorio}
                                 </span>
-                                <span className={`status-badge ${consultorio.ck_estado === 'ACTIVO' ? 'success' : 'danger'}`}>
-                                  {RECORD_STATUS_LABELS[consultorio.ck_estado] || consultorio.ck_estado}
-                                </span>
+                                {consultorio.ck_estado !== 'ACTIVO' && (
+                                  <span className="status-badge danger" style={{
+                                    background: 'var(--danger-color)',
+                                    color: 'white',
+                                    padding: '2px 8px',
+                                    borderRadius: '4px',
+                                    fontSize: '11px',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}>
+                                    <FaLock style={{ fontSize: '9px' }} />
+                                    {t('consultorio:areas.blocked')}
+                                  </span>
+                                )}
                               </div>
                               <div style={{ display: 'flex', gap: '4px' }}>
                                 <button
