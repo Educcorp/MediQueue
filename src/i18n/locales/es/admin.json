@@ -18,7 +18,6 @@
     "loadError": "Error cargando datos del dashboard",
     "viewDetails": "Ver detalles",
     "recentActivity": "Actividad Reciente",
-    "quickActions": "Acciones Rápidas",
     "turn": "Turno",
     "patient": "Paciente",
     "office": "Consultorio",
@@ -44,6 +43,7 @@
       "thisMonth": "{{percentage}} este mes"
     },
     "quickActions": {
+      "title": "Acciones Rápidas",
       "managePatients": "Gestionar Pacientes",
       "viewAndManage": "Ver y administrar pacientes",
       "scheduleTurns": "Programar Turnos",
@@ -404,7 +404,10 @@
 
   "statistics": {
     "title": "Estadísticas del Sistema",
-    "subtitle": "Análisis y reportes del sistema de turnos",
+    "subtitle": "Análisis y métricas generales del sistema MediQueue",
+    "refresh": "Actualizar",
+    "loading": "Cargando estadísticas...",
+    "errorLoading": "Error cargando estadísticas",
     "overview": "Resumen General",
     "charts": "Gráficos",
     "reports": "Reportes",
@@ -415,6 +418,22 @@
     "export": "Exportar",
     "exportPDF": "Exportar PDF",
     "exportExcel": "Exportar Excel",
+    "totalAppointments": "Total Turnos",
+    "totalPatients": "Total Pacientes",
+    "today": "Hoy",
+    "appointmentsByStatus": "Turnos por Estado",
+    "quickSummary": "Resumen Rápido",
+    "yearAppointments": "Turnos del Año",
+    "monthAppointments": "Turnos del Mes",
+    "dayAppointments": "Turnos del Día",
+    "officesByMedicalArea": "Consultorios por Área Médica",
+    "noAppointmentsData": "Sin datos de turnos",
+    "noAppointmentsInfo": "No hay información de turnos para mostrar",
+    "statuses": {
+      "waiting": "En espera",
+      "attended": "Atendido",
+      "cancelled": "Cancelado"
+    },
     "metrics": {
       "totalTurns": "Total de Turnos",
       "completedTurns": "Turnos Completados",
