@@ -198,7 +198,7 @@ const IconSelector = ({ value, onChange, disabled = false, label }) => {
             onClick={() => handleIconSelect('')}
           >
             <FaTimes size={14} />
-            Limpiar selección
+            {t('consultorio:iconSelector.clearSelection')}
           </button>
           <div className="popup-actions">
             <button
@@ -206,7 +206,7 @@ const IconSelector = ({ value, onChange, disabled = false, label }) => {
               className="cancel-btn"
               onClick={handleClose}
             >
-              Cancelar
+              {t('common:buttons.cancel')}
             </button>
             {currentIcon && (
               <button
@@ -215,7 +215,7 @@ const IconSelector = ({ value, onChange, disabled = false, label }) => {
                 onClick={handleClose}
               >
                 <FaCheck size={14} />
-                Confirmar
+                {t('common:buttons.confirm')}
               </button>
             )}
           </div>
@@ -249,7 +249,7 @@ const IconSelector = ({ value, onChange, disabled = false, label }) => {
 
           <div className="icon-info">
             <span className="icon-name">
-              {currentIcon ? currentIcon.label : 'Sin seleccionar'}
+              {currentIcon ? currentIcon.label : t('consultorio:iconSelector.notSelected')}
             </span>
           </div>
 
