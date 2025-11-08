@@ -117,35 +117,34 @@ const getAreaIcon = (areaName) => {
   const iconMap = {
     'Medicina General': FaUserMd,
     'Pediatría': FaBaby,
+    'Pediatria': FaBaby,      // Sin tilde
     'Ginecólogo': MdPregnantWoman,
+    'Ginecologo': MdPregnantWoman, // Sin tilde
     'Dentista': FaTooth,
     'Neurólogo': FaHeadSideVirus,
     'Neurología': FaHeadSideVirus,
-    'Laboratorio': FaFlask,
-    'Vacunación': FaSyringe,
-    'Enfermería': FaSyringe,
-    'Cardiología': FaHeart,
-    'Dermatología': FaBandAid,
-    'Oftalmología': FaEyeDropper,
-    'Traumatología': FaBone,
-    'Psicología': MdPsychology,
-    'Radiología': FaCamera,
-    // Agregando variaciones comunes de nombres
-    'area': FaHospital,
-    'Area Prueba': FaHospital,
-    'Ginecólogo': MdPregnantWoman,
-    'Enfermeria': FaSyringe,  // Sin tilde
-    'Pediatria': FaBaby,      // Sin tilde
     'Neurologo': FaHeadSideVirus, // Sin tilde
     'Neurologia': FaHeadSideVirus, // Sin tilde
-    'Laboratorio': FaFlask,   // Laboratorio
+    'Laboratorio': FaFlask,
+    'Vacunación': FaSyringe,
     'Vacunacion': FaSyringe, // Sin tilde
+    'Enfermería': FaSyringe,
+    'Enfermeria': FaSyringe,  // Sin tilde
+    'Cardiología': FaHeart,
     'Cardiologia': FaHeart,   // Sin tilde
+    'Dermatología': FaBandAid,
     'Dermatologia': FaBandAid, // Sin tilde
+    'Oftalmología': FaEyeDropper,
     'Oftalmologia': FaEyeDropper, // Sin tilde
+    'Traumatología': FaBone,
     'Traumatologia': FaBone,  // Sin tilde
+    'Psicología': MdPsychology,
     'Psicologia': MdPsychology, // Sin tilde
-    'Radiologia': FaCamera    // Sin tilde
+    'Radiología': FaCamera,
+    'Radiologia': FaCamera,    // Sin tilde
+    // Áreas adicionales
+    'area': FaHospital,
+    'Area Prueba': FaHospital
   };
 
   return iconMap[areaName] || FaHospital;
