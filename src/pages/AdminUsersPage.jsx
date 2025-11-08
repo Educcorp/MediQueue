@@ -35,7 +35,9 @@ import {
   FaCrown,
   FaEyeSlash,
   FaKey,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaCheckCircle,
+  FaExclamationCircle
 } from 'react-icons/fa';
 
 const AdminUsersPage = () => {
@@ -509,9 +511,36 @@ const AdminUsersPage = () => {
                           </div>
                         </td>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
-                            <span style={{ color: 'var(--primary-medical)' }}>{admin.s_email}</span>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <FaEnvelope style={{ color: 'var(--primary-medical)', fontSize: '12px' }} />
+                              <span style={{ color: 'var(--primary-medical)' }}>{admin.s_email}</span>
+                            </div>
+                            {admin.b_email_verified ? (
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '4px',
+                                fontSize: '11px',
+                                color: '#10b981',
+                                fontWeight: '500'
+                              }}>
+                                <FaCheckCircle style={{ fontSize: '10px' }} />
+                                {t('admin:users.emailVerified', 'Email verificado')}
+                              </div>
+                            ) : (
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '4px',
+                                fontSize: '11px',
+                                color: '#f59e0b',
+                                fontWeight: '500'
+                              }}>
+                                <FaExclamationCircle style={{ fontSize: '10px' }} />
+                                {t('admin:users.pendingVerification', 'Pendiente de verificación')}
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td>

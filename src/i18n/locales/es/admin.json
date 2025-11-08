@@ -349,6 +349,8 @@
     "search": "Buscar usuarios...",
     "confirmDelete": "¿Estás seguro de eliminar este usuario?",
     "noPhone": "No registrado",
+    "emailVerified": "Email verificado",
+    "pendingVerification": "Pendiente de verificación",
     "stats": {
       "totalUsers": "Total Usuarios",
       "superAdmins": "Super Administradores",

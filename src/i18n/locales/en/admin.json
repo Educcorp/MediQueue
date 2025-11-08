@@ -349,6 +349,8 @@
     "search": "Search users...",
     "confirmDelete": "Are you sure you want to delete this user?",
     "noPhone": "Not registered",
+    "emailVerified": "Email verified",
+    "pendingVerification": "Pending verification",
     "stats": {
       "totalUsers": "Total Users",
       "superAdmins": "Super Administrators",
