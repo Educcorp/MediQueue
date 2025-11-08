@@ -146,8 +146,57 @@
 }
 
 .language-flag {
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1;
+  font-family: "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  display: inline-block;
+  vertical-align: middle;
+  /* Forzar renderizado de emojis coloridos */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.flag-image {
+  width: 28px;
+  height: 21px;
+  border-radius: 3px;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.language-flags {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 70px;
+  justify-content: flex-start;
+}
+
+.language-flags .language-flag {
+  font-size: 28px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+  font-family: "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  /* Forzar renderizado de emojis coloridos */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.language-option:hover .language-flags .language-flag {
+  transform: scale(1.15);
+}
+
+.language-option:hover .flag-image {
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .language-name {
@@ -278,8 +327,19 @@
     font-size: 13px;
   }
 
-  .language-flag {
-    font-size: 20px;
+  .language-flag,
+  .language-flags .language-flag {
+    font-size: 22px;
+  }
+  
+  .flag-image {
+    width: 24px;
+    height: 18px;
+  }
+  
+  .language-flags {
+    gap: 6px;
+    min-width: 50px;
   }
 }
 
