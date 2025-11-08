@@ -1,0 +1,247 @@
+.email-verification-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.verification-card {
+  background: white;
+  border-radius: 20px;
+  padding: 60px 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading State */
+.verification-card.loading {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 30px;
+  border: 6px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.verification-card.loading h2 {
+  color: #667eea;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.verification-card.loading p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Success State */
+.verification-card.success {
+  border-top: 6px solid #11998e;
+}
+
+.icon-container {
+  margin-bottom: 30px;
+}
+
+.checkmark {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  display: block;
+}
+
+.checkmark-circle {
+  stroke: #11998e;
+  stroke-width: 3;
+  stroke-miterlimit: 10;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  stroke: #11998e;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-miterlimit: 10;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.verification-card.success h1 {
+  color: #11998e;
+  font-size: 32px;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.success-message {
+  color: #333;
+  font-size: 18px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.redirect-message {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 30px;
+  font-style: italic;
+}
+
+/* Error State */
+.verification-card.error {
+  border-top: 6px solid #e74c3c;
+}
+
+.error-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  display: block;
+}
+
+.error-circle {
+  stroke: #e74c3c;
+  stroke-width: 3;
+  stroke-miterlimit: 10;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.error-cross {
+  stroke: #e74c3c;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-miterlimit: 10;
+  stroke-dasharray: 54;
+  stroke-dashoffset: 54;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+.verification-card.error h1 {
+  color: #e74c3c;
+  font-size: 32px;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.error-description {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px 0;
+  color: #856404;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.error-description p {
+  margin: 8px 0;
+}
+
+/* Buttons */
+.action-buttons {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 14px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-secondary {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-secondary:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .verification-card {
+    padding: 40px 25px;
+  }
+
+  .verification-card h1 {
+    font-size: 24px;
+  }
+
+  .success-message,
+  .error-message {
+    font-size: 16px;
+  }
+
+  .checkmark,
+  .error-icon {
+    width: 80px;
+    height: 80px;
+  }
+}
