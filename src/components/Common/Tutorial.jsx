@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import '../../styles/Tutorial.css';
 
@@ -10,6 +11,7 @@ import '../../styles/Tutorial.css';
  * @param {boolean} show - Controla si el tutorial debe mostrarse
  */
 const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
+    const { t } = useTranslation(['tutorial']);
     const [currentStep, setCurrentStep] = useState(0);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
     const [arrowPosition, setArrowPosition] = useState('top');
@@ -172,7 +174,7 @@ const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
                 }}
             >
                 {/* Botón cerrar */}
-                <button className="tutorial-close" onClick={handleSkip} title="Saltar tutorial">
+                <button className="tutorial-close" onClick={handleSkip} title={t('tutorial:common.skipTutorial')}>
                     <FaTimes />
                 </button>
 
@@ -181,7 +183,7 @@ const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
                     <div className="tutorial-header">
                         <h3 className="tutorial-title">{step.title}</h3>
                         <span className="tutorial-step-counter">
-                            {currentStep + 1} / {steps.length}
+                            {t('tutorial:common.stepCounter', { current: currentStep + 1, total: steps.length })}
                         </span>
                     </div>
 
@@ -196,7 +198,7 @@ const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
                             onClick={handlePrevious}
                             disabled={currentStep === 0}
                         >
-                            <FaChevronLeft /> Anterior
+                            <FaChevronLeft /> {t('tutorial:common.previous')}
                         </button>
 
                         <button
@@ -205,11 +207,11 @@ const Tutorial = ({ steps = [], onComplete, onSkip, show = false }) => {
                         >
                             {currentStep < steps.length - 1 ? (
                                 <>
-                                    Siguiente <FaChevronRight />
+                                    {t('tutorial:common.next')} <FaChevronRight />
                                 </>
                             ) : (
                                 <>
-                                    Finalizar <FaChevronRight />
+                                    {t('tutorial:common.finish')} <FaChevronRight />
                                 </>
                             )}
                         </button>

@@ -1,0 +1,220 @@
+{
+  "common": {
+    "skipTutorial": "Skip tutorial",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "stepCounter": "{{current}} / {{total}}"
+  },
+  "turns": {
+    "welcome": {
+      "title": "Welcome to Appointment Management",
+      "content": "This module allows you to manage all patient appointments. Here you can view, filter, edit and update appointment statuses."
+    },
+    "filters": {
+      "title": "Search Filters",
+      "content": "Use these filters to find specific appointments. You can filter by date range, appointment status and area/office."
+    },
+    "dateFilter": {
+      "title": "Filter by Date",
+      "content": "Select a date range to view appointments. Current date is shown by default. Use the reset button to return to today."
+    },
+    "statusFilter": {
+      "title": "Filter by Status",
+      "content": "Filter appointments by their status: Waiting, Attended, Cancelled, etc. Click to see all available options."
+    },
+    "areaFilter": {
+      "title": "Filter by Area or Office",
+      "content": "Filter appointments by specific medical area (such as Pediatrics, Cardiology) or by individual office."
+    },
+    "table": {
+      "title": "Appointments Table",
+      "content": "Here all appointments matching your filters are displayed. Each row contains appointment information, patient data and management options."
+    },
+    "turnInfo": {
+      "title": "Appointment Information",
+      "content": "Each appointment shows the number, patient, date/time, area, office and current status. You can see all details at a glance."
+    },
+    "actions": {
+      "title": "Appointment Actions",
+      "content": "Use these buttons to manage the appointment: update status, edit information or cancel the appointment if necessary."
+    },
+    "statusBadge": {
+      "title": "Visual Status",
+      "content": "Appointment status is shown with distinctive colors: yellow (waiting), green (attended), red (cancelled), etc."
+    },
+    "pagination": {
+      "title": "Page Navigation",
+      "content": "If you have many appointments, use these controls to navigate between pages. Shows 5 appointments per page for better visualization."
+    },
+    "history": {
+      "title": "View History",
+      "content": "Click here to access the complete appointment history, where you can view detailed statistics and reports."
+    },
+    "refresh": {
+      "title": "Refresh Data",
+      "content": "Use this button to reload information and ensure you're viewing the most recent data."
+    }
+  },
+  "patients": {
+    "welcome": {
+      "title": "Welcome to Patient Management",
+      "content": "This module allows you to manage all patient information. Here you can register, edit, search and manage the status of each patient."
+    },
+    "actions": {
+      "title": "Main Actions",
+      "content": "Use these buttons to update the patient list or add a new patient to the system."
+    },
+    "stats": {
+      "title": "Patient Statistics",
+      "content": "Here you can see general statistics: total registered patients, active patients, inactive patients and those with email addresses."
+    },
+    "filters": {
+      "title": "Search and Filters",
+      "content": "Use the search bar to find patients by name, last name, phone or email. You can also filter by status (active/inactive)."
+    },
+    "searchInput": {
+      "title": "Quick Search",
+      "content": "Type in this field to search for patients. The search is performed in real time and filters by name, last name, phone or email."
+    },
+    "statusSelect": {
+      "title": "Filter by Status",
+      "content": "Use this selector to filter patients by their status: all, active only or inactive only."
+    },
+    "table": {
+      "title": "Patient Table",
+      "content": "Here the complete list of patients is shown with all their information: name, phone, date of birth, age, email, status and registration date."
+    },
+    "patientInfo": {
+      "title": "Patient Information",
+      "content": "Each row shows the complete patient data. You can see their name, contact information, automatically calculated age and current status."
+    },
+    "statusBadge": {
+      "title": "Patient Status",
+      "content": "Patient status is indicated with colors: green for active and gray for inactive. This allows you to quickly identify who can receive care."
+    },
+    "patientActions": {
+      "title": "Patient Actions",
+      "content": "Use these buttons to edit patient information or delete their record from the system."
+    }
+  },
+  "consultorios": {
+    "welcome": {
+      "title": "Welcome to Office Management",
+      "content": "This module allows you to manage medical areas and their offices. Here you can create, edit and organize your medical center's structure."
+    },
+    "actions": {
+      "title": "Main Actions",
+      "content": "Use these buttons to create new medical areas, add offices, view the tutorial or update information."
+    },
+    "search": {
+      "title": "Search and Filters",
+      "content": "Search for specific areas or offices by typing in the search field. Results are filtered in real time."
+    },
+    "areasGrid": {
+      "title": "Medical Areas",
+      "content": "Here all medical areas of your center are shown. Each card represents an area with its color, icon and associated offices."
+    },
+    "areaCard": {
+      "title": "Area Card",
+      "content": "Each area shows its name, identifying letter, number of offices and options to edit, delete or activate/deactivate."
+    },
+    "areaHeader": {
+      "title": "Area Header",
+      "content": "The header shows the icon, color and name of the area. The color and icon help quickly identify each specialty."
+    },
+    "consultoriosList": {
+      "title": "Office List",
+      "content": "Here all offices belonging to this area are listed. Each office has its own identification number."
+    },
+    "consultorioItem": {
+      "title": "Individual Office",
+      "content": "Each office shows its number and options to edit, delete or change its active/inactive status."
+    },
+    "areaActions": {
+      "title": "Area Actions",
+      "content": "Use these buttons to edit the area, delete the entire area, or activate/deactivate its availability."
+    },
+    "addConsultorio": {
+      "title": "Add Office",
+      "content": "Click this button to add a new office to this specific area."
+    }
+  },
+  "users": {
+    "welcome": {
+      "title": "Welcome to User Management",
+      "content": "This module allows you to manage all system administrative users. Here you can create, edit and manage super administrators and supervisors."
+    },
+    "actions": {
+      "title": "Main Actions",
+      "content": "Use these buttons to update the user list or add a new administrative user to the system."
+    },
+    "stats": {
+      "title": "User Statistics",
+      "content": "Here you can see general statistics: total administrative users, super administrators and supervisors registered in the system."
+    },
+    "filters": {
+      "title": "User Search",
+      "content": "Use the search bar to find users by username, full name, email or phone. The search is performed in real time."
+    },
+    "searchInput": {
+      "title": "Quick Search",
+      "content": "Type in this field to search for users. The search filters by username, full name, email or phone number."
+    },
+    "table": {
+      "title": "User Table",
+      "content": "Here the complete list of administrative users is shown with all their information: username, name, email, phone, user type and registration date."
+    },
+    "userInfo": {
+      "title": "User Information",
+      "content": "Each row shows the complete data of the administrative user. You can see their username, contact information and assigned role type."
+    },
+    "statusBadge": {
+      "title": "User Type",
+      "content": "User type is indicated with colors and icons: yellow with crown for Super Administrators and green with shield for Supervisors."
+    },
+    "userActions": {
+      "title": "User Actions",
+      "content": "Use these buttons to edit user information or delete their account from the system. You cannot delete your own account."
+    }
+  },
+  "historial": {
+    "welcome": {
+      "title": "Welcome to Appointment History",
+      "content": "This module allows you to query and review the complete appointment history. Here you can filter, search and analyze all appointments registered in the system."
+    },
+    "actions": {
+      "title": "Main Actions",
+      "content": "Use these buttons to return to appointment management or update history information."
+    },
+    "filters": {
+      "title": "Search Filters",
+      "content": "Use these filters to find specific appointments by date, appointment status and area/office. Filters are applied automatically."
+    },
+    "dateRange": {
+      "title": "Filter by Date Range",
+      "content": "Select start and end dates to view appointments within that period. Use the reset button to return to the default range."
+    },
+    "statusFilter": {
+      "title": "Filter by Status",
+      "content": "Filter appointments by their status: All, Waiting, Attended, Cancelled, Not present, etc. Colors help you identify each status."
+    },
+    "areaFilter": {
+      "title": "Filter by Area or Office",
+      "content": "Filter appointments by specific medical area or individual office. You can view all or select a specific one."
+    },
+    "cards": {
+      "title": "Appointment Cards",
+      "content": "Here all appointments are shown in card format. Each card contains complete appointment information: number, patient, date, time, area, office and status."
+    },
+    "cardInfo": {
+      "title": "Appointment Information",
+      "content": "Each card shows the area icon and color, appointment number, patient name, date and time of care, assigned office and current status with its distinctive color."
+    },
+    "pagination": {
+      "title": "Pagination Controls",
+      "content": "Use these controls to navigate between history pages. You can go to the first, previous, next or last page, and see the total available pages."
+    }
+  }
+}
+
