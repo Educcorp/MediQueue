@@ -38,11 +38,6 @@ const EmailVerification = () => {
           error: null
         });
 
-        // Redirigir al login después de 3 segundos
-        setTimeout(() => {
-          navigate('/admin/login');
-        }, 3000);
-
       } catch (error) {
         // Silenciar el log del primer intento, es esperado que falle si el token ya se usó
         const errorMessage = error.response?.data?.message || 'Error al verificar el email';
@@ -59,9 +54,6 @@ const EmailVerification = () => {
               error: null
             });
 
-            setTimeout(() => {
-              navigate('/admin/login');
-            }, 3000);
             return;
           }
         } catch (fbErr) {
@@ -87,11 +79,18 @@ const EmailVerification = () => {
 
   if (verificationState.loading) {
     return (
-      <div className="email-verification-container">
-        <div className="verification-card loading">
-          <div className="spinner"></div>
-          <h2>Verificando tu correo electrónico...</h2>
-          <p>Por favor espera un momento</p>
+      <div className="email-verification-overlay">
+        <div className="medical-float">➕</div>
+        <div className="medical-float">🩺</div>
+        <div className="medical-float">💊</div>
+        <div className="medical-float">❤️</div>
+        <div className="medical-float">➕</div>
+        <div className="email-verification-container">
+          <div className="verification-card loading">
+            <div className="spinner"></div>
+            <h2>Verificando tu correo electrónico...</h2>
+            <p>Por favor espera un momento</p>
+          </div>
         </div>
       </div>
     );
@@ -99,30 +98,43 @@ const EmailVerification = () => {
 
   if (verificationState.success) {
     return (
-      <div className="email-verification-container">
-        <div className="verification-card success">
-          <div className="icon-container">
-            <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-              <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-              <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
+      <div className="email-verification-overlay">
+        <div className="medical-float">➕</div>
+        <div className="medical-float">🩺</div>
+        <div className="medical-float">💊</div>
+        <div className="medical-float">❤️</div>
+        <div className="medical-float">➕</div>
+        <div className="email-verification-container">
+          <div className="verification-card success">
+            <div className="icon-container">
+              <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+            </div>
+            <h1>¡Email Verificado Exitosamente!</h1>
+            <p className="success-message">{verificationState.message}</p>
+            <p className="redirect-message">
+              Tu cuenta ha sido verificada. Ya puedes iniciar sesión.
+            </p>
+            <button className="btn-primary" onClick={handleGoToLogin}>
+              Ir al Inicio de Sesión
+            </button>
           </div>
-          <h1>¡Email Verificado Exitosamente!</h1>
-          <p className="success-message">{verificationState.message}</p>
-          <p className="redirect-message">
-            Serás redirigido al inicio de sesión en unos segundos...
-          </p>
-          <button className="btn-primary" onClick={handleGoToLogin}>
-            Ir al Inicio de Sesión
-          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="email-verification-container">
-      <div className="verification-card error">
+    <div className="email-verification-overlay">
+      <div className="medical-float">➕</div>
+      <div className="medical-float">🩺</div>
+      <div className="medical-float">💊</div>
+      <div className="medical-float">❤️</div>
+      <div className="medical-float">➕</div>
+      <div className="email-verification-container">
+        <div className="verification-card error">
         <div className="icon-container">
           <svg className="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
             <circle className="error-circle" cx="26" cy="26" r="25" fill="none"/>
@@ -150,6 +162,7 @@ const EmailVerification = () => {
           <button className="btn-secondary" onClick={handleGoToLogin}>
             Volver al Inicio de Sesión
           </button>
+        </div>
         </div>
       </div>
     </div>

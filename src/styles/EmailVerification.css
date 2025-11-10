@@ -1,20 +1,128 @@
+/* Email Verification with Login Background */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.email-verification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e3f2f7 0%, #f5f9fa 100%);
+  z-index: 9999;
+  opacity: 1;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+}
+
+.email-verification-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(74, 144, 164, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(74, 144, 164, 0.05) 0%, transparent 50%);
+  animation: backgroundPulse 15s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Animación de iconos médicos flotantes */
+.email-verification-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='30' fill='%234a90a4' opacity='0.1' text-anchor='middle' dominant-baseline='middle'%3E%E2%9E%95%3C/text%3E%3C/svg%3E");
+  background-size: 100px 100px;
+  animation: floatMedicalIcons 60s linear infinite;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+@keyframes floatMedicalIcons {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(-100px) translateX(50px); }
+}
+
 .email-verification-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Elementos decorativos médicos flotantes */
+.medical-float {
+  position: absolute;
+  font-size: 40px;
+  color: rgba(74, 144, 164, 0.15);
+  animation: float 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+}
+
+.medical-float:nth-child(1) {
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.medical-float:nth-child(2) {
+  top: 70%;
+  left: 80%;
+  animation-delay: 2s;
+}
+
+.medical-float:nth-child(3) {
+  top: 30%;
+  left: 85%;
+  animation-delay: 4s;
+}
+
+.medical-float:nth-child(4) {
+  top: 80%;
+  left: 15%;
+  animation-delay: 6s;
+}
+
+.medical-float:nth-child(5) {
+  top: 50%;
+  left: 5%;
+  animation-delay: 8s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translateY(-30px) rotate(10deg);
+    opacity: 0.15;
+  }
 }
 
 .verification-card {
   background: white;
-  border-radius: 20px;
-  padding: 60px 40px;
+  border-radius: 12px;
+  padding: 50px 40px;
   max-width: 500px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.5s ease-out;
 }
 
@@ -31,15 +139,15 @@
 
 /* Loading State */
 .verification-card.loading {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: white;
 }
 
 .spinner {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 30px;
-  border: 6px solid rgba(102, 126, 234, 0.2);
-  border-top-color: #667eea;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 25px;
+  border: 5px solid #e0e0e0;
+  border-top-color: #4a90a4;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -51,41 +159,42 @@
 }
 
 .verification-card.loading h2 {
-  color: #667eea;
+  color: #202124;
   margin-bottom: 10px;
-  font-size: 24px;
+  font-size: 22px;
+  font-weight: 600;
 }
 
 .verification-card.loading p {
-  color: #666;
-  font-size: 16px;
+  color: #5f6368;
+  font-size: 14px;
 }
 
 /* Success State */
 .verification-card.success {
-  border-top: 6px solid #11998e;
+  background: white;
 }
 
 .icon-container {
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .checkmark {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto;
   display: block;
 }
 
 .checkmark-circle {
-  stroke: #11998e;
+  stroke: #4a90a4;
   stroke-width: 3;
   stroke-miterlimit: 10;
   animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
 }
 
 .checkmark-check {
-  stroke: #11998e;
+  stroke: #4a90a4;
   stroke-width: 3;
   stroke-linecap: round;
   stroke-miterlimit: 10;
@@ -101,47 +210,51 @@
 }
 
 .verification-card.success h1 {
-  color: #11998e;
-  font-size: 32px;
+  color: #4a90a4;
+  font-size: 28px;
   margin-bottom: 15px;
   font-weight: 700;
 }
 
 .success-message {
-  color: #333;
-  font-size: 18px;
+  color: #202124;
+  font-size: 16px;
   margin-bottom: 20px;
-  line-height: 1.6;
+  line-height: 1.5;
+  background-color: #e6f4ea;
+  padding: 15px;
+  border-radius: 8px;
+  color: #137333;
 }
 
 .redirect-message {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 30px;
+  color: #5f6368;
+  font-size: 13px;
+  margin-bottom: 25px;
   font-style: italic;
 }
 
 /* Error State */
 .verification-card.error {
-  border-top: 6px solid #e74c3c;
+  background: white;
 }
 
 .error-icon {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto;
   display: block;
 }
 
 .error-circle {
-  stroke: #e74c3c;
+  stroke: #d93025;
   stroke-width: 3;
   stroke-miterlimit: 10;
   animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
 }
 
 .error-cross {
-  stroke: #e74c3c;
+  stroke: #d93025;
   stroke-width: 3;
   stroke-linecap: round;
   stroke-miterlimit: 10;
@@ -151,28 +264,29 @@
 }
 
 .verification-card.error h1 {
-  color: #e74c3c;
-  font-size: 32px;
+  color: #d93025;
+  font-size: 28px;
   margin-bottom: 15px;
   font-weight: 700;
 }
 
 .error-message {
-  color: #e74c3c;
-  font-size: 18px;
+  color: #d93025;
+  font-size: 16px;
   font-weight: 600;
   margin-bottom: 15px;
 }
 
 .error-description {
-  background-color: #fff3cd;
-  border: 1px solid #ffc107;
-  border-radius: 8px;
+  background-color: #fef7e0;
+  border: 1px solid #f9ab00;
+  border-radius: 6px;
   padding: 15px;
   margin: 20px 0;
-  color: #856404;
+  color: #5f6368;
   font-size: 14px;
   line-height: 1.6;
+  text-align: left;
 }
 
 .error-description p {
@@ -181,18 +295,18 @@
 
 /* Buttons */
 .action-buttons {
-  margin-top: 30px;
+  margin-top: 25px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
 .btn-primary,
 .btn-secondary {
-  padding: 14px 30px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -201,33 +315,34 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #4a90a4;
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 8px rgba(74, 144, 164, 0.3);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  background-color: #357a8a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 144, 164, 0.4);
 }
 
 .btn-secondary {
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #4a90a4;
+  border: 2px solid #4a90a4;
 }
 
 .btn-secondary:hover {
-  background: #667eea;
+  background: #4a90a4;
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(74, 144, 164, 0.3);
 }
 
 /* Responsive */
 @media (max-width: 600px) {
   .verification-card {
-    padding: 40px 25px;
+    padding: 35px 20px;
   }
 
   .verification-card h1 {
@@ -236,12 +351,12 @@
 
   .success-message,
   .error-message {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .checkmark,
   .error-icon {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
   }
 }
