@@ -3,6 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/EmailVerification.css';
 
+// URL del backend (usar variable de entorno o fallback)
+const API_URL = import.meta.env.VITE_API_URL || 'https://mediqueue-backend-production.up.railway.app/api';
+
 const EmailVerification = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -39,8 +42,8 @@ const EmailVerification = () => {
         // Marcar como verificado ANTES de hacer la llamada
         hasVerified.current = true;
         
-        // Usar el proxy de Vite configurado en vite.config.js
-        const response = await axios.get(`/api/administradores/verify-email/${token}`);
+        // Usar URL completa del backend
+        const response = await axios.get(`${API_URL}/administradores/verify-email/${token}`);
 
         setVerificationState({
           loading: false,
@@ -66,7 +69,7 @@ const EmailVerification = () => {
 
         // Para otros errores, intentar fallback: consultar el estado del token en el backend
         try {
-          const fallbackResp = await axios.get(`/api/administradores/verify-status/${token}`);
+          const fallbackResp = await axios.get(`${API_URL}/administradores/verify-status/${token}`);
           // Si el fallback indica que está verificado, mostrar éxito
           if (fallbackResp.data?.success) {
             setVerificationState({
@@ -105,7 +108,7 @@ const EmailVerification = () => {
     
     try {
       console.log('🔍 Verificando estado real en BD...');
-      const response = await axios.get(`/api/administradores/verify-status/${token}`);
+      const response = await axios.get(`${API_URL}/administradores/verify-status/${token}`);
       console.log('📊 Estado real:', response.data);
       
       // El backend ahora devuelve un campo "verified" directo
@@ -131,7 +134,7 @@ const EmailVerification = () => {
     try {
       console.log('🔄 Intentando verificación manual con token:', token);
       
-      const response = await axios.get(`/api/administradores/verify-email/${token}`);
+      const response = await axios.get(`${API_URL}/administradores/verify-email/${token}`);
 
       console.log('✅ Verificación manual exitosa:', response.data);
 
