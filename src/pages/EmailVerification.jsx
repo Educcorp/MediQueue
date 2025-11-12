@@ -13,6 +13,7 @@ const EmailVerification = () => {
     message: '',
     error: null
   });
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const token = searchParams.get('token');
 
@@ -96,6 +97,58 @@ const EmailVerification = () => {
 
   const handleGoToLogin = () => {
     navigate('/admin/login');
+  };
+
+  // Función para reintentar la verificación manualmente
+  const handleManualVerification = async () => {
+    if (!token) {
+      return;
+    }
+
+    setIsRetrying(true);
+    
+    try {
+      console.log('🔄 Intentando verificación manual con token:', token);
+      
+      const response = await axios.get(`/api/administradores/verify-email/${token}`);
+
+      console.log('✅ Verificación manual exitosa:', response.data);
+
+      setVerificationState({
+        loading: false,
+        success: true,
+        message: response.data.message || 'Email verificado exitosamente',
+        error: null
+      });
+
+    } catch (error) {
+      const errorStatus = error.response?.status;
+      const errorMessage = error.response?.data?.message || 'Error al verificar el email';
+
+      console.error('❌ Error en verificación manual:', {
+        status: errorStatus,
+        message: errorMessage
+      });
+
+      // Si ya fue verificado (410), mostrar como éxito
+      if (errorStatus === 410) {
+        setVerificationState({
+          loading: false,
+          success: true,
+          message: 'Tu email ya ha sido verificado exitosamente',
+          error: null
+        });
+      } else {
+        setVerificationState({
+          loading: false,
+          success: false,
+          message: errorMessage,
+          error: errorStatus || 'UNKNOWN'
+        });
+      }
+    } finally {
+      setIsRetrying(false);
+    }
   };
 
   if (verificationState.loading) {
@@ -243,8 +296,37 @@ const EmailVerification = () => {
             <p>Los enlaces de verificación expiran después de 24 horas por seguridad.</p>
           </div>
         )}
+
+        {verificationState.error !== 'NO_TOKEN' && verificationState.error !== 'ALREADY_USED' && (
+          <div className="manual-verification-section">
+            <p className="manual-verification-text">
+              <strong>¿El proceso automático falló?</strong>
+            </p>
+            <p className="manual-verification-hint">
+              Puedes intentar verificar manualmente haciendo clic en el botón:
+            </p>
+          </div>
+        )}
         
         <div className="action-buttons">
+          {verificationState.error !== 'NO_TOKEN' && verificationState.error !== 'ALREADY_USED' && (
+            <button 
+              className="btn-primary"
+              onClick={handleManualVerification}
+              disabled={isRetrying}
+            >
+              {isRetrying ? (
+                <>
+                  <span className="btn-spinner"></span>
+                  Verificando...
+                </>
+              ) : (
+                <>
+                  🔄 Verificar Manualmente
+                </>
+              )}
+            </button>
+          )}
           <button className="btn-secondary" onClick={handleGoToLogin}>
             Volver al Inicio de Sesión
           </button>
