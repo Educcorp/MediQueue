@@ -269,34 +269,7 @@ const EmailVerification = () => {
             <p className="redirect-message">
               Tu cuenta ha sido verificada. Ya puedes iniciar sesión.
             </p>
-            
-            {/* Botón de verificación manual por si falla en BD */}
-            {!verificationState.reallyVerified && (
-              <div className="success-verification-check">
-                <p className="verification-warning">
-                  <strong>⚠️ ¿No puedes iniciar sesión?</strong>
-                </p>
-                <p className="verification-hint">
-                  Si el sistema no te permite acceder, intenta verificar manualmente:
-                </p>
-                <button 
-                  className="btn-verify-manual"
-                  onClick={handleManualVerification}
-                  disabled={isRetrying}
-                >
-                  {isRetrying ? (
-                    <>
-                      <span className="btn-spinner"></span>
-                      Verificando en BD...
-                    </>
-                  ) : (
-                    <>
-                      🔄 Forzar Verificación
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
+                       
             
             <button className="btn-primary" onClick={handleGoToLogin}>
               Ir al Inicio de Sesión
