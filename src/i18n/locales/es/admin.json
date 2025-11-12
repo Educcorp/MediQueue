@@ -353,8 +353,7 @@
     "pendingVerification": "Pendiente de verificación",
     "stats": {
       "totalUsers": "Total Usuarios",
-      "superAdmins": "Super Administradores",
-      "supervisors": "Supervisores"
+      "superAdmins": "Super Administradores"
     },
     "table": {
       "username": "Usuario",

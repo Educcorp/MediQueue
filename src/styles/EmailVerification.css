@@ -1,4 +1,4 @@
-/* Email Verification with Login Background */
+/* Email Verification with Medical Pattern Background */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 .email-verification-overlay {
@@ -7,13 +7,14 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #e3f2f7 0%, #f5f9fa 100%);
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 50%, #e3f2f7 100%);
   z-index: 9999;
   opacity: 1;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
 }
 
+/* Capa de brillo sutil */
 .email-verification-overlay::before {
   content: '';
   position: absolute;
@@ -21,36 +22,17 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(74, 144, 164, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 90% 80%, rgba(74, 144, 164, 0.05) 0%, transparent 50%);
-  animation: backgroundPulse 15s ease-in-out infinite;
-}
-
-@keyframes backgroundPulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-/* Animación de iconos médicos flotantes */
-.email-verification-overlay::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='30' fill='%234a90a4' opacity='0.1' text-anchor='middle' dominant-baseline='middle'%3E%E2%9E%95%3C/text%3E%3C/svg%3E");
-  background-size: 100px 100px;
-  animation: floatMedicalIcons 60s linear infinite;
-  opacity: 0.3;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(74, 144, 164, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(102, 179, 204, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(74, 144, 164, 0.05) 0%, transparent 50%);
+  animation: shimmer 20s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes floatMedicalIcons {
-  0% { transform: translateY(0) translateX(0); }
-  100% { transform: translateY(-100px) translateX(50px); }
+@keyframes shimmer {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 .email-verification-container {
@@ -66,52 +48,476 @@
 /* Elementos decorativos médicos flotantes */
 .medical-float {
   position: absolute;
-  font-size: 40px;
-  color: rgba(74, 144, 164, 0.15);
-  animation: float 20s ease-in-out infinite;
+  font-size: 55px;
+  color: rgba(74, 144, 164, 0.25);
+  animation: float 25s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
   will-change: transform, opacity;
+  text-shadow: 0 3px 8px rgba(74, 144, 164, 0.2);
+  filter: drop-shadow(0 2px 4px rgba(74, 144, 164, 0.15));
 }
 
 .medical-float:nth-child(1) {
-  top: 10%;
-  left: 10%;
-  animation-delay: 0s;
+  top: 8%;
+  left: 12%;
+  animation: floatRotate1 18s ease-in-out infinite;
+  font-size: 60px;
 }
 
 .medical-float:nth-child(2) {
-  top: 70%;
-  left: 80%;
-  animation-delay: 2s;
+  top: 65%;
+  left: 85%;
+  animation: floatRotate2 22s ease-in-out infinite;
+  font-size: 52px;
+  color: rgba(102, 179, 204, 0.28);
 }
 
 .medical-float:nth-child(3) {
-  top: 30%;
-  left: 85%;
-  animation-delay: 4s;
+  top: 25%;
+  left: 88%;
+  animation: floatRotate3 16s ease-in-out infinite;
+  font-size: 48px;
 }
 
 .medical-float:nth-child(4) {
-  top: 80%;
-  left: 15%;
-  animation-delay: 6s;
+  top: 75%;
+  left: 8%;
+  animation: floatRotate4 20s ease-in-out infinite;
+  font-size: 58px;
+  color: rgba(74, 144, 164, 0.3);
 }
 
 .medical-float:nth-child(5) {
-  top: 50%;
-  left: 5%;
-  animation-delay: 8s;
+  top: 45%;
+  left: 3%;
+  animation: floatRotate5 19s ease-in-out infinite;
+  font-size: 50px;
+  color: rgba(102, 179, 204, 0.22);
 }
 
-@keyframes float {
+.medical-float:nth-child(6) {
+  top: 15%;
+  left: 50%;
+  animation: floatRotate6 21s ease-in-out infinite;
+  font-size: 56px;
+  color: rgba(74, 144, 164, 0.27);
+}
+
+.medical-float:nth-child(7) {
+  top: 55%;
+  left: 50%;
+  animation: floatRotate7 17s ease-in-out infinite;
+  font-size: 48px;
+  color: rgba(102, 179, 204, 0.25);
+}
+
+.medical-float:nth-child(8) {
+  top: 35%;
+  left: 15%;
+  animation: floatRotate8 23s ease-in-out infinite;
+  font-size: 54px;
+  color: rgba(74, 144, 164, 0.24);
+}
+
+.medical-float:nth-child(9) {
+  top: 82%;
+  left: 50%;
+  animation: floatRotate9 19s ease-in-out infinite;
+  font-size: 50px;
+  color: rgba(102, 179, 204, 0.26);
+}
+
+.medical-float:nth-child(10) {
+  top: 60%;
+  left: 25%;
+  animation: floatRotate10 20s ease-in-out infinite;
+  font-size: 52px;
+  color: rgba(74, 144, 164, 0.23);
+}
+
+.medical-float:nth-child(11) {
+  top: 5%;
+  left: 70%;
+  animation: floatRotate11 24s ease-in-out infinite;
+  font-size: 58px;
+  color: rgba(102, 179, 204, 0.29);
+}
+
+.medical-float:nth-child(12) {
+  top: 90%;
+  left: 70%;
+  animation: floatRotate12 18s ease-in-out infinite;
+  font-size: 46px;
+  color: rgba(74, 144, 164, 0.26);
+}
+
+.medical-float:nth-child(13) {
+  top: 20%;
+  left: 35%;
+  animation: floatRotate13 22s ease-in-out infinite;
+  font-size: 54px;
+  color: rgba(102, 179, 204, 0.24);
+}
+
+.medical-float:nth-child(14) {
+  top: 48%;
+  left: 70%;
+  animation: floatRotate14 19s ease-in-out infinite;
+  font-size: 50px;
+  color: rgba(74, 144, 164, 0.28);
+}
+
+.medical-float:nth-child(15) {
+  top: 70%;
+  left: 45%;
+  animation: floatRotate15 21s ease-in-out infinite;
+  font-size: 52px;
+  color: rgba(102, 179, 204, 0.25);
+}
+
+.medical-float:nth-child(16) {
+  top: 12%;
+  left: 92%;
+  animation: floatRotate16 17s ease-in-out infinite;
+  font-size: 48px;
+  color: rgba(74, 144, 164, 0.27);
+}
+
+.medical-float:nth-child(17) {
+  top: 85%;
+  left: 92%;
+  animation: floatRotate17 23s ease-in-out infinite;
+  font-size: 56px;
+  color: rgba(102, 179, 204, 0.23);
+}
+
+.medical-float:nth-child(18) {
+  top: 38%;
+  left: 40%;
+  animation: floatRotate18 20s ease-in-out infinite;
+  font-size: 50px;
+  color: rgba(74, 144, 164, 0.26);
+}
+
+.medical-float:nth-child(19) {
+  top: 92%;
+  left: 35%;
+  animation: floatRotate19 18s ease-in-out infinite;
+  font-size: 54px;
+  color: rgba(102, 179, 204, 0.28);
+}
+
+.medical-float:nth-child(20) {
+  top: 28%;
+  left: 62%;
+  animation: floatRotate20 22s ease-in-out infinite;
+  font-size: 52px;
+  color: rgba(74, 144, 164, 0.25);
+}
+
+/* Animaciones variadas para cada icono - MÁS MOVIMIENTO */
+@keyframes floatRotate1 {
   0%, 100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.1;
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.25;
+  }
+  25% {
+    transform: translateY(-50px) translateX(30px) rotate(15deg) scale(1.2);
+    opacity: 0.4;
   }
   50% {
-    transform: translateY(-30px) rotate(10deg);
-    opacity: 0.15;
+    transform: translateY(-80px) translateX(50px) rotate(25deg) scale(1.15);
+    opacity: 0.35;
+  }
+  75% {
+    transform: translateY(-50px) translateX(30px) rotate(15deg) scale(1.2);
+    opacity: 0.4;
+  }
+}
+
+@keyframes floatRotate2 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.28;
+  }
+  33% {
+    transform: translateY(-65px) translateX(-40px) rotate(-20deg) scale(1.25);
+    opacity: 0.45;
+  }
+  66% {
+    transform: translateY(-40px) translateX(-25px) rotate(-12deg) scale(1.18);
+    opacity: 0.38;
+  }
+}
+
+@keyframes floatRotate3 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.22;
+  }
+  40% {
+    transform: translateY(-55px) translateX(-35px) rotate(-18deg) scale(1.22);
+    opacity: 0.42;
+  }
+  80% {
+    transform: translateY(-30px) translateX(-20px) rotate(-10deg) scale(1.12);
+    opacity: 0.32;
+  }
+}
+
+@keyframes floatRotate4 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.3;
+  }
+  30% {
+    transform: translateY(-60px) translateX(45px) rotate(22deg) scale(1.2);
+    opacity: 0.48;
+  }
+  60% {
+    transform: translateY(-90px) translateX(65px) rotate(35deg) scale(1.28);
+    opacity: 0.42;
+  }
+}
+
+@keyframes floatRotate5 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.22;
+  }
+  35% {
+    transform: translateY(-70px) translateX(40px) rotate(25deg) scale(1.18);
+    opacity: 0.4;
+  }
+  70% {
+    transform: translateY(-45px) translateX(28px) rotate(15deg) scale(1.15);
+    opacity: 0.35;
+  }
+}
+
+@keyframes floatRotate6 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.27;
+  }
+  30% {
+    transform: translateY(-55px) translateX(-30px) rotate(-18deg) scale(1.16);
+    opacity: 0.43;
+  }
+  65% {
+    transform: translateY(-75px) translateX(-45px) rotate(-28deg) scale(1.22);
+    opacity: 0.38;
+  }
+}
+
+@keyframes floatRotate7 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.25;
+  }
+  40% {
+    transform: translateY(-48px) translateX(35px) rotate(20deg) scale(1.14);
+    opacity: 0.41;
+  }
+  75% {
+    transform: translateY(-32px) translateX(22px) rotate(12deg) scale(1.1);
+    opacity: 0.34;
+  }
+}
+
+@keyframes floatRotate8 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.24;
+  }
+  33% {
+    transform: translateY(-62px) translateX(38px) rotate(22deg) scale(1.19);
+    opacity: 0.44;
+  }
+  66% {
+    transform: translateY(-85px) translateX(52px) rotate(32deg) scale(1.24);
+    opacity: 0.39;
+  }
+}
+
+@keyframes floatRotate9 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.26;
+  }
+  38% {
+    transform: translateY(-58px) translateX(-42px) rotate(-24deg) scale(1.17);
+    opacity: 0.42;
+  }
+  72% {
+    transform: translateY(-38px) translateX(-28px) rotate(-14deg) scale(1.12);
+    opacity: 0.36;
+  }
+}
+
+@keyframes floatRotate10 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.23;
+  }
+  36% {
+    transform: translateY(-52px) translateX(36px) rotate(19deg) scale(1.15);
+    opacity: 0.39;
+  }
+  68% {
+    transform: translateY(-68px) translateX(48px) rotate(28deg) scale(1.2);
+    opacity: 0.35;
+  }
+}
+
+@keyframes floatRotate11 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.29;
+  }
+  32% {
+    transform: translateY(-64px) translateX(-38px) rotate(-21deg) scale(1.21);
+    opacity: 0.46;
+  }
+  64% {
+    transform: translateY(-42px) translateX(-26px) rotate(-13deg) scale(1.14);
+    opacity: 0.38;
+  }
+}
+
+@keyframes floatRotate12 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.26;
+  }
+  45% {
+    transform: translateY(-56px) translateX(42px) rotate(23deg) scale(1.17);
+    opacity: 0.41;
+  }
+  78% {
+    transform: translateY(-35px) translateX(28px) rotate(14deg) scale(1.11);
+    opacity: 0.34;
+  }
+}
+
+@keyframes floatRotate13 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.24;
+  }
+  38% {
+    transform: translateY(-72px) translateX(44px) rotate(26deg) scale(1.19);
+    opacity: 0.43;
+  }
+  72% {
+    transform: translateY(-48px) translateX(32px) rotate(16deg) scale(1.13);
+    opacity: 0.36;
+  }
+}
+
+@keyframes floatRotate14 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.28;
+  }
+  34% {
+    transform: translateY(-60px) translateX(-40px) rotate(-22deg) scale(1.18);
+    opacity: 0.45;
+  }
+  68% {
+    transform: translateY(-78px) translateX(-54px) rotate(-30deg) scale(1.23);
+    opacity: 0.4;
+  }
+}
+
+@keyframes floatRotate15 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.25;
+  }
+  40% {
+    transform: translateY(-50px) translateX(36px) rotate(20deg) scale(1.16);
+    opacity: 0.42;
+  }
+  74% {
+    transform: translateY(-66px) translateX(46px) rotate(27deg) scale(1.2);
+    opacity: 0.37;
+  }
+}
+
+@keyframes floatRotate16 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.27;
+  }
+  36% {
+    transform: translateY(-54px) translateX(-34px) rotate(-19deg) scale(1.15);
+    opacity: 0.44;
+  }
+  70% {
+    transform: translateY(-70px) translateX(-48px) rotate(-29deg) scale(1.22);
+    opacity: 0.39;
+  }
+}
+
+@keyframes floatRotate17 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.23;
+  }
+  42% {
+    transform: translateY(-62px) translateX(40px) rotate(24deg) scale(1.2);
+    opacity: 0.4;
+  }
+  76% {
+    transform: translateY(-44px) translateX(30px) rotate(15deg) scale(1.14);
+    opacity: 0.33;
+  }
+}
+
+@keyframes floatRotate18 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.26;
+  }
+  35% {
+    transform: translateY(-58px) translateX(-36px) rotate(-20deg) scale(1.17);
+    opacity: 0.43;
+  }
+  69% {
+    transform: translateY(-74px) translateX(-50px) rotate(-28deg) scale(1.21);
+    opacity: 0.38;
+  }
+}
+
+@keyframes floatRotate19 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.28;
+  }
+  44% {
+    transform: translateY(-68px) translateX(46px) rotate(25deg) scale(1.18);
+    opacity: 0.46;
+  }
+  77% {
+    transform: translateY(-46px) translateX(34px) rotate(17deg) scale(1.12);
+    opacity: 0.39;
+  }
+}
+
+@keyframes floatRotate20 {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.25;
+  }
+  37% {
+    transform: translateY(-52px) translateX(-38px) rotate(-21deg) scale(1.16);
+    opacity: 0.41;
+  }
+  71% {
+    transform: translateY(-64px) translateX(-44px) rotate(-26deg) scale(1.19);
+    opacity: 0.35;
   }
 }
 
@@ -124,6 +530,54 @@
   text-align: center;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.5s ease-out;
+}
+
+/* Logo de MediQueue en header */
+.verification-header {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  z-index: 10;
+  animation: logoSlideIn 0.6s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.verification-logo {
+  height: 45px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.verification-brand {
+  font-size: 24px;
+  font-weight: 600;
+  color: #4a90a4;
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 20px rgba(255, 255, 255, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+
+@keyframes logoSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Eliminar estilos antiguos del logo-container */
+.logo-container {
+  display: none;
 }
 
 @keyframes slideUp {
@@ -271,10 +725,14 @@
 }
 
 .error-message {
-  color: #d93025;
+  color: white;
+  background-color: #d93025;
+  padding: 15px 20px;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 15px;
+  line-height: 1.5;
 }
 
 .error-description {

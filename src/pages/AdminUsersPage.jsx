@@ -52,14 +52,16 @@ const AdminUsersPage = () => {
   const [editingAdmin, setEditingAdmin] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [formData, setFormData] = useState({
     s_nombre: '',
     s_apellido: '',
     s_email: '',
     s_usuario: '',
     s_password: '',
+    s_password_confirm: '',
     c_telefono: '',
-    tipo_usuario: 2
+    tipo_usuario: 1
   });
 
   // Tutorial hook
@@ -99,8 +101,9 @@ const AdminUsersPage = () => {
       s_email: '',
       s_usuario: '',
       s_password: '',
+      s_password_confirm: '',
       c_telefono: '',
-      tipo_usuario: 2
+      tipo_usuario: 1
     });
     setShowModal(true);
   };
@@ -113,6 +116,7 @@ const AdminUsersPage = () => {
       s_email: admin.s_email,
       s_usuario: admin.s_usuario,
       s_password: '',
+      s_password_confirm: '',
       c_telefono: admin.c_telefono || '',
       tipo_usuario: admin.tipo_usuario
     });
@@ -154,9 +158,18 @@ const AdminUsersPage = () => {
       return;
     }
 
-    if (passwordProvided && !passwordRegex.test(formData.s_password)) {
-      alert(t('admin:users.messages.passwordFormat', 'La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número'));
-      return;
+    if (passwordProvided) {
+      // Validar que las contraseñas coincidan
+      if (formData.s_password !== formData.s_password_confirm) {
+        alert(t('admin:users.messages.passwordMismatch', 'Las contraseñas no coinciden'));
+        return;
+      }
+
+      // Validar formato de contraseña
+      if (!passwordRegex.test(formData.s_password)) {
+        alert(t('admin:users.messages.passwordFormat', 'La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número'));
+        return;
+      }
     }
 
     try {
@@ -178,6 +191,8 @@ const AdminUsersPage = () => {
         adminData.s_password = formData.s_password;
       }
 
+      console.log('Datos a enviar:', adminData);
+
       if (editingAdmin) {
         await adminService.updateAdmin(editingAdmin.uk_administrador, adminData);
         alert(t('admin:users.messages.updateSuccess'));
@@ -194,8 +209,9 @@ const AdminUsersPage = () => {
         s_email: '',
         s_usuario: '',
         s_password: '',
+        s_password_confirm: '',
         c_telefono: '',
-        tipo_usuario: 2
+        tipo_usuario: 1
       });
     } catch (error) {
       let errorMessage = 'Error guardando administrador';
@@ -240,8 +256,7 @@ const AdminUsersPage = () => {
 
   // Calcular estadísticas
   const totalAdmins = admins.length;
-  const superAdmins = admins.filter(a => a.tipo_usuario === 1).length;
-  const supervisors = admins.filter(a => a.tipo_usuario === 2).length;
+  const activeAdmins = admins.filter(a => a.email_verified).length;
 
   if (loading) {
     return (
@@ -353,59 +368,7 @@ const AdminUsersPage = () => {
                 </p>
               </div>
             </div>
-          </div>
-
-          <div className="content-card">
-            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: 'var(--border-radius-sm)',
-                background: 'linear-gradient(135deg, var(--warning-color), #fd7e14)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '20px'
-              }}>
-                <FaCrown />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                  {superAdmins}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  {t('admin:users.stats.superAdmins', 'Super Administradores')}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="content-card">
-            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: 'var(--border-radius-sm)',
-                background: 'linear-gradient(135deg, var(--success-color), #20c997)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '20px'
-              }}>
-                <FaUserShield />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
-                  {supervisors}
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  {t('admin:users.stats.supervisors', 'Supervisores')}
-                </p>
-              </div>
-            </div>
-          </div>
+          </div>                  
         </div>
 
         {/* Search Section */}
@@ -554,18 +517,11 @@ const AdminUsersPage = () => {
                           )}
                         </td>
                         <td>
-                          <span className={`status-badge ${admin.tipo_usuario === 1 ? 'warning' : 'success'}`}>
-                            {admin.tipo_usuario === 1 ? (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <FaCrown style={{ fontSize: '10px' }} />
-                                {t('common:roles.admin')}
-                              </div>
-                            ) : (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <FaUserShield style={{ fontSize: '10px' }} />
-                                {t('common:roles.supervisor')}
-                              </div>
-                            )}
+                          <span className="status-badge warning">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <FaUserShield style={{ fontSize: '10px' }} />
+                              {t('common:roles.admin')}
+                            </div>
                           </span>
                         </td>
                         <td>
@@ -701,7 +657,20 @@ const AdminUsersPage = () => {
                     className="form-control"
                     required
                     maxLength={100}
+                    readOnly={editingAdmin !== null}
+                    disabled={editingAdmin !== null}
+                    style={editingAdmin !== null ? { 
+                      backgroundColor: '#f5f5f5', 
+                      cursor: 'not-allowed',
+                      color: '#666'
+                    } : {}}
+                    title={editingAdmin !== null ? 'El email no puede modificarse una vez creado el usuario' : ''}
                   />
+                  {editingAdmin !== null && (
+                    <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                      ℹ️ El email no puede modificarse para mantener la verificación
+                    </small>
+                  )}
                 </div>
                 <div className="form-group">
                   <label>{t('admin:users.form.phone', 'Teléfono')}</label>
@@ -740,45 +709,103 @@ const AdminUsersPage = () => {
                     className="form-control"
                     required
                   >
-                    <option value={2}>{t('common:roles.supervisor')}</option>
-                    <option value={1}>{t('common:roles.admin')}</option>
+                    <option value="1">{t('common:roles.admin', 'Administrador')}</option>
                   </select>
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>
-                  {editingAdmin ? t('admin:users.form.newPasswordOptional', 'Nueva Contraseña (opcional)') : t('admin:users.form.password') + ' *'}
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="s_password"
-                    value={formData.s_password}
-                    onChange={handleInputChange}
-                    placeholder={editingAdmin ? t('admin:users.form.passwordEmptyToKeep', 'Dejar vacío para no cambiar') : t('admin:users.form.passwordPlaceholder')}
-                    className="form-control"
-                    style={{ paddingRight: '40px' }}
-                    required={!editingAdmin}
-                    minLength={6}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: 'var(--text-muted)'
-                    }}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
+              <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-group">
+                  <label>
+                    {editingAdmin ? t('admin:users.form.newPasswordOptional', 'Nueva Contraseña (opcional)') : t('admin:users.form.password') + ' *'}
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="s_password"
+                      value={formData.s_password}
+                      onChange={handleInputChange}
+                      placeholder={editingAdmin ? t('admin:users.form.passwordEmptyToKeep', 'Dejar vacío para no cambiar') : t('admin:users.form.passwordPlaceholder')}
+                      className="form-control"
+                      style={{ paddingRight: '40px' }}
+                      required={!editingAdmin}
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '8px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--text-muted)',
+                        padding: '4px 8px',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
                 </div>
+
+                {/* Campo de Confirmación de Contraseña - Solo aparece si hay contraseña escrita */}
+                {formData.s_password && formData.s_password.length > 0 && (
+                  <div className="form-group">
+                    <label>
+                      {t('admin:users.form.confirmPassword', 'Confirmar Contraseña')} *
+                    </label>
+                    <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                      <input
+                        type={showPasswordConfirm ? 'text' : 'password'}
+                        name="s_password_confirm"
+                        value={formData.s_password_confirm}
+                        onChange={handleInputChange}
+                        placeholder={t('admin:users.form.confirmPassword', 'Confirmar Contraseña')}
+                        className="form-control"
+                        style={{ 
+                          paddingRight: '40px',
+                          borderColor: formData.s_password_confirm && formData.s_password !== formData.s_password_confirm ? '#d93025' : ''
+                        }}
+                        required
+                        minLength={6}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: 'var(--text-muted)',
+                          padding: '4px 8px',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                      >
+                        {showPasswordConfirm ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                    {formData.s_password_confirm && formData.s_password !== formData.s_password_confirm && (
+                      <small style={{ color: '#d93025', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                         Las contraseñas no coinciden
+                      </small>
+                    )}
+                    {formData.s_password_confirm && formData.s_password === formData.s_password_confirm && (
+                      <small style={{ color: '#137333', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                         Las contraseñas coinciden
+                      </small>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
