@@ -99,6 +99,27 @@ const EmailVerification = () => {
     navigate('/admin/login');
   };
 
+  // Función para verificar el estado REAL en la base de datos
+  const checkVerificationStatus = async () => {
+    if (!token) return null;
+    
+    try {
+      console.log('🔍 Verificando estado real en BD...');
+      const response = await axios.get(`/api/administradores/verify-status/${token}`);
+      console.log('📊 Estado real:', response.data);
+      
+      // El backend ahora devuelve un campo "verified" directo
+      if (response.data?.verified === true) {
+        return { verified: true, admin: response.data.data };
+      }
+      
+      return { verified: false };
+    } catch (error) {
+      console.error('❌ Error al verificar estado:', error);
+      return { verified: false };
+    }
+  };
+
   // Función para reintentar la verificación manualmente
   const handleManualVerification = async () => {
     if (!token) {
@@ -114,12 +135,27 @@ const EmailVerification = () => {
 
       console.log('✅ Verificación manual exitosa:', response.data);
 
-      setVerificationState({
-        loading: false,
-        success: true,
-        message: response.data.message || 'Email verificado exitosamente',
-        error: null
-      });
+      // Verificar que REALMENTE se actualizó en la BD
+      await new Promise(resolve => setTimeout(resolve, 500)); // Esperar medio segundo
+      const status = await checkVerificationStatus();
+      
+      if (status?.verified) {
+        setVerificationState({
+          loading: false,
+          success: true,
+          message: response.data.message || 'Email verificado exitosamente',
+          error: null,
+          reallyVerified: true
+        });
+      } else {
+        console.error('⚠️ Backend reportó éxito pero BD no está actualizada');
+        setVerificationState({
+          loading: false,
+          success: false,
+          message: 'Error: La verificación no se completó en la base de datos. Por favor contacta al administrador.',
+          error: 'DB_NOT_UPDATED'
+        });
+      }
 
     } catch (error) {
       const errorStatus = error.response?.status;
@@ -136,7 +172,8 @@ const EmailVerification = () => {
           loading: false,
           success: true,
           message: 'Tu email ya ha sido verificado exitosamente',
-          error: null
+          error: null,
+          reallyVerified: true
         });
       } else {
         setVerificationState({
@@ -229,6 +266,35 @@ const EmailVerification = () => {
             <p className="redirect-message">
               Tu cuenta ha sido verificada. Ya puedes iniciar sesión.
             </p>
+            
+            {/* Botón de verificación manual por si falla en BD */}
+            {!verificationState.reallyVerified && (
+              <div className="success-verification-check">
+                <p className="verification-warning">
+                  <strong>⚠️ ¿No puedes iniciar sesión?</strong>
+                </p>
+                <p className="verification-hint">
+                  Si el sistema no te permite acceder, intenta verificar manualmente:
+                </p>
+                <button 
+                  className="btn-verify-manual"
+                  onClick={handleManualVerification}
+                  disabled={isRetrying}
+                >
+                  {isRetrying ? (
+                    <>
+                      <span className="btn-spinner"></span>
+                      Verificando en BD...
+                    </>
+                  ) : (
+                    <>
+                      🔄 Forzar Verificación
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+            
             <button className="btn-primary" onClick={handleGoToLogin}>
               Ir al Inicio de Sesión
             </button>
