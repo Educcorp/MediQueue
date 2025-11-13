@@ -99,29 +99,49 @@ const ModernAdminDashboard = () => {
                 patientsData,
                 consultoriosData,
                 areasData,
-                todayTurns,
-                activeTurns,
-                recentTurnsData
+                todayTurns
             ] = await Promise.all([
                 turnService.getTurnStatistics().catch(() => null),
                 patientService.getAllPatients().catch(() => []),
                 consultorioService.getAll().catch(() => []),
                 areaService.getAll().catch(() => []),
-                turnService.getTurnsByDate(new Date().toISOString().split('T')[0]).catch(() => []),
-                turnService.getActiveTurns().catch(() => []),
-                turnService.getRecentTurns?.() || Promise.resolve([])
+                // Usar getAllTurns sin filtros para obtener turnos de hoy (por defecto del backend)
+                turnService.getAllTurns().catch(() => [])
             ]);
+
+            // Debug: Ver estructura de turnos
+            console.log('📊 Total turnos de hoy:', todayTurns.length);
+            if (todayTurns.length > 0) {
+                console.log('📋 Primer turno estructura:', todayTurns[0]);
+                console.log('📋 Estados disponibles:', todayTurns.map(t => t.s_estado));
+            }
+
+            // Filtrar turnos activos de hoy (EN_ESPERA o LLAMANDO)
+            let activeTurns = todayTurns.filter(turn => 
+                turn.s_estado === 'EN_ESPERA' || turn.s_estado === 'LLAMANDO'
+            );
+
+            console.log('🎯 Turnos activos filtrados:', activeTurns.length);
+
+            // Si no hay turnos activos, mostrar todos los turnos del día
+            if (activeTurns.length === 0) {
+                console.log('⚠️ No hay turnos activos, mostrando todos los turnos de hoy');
+                activeTurns = todayTurns;
+            }
 
             setStats({
                 totalTurns: turnsStats?.total_turnos || 0,
-                activeTurns: activeTurns.length,
+                activeTurns: todayTurns.filter(t => t.s_estado === 'EN_ESPERA' || t.s_estado === 'LLAMANDO').length,
                 totalPatients: patientsData.length,
                 totalConsultorios: consultoriosData.length,
                 todayTurns: todayTurns.length,
                 completedTurns: turnsStats?.completados || 0
             });
 
-            setRecentTurns(recentTurnsData.slice(0, 8));
+            // Usar los turnos para la sección de actividad reciente
+            // Los turnos ya incluyen información del área y consultorio con colores
+            console.log('🎨 Turnos para actividad reciente:', activeTurns.slice(0, 2));
+            setRecentTurns(activeTurns.slice(0, 8));
 
         } catch (error) {
             console.error('Error loading dashboard data:', error);
@@ -251,20 +271,31 @@ const ModernAdminDashboard = () => {
                             <div className="activity-list">
                                 {recentTurns.length > 0 ? recentTurns.map((turn, index) => (
                                     <div key={index} className="activity-item">
-                                        <div className="activity-icon">
-                                            <FaUserCheck />
+                                        <div className="activity-icon" style={{ 
+                                            backgroundColor: turn.s_color || '#667eea',
+                                            color: 'white',
+                                            background: turn.s_color ? turn.s_color : 'linear-gradient(135deg, #667eea, #764ba2)'
+                                        }}>
+                                            {turn.s_letra || turn.i_numero_turno}
                                         </div>
                                         <div className="activity-content">
                                             <p className="activity-title">
-                                                {t('admin:dashboard.turn')} #{turn.id || (index + 1)} - {turn.paciente || t('admin:dashboard.patient')}
+                                                {t('admin:dashboard.turn')} #{turn.i_numero_turno || turn.id || (index + 1)}
+                                                {turn.s_nombre_paciente && ` - ${turn.s_nombre_paciente} ${turn.s_apellido_paciente || ''}`}
                                             </p>
                                             <p className="activity-subtitle">
-                                                {turn.consultorio || t('admin:dashboard.office')} • {turn.fecha || t('common:time.today')}
+                                                <FaHospital style={{ marginRight: '5px' }} />
+                                                {turn.s_nombre_area || turn.area || t('admin:dashboard.office')} 
+                                                {' • '}
+                                                {t('admin:dashboard.office')} {turn.i_numero_consultorio || turn.consultorio}
                                             </p>
                                         </div>
                                         <div className="activity-status">
-                                            <span className={`status-badge ${turn.estado || 'pending'}`}>
-                                                {turn.estado === 'completado' ? t('common:status.completed') : t('common:status.pending')}
+                                            <span className={`status-badge ${turn.s_estado?.toLowerCase() || turn.estado || 'pending'}`}>
+                                                {turn.s_estado === 'EN_ESPERA' ? t('common:status.waiting') : 
+                                                 turn.s_estado === 'LLAMANDO' ? t('common:status.calling') :
+                                                 turn.s_estado === 'ATENDIDO' ? t('common:status.completed') : 
+                                                 turn.estado || t('common:status.pending')}
                                             </span>
                                         </div>
                                     </div>

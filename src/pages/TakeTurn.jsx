@@ -35,6 +35,7 @@ const TakeTurn = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isCooldownError, setIsCooldownError] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
   const [areas, setAreas] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -44,15 +45,15 @@ const TakeTurn = () => {
   // Función mejorada para obtener iconos desde la base de datos
   const getAreaIcon = (areaName, areaData = null) => {
     console.log('getAreaIcon llamada con:', { areaName, areaData });
-    
+
     // Si tenemos datos del área desde la BD, usar esos primero
     if (areaData && areaData.s_icono && areaData.s_color) {
       const iconName = areaData.s_icono;
       const color = areaData.s_color;
       const letter = areaData.s_letra || (areaData.s_nombre_area || areaName)?.charAt(0) || 'A';
-      
+
       console.log('Usando datos de BD:', { iconName, color, letter });
-      
+
       // Mapear iconos de la BD a React Icons (nombres más comunes en Material Design)
       const iconMapping = {
         // React Icons FontAwesome directos (nombres exactos de la BD)
@@ -70,7 +71,7 @@ const TakeTurn = () => {
         'FaMale': FaMale,
         'FaProcedures': FaProcedures,
         'FaHospital': FaHospital,
-        
+
         // Material Design Icons (sin prefijo mdi-)
         'stethoscope': FaStethoscope,
         'baby': FaBaby,
@@ -109,7 +110,7 @@ const TakeTurn = () => {
         'medical-bag': FaHospital,
         'wheelchair-accessibility': FaUserMd,
         'thermometer': FaHospital,
-        
+
         // FontAwesome icons (con y sin prefijo fa-)
         'fa-stethoscope': FaStethoscope,
         'fa-baby': FaBaby,
@@ -126,22 +127,22 @@ const TakeTurn = () => {
         'fa-tooth': FaTooth,
         'fa-syringe': FaSyringe
       };
-      
+
       // Limpiar el nombre del icono (remover prefijos como 'mdi-', 'fa-', etc.)
       const cleanIconName = iconName.replace(/^(mdi-|fa-|fas-|far-|fab-)/, '').toLowerCase();
-      
+
       // Buscar el icono primero por nombre exacto, luego por nombre limpio
       const IconComponent = iconMapping[iconName] || iconMapping[cleanIconName] || iconMapping[iconName.toLowerCase()] || FaHospital;
-      
-      console.log('Mapeo de icono:', { 
-        iconNameOriginal: iconName, 
-        cleanIconName, 
+
+      console.log('Mapeo de icono:', {
+        iconNameOriginal: iconName,
+        cleanIconName,
         foundIconExact: !!iconMapping[iconName],
         foundIconClean: !!iconMapping[cleanIconName],
         foundIconLower: !!iconMapping[iconName.toLowerCase()],
-        IconComponent: IconComponent.name 
+        IconComponent: IconComponent.name
       });
-      
+
       return {
         icon: IconComponent,
         color: color,
@@ -171,14 +172,14 @@ const TakeTurn = () => {
       'Vacunación': { icon: FaHospital, color: '#DC3545', letter: 'V' }
     };
 
-    const defaultArea = iconMap[areaName] || { 
-      icon: FaHospital, 
-      color: '#4A90E2', 
-      letter: areaName?.charAt(0) || 'A' 
+    const defaultArea = iconMap[areaName] || {
+      icon: FaHospital,
+      color: '#4A90E2',
+      letter: areaName?.charAt(0) || 'A'
     };
-    
+
     console.log('📋 Usando fallback icon para:', areaName, defaultArea);
-    
+
     return defaultArea;
   };
 
@@ -239,6 +240,7 @@ const TakeTurn = () => {
   const handleSelectArea = (area) => {
     setSelectedArea(area);
     setError('');
+    setIsCooldownError(false);
   };
 
   const handleTakeAreaTurn = async () => {
@@ -262,29 +264,31 @@ const TakeTurn = () => {
 
     } catch (error) {
       console.error('Error generando turno:', error);
-      
+
       // Manejar específicamente el error de cooldown (429)
       if (error.response?.status === 429) {
         const errorData = error.response?.data;
         const timeRemaining = errorData?.data?.timeRemaining;
-        
+
         // Mensaje personalizado para cooldown
-        let cooldownMessage = error.response?.data?.message || 
+        let cooldownMessage = error.response?.data?.message ||
           'Por favor espera antes de solicitar otro turno';
-        
+
         if (timeRemaining) {
           const minutes = Math.floor(timeRemaining / 60);
           const seconds = timeRemaining % 60;
           if (minutes > 0) {
-            cooldownMessage = `⏳ Debes esperar ${minutes} minuto${minutes > 1 ? 's' : ''} y ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
+            cooldownMessage = `Debes esperar ${minutes} minuto${minutes > 1 ? 's' : ''} y ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
           } else {
-            cooldownMessage = `⏳ Debes esperar ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
+            cooldownMessage = `Debes esperar ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
           }
         }
-        
+
         setError(cooldownMessage);
+        setIsCooldownError(true);
       } else {
         setError(error.response?.data?.message || t('takeTurn:errors.generatingError'));
+        setIsCooldownError(false);
       }
     } finally {
       setLoading(false);
@@ -300,6 +304,7 @@ const TakeTurn = () => {
     setShowSuccess(false);
     setTurnResult(null);
     setError('');
+    setIsCooldownError(false);
   };
 
   const handleNewTurn = () => {
@@ -307,6 +312,7 @@ const TakeTurn = () => {
     setShowSuccess(false);
     setTurnResult(null);
     setError('');
+    setIsCooldownError(false);
     setCountdown(5);
   };
 
@@ -366,7 +372,7 @@ const TakeTurn = () => {
               {(() => {
                 const areaIcon = selectedArea ? getAreaIcon(selectedArea.s_nombre_area, selectedArea) : null;
                 const IconComponent = areaIcon ? areaIcon.icon : FaCheckCircle;
-                
+
                 return (
                   <>
                     <div className="success-icon-area" style={{
@@ -376,14 +382,14 @@ const TakeTurn = () => {
                       <FaCheckCircle className="success-check-overlay" />
                     </div>
                     <h1 style={{ color: areaIcon?.color || '#4A90E2' }}>{t('takeTurn:success.title')}</h1>
-                    
+
                     <div className="area-info-success">
                       <h3>{t('takeTurn:success.area')}: {selectedArea?.s_nombre_area}</h3>
                     </div>
                   </>
                 );
               })()}
-              
+
               <div className="turn-number-display-compact">
                 <div className="turn-label">{t('takeTurn:success.yourNumber')}</div>
                 <div className="turn-number-big" style={{
@@ -506,7 +512,7 @@ const TakeTurn = () => {
                   <h2>{t('takeTurn:')}</h2>
                   <p>{t('takeTurn:')}</p>
                 </div>
-                
+
                 <div className="areas-grid-touch">
                   {areas.map(area => {
                     const areaIcon = getAreaIcon(area.s_nombre_area, area);
@@ -544,7 +550,7 @@ const TakeTurn = () => {
         {error && (
           <div className="error-message-touch">
             <div className="error-content">
-              <h3>⚠️ {t('common:messages.error')}</h3>
+              <h3>{isCooldownError ? 'En espera' : `⚠️ ${t('common:messages.error')}`}</h3>
               <p>{error}</p>
             </div>
           </div>
@@ -1486,7 +1492,7 @@ const TakeTurn = () => {
           }
         }
       `}</style>
-      
+
       <Footer />
     </div>
   );
