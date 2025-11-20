@@ -22,8 +22,6 @@
     "patient": "Paciente",
     "office": "Consultorio",
     "noRecentActivity": "No hay actividad reciente",
-    "systemStatus": "Estado del Sistema",
-    "configure": "Configurar",
     "stats": {
       "totalTurns": "Total Turnos",
       "activeTurns": "Turnos Activos",
@@ -52,11 +50,6 @@
       "manageSpaces": "Administrar espacios",
       "viewStatistics": "Ver Estadísticas",
       "reportsAndMetrics": "Reportes y métricas"
-    },
-    "metrics": {
-      "turnsCompleted": "Turnos Completados",
-      "officesBusy": "Consultorios Ocupados",
-      "patientSatisfaction": "Satisfacción Pacientes"
     },
     "cards": {
       "turns": {

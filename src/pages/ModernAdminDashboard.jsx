@@ -374,45 +374,6 @@ const ModernAdminDashboard = () => {
                         </div>
                     </div>
 
-                    {/* System Status */}
-                    <div className="content-card full-width">
-                        <div className="card-header">
-                            <h3 className="card-title">
-                                <HiOutlineUsers />
-                                {t('admin:dashboard.systemStatus')}
-                            </h3>
-                            <div className="card-actions">
-                                <button className="card-action primary">
-                                    <FaEdit /> {t('admin:dashboard.configure')}
-                                </button>
-                            </div>
-                        </div>
-                        <div className="card-content">
-                            <div className="system-metrics">
-                                <div className="metric-item">
-                                    <div className="metric-label">{t('admin:dashboard.metrics.turnsCompleted')}</div>
-                                    <div className="metric-bar">
-                                        <div className="metric-progress" style={{ width: '75%' }}></div>
-                                    </div>
-                                    <div className="metric-value">75% (12/16)</div>
-                                </div>
-                                <div className="metric-item">
-                                    <div className="metric-label">{t('admin:dashboard.metrics.officesBusy')}</div>
-                                    <div className="metric-bar">
-                                        <div className="metric-progress secondary" style={{ width: '60%' }}></div>
-                                    </div>
-                                    <div className="metric-value">60% (3/5)</div>
-                                </div>
-                                <div className="metric-item">
-                                    <div className="metric-label">{t('admin:dashboard.metrics.patientSatisfaction')}</div>
-                                    <div className="metric-bar">
-                                        <div className="metric-progress success" style={{ width: '92%' }}></div>
-                                    </div>
-                                    <div className="metric-value">92%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 

@@ -22,8 +22,6 @@
     "patient": "Patient",
     "office": "Office",
     "noRecentActivity": "No recent activity",
-    "systemStatus": "System Status",
-    "configure": "Configure",
     "stats": {
       "totalTurns": "Total Appointments",
       "activeTurns": "Active Appointments",
@@ -52,11 +50,6 @@
       "manageSpaces": "Manage spaces",
       "viewStatistics": "View Statistics",
       "reportsAndMetrics": "Reports and metrics"
-    },
-    "metrics": {
-      "turnsCompleted": "Appointments Completed",
-      "officesBusy": "Offices Busy",
-      "patientSatisfaction": "Patient Satisfaction"
     },
     "cards": {
       "turns": {

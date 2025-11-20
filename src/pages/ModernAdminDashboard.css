@@ -610,57 +610,6 @@
     margin: 0;
 }
 
-/* System Metrics */
-.system-metrics {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.metric-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.metric-label {
-    min-width: 180px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.metric-bar {
-    flex: 1;
-    height: 8px;
-    background: rgba(108, 117, 125, 0.2);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.metric-progress {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-medical), var(--accent-medical));
-    border-radius: 4px;
-    transition: width 0.8s ease;
-}
-
-.metric-progress.secondary {
-    background: linear-gradient(90deg, var(--secondary-medical), var(--text-secondary));
-}
-
-.metric-progress.success {
-    background: linear-gradient(90deg, var(--success-color), #20c997);
-}
-
-.metric-value {
-    min-width: 80px;
-    text-align: right;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
 /* Responsive Design */
 @media (max-width: 1200px) {
     .content-grid {
@@ -707,21 +656,6 @@
 
     .quick-actions-grid {
         grid-template-columns: 1fr;
-    }
-
-    .metric-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    .metric-label {
-        min-width: auto;
-    }
-
-    .metric-value {
-        text-align: left;
-        min-width: auto;
     }
 }
 
