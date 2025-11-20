@@ -230,6 +230,11 @@ const AdminLogin = () => {
           </button>
         </form>
 
+        {/* Forgot Password Link */}
+        <div className="forgot-password-link">
+          <a href="/admin/forgot-password">¿Olvidó su contraseña?</a>
+        </div>
+
       </div>
     </div>
   );

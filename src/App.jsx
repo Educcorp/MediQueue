@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import TakeTurn from './pages/TakeTurn'
 import AdminLogin from './pages/AdminLogin'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import AdminDashboard from './pages/AdminDashboard'
 import ModernAdminDashboard from './pages/ModernAdminDashboard'
 import DashboardDemo from './components/Common/DashboardDemo'
@@ -44,6 +46,8 @@ function App() {
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+        <Route path="/admin/reset-password" element={<ResetPassword />} />
         <Route path="/admin/demo" element={<DashboardDemo />} />
         <Route
           path="/admin/dashboard"

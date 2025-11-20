@@ -110,6 +110,20 @@ export const AuthProvider = ({ children }) => {
         storage.setItem('auth_user', JSON.stringify(updatedUser));
     };
 
+    // Función para login rápido (sin contraseña) - usado en recuperación
+    const quickLogin = (authData, remember = true) => {
+        try {
+            // Guardar datos de autenticación usando el servicio
+            authService.saveAuthData(authData, remember);
+            // Actualizar el estado del usuario en el contexto
+            setUser(authData.user);
+            return { success: true };
+        } catch (error) {
+            console.error('Error en quick login:', error);
+            return { success: false, message: 'Error al iniciar sesión' };
+        }
+    };
+
     // Función para cambiar contraseña
     const changePassword = async (passwordActual, passwordNuevo) => {
         try {
@@ -170,6 +184,7 @@ export const AuthProvider = ({ children }) => {
         error,
         login,
         loginByUsuario,
+        quickLogin,
         logout,
         updateUser,
         changePassword,
