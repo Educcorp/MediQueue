@@ -578,8 +578,7 @@ const StatisticsPage = () => {
           display: 'grid', 
           gridTemplateColumns: '2fr 1fr', 
           gap: '24px', 
-          marginBottom: '32px',
-          alignItems: 'start'
+          marginBottom: '32px'
         }}
         className="stats-content-grid">
           {/* Columna izquierda - Turnos por Estado y Distribución */}
@@ -838,14 +837,14 @@ const StatisticsPage = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="content-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <div className="content-card">
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartBar />
                 Resumen Rápido
               </h3>
             </div>
-            <div className="card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="card-content">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Turnos del Año */}
                 <div style={{
