@@ -17,11 +17,11 @@ const SimpleDemo = () => {
     };
 
     if (showLoading) {
-        return <LoadingScreen message="Procesando información" />;
+        return <LoadingScreen message="Processing information" />;
     }
 
     if (showLoadingWithProgress) {
-        return <LoadingScreen message="Cargando dashboard" showProgress={true} />;
+        return <LoadingScreen message="Loading dashboard" showProgress={true} />;
     }
 
     return (
@@ -50,7 +50,7 @@ const SimpleDemo = () => {
                     fontSize: '24px',
                     fontWeight: '700'
                 }}>
-                    🎯 Pantalla de Carga Minimalista
+                    🎯 Minimalist Loading Screen
                 </h2>
 
                 <div style={{

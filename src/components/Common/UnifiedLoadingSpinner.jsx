@@ -1,7 +1,7 @@
 import React from 'react';
 
 const UnifiedLoadingSpinner = ({ 
-  message = "Cargando...", 
+  message = "Loading...", 
   fullScreen = true,
   background = '#f8fafc',
   textColor = '#718096',
