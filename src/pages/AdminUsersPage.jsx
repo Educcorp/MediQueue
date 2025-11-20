@@ -64,6 +64,45 @@ const AdminUsersPage = () => {
     tipo_usuario: 1
   });
 
+  // Detectar tema actual
+  const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
+  const isDarkMode = theme === 'dark';
+
+  // Escuchar cambios de tema
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      if (currentTheme !== theme) {
+        setTheme(currentTheme);
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [theme]);
+
+  // Estados para modales de notificación
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successModalData, setSuccessModalData] = useState({ 
+    message: '', 
+    data: null,
+    type: '' // 'create', 'update', 'delete'
+  });
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalData, setErrorModalData] = useState({ message: '' });
+
+  // Estados para modales de confirmación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [warningModalData, setWarningModalData] = useState({ message: '' });
+
   // Tutorial hook
   const {
     showTutorial,
@@ -123,29 +162,92 @@ const AdminUsersPage = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (admin) => {
+  const handleDelete = (admin) => {
     if (admin.uk_administrador === user?.uk_administrador) {
-      alert(t('admin:users.messages.cannotDeleteSelf', 'No puedes eliminar tu propia cuenta'));
+      setWarningModalData({ 
+        message: 'No puedes eliminar tu propia cuenta'
+      });
+      setShowWarningModal(true);
       return;
     }
 
-    if (window.confirm(t('admin:users.messages.deleteConfirm'))) {
-      try {
-        await adminService.deleteAdmin(admin.uk_administrador);
-        await loadAdmins();
-        alert(t('admin:users.messages.deleteSuccess'));
-      } catch (error) {
-        alert(t('common:messages.error') + ': ' + error.message);
-        console.error('Error eliminando administrador:', error);
-      }
+    setUserToDelete(admin);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await adminService.deleteAdmin(userToDelete.uk_administrador);
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+      await loadAdmins();
+      
+      // Mostrar modal de éxito
+      setSuccessModalData({
+        message: 'Usuario eliminado exitosamente',
+        data: {
+          nombre: userToDelete.s_nombre,
+          apellido: userToDelete.s_apellido,
+          email: userToDelete.s_email,
+          usuario: userToDelete.s_usuario
+        },
+        type: 'delete'
+      });
+      setShowSuccessModal(true);
+      
+      // Auto cerrar después de 3 segundos
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 3000);
+    } catch (error) {
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+      
+      setErrorModalData({ 
+        message: 'No se pudo eliminar el usuario'
+      });
+      setShowErrorModal(true);
+      
+      // Auto cerrar después de 4 segundos
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 4000);
+      
+      console.error('Error eliminando administrador:', error);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setUserToDelete(null);
+  };
+
+  const closeWarningModal = () => {
+    setShowWarningModal(false);
+  };
+
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+  };
+
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.s_nombre || !formData.s_apellido || !formData.s_email || !formData.s_usuario) {
-      alert(t('admin:users.messages.validationError'));
+      setErrorModalData({ 
+        message: 'Por favor completa todos los campos requeridos'
+      });
+      setShowErrorModal(true);
+      
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 4000);
       return;
     }
 
@@ -154,20 +256,41 @@ const AdminUsersPage = () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
 
     if (!editingAdmin && !passwordProvided) {
-      alert(t('admin:users.messages.passwordRequired', 'La contraseña es requerida para crear un nuevo administrador'));
+      setErrorModalData({ 
+        message: 'La contraseña es requerida para crear un nuevo usuario'
+      });
+      setShowErrorModal(true);
+      
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 4000);
       return;
     }
 
     if (passwordProvided) {
       // Validar que las contraseñas coincidan
       if (formData.s_password !== formData.s_password_confirm) {
-        alert(t('admin:users.messages.passwordMismatch', 'Las contraseñas no coinciden'));
+        setErrorModalData({ 
+          message: 'Las contraseñas no coinciden'
+        });
+        setShowErrorModal(true);
+        
+        setTimeout(() => {
+          setShowErrorModal(false);
+        }, 4000);
         return;
       }
 
       // Validar formato de contraseña
       if (!passwordRegex.test(formData.s_password)) {
-        alert(t('admin:users.messages.passwordFormat', 'La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número'));
+        setErrorModalData({ 
+          message: 'La contraseña debe tener al menos 6 caracteres e incluir minúscula, mayúscula y número'
+        });
+        setShowErrorModal(true);
+        
+        setTimeout(() => {
+          setShowErrorModal(false);
+        }, 4000);
         return;
       }
     }
@@ -195,10 +318,42 @@ const AdminUsersPage = () => {
 
       if (editingAdmin) {
         await adminService.updateAdmin(editingAdmin.uk_administrador, adminData);
-        alert(t('admin:users.messages.updateSuccess'));
+        
+        setSuccessModalData({
+          message: 'Usuario actualizado exitosamente',
+          data: {
+            nombre: formData.s_nombre,
+            apellido: formData.s_apellido,
+            email: formData.s_email,
+            usuario: formData.s_usuario,
+            telefono: formData.c_telefono
+          },
+          type: 'update'
+        });
+        setShowSuccessModal(true);
+        
+        setTimeout(() => {
+          setShowSuccessModal(false);
+        }, 3000);
       } else {
         await adminService.createAdmin(adminData);
-        alert(t('admin:users.messages.createSuccess'));
+        
+        setSuccessModalData({
+          message: 'Usuario creado exitosamente',
+          data: {
+            nombre: formData.s_nombre,
+            apellido: formData.s_apellido,
+            email: formData.s_email,
+            usuario: formData.s_usuario,
+            telefono: formData.c_telefono
+          },
+          type: 'create'
+        });
+        setShowSuccessModal(true);
+        
+        setTimeout(() => {
+          setShowSuccessModal(false);
+        }, 3000);
       }
 
       await loadAdmins();
@@ -214,22 +369,21 @@ const AdminUsersPage = () => {
         tipo_usuario: 1
       });
     } catch (error) {
-      let errorMessage = 'Error guardando administrador';
+      let errorMessage = 'No se pudo guardar el usuario';
       if (error.response && error.response.data) {
         const data = error.response.data;
         if (data.message) {
-          errorMessage += ': ' + data.message;
+          errorMessage = data.message;
         }
-        if (Array.isArray(data.errors) && data.errors.length > 0) {
-          const detail = data.errors
-            .map(err => (err.field ? `${err.field}: ${err.message}` : err.message))
-            .join('; ');
-          errorMessage += `\nDetalles: ${detail}`;
-        }
-      } else {
-        errorMessage += ': ' + error.message;
       }
-      alert(errorMessage);
+      
+      setErrorModalData({ message: errorMessage });
+      setShowErrorModal(true);
+      
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 4000);
+      
       console.error('Error guardando administrador:', error);
     }
   };
@@ -818,6 +972,543 @@ const AdminUsersPage = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de advertencia (no puede eliminar su propia cuenta) */}
+      {showWarningModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{ padding: '32px 24px' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #ffc107 0%, #ff9800 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(255, 193, 7, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaExclamationTriangle style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                Advertencia
+              </h3>
+
+              <p style={{ 
+                margin: '0 0 24px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '16px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                {warningModalData.message}
+              </p>
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeWarningModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #ffc107 0%, #ff9800 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(255, 193, 7, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(255, 193, 7, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.3)';
+                }}
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && userToDelete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              background: isDarkMode ? 'rgba(234, 93, 75, 0.1)' : 'rgba(234, 93, 75, 0.05)'
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'rgba(234, 93, 75, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ea5d4b',
+                fontSize: '20px'
+              }}>
+                <FaExclamationTriangle />
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                Confirmar Eliminación
+              </h3>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <p style={{ 
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
+                fontSize: '16px',
+                lineHeight: '1.5'
+              }}>
+                ¿Estás seguro de eliminar el usuario <strong>{userToDelete.s_usuario}</strong>?
+              </p>
+              
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.1)' : 'rgba(216, 240, 244, 0.5)',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.2)' : 'rgba(119, 184, 206, 0.3)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Usuario:</strong> {userToDelete.s_usuario}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Nombre:</strong> {userToDelete.s_nombre} {userToDelete.s_apellido}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaEnvelope style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Email:</strong> {userToDelete.s_email}
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ 
+                margin: '0',
+                color: 'var(--text-muted)',
+                fontSize: '14px',
+                fontStyle: 'italic'
+              }}>
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              gap: '12px', 
+              justifyContent: 'flex-end'
+            }}>
+              <button 
+                type="button" 
+                onClick={cancelDelete} 
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmDelete}
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: '#ea5d4b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(234, 93, 75, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#d94435';
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(234, 93, 75, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ea5d4b';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 8px rgba(234, 93, 75, 0.3)';
+                }}
+              >
+                Sí, eliminar usuario
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de notificación de éxito */}
+      {showSuccessModal && successModalData.data && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '420px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{ padding: '32px 24px' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(40, 167, 69, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaCheck style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                ¡Éxito!
+              </h3>
+
+              <p style={{ 
+                margin: '0 0 20px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '15px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                {successModalData.message}
+              </p>
+              
+              <div style={{
+                background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
+                padding: '16px',
+                borderRadius: '12px',
+                marginBottom: '24px',
+                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.25)'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Usuario:</strong> {successModalData.data.usuario}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <FaUser style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Nombre:</strong> {successModalData.data.nombre} {successModalData.data.apellido}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: successModalData.data.telefono ? '8px' : '0' }}>
+                  <FaEnvelope style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                    <strong>Email:</strong> {successModalData.data.email}
+                  </span>
+                </div>
+                {successModalData.data.telefono && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaPhone style={{ color: 'var(--text-muted)', fontSize: '14px' }} />
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                      <strong>Teléfono:</strong> {successModalData.data.telefono}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{
+              height: '4px',
+              background: isDarkMode ? 'rgba(40, 167, 69, 0.1)' : 'rgba(40, 167, 69, 0.15)',
+              borderRadius: '0 0 var(--border-radius) var(--border-radius)',
+              overflow: 'hidden',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                animation: 'autoCloseProgress 3s linear forwards'
+              }} />
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeSuccessModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(40, 167, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
+                }}
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de notificación de error */}
+      {showErrorModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--bg-white)',
+            borderRadius: 'var(--border-radius)',
+            padding: 0,
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border-color)',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            <div style={{ padding: '32px 24px' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(220, 53, 69, 0.3)',
+                  animation: 'successPulse 0.6s ease-out'
+                }}>
+                  <FaExclamationTriangle style={{ color: 'white', fontSize: '32px' }} />
+                </div>
+              </div>
+
+              <h3 style={{ 
+                margin: '0 0 12px 0',
+                color: 'var(--text-primary)',
+                fontSize: '22px',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                Error
+              </h3>
+
+              <p style={{ 
+                margin: '0 0 24px 0',
+                color: 'var(--text-secondary)',
+                fontSize: '16px',
+                lineHeight: '1.6',
+                textAlign: 'center'
+              }}>
+                {errorModalData.message}
+              </p>
+            </div>
+
+            <div style={{
+              height: '4px',
+              background: isDarkMode ? 'rgba(220, 53, 69, 0.1)' : 'rgba(220, 53, 69, 0.15)',
+              borderRadius: '0 0 var(--border-radius) var(--border-radius)',
+              overflow: 'hidden',
+              marginTop: '8px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                animation: 'autoCloseProgress 4s linear forwards'
+              }} />
+            </div>
+
+            <div style={{ 
+              padding: '16px 24px 24px',
+              display: 'flex', 
+              justifyContent: 'center'
+            }}>
+              <button 
+                type="button" 
+                onClick={closeErrorModal}
+                style={{
+                  padding: '12px 32px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(220, 53, 69, 0.3)',
+                  width: '100%',
+                  maxWidth: '200px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 16px rgba(220, 53, 69, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+                }}
+              >
+                Aceptar
+              </button>
+            </div>
           </div>
         </div>
       )}
