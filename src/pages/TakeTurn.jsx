@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
+import { generateTurnTicket } from '../services/ticketService';
 import Footer from '../components/Footer';
 import '../styles/TakeTurn.css';
 
@@ -261,6 +262,27 @@ const TakeTurn = () => {
       setTurnResult(result);
       setShowSuccess(true);
       setCountdown(5); // Iniciar countdown de 5 segundos
+
+      // 🎫 GENERAR Y DESCARGAR TICKET AUTOMÁTICAMENTE
+      try {
+        const ticketData = {
+          numero_turno: result.i_numero_turno || result.numero_turno || result.id,
+          paciente_nombre: 'Paciente', // Anónimo en modo público
+          area_nombre: selectedArea.s_nombre_area,
+          consultorio_nombre: result.asignacion_automatica?.consultorio_asignado?.area ||
+            `Consultorio #${result.asignacion_automatica?.consultorio_asignado?.numero || 'N/A'}`,
+          fecha_creacion: new Date().toISOString(),
+          estado: 'espera',
+          id: result.id || result.uk_turno
+        };
+
+        // Generar ticket PDF automáticamente
+        await generateTurnTicket(ticketData);
+        console.log('✅ Ticket PDF generado y descargado automáticamente');
+      } catch (ticketError) {
+        console.error('⚠️ Error al generar ticket (no afecta el turno):', ticketError);
+        // No mostramos error al usuario porque el turno se creó correctamente
+      }
 
     } catch (error) {
       console.error('Error generando turno:', error);
