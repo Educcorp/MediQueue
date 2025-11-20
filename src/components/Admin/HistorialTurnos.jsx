@@ -307,9 +307,9 @@ const HistorialTurnos = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'EN_ESPERA', label: 'En espera', color: 'info', indicator: '#ffc107' },
-    { value: 'ATENDIDO', label: 'Atendido', color: 'success', indicator: '#28a745' },
-    { value: 'CANCELADO', label: 'Cancelado', color: 'danger', indicator: '#dc3545' },
+    { value: 'EN_ESPERA', label: 'Waiting', color: 'info', indicator: '#ffc107' },
+    { value: 'ATENDIDO', label: 'Attended', color: 'success', indicator: '#28a745' },
+    { value: 'CANCELADO', label: 'Cancelled', color: 'danger', indicator: '#dc3545' },
   ];
 
   // Cargar datos al montar el componente
@@ -394,7 +394,7 @@ const HistorialTurnos = () => {
       setConsultorios(consultoriosData);
       setAreas(areasData);
     } catch (error) {
-      setError('Error cargando datos: ' + error.message);
+      setError('Error loading data: ' + error.message);
       console.error('Error cargando datos:', error);
     } finally {
       // Delay mínimo para transición suave del spinner
@@ -437,7 +437,7 @@ const HistorialTurnos = () => {
 
       setTurns(turnsData || []);
     } catch (error) {
-      setError('Error cargando turnos: ' + error.message);
+      setError('Error loading turns: ' + error.message);
       console.error('Error cargando turnos:', error);
       setTurns([]);
     }
@@ -461,14 +461,14 @@ const HistorialTurnos = () => {
   };
 
   const getPatientName = (uk_paciente) => {
-    if (!uk_paciente) return 'Invitado';
+    if (!uk_paciente) return 'Guest';
     const patient = patients.find(p => p.uk_paciente === uk_paciente);
-    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Paciente no encontrado';
+    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Patient not found';
   };
 
   const getConsultorioInfo = (uk_consultorio) => {
     const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
-    return consultorio ? `Consultorio ${consultorio.i_numero_consultorio}` : 'Consultorio no encontrado';
+    return consultorio ? `Office ${consultorio.i_numero_consultorio}` : 'Office not found';
   };
 
   const getAreaInfo = (uk_consultorio) => {
@@ -494,8 +494,8 @@ const HistorialTurnos = () => {
         combined.push({
           type: 'consultorio',
           id: consultorio.uk_consultorio,
-          name: `Consultorio ${consultorio.i_numero_consultorio}`,
-          displayName: `Consultorio ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
+          name: `Office ${consultorio.i_numero_consultorio}`,
+          displayName: `Office ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
           areaName: area.s_nombre_area,
           areaColor: areaColor,
           icon: AreaIconComponent,
@@ -516,7 +516,7 @@ const HistorialTurnos = () => {
         iconComponent: FaHospital,
         areaColor: '#4A90E2',
         className: '',
-        displayName: 'Todos los consultorios'
+        displayName: 'All offices'
       };
     }
 
@@ -567,7 +567,7 @@ const HistorialTurnos = () => {
   }, [turns.length, currentTurns.length, currentPage, turnsPerPage]);
 
   if (loading) {
-    return <TestSpinner message="Cargando historial de turnos..." />;
+    return <TestSpinner message="Loading turn history..." />;
   }
 
   return (
@@ -581,16 +581,16 @@ const HistorialTurnos = () => {
             <FaHistory />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Historial de Turnos</h1>
+            <h1 className="page-title">Turn History</h1>
             <p className="page-subtitle">
-              Consulta y revisa el historial completo de turnos - {turns.length} turnos encontrados
+              View and review complete turn history - {turns.length} turns found
             </p>
           </div>
           <div className="page-actions">
             <button
               className="btn btn-secondary"
               onClick={startTutorial}
-              title="Ver tutorial"
+              title="View tutorial"
               style={{ padding: '8px 12px' }}
             >
               <FaQuestionCircle />
@@ -598,12 +598,12 @@ const HistorialTurnos = () => {
             <button
               className="btn btn-secondary"
               onClick={() => navigate('/admin/turns')}
-              title="Ir a Gestión de Turnos"
+              title="Go to Turn Management"
             >
-              <FaCalendarCheck /> Gestión de Turnos
+              <FaCalendarCheck /> Turn Management
             </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
-              <FaSync /> Actualizar
+              <FaSync /> Refresh
             </button>
           </div>
         </div>
@@ -623,7 +623,7 @@ const HistorialTurnos = () => {
         <div className="filters-section">
           <div className="filter-group date-range-filter">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label style={{ margin: 0 }}>Fechas</label>
+              <label style={{ margin: 0 }}>DATES</label>
               <button
                 type="button"
                 onClick={() => {
@@ -638,7 +638,7 @@ const HistorialTurnos = () => {
                   height: 'auto',
                   lineHeight: '1'
                 }}
-                title="Reiniciar a último mes"
+                title="Reset to last month"
               >
                 <FaSync style={{ fontSize: '10px' }} />
               </button>
@@ -668,8 +668,8 @@ const HistorialTurnos = () => {
                     e.target.showPicker && e.target.showPicker();
                   }}
                   className="form-control"
-                  placeholder="Fecha inicial"
-                  title="Fecha inicial"
+                  placeholder="Start date"
+                  title="Start date"
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
@@ -680,7 +680,7 @@ const HistorialTurnos = () => {
                 whiteSpace: 'nowrap',
                 padding: '0 6px',
                 flexShrink: 0
-              }}>a</span>
+              }}>to</span>
               <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
                 <input
                   type="date"
@@ -699,15 +699,15 @@ const HistorialTurnos = () => {
                   }}
                   min={selectedStartDate}
                   className="form-control"
-                  placeholder="Fecha final"
-                  title="Fecha final"
+                  placeholder="End date"
+                  title="End date"
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
             </div>
           </div>
           <div className="filter-group">
-            <label>Estado</label>
+            <label>STATUS</label>
             <div className="custom-status-select">
               <div
                 ref={statusButtonRef}
@@ -728,7 +728,7 @@ const HistorialTurnos = () => {
                   <div className={`status-icon status-${selectedStatus.toLowerCase()}`}>
                     {React.createElement(getStatusIcon(selectedStatus))}
                   </div>
-                  <span>{selectedStatus === 'todos' ? 'Todos los estados' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
+                  <span>{selectedStatus === 'todos' ? 'All statuses' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -763,7 +763,7 @@ const HistorialTurnos = () => {
                       <div className="status-icon status-todos">
                         <FaList />
                       </div>
-                      <span>Todos los estados</span>
+                      <span>All statuses</span>
                     </div>
                     {turnStatuses.map(status => (
                       <div
@@ -869,7 +869,7 @@ const HistorialTurnos = () => {
                           <FaHospital />
                         </span>
                       </div>
-                      <span>Todos los consultorios</span>
+                      <span>All offices</span>
                     </div>
                     {getCombinedAreaConsultorioList().map(item => (
                       <div
@@ -906,7 +906,7 @@ const HistorialTurnos = () => {
           </div>
           <div className="filter-group">
             <button className="btn btn-secondary">
-              <FaFilter /> Aplicar Filtros
+              <FaFilter /> Apply Filters
             </button>
           </div>
         </div>
@@ -916,7 +916,7 @@ const HistorialTurnos = () => {
           <div className="card-header">
             <h3 className="card-title">
               <FaClipboardList />
-              Registros de Turnos
+              Turn Records
             </h3>
             <div className="card-actions">
               <span style={{
@@ -924,7 +924,7 @@ const HistorialTurnos = () => {
                 color: 'var(--text-muted)',
                 fontWeight: 500
               }}>
-                {turns.length} registro{turns.length !== 1 ? 's' : ''} encontrado{turns.length !== 1 ? 's' : ''}
+                {turns.length} record{turns.length !== 1 ? 's' : ''} found
               </span>
             </div>
           </div>
@@ -933,8 +933,8 @@ const HistorialTurnos = () => {
             {turns.length === 0 ? (
               <div className="empty-state">
                 <FaHistory />
-                <h3>No hay turnos en el historial</h3>
-                <p>No se encontraron turnos para los filtros seleccionados</p>
+                <h3>No turns in history</h3>
+                <p>No turns found for the selected filters</p>
               </div>
             ) : (
               <div className="history-cards" style={{
@@ -950,7 +950,7 @@ const HistorialTurnos = () => {
                   // Obtener color e icono desde la BD
                   const areaColor = areaData?.s_color || '#4A90E2';
                   const areaIconName = areaData?.s_icono || 'FaHospital';
-                  const areaName = areaData?.s_nombre_area || 'Área';
+                  const areaName = areaData?.s_nombre_area || 'Area';
                   const AreaIconComponent = getIconComponent(areaIconName);
 
                   return (
@@ -1113,14 +1113,14 @@ const HistorialTurnos = () => {
             {turns.length > turnsPerPage && (
               <div className="pagination-bar">
                 <div className="pagination-info">
-                  <span>Página {currentPage} de {totalPages} | {turns.length} turnos total</span>
+                  <span>Page {currentPage} of {totalPages} | {turns.length} turns total</span>
                 </div>
                 <div className="pagination-controls">
                   <button
                     onClick={goToFirstPage}
                     disabled={currentPage === 1}
                     className="pagination-btn"
-                    title="Primera página"
+                    title="First page"
                   >
                     <FaAngleDoubleLeft />
                   </button>
@@ -1128,7 +1128,7 @@ const HistorialTurnos = () => {
                     onClick={goToPreviousPage}
                     disabled={currentPage === 1}
                     className="pagination-btn"
-                    title="Página anterior"
+                    title="Previous page"
                   >
                     <FaChevronLeft />
                   </button>
@@ -1136,7 +1136,7 @@ const HistorialTurnos = () => {
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
                     className="pagination-btn"
-                    title="Página siguiente"
+                    title="Next page"
                   >
                     <FaChevronRight />
                   </button>
@@ -1144,7 +1144,7 @@ const HistorialTurnos = () => {
                     onClick={goToLastPage}
                     disabled={currentPage === totalPages}
                     className="pagination-btn"
-                    title="Última página"
+                    title="Last page"
                   >
                     <FaAngleDoubleRight />
                   </button>
