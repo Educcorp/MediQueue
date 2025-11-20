@@ -651,8 +651,191 @@ const StatisticsPage = () => {
             </div>
           </div>
 
-          {/* Quick Stats */}
+          {/* Circular Chart - Distribución de Estados en la misma columna */}
           <div className="content-card">
+            <div className="card-header">
+              <h3 className="card-title">
+                <FaChartPie />
+                Distribución de Turnos del Día por Estado
+              </h3>
+              <div className="card-actions">
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
+                  {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+            </div>
+            <div className="card-content" style={{ padding: '24px' }}>
+              {Object.keys(stats.turns.byStatus).length > 0 && stats.turns.today > 0 ? (
+                <div style={{ display: 'flex', gap: '40px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {/* Gráfica Circular SVG */}
+                  <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0 }}>
+                    <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%' }}>
+                      {(() => {
+                        console.log('🎨 Renderizando gráfica circular:', stats.turns.byStatus);
+                        
+                        const colors = {
+                          'En espera': '#17a2b8',
+                          'Atendido': '#28a745',
+                          'Cancelado': '#dc3545',
+                          'En atención': '#ffc107',
+                          'No presente': '#6c757d'
+                        };
+                        
+                        const centerX = 100;
+                        const centerY = 100;
+                        const radius = 70;
+                        const strokeWidth = 35;
+                        const total = stats.turns.today;
+                        
+                        let cumulativePercent = 0;
+                        
+                        return Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                          if (count === 0) return null;
+                          
+                          const percentage = (count / total);
+                          const color = colors[status] || '#2f97d1';
+                          
+                          console.log(`Estado: ${status}, Count: ${count}, Color: ${color}, Percentage: ${percentage * 100}%`);
+                          
+                          const circumference = 2 * Math.PI * radius;
+                          const segmentLength = circumference * percentage;
+                          const offset = -cumulativePercent * circumference;
+                          
+                          cumulativePercent += percentage;
+                          
+                          return (
+                            <circle
+                              key={status}
+                              cx={centerX}
+                              cy={centerY}
+                              r={radius}
+                              fill="none"
+                              stroke={color}
+                              strokeWidth={strokeWidth}
+                              strokeDasharray={`${segmentLength} ${circumference}`}
+                              strokeDashoffset={offset}
+                              transform={`rotate(-90 ${centerX} ${centerY})`}
+                              style={{
+                                cursor: 'pointer',
+                                transition: 'opacity 0.3s ease'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                            >
+                              <title>{`${status}: ${count} turnos (${(percentage * 100).toFixed(1)}%)`}</title>
+                            </circle>
+                          );
+                        });
+                      })()}
+                      
+                      {/* Texto central */}
+                      <text
+                        x="100"
+                        y="95"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{
+                          fontSize: '40px',
+                          fontWeight: '900',
+                          fill: 'var(--text-primary)',
+                          pointerEvents: 'none'
+                        }}
+                      >
+                        {stats.turns.today}
+                      </text>
+                      <text
+                        x="100"
+                        y="120"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          fill: 'var(--text-muted)',
+                          pointerEvents: 'none'
+                        }}
+                      >
+                        Turnos
+                      </text>
+                    </svg>
+                  </div>
+                  
+                  {/* Leyenda */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, minWidth: '250px' }}>
+                    {Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                      if (count === 0) return null;
+                      
+                      const percentage = stats.turns.today > 0 ? (count / stats.turns.today * 100).toFixed(1) : 0;
+                      const colors = {
+                        'En espera': '#17a2b8',
+                        'Atendido': '#28a745',
+                        'Cancelado': '#dc3545',
+                        'En atención': '#ffc107',
+                        'No presente': '#6c757d'
+                      };
+                      const color = colors[status] || '#2f97d1';
+
+                      return (
+                        <div key={status} style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '12px',
+                          padding: '14px 18px',
+                          background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
+                          borderRadius: '12px',
+                          border: `2px solid ${color}30`,
+                          transition: 'all 0.3s ease',
+                          cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateX(4px)';
+                          e.currentTarget.style.borderColor = color;
+                          e.currentTarget.style.boxShadow = `0 4px 12px ${color}40`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateX(0)';
+                          e.currentTarget.style.borderColor = `${color}30`;
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                        >
+                          <div style={{
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '4px',
+                            backgroundColor: color,
+                            flexShrink: 0,
+                            boxShadow: `0 2px 8px ${color}50`
+                          }}></div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                              <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                {status}
+                              </span>
+                              <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>
+                                {percentage}%
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '22px', fontWeight: '900', color: color }}>
+                              {count}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="empty-state" style={{ padding: '60px 20px', textAlign: 'center' }}>
+                  <FaChartPie style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '16px' }} />
+                  <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)' }}>Sin turnos hoy</h3>
+                  <p style={{ margin: 0, color: 'var(--text-muted)' }}>No hay turnos registrados para el día de hoy</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="content-card" style={{ gridRow: 'span 2' }}>
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartBar />
@@ -1037,214 +1220,6 @@ const StatisticsPage = () => {
                   </div>
                 </div>
             </div>
-          </div>
-        </div>
-
-        {/* Circular Chart - Distribución de Estados */}
-        <div className="content-card" style={{ marginBottom: '32px' }}>
-          <div className="card-header">
-            <h3 className="card-title">
-              <FaChartPie />
-              Distribución de Turnos del Día por Estado
-            </h3>
-            <div className="card-actions">
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
-                {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-              </span>
-            </div>
-          </div>
-          <div className="card-content" style={{ padding: '24px' }}>
-            {Object.keys(stats.turns.byStatus).length > 0 && stats.turns.today > 0 ? (
-              <div style={{ display: 'flex', gap: '40px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-                {/* Gráfica Circular SVG */}
-                <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, background: 'transparent' }}>
-                  <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)', overflow: 'visible' }}>
-                    {(() => {
-                      const colors = {
-                        'En espera': '#17a2b8',
-                        'Atendido': '#28a745',
-                        'Cancelado': '#dc3545',
-                        'En atención': '#ffc107',
-                        'No presente': '#6c757d'
-                      };
-                      
-                      let currentAngle = 0;
-                      const outerRadius = 90;
-                      const innerRadius = 55;
-                      const centerX = 100;
-                      const centerY = 100;
-                      const total = stats.turns.today;
-                      
-                      return Object.entries(stats.turns.byStatus).map(([status, count]) => {
-                        if (count === 0) return null;
-                        
-                        const percentage = (count / total) * 100;
-                        const angle = (count / total) * 360;
-                        const startAngle = currentAngle;
-                        const endAngle = currentAngle + angle;
-                        
-                        currentAngle = endAngle;
-                        
-                        // Convertir ángulos a radianes
-                        const startRad = (startAngle * Math.PI) / 180;
-                        const endRad = (endAngle * Math.PI) / 180;
-                        
-                        // Coordenadas del arco exterior
-                        const outerStartX = centerX + outerRadius * Math.cos(startRad);
-                        const outerStartY = centerY + outerRadius * Math.sin(startRad);
-                        const outerEndX = centerX + outerRadius * Math.cos(endRad);
-                        const outerEndY = centerY + outerRadius * Math.sin(endRad);
-                        
-                        // Coordenadas del arco interior
-                        const innerStartX = centerX + innerRadius * Math.cos(startRad);
-                        const innerStartY = centerY + innerRadius * Math.sin(startRad);
-                        const innerEndX = centerX + innerRadius * Math.cos(endRad);
-                        const innerEndY = centerY + innerRadius * Math.sin(endRad);
-                        
-                        const largeArcFlag = angle > 180 ? 1 : 0;
-                        
-                        // Path para crear un anillo (donut)
-                        const pathData = [
-                          `M ${outerStartX} ${outerStartY}`,
-                          `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${outerEndX} ${outerEndY}`,
-                          `L ${innerEndX} ${innerEndY}`,
-                          `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${innerStartX} ${innerStartY}`,
-                          'Z'
-                        ].join(' ');
-                        
-                        const color = colors[status] || '#2f97d1';
-                        
-                        return (
-                          <path
-                            key={status}
-                            d={pathData}
-                            fill={color}
-                            stroke="rgba(255, 255, 255, 0.5)"
-                            strokeWidth="2"
-                            style={{
-                              cursor: 'pointer',
-                              transition: 'all 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.setAttribute('opacity', '0.8');
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.setAttribute('opacity', '1');
-                            }}
-                          >
-                            <title>{`${status}: ${count} turnos (${percentage.toFixed(1)}%)`}</title>
-                          </path>
-                        );
-                      });
-                    })()}
-                    
-                    {/* Texto central */}
-                    <text
-                      x="100"
-                      y="95"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      style={{
-                        fontSize: '38px',
-                        fontWeight: '900',
-                        fill: 'var(--text-primary)',
-                        transform: 'rotate(90deg)',
-                        transformOrigin: '100px 100px',
-                        pointerEvents: 'none'
-                      }}
-                    >
-                      {stats.turns.today}
-                    </text>
-                    <text
-                      x="100"
-                      y="115"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      style={{
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        fill: 'var(--text-muted)',
-                        transform: 'rotate(90deg)',
-                        transformOrigin: '100px 100px',
-                        pointerEvents: 'none'
-                      }}
-                    >
-                      Turnos
-                    </text>
-                  </svg>
-                </div>
-                
-                {/* Leyenda */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, minWidth: '250px' }}>
-                  {Object.entries(stats.turns.byStatus).map(([status, count]) => {
-                    if (count === 0) return null;
-                    
-                    const percentage = stats.turns.today > 0 ? (count / stats.turns.today * 100).toFixed(1) : 0;
-                    const colors = {
-                      'En espera': '#17a2b8',
-                      'Atendido': '#28a745',
-                      'Cancelado': '#dc3545',
-                      'En atención': '#ffc107',
-                      'No presente': '#6c757d'
-                    };
-                    const color = colors[status] || '#2f97d1';
-
-                    return (
-                      <div key={status} style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '12px',
-                        padding: '14px 18px',
-                        background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-                        borderRadius: '12px',
-                        border: `2px solid ${color}30`,
-                        transition: 'all 0.3s ease',
-                        cursor: 'pointer'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateX(4px)';
-                        e.currentTarget.style.borderColor = color;
-                        e.currentTarget.style.boxShadow = `0 4px 12px ${color}40`;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateX(0)';
-                        e.currentTarget.style.borderColor = `${color}30`;
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                      >
-                        <div style={{
-                          width: '18px',
-                          height: '18px',
-                          borderRadius: '4px',
-                          backgroundColor: color,
-                          flexShrink: 0,
-                          boxShadow: `0 2px 8px ${color}50`
-                        }}></div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
-                              {status}
-                            </span>
-                            <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>
-                              {percentage}%
-                            </span>
-                          </div>
-                          <div style={{ fontSize: '22px', fontWeight: '900', color: color }}>
-                            {count}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div className="empty-state" style={{ padding: '60px 20px', textAlign: 'center' }}>
-                <FaChartPie style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '16px' }} />
-                <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)' }}>Sin turnos hoy</h3>
-                <p style={{ margin: 0, color: 'var(--text-muted)' }}>No hay turnos registrados para el día de hoy</p>
-              </div>
-            )}
           </div>
         </div>
 
