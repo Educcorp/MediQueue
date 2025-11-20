@@ -17,22 +17,31 @@ export const generateTurnTicket = (turnData) => {
         const pageWidth = doc.internal.pageSize.getWidth();
         let yPosition = 10;
 
-        // ==================== ENCABEZADO ====================
+        // ==================== ENCABEZADO CON LOGO ====================
         doc.setFillColor(41, 128, 185); // Azul corporativo
-        doc.rect(0, 0, pageWidth, 25, 'F');
+        doc.rect(0, 0, pageWidth, 30, 'F');
 
-        // Título principal
+        // Intentar cargar el logo de MediQueue
+        try {
+            const logoImg = new Image();
+            logoImg.src = '/images/mediqueue_logo.png';
+            // Logo centrado en el encabezado (tamaño reducido para ticket)
+            doc.addImage(logoImg, 'PNG', pageWidth / 2 - 10, 5, 20, 8);
+        } catch (e) {
+            console.log('Logo no disponible, usando texto');
+        }
+
+        // Título principal debajo del logo
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(18);
+        doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text('MEDIQUEUE', pageWidth / 2, 10, { align: 'center' });
+        doc.text('MEDIQUEUE', pageWidth / 2, 18, { align: 'center' });
 
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text('Sistema de Turnos', pageWidth / 2, 16, { align: 'center' });
-        doc.text('Médicos', pageWidth / 2, 21, { align: 'center' });
+        doc.text('Sistema de Turnos Médicos', pageWidth / 2, 24, { align: 'center' });
 
-        yPosition = 30;
+        yPosition = 35;
 
         // ==================== NÚMERO DE TURNO (DESTACADO) ====================
         doc.setFillColor(240, 240, 240);
@@ -69,16 +78,6 @@ export const generateTurnTicket = (turnData) => {
             doc.text(lines, 10, yPosition + 4);
             yPosition += 4 + (lines.length * 4);
         };
-
-        // Paciente
-        addInfoLine('PACIENTE:', turnData.paciente_nombre || 'No especificado', true);
-        yPosition += 2;
-
-        // DNI/Documento
-        if (turnData.paciente_dni) {
-            addInfoLine('DNI:', turnData.paciente_dni);
-            yPosition += 2;
-        }
 
         // Área/Especialidad
         addInfoLine('ÁREA:', turnData.area_nombre || 'General');
