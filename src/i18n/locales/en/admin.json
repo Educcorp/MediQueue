@@ -323,7 +323,24 @@
     "stats": {
       "total": "Total Patients",
       "active": "Active",
+      "inactive": "Inactive Patients",
+      "withEmail": "With Email",
       "newThisMonth": "New this month"
+    },
+    "recordsFound": "records found",
+    "listTitle": "Patient List",
+    "filters": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "age": "Age",
+      "status": "Status",
+      "registrationDate": "Registration Date",
+      "actions": "Actions"
     },
     "empty": "No patients registered"
   },
