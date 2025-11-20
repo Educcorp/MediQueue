@@ -582,200 +582,70 @@ const StatisticsPage = () => {
           alignItems: 'start'
         }}
         className="stats-content-grid">
-          {/* Circular Chart - Turns by Status */}
+          {/* Turns by Status Chart */}
           <div className="content-card">
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartPie />
-                Distribución de Turnos del Día por Estado
+                Turnos por Estado
               </h3>
               <div className="card-actions">
-                <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
-                  {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                </span>
               </div>
             </div>
-            <div className="card-content" style={{ padding: '24px' }}>
-              {Object.keys(stats.turns.byStatus).length > 0 && stats.turns.today > 0 ? (
-                <div style={{ display: 'flex', gap: '40px', alignItems: 'center', justifyContent: 'center' }}>
-                  {/* Gráfica Circular */}
-                  <div style={{ position: 'relative', width: '280px', height: '280px', flexShrink: 0 }}>
-                    <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                      {(() => {
-                        const colors = {
-                          'En espera': '#17a2b8',
-                          'Atendido': '#28a745',
-                          'Cancelado': '#dc3545',
-                          'En atención': '#ffc107',
-                          'No presente': '#6c757d'
-                        };
-                        
-                        let currentAngle = 0;
-                        const radius = 80;
-                        const centerX = 100;
-                        const centerY = 100;
-                        const total = stats.turns.today;
-                        
-                        return Object.entries(stats.turns.byStatus).map(([status, count], index) => {
-                          if (count === 0) return null;
-                          
-                          const percentage = (count / total) * 100;
-                          const angle = (count / total) * 360;
-                          const startAngle = currentAngle;
-                          const endAngle = currentAngle + angle;
-                          
-                          currentAngle = endAngle;
-                          
-                          // Calcular path del arco
-                          const startX = centerX + radius * Math.cos((startAngle * Math.PI) / 180);
-                          const startY = centerY + radius * Math.sin((startAngle * Math.PI) / 180);
-                          const endX = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
-                          const endY = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
-                          
-                          const largeArcFlag = angle > 180 ? 1 : 0;
-                          
-                          const pathData = [
-                            `M ${centerX} ${centerY}`,
-                            `L ${startX} ${startY}`,
-                            `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
-                            'Z'
-                          ].join(' ');
-                          
-                          const color = colors[status] || '#2f97d1';
-                          
-                          return (
-                            <g key={status}>
-                              <path
-                                d={pathData}
-                                fill={color}
-                                stroke="var(--card-bg)"
-                                strokeWidth="2"
-                                style={{
-                                  cursor: 'pointer',
-                                  transition: 'opacity 0.3s ease',
-                                  opacity: 0.9
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                                onMouseLeave={(e) => e.currentTarget.style.opacity = '0.9'}
-                              >
-                                <title>{`${status}: ${count} turnos (${percentage.toFixed(1)}%)`}</title>
-                              </path>
-                            </g>
-                          );
-                        });
-                      })()}
-                      
-                      {/* Círculo central */}
-                      <circle
-                        cx="100"
-                        cy="100"
-                        r="45"
-                        fill="var(--card-bg)"
-                        stroke="var(--border-color)"
-                        strokeWidth="2"
-                      />
-                      
-                      {/* Texto central */}
-                      <text
-                        x="100"
-                        y="95"
-                        textAnchor="middle"
-                        style={{
-                          fontSize: '32px',
-                          fontWeight: '900',
-                          fill: 'var(--text-primary)',
-                          transform: 'rotate(90deg)',
-                          transformOrigin: '100px 100px'
-                        }}
-                      >
-                        {stats.turns.today}
-                      </text>
-                      <text
-                        x="100"
-                        y="110"
-                        textAnchor="middle"
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          fill: 'var(--text-muted)',
-                          transform: 'rotate(90deg)',
-                          transformOrigin: '100px 100px'
-                        }}
-                      >
-                        Turnos
-                      </text>
-                    </svg>
-                  </div>
-                  
-                  {/* Leyenda */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
-                    {Object.entries(stats.turns.byStatus).map(([status, count]) => {
-                      if (count === 0) return null;
-                      
-                      const percentage = stats.turns.today > 0 ? (count / stats.turns.today * 100).toFixed(1) : 0;
-                      const colors = {
-                        'En espera': '#17a2b8',
-                        'Atendido': '#28a745',
-                        'Cancelado': '#dc3545',
-                        'En atención': '#ffc107',
-                        'No presente': '#6c757d'
-                      };
-                      const color = colors[status] || '#2f97d1';
+            <div className="card-content" style={{ padding: '18px 24px' }}>
+              {Object.keys(stats.turns.byStatus).length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                    const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
+                    const colors = {
+                      'En espera': 'var(--info-color)',
+                      'Atendido': 'var(--success-color)',
+                      'Cancelado': 'var(--danger-color)',
+                      'En atención': 'var(--warning-color)'
+                    };
+                    const color = colors[status] || 'var(--primary-medical)';
 
-                      return (
-                        <div key={status} style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '12px',
-                          padding: '12px 16px',
-                          background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-                          borderRadius: '10px',
-                          border: `2px solid ${color}30`,
-                          transition: 'all 0.3s ease',
-                          cursor: 'pointer'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateX(4px)';
-                          e.currentTarget.style.borderColor = color;
-                          e.currentTarget.style.boxShadow = `0 4px 12px ${color}40`;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateX(0)';
-                          e.currentTarget.style.borderColor = `${color}30`;
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
-                        >
+                    return (
+                      <div key={status} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{
+                          width: '12px',
+                          height: '12px',
+                          borderRadius: '50%',
+                          backgroundColor: color
+                        }}></div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                              {status}
+                            </span>
+                            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+                              {count} ({percentage}%)
+                            </span>
+                          </div>
                           <div style={{
-                            width: '16px',
-                            height: '16px',
-                            borderRadius: '4px',
-                            backgroundColor: color,
-                            flexShrink: 0,
-                            boxShadow: `0 2px 8px ${color}50`
-                          }}></div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
-                                {status}
-                              </span>
-                              <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>
-                                {percentage}%
-                              </span>
-                            </div>
-                            <div style={{ fontSize: '20px', fontWeight: '900', color: color, marginTop: '2px' }}>
-                              {count}
-                            </div>
+                            width: '100%',
+                            height: '6px',
+                            backgroundColor: 'var(--border-color)',
+                            borderRadius: '3px',
+                            overflow: 'hidden'
+                          }}>
+                            <div style={{
+                              width: `${percentage}%`,
+                              height: '100%',
+                              backgroundColor: color,
+                              transition: 'width 0.3s ease'
+                            }}></div>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="empty-state" style={{ padding: '60px 20px' }}>
-                  <FaChartPie style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '16px' }} />
-                  <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)' }}>Sin turnos hoy</h3>
-                  <p style={{ margin: 0, color: 'var(--text-muted)' }}>No hay turnos registrados para el día de hoy</p>
+                <div className="empty-state" style={{ padding: '40px 20px' }}>
+                  <FaChartPie />
+                  <h3>Sin datos de turnos</h3>
+                  <p>No hay información de turnos para mostrar</p>
                 </div>
               )}
             </div>
@@ -1167,6 +1037,207 @@ const StatisticsPage = () => {
                   </div>
                 </div>
             </div>
+          </div>
+        </div>
+
+        {/* Circular Chart - Distribución de Estados */}
+        <div className="content-card" style={{ marginBottom: '32px' }}>
+          <div className="card-header">
+            <h3 className="card-title">
+              <FaChartPie />
+              Distribución de Turnos del Día por Estado
+            </h3>
+            <div className="card-actions">
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
+                {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              </span>
+            </div>
+          </div>
+          <div className="card-content" style={{ padding: '24px' }}>
+            {Object.keys(stats.turns.byStatus).length > 0 && stats.turns.today > 0 ? (
+              <div style={{ display: 'flex', gap: '40px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                {/* Gráfica Circular SVG */}
+                <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0 }}>
+                  <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                    {(() => {
+                      const colors = {
+                        'En espera': '#17a2b8',
+                        'Atendido': '#28a745',
+                        'Cancelado': '#dc3545',
+                        'En atención': '#ffc107',
+                        'No presente': '#6c757d'
+                      };
+                      
+                      let currentAngle = 0;
+                      const radius = 80;
+                      const centerX = 100;
+                      const centerY = 100;
+                      const total = stats.turns.today;
+                      
+                      return Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                        if (count === 0) return null;
+                        
+                        const percentage = (count / total) * 100;
+                        const angle = (count / total) * 360;
+                        const startAngle = currentAngle;
+                        const endAngle = currentAngle + angle;
+                        
+                        currentAngle = endAngle;
+                        
+                        // Calcular coordenadas del arco
+                        const startX = centerX + radius * Math.cos((startAngle * Math.PI) / 180);
+                        const startY = centerY + radius * Math.sin((startAngle * Math.PI) / 180);
+                        const endX = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
+                        const endY = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
+                        
+                        const largeArcFlag = angle > 180 ? 1 : 0;
+                        
+                        const pathData = [
+                          `M ${centerX} ${centerY}`,
+                          `L ${startX} ${startY}`,
+                          `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
+                          'Z'
+                        ].join(' ');
+                        
+                        const color = colors[status] || '#2f97d1';
+                        
+                        return (
+                          <g key={status}>
+                            <path
+                              d={pathData}
+                              fill={color}
+                              stroke="var(--card-bg)"
+                              strokeWidth="2"
+                              style={{
+                                cursor: 'pointer',
+                                transition: 'opacity 0.3s ease',
+                                opacity: 0.9
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.9'}
+                            >
+                              <title>{`${status}: ${count} turnos (${percentage.toFixed(1)}%)`}</title>
+                            </path>
+                          </g>
+                        );
+                      });
+                    })()}
+                    
+                    {/* Círculo central blanco */}
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r="50"
+                      fill="var(--card-bg)"
+                      stroke="var(--border-color)"
+                      strokeWidth="2"
+                    />
+                    
+                    {/* Texto central */}
+                    <text
+                      x="100"
+                      y="95"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      style={{
+                        fontSize: '36px',
+                        fontWeight: '900',
+                        fill: 'var(--text-primary)',
+                        transform: 'rotate(90deg)',
+                        transformOrigin: '100px 100px'
+                      }}
+                    >
+                      {stats.turns.today}
+                    </text>
+                    <text
+                      x="100"
+                      y="115"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        fill: 'var(--text-muted)',
+                        transform: 'rotate(90deg)',
+                        transformOrigin: '100px 100px'
+                      }}
+                    >
+                      Turnos
+                    </text>
+                  </svg>
+                </div>
+                
+                {/* Leyenda */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, minWidth: '250px' }}>
+                  {Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                    if (count === 0) return null;
+                    
+                    const percentage = stats.turns.today > 0 ? (count / stats.turns.today * 100).toFixed(1) : 0;
+                    const colors = {
+                      'En espera': '#17a2b8',
+                      'Atendido': '#28a745',
+                      'Cancelado': '#dc3545',
+                      'En atención': '#ffc107',
+                      'No presente': '#6c757d'
+                    };
+                    const color = colors[status] || '#2f97d1';
+
+                    return (
+                      <div key={status} style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '12px',
+                        padding: '14px 18px',
+                        background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
+                        borderRadius: '12px',
+                        border: `2px solid ${color}30`,
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateX(4px)';
+                        e.currentTarget.style.borderColor = color;
+                        e.currentTarget.style.boxShadow = `0 4px 12px ${color}40`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateX(0)';
+                        e.currentTarget.style.borderColor = `${color}30`;
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                      >
+                        <div style={{
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '4px',
+                          backgroundColor: color,
+                          flexShrink: 0,
+                          boxShadow: `0 2px 8px ${color}50`
+                        }}></div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                              {status}
+                            </span>
+                            <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>
+                              {percentage}%
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '22px', fontWeight: '900', color: color }}>
+                            {count}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="empty-state" style={{ padding: '60px 20px', textAlign: 'center' }}>
+                <FaChartPie style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '16px' }} />
+                <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)' }}>Sin turnos hoy</h3>
+                <p style={{ margin: 0, color: 'var(--text-muted)' }}>No hay turnos registrados para el día de hoy</p>
+              </div>
+            )}
           </div>
         </div>
 
