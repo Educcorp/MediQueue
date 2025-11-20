@@ -191,6 +191,19 @@ const turnService = {
         }
     },
 
+    // Obtener estadísticas para gráfica (por día, mes o año)
+    async getChartStatistics(periodo = 'day') {
+        try {
+            const response = await api.get('/turnos/estadisticas-grafica', {
+                params: { periodo }
+            });
+            return response.data.data;
+        } catch (error) {
+            console.error('Error obteniendo estadísticas de gráfica:', error);
+            throw error;
+        }
+    },
+
     // Obtener el próximo turno (público)
     async getNextTurn() {
         try {
