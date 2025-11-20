@@ -265,12 +265,18 @@ const TakeTurn = () => {
 
       // 🎫 GENERAR Y DESCARGAR TICKET AUTOMÁTICAMENTE
       try {
+        // Obtener la letra del área desde los datos del área seleccionada
+        const areaLetra = selectedArea.s_letra || selectedArea.s_nombre_area?.charAt(0) || 'A';
+        const numeroTurno = result.i_numero_turno || result.numero_turno || result.id;
+
+        // Formatear número de turno con letra (ej: C1, M2, P3)
+        const numeroTurnoConLetra = `${areaLetra}${numeroTurno}`;
+
         const ticketData = {
-          numero_turno: result.i_numero_turno || result.numero_turno || result.id,
+          numero_turno: numeroTurnoConLetra,
           paciente_nombre: 'Paciente', // Anónimo en modo público
           area_nombre: selectedArea.s_nombre_area,
-          consultorio_nombre: result.asignacion_automatica?.consultorio_asignado?.area ||
-            `Consultorio #${result.asignacion_automatica?.consultorio_asignado?.numero || 'N/A'}`,
+          consultorio_numero: result.asignacion_automatica?.consultorio_asignado?.numero || null,
           fecha_creacion: new Date().toISOString(),
           estado: 'espera',
           id: result.id || result.uk_turno

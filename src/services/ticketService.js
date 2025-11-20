@@ -84,9 +84,9 @@ export const generateTurnTicket = (turnData) => {
         addInfoLine('ÁREA:', turnData.area_nombre || 'General');
         yPosition += 2;
 
-        // Consultorio
-        if (turnData.consultorio_nombre) {
-            addInfoLine('CONSULTORIO:', turnData.consultorio_nombre);
+        // Consultorio - Mostrar número del consultorio
+        if (turnData.consultorio_numero) {
+            addInfoLine('CONSULTORIO:', `Consultorio ${turnData.consultorio_numero}`);
             yPosition += 2;
         }
 
@@ -116,34 +116,8 @@ export const generateTurnTicket = (turnData) => {
                 minute: '2-digit'
             });
         addInfoLine('HORA:', hora);
-        yPosition += 2;
-
-        // Estado
-        const estadoTexto = turnData.estado === 'espera' ? 'EN ESPERA' :
-            turnData.estado === 'llamado' ? 'LLAMADO' :
-                turnData.estado === 'atendido' ? 'ATENDIDO' :
-                    turnData.estado === 'cancelado' ? 'CANCELADO' : 'PENDIENTE';
-        addInfoLine('ESTADO:', estadoTexto);
 
         yPosition += 5;
-
-        // ==================== LÍNEA SEPARADORA ====================
-        doc.line(10, yPosition, pageWidth - 10, yPosition);
-        yPosition += 5;
-
-        // ==================== CÓDIGO DE VERIFICACIÓN ====================
-        if (turnData.id) {
-            doc.setFontSize(7);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Código de verificación:', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 4;
-
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'bold');
-            const codigo = `MQ-${String(turnData.id).padStart(6, '0')}`;
-            doc.text(codigo, pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 8;
-        }
 
         // ==================== INSTRUCCIONES ====================
         doc.setFillColor(255, 243, 205);
