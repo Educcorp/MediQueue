@@ -1057,13 +1057,8 @@ const StatisticsPage = () => {
             {Object.keys(stats.turns.byStatus).length > 0 && stats.turns.today > 0 ? (
               <div style={{ display: 'flex', gap: '40px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
                 {/* Gráfica Circular SVG */}
-                <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0 }}>
-                  <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                    <defs>
-                      <filter id="shadow">
-                        <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.3"/>
-                      </filter>
-                    </defs>
+                <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, background: 'transparent' }}>
+                  <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)', overflow: 'visible' }}>
                     {(() => {
                       const colors = {
                         'En espera': '#17a2b8',
@@ -1074,7 +1069,8 @@ const StatisticsPage = () => {
                       };
                       
                       let currentAngle = 0;
-                      const radius = 80;
+                      const outerRadius = 90;
+                      const innerRadius = 55;
                       const centerX = 100;
                       const centerY = 100;
                       const total = stats.turns.today;
@@ -1089,60 +1085,58 @@ const StatisticsPage = () => {
                         
                         currentAngle = endAngle;
                         
-                        // Calcular coordenadas del arco
-                        const startX = centerX + radius * Math.cos((startAngle * Math.PI) / 180);
-                        const startY = centerY + radius * Math.sin((startAngle * Math.PI) / 180);
-                        const endX = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
-                        const endY = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
+                        // Convertir ángulos a radianes
+                        const startRad = (startAngle * Math.PI) / 180;
+                        const endRad = (endAngle * Math.PI) / 180;
+                        
+                        // Coordenadas del arco exterior
+                        const outerStartX = centerX + outerRadius * Math.cos(startRad);
+                        const outerStartY = centerY + outerRadius * Math.sin(startRad);
+                        const outerEndX = centerX + outerRadius * Math.cos(endRad);
+                        const outerEndY = centerY + outerRadius * Math.sin(endRad);
+                        
+                        // Coordenadas del arco interior
+                        const innerStartX = centerX + innerRadius * Math.cos(startRad);
+                        const innerStartY = centerY + innerRadius * Math.sin(startRad);
+                        const innerEndX = centerX + innerRadius * Math.cos(endRad);
+                        const innerEndY = centerY + innerRadius * Math.sin(endRad);
                         
                         const largeArcFlag = angle > 180 ? 1 : 0;
                         
+                        // Path para crear un anillo (donut)
                         const pathData = [
-                          `M ${centerX} ${centerY}`,
-                          `L ${startX} ${startY}`,
-                          `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
+                          `M ${outerStartX} ${outerStartY}`,
+                          `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${outerEndX} ${outerEndY}`,
+                          `L ${innerEndX} ${innerEndY}`,
+                          `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${innerStartX} ${innerStartY}`,
                           'Z'
                         ].join(' ');
                         
                         const color = colors[status] || '#2f97d1';
                         
                         return (
-                          <g key={status}>
-                            <path
-                              d={pathData}
-                              fill={color}
-                              stroke="#ffffff"
-                              strokeWidth="3"
-                              filter="url(#shadow)"
-                              style={{
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                opacity: 1
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'scale(1.05)';
-                                e.currentTarget.style.transformOrigin = 'center';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'scale(1)';
-                              }}
-                            >
-                              <title>{`${status}: ${count} turnos (${percentage.toFixed(1)}%)`}</title>
-                            </path>
-                          </g>
+                          <path
+                            key={status}
+                            d={pathData}
+                            fill={color}
+                            stroke="rgba(255, 255, 255, 0.5)"
+                            strokeWidth="2"
+                            style={{
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.setAttribute('opacity', '0.8');
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.setAttribute('opacity', '1');
+                            }}
+                          >
+                            <title>{`${status}: ${count} turnos (${percentage.toFixed(1)}%)`}</title>
+                          </path>
                         );
                       });
                     })()}
-                    
-                    {/* Círculo central blanco */}
-                    <circle
-                      cx="100"
-                      cy="100"
-                      r="50"
-                      fill="var(--card-bg)"
-                      stroke="var(--border-color)"
-                      strokeWidth="2"
-                    />
                     
                     {/* Texto central */}
                     <text
@@ -1151,11 +1145,12 @@ const StatisticsPage = () => {
                       textAnchor="middle"
                       dominantBaseline="middle"
                       style={{
-                        fontSize: '36px',
+                        fontSize: '38px',
                         fontWeight: '900',
                         fill: 'var(--text-primary)',
                         transform: 'rotate(90deg)',
-                        transformOrigin: '100px 100px'
+                        transformOrigin: '100px 100px',
+                        pointerEvents: 'none'
                       }}
                     >
                       {stats.turns.today}
@@ -1170,7 +1165,8 @@ const StatisticsPage = () => {
                         fontWeight: '600',
                         fill: 'var(--text-muted)',
                         transform: 'rotate(90deg)',
-                        transformOrigin: '100px 100px'
+                        transformOrigin: '100px 100px',
+                        pointerEvents: 'none'
                       }}
                     >
                       Turnos
