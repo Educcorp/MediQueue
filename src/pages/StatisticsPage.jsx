@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import AdminHeader from '../components/Common/AdminHeader';
 import AdminFooter from '../components/Common/AdminFooter';
@@ -103,7 +102,6 @@ const getIconComponent = (iconName) => {
 };
 
 const StatisticsPage = () => {
-  const { t, i18n } = useTranslation('admin');
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -166,6 +164,11 @@ const StatisticsPage = () => {
     end: new Date().toISOString().split('T')[0]
   });
   const [recentTurns, setRecentTurns] = useState([]);
+  const [chartPeriod, setChartPeriod] = useState('day'); // 'day', 'month', 'year'
+  const [chartData, setChartData] = useState({
+    labels: [],
+    data: []
+  });
 
   useEffect(() => {
     // Mostrar spinner brevemente para mejor UX
@@ -174,6 +177,17 @@ const StatisticsPage = () => {
       loadStatistics();
     }, 800);
   }, []);
+
+  // Auto-refresh para el día actual cada 30 segundos
+  useEffect(() => {
+    if (chartPeriod === 'day') {
+      const interval = setInterval(() => {
+        loadChartData('day');
+      }, 30000); // 30 segundos
+      
+      return () => clearInterval(interval);
+    }
+  }, [chartPeriod]);
 
   const loadStatistics = async () => {
     try {
@@ -209,20 +223,20 @@ const StatisticsPage = () => {
 
       // Procesar estadísticas de turnos - contar directamente desde los datos
       const turnsByStatus = {
-        'waiting': 0,
-        'attended': 0,
-        'cancelled': 0,
+        'En espera': 0,
+        'Atendido': 0,
+        'Cancelado': 0,
       };
 
       // Contar turnos por estado
       allTurns.forEach(turn => {
         const estado = turn.s_estado;
         if (estado === 'EN_ESPERA') {
-          turnsByStatus['waiting']++;
+          turnsByStatus['En espera']++;
         } else if (estado === 'ATENDIDO') {
-          turnsByStatus['attended']++;
+          turnsByStatus['Atendido']++;
         } else if (estado === 'CANCELADO') {
-          turnsByStatus['cancelled']++;
+          turnsByStatus['Cancelado']++;
         }
       });
 
@@ -287,14 +301,156 @@ const StatisticsPage = () => {
       });
 
       setRecentTurns(recentTurnsData.slice(0, 10));
+      
+      // Cargar datos iniciales de la gráfica
+      loadChartData(chartPeriod);
     } catch (error) {
       console.error('Error cargando estadísticas:', error);
-      setError(t('statistics.errorLoading'));
+      setError('Error cargando estadísticas');
     } finally {
       // Delay mínimo para transición suave del spinner
       setTimeout(() => {
         setLoading(false);
       }, 300);
+    }
+  };
+
+  const loadChartData = async (period) => {
+    try {
+      const now = new Date();
+      let labels = [];
+      let data = [];
+
+      // Intentar usar el nuevo endpoint, si falla usar el método de respaldo
+      let chartStats = null;
+      let usingBackupMethod = false;
+
+      try {
+        chartStats = await turnService.getChartStatistics(period);
+        console.log('📊 Estadísticas de gráfica recibidas del nuevo endpoint:', chartStats);
+      } catch (backendError) {
+        console.warn('⚠️ Endpoint nuevo no disponible, usando método de respaldo:', backendError.message);
+        usingBackupMethod = true;
+      }
+
+      if (period === 'day') {
+        // Datos por hora del día actual (0-23)
+        if (usingBackupMethod) {
+          const todayStr = now.toISOString().split('T')[0];
+          const todayTurns = await turnService.getTurnsByDateRange(todayStr, todayStr).catch(() => []) || [];
+          
+          // Agrupar por hora
+          const turnosPorHora = new Map();
+          todayTurns.forEach(turno => {
+            // Parsear hora del campo t_hora (formato HH:MM:SS)
+            const hora = turno.t_hora ? parseInt(turno.t_hora.split(':')[0]) : 0;
+            turnosPorHora.set(hora, (turnosPorHora.get(hora) || 0) + 1);
+          });
+          
+          for (let i = 0; i < 24; i++) {
+            labels.push(`${i.toString().padStart(2, '0')}:00`);
+            data.push(turnosPorHora.get(i) || 0);
+          }
+          
+          console.log('✅ Vista DÍA (Respaldo) - Total turnos:', todayTurns.length);
+        } else {
+          const horasConDatos = new Map(chartStats.datos.map(d => [d.periodo, d.total]));
+          for (let i = 0; i < 24; i++) {
+            labels.push(`${i.toString().padStart(2, '0')}:00`);
+            data.push(horasConDatos.get(i) || 0);
+          }
+          console.log('✅ Vista DÍA - Total turnos:', data.reduce((a, b) => a + b, 0));
+        }
+      } else if (period === 'month') {
+        // Datos por día del mes actual
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        if (usingBackupMethod) {
+          const startOfMonth = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+          const endOfMonth = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+          const monthTurns = await turnService.getTurnsByDateRange(startOfMonth, endOfMonth).catch(() => []) || [];
+          
+          // Agrupar por día
+          const turnosPorDia = new Map();
+          monthTurns.forEach(turno => {
+            // Parsear día del campo d_fecha (formato YYYY-MM-DD)
+            const dia = turno.d_fecha ? parseInt(turno.d_fecha.split('-')[2]) : 0;
+            turnosPorDia.set(dia, (turnosPorDia.get(dia) || 0) + 1);
+          });
+          
+          for (let day = 1; day <= daysInMonth; day++) {
+            labels.push(day.toString());
+            data.push(turnosPorDia.get(day) || 0);
+          }
+          
+          console.log('✅ Vista MES (Respaldo) - Total turnos:', monthTurns.length);
+        } else {
+          const diasConDatos = new Map(chartStats.datos.map(d => [d.periodo, d.total]));
+          for (let day = 1; day <= daysInMonth; day++) {
+            labels.push(day.toString());
+            data.push(diasConDatos.get(day) || 0);
+          }
+          console.log('✅ Vista MES - Total turnos:', data.reduce((a, b) => a + b, 0));
+        }
+      } else if (period === 'year') {
+        // Datos por mes del año actual
+        const year = now.getFullYear();
+        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        
+        if (usingBackupMethod) {
+          const startOfYear = `${year}-01-01`;
+          const endOfYear = `${year}-12-31`;
+          const yearTurns = await turnService.getTurnsByDateRange(startOfYear, endOfYear).catch(() => []) || [];
+          
+          // Agrupar por mes
+          const turnosPorMes = new Map();
+          yearTurns.forEach(turno => {
+            // Parsear mes del campo d_fecha (formato YYYY-MM-DD)
+            const mes = turno.d_fecha ? parseInt(turno.d_fecha.split('-')[1]) : 0;
+            turnosPorMes.set(mes, (turnosPorMes.get(mes) || 0) + 1);
+          });
+          
+          for (let month = 1; month <= 12; month++) {
+            labels.push(monthNames[month - 1]);
+            data.push(turnosPorMes.get(month) || 0);
+          }
+          
+          console.log('✅ Vista AÑO (Respaldo) - Total turnos:', yearTurns.length);
+        } else {
+          const mesesConDatos = new Map(chartStats.datos.map(d => [d.periodo, d.total]));
+          for (let month = 1; month <= 12; month++) {
+            labels.push(monthNames[month - 1]);
+            data.push(mesesConDatos.get(month) || 0);
+          }
+          console.log('✅ Vista AÑO - Total turnos:', data.reduce((a, b) => a + b, 0));
+        }
+      }
+
+      setChartData({ labels, data });
+    } catch (error) {
+      console.error('❌ Error cargando datos de gráfica:', error);
+      // En caso de error, mostrar estructura vacía pero válida
+      const now = new Date();
+      if (period === 'day') {
+        setChartData({ 
+          labels: Array.from({length: 24}, (_, i) => `${i.toString().padStart(2, '0')}:00`),
+          data: Array(24).fill(0)
+        });
+      } else if (period === 'month') {
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        setChartData({ 
+          labels: Array.from({length: daysInMonth}, (_, i) => (i + 1).toString()),
+          data: Array(daysInMonth).fill(0)
+        });
+      } else if (period === 'year') {
+        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        setChartData({ 
+          labels: monthNames,
+          data: Array(12).fill(0)
+        });
+      }
     }
   };
 
@@ -310,13 +466,18 @@ const StatisticsPage = () => {
     loadStatistics();
   };
 
+  const handlePeriodChange = (period) => {
+    setChartPeriod(period);
+    loadChartData(period);
+  };
+
   const exportData = () => {
     // Implementar exportación de datos
     alert('Función de exportación pendiente de implementar');
   };
 
   if (loading) {
-    return <TestSpinner message={t('statistics.loading')} />;
+    return <TestSpinner message="Cargando estadísticas..." />;
   }
 
   return (
@@ -330,14 +491,14 @@ const StatisticsPage = () => {
             <FaChartLine />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">{t('statistics.title')}</h1>
+            <h1 className="page-title">Estadísticas del Sistema</h1>
             <p className="page-subtitle">
-              {t('statistics.subtitle')}
+              Análisis y métricas generales del sistema MediQueue
             </p>
           </div>
           <div className="page-actions">
                         <button className="btn btn-primary" onClick={refreshData}>
-              <FaSync /> {t('statistics.refresh')}
+              <FaSync /> Actualizar
             </button>
           </div>
         </div>
@@ -375,10 +536,10 @@ const StatisticsPage = () => {
                   {stats.turns.total}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  {t('statistics.totalAppointments')}
+                  Total Turnos
                 </p>
                 <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {t('statistics.today')}: {stats.turns.today}
+                  Hoy: {stats.turns.today}
                 </p>
               </div>
             </div>
@@ -404,88 +565,275 @@ const StatisticsPage = () => {
                   {stats.patients.total}
                 </h3>
                 <p style={{ margin: 0, color: 'var(--text-secondary)', fontWeight: '600' }}>
-                  {t('statistics.totalPatients')}
+                  Total Pacientes
                 </p>
               </div>
             </div>
           </div>
         </div>
 
+
         {/* Content Grid */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: '2fr 1fr', 
           gap: '24px', 
-          marginBottom: '32px',
-          alignItems: 'start'
+          marginBottom: '32px'
         }}
         className="stats-content-grid">
-          {/* Turns by Status Chart */}
-          <div className="content-card">
+          {/* Columna izquierda - Turnos por Estado y Distribución */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Turns by Status Chart */}
+            <div className="content-card">
+              <div className="card-header">
+                <h3 className="card-title">
+                  <FaChartPie />
+                  Turnos por Estado
+                </h3>
+                <div className="card-actions">
+                </div>
+              </div>
+              <div className="card-content" style={{ padding: '18px 24px' }}>
+                {Object.keys(stats.turns.byStatus).length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                      const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
+                      const colors = {
+                        'En espera': 'var(--info-color)',
+                        'Atendido': 'var(--success-color)',
+                        'Cancelado': 'var(--danger-color)',
+                        'En atención': 'var(--warning-color)'
+                      };
+                      const color = colors[status] || 'var(--primary-medical)';
+
+                      return (
+                        <div key={status} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            backgroundColor: color
+                          }}></div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                                {status}
+                              </span>
+                              <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+                                {count} ({percentage}%)
+                              </span>
+                            </div>
+                            <div style={{
+                              width: '100%',
+                              height: '6px',
+                              backgroundColor: 'var(--border-color)',
+                              borderRadius: '3px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                width: `${percentage}%`,
+                                height: '100%',
+                                backgroundColor: color,
+                                transition: 'width 0.3s ease'
+                              }}></div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="empty-state" style={{ padding: '40px 20px' }}>
+                    <FaChartPie />
+                    <h3>Sin datos de turnos</h3>
+                    <p>No hay información de turnos para mostrar</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Circular Chart - Distribución de Estados */}
+            <div className="content-card">
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartPie />
-                {t('statistics.appointmentsByStatus')}
+                Distribución de Turnos del Día por Estado
               </h3>
               <div className="card-actions">
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
+                  {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
               </div>
             </div>
-            <div className="card-content" style={{ padding: '18px 24px' }}>
-              {Object.keys(stats.turns.byStatus).length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {Object.entries(stats.turns.byStatus).map(([status, count]) => {
-                    const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
-                    const colors = {
-                      'waiting': 'var(--info-color)',
-                      'attended': 'var(--success-color)',
-                      'cancelled': 'var(--danger-color)',
-                    };
-                    const color = colors[status] || 'var(--primary-medical)';
+            <div className="card-content" style={{ padding: '24px' }}>
+              {Object.keys(stats.turns.byStatus).length > 0 && stats.turns.today > 0 ? (
+                <div style={{ display: 'flex', gap: '40px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {/* Gráfica Circular SVG */}
+                  <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0 }}>
+                    <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%' }}>
+                      {(() => {
+                        console.log('🎨 Renderizando gráfica circular:', stats.turns.byStatus);
+                        
+                        const colors = {
+                          'En espera': '#17a2b8',
+                          'Atendido': '#28a745',
+                          'Cancelado': '#dc3545',
+                          'En atención': '#ffc107',
+                          'No presente': '#6c757d'
+                        };
+                        
+                        const centerX = 100;
+                        const centerY = 100;
+                        const radius = 70;
+                        const strokeWidth = 35;
+                        const total = stats.turns.today;
+                        
+                        let cumulativePercent = 0;
+                        
+                        return Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                          if (count === 0) return null;
+                          
+                          const percentage = (count / total);
+                          const color = colors[status] || '#2f97d1';
+                          
+                          console.log(`Estado: ${status}, Count: ${count}, Color: ${color}, Percentage: ${percentage * 100}%`);
+                          
+                          const circumference = 2 * Math.PI * radius;
+                          const segmentLength = circumference * percentage;
+                          const offset = -cumulativePercent * circumference;
+                          
+                          cumulativePercent += percentage;
+                          
+                          return (
+                            <circle
+                              key={status}
+                              cx={centerX}
+                              cy={centerY}
+                              r={radius}
+                              fill="none"
+                              stroke={color}
+                              strokeWidth={strokeWidth}
+                              strokeDasharray={`${segmentLength} ${circumference}`}
+                              strokeDashoffset={offset}
+                              transform={`rotate(-90 ${centerX} ${centerY})`}
+                              style={{
+                                cursor: 'pointer',
+                                transition: 'opacity 0.3s ease'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                            >
+                              <title>{`${status}: ${count} turnos (${(percentage * 100).toFixed(1)}%)`}</title>
+                            </circle>
+                          );
+                        });
+                      })()}
+                      
+                      {/* Texto central */}
+                      <text
+                        x="100"
+                        y="95"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{
+                          fontSize: '40px',
+                          fontWeight: '900',
+                          fill: 'var(--text-primary)',
+                          pointerEvents: 'none'
+                        }}
+                      >
+                        {stats.turns.today}
+                      </text>
+                      <text
+                        x="100"
+                        y="120"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          fill: 'var(--text-muted)',
+                          pointerEvents: 'none'
+                        }}
+                      >
+                        Turnos
+                      </text>
+                    </svg>
+                  </div>
+                  
+                  {/* Leyenda */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, minWidth: '250px' }}>
+                    {Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                      if (count === 0) return null;
+                      
+                      const percentage = stats.turns.today > 0 ? (count / stats.turns.today * 100).toFixed(1) : 0;
+                      const colors = {
+                        'En espera': '#17a2b8',
+                        'Atendido': '#28a745',
+                        'Cancelado': '#dc3545',
+                        'En atención': '#ffc107',
+                        'No presente': '#6c757d'
+                      };
+                      const color = colors[status] || '#2f97d1';
 
-                    return (
-                      <div key={status} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{
-                          width: '12px',
-                          height: '12px',
-                          borderRadius: '50%',
-                          backgroundColor: color
-                        }}></div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                              {t(`statistics.statuses.${status}`)}
-                            </span>
-                            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-                              {count} ({percentage}%)
-                            </span>
-                          </div>
+                      return (
+                        <div key={status} style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '12px',
+                          padding: '14px 18px',
+                          background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
+                          borderRadius: '12px',
+                          border: `2px solid ${color}30`,
+                          transition: 'all 0.3s ease',
+                          cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateX(4px)';
+                          e.currentTarget.style.borderColor = color;
+                          e.currentTarget.style.boxShadow = `0 4px 12px ${color}40`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateX(0)';
+                          e.currentTarget.style.borderColor = `${color}30`;
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                        >
                           <div style={{
-                            width: '100%',
-                            height: '6px',
-                            backgroundColor: 'var(--border-color)',
-                            borderRadius: '3px',
-                            overflow: 'hidden'
-                          }}>
-                            <div style={{
-                              width: `${percentage}%`,
-                              height: '100%',
-                              backgroundColor: color,
-                              transition: 'width 0.3s ease'
-                            }}></div>
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '4px',
+                            backgroundColor: color,
+                            flexShrink: 0,
+                            boxShadow: `0 2px 8px ${color}50`
+                          }}></div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                              <span style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                                {status}
+                              </span>
+                              <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>
+                                {percentage}%
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '22px', fontWeight: '900', color: color }}>
+                              {count}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
-                <div className="empty-state" style={{ padding: '40px 20px' }}>
-                  <FaChartPie />
-                  <h3>{t('statistics.noAppointmentsData')}</h3>
-                  <p>{t('statistics.noAppointmentsInfo')}</p>
+                <div className="empty-state" style={{ padding: '60px 20px', textAlign: 'center' }}>
+                  <FaChartPie style={{ fontSize: '48px', color: 'var(--text-muted)', marginBottom: '16px' }} />
+                  <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)' }}>Sin turnos hoy</h3>
+                  <p style={{ margin: 0, color: 'var(--text-muted)' }}>No hay turnos registrados para el día de hoy</p>
                 </div>
               )}
             </div>
+          </div>
           </div>
 
           {/* Quick Stats */}
@@ -493,7 +841,7 @@ const StatisticsPage = () => {
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartBar />
-                {t('statistics.quickSummary')}
+                Resumen Rápido
               </h3>
             </div>
             <div className="card-content">
@@ -543,7 +891,7 @@ const StatisticsPage = () => {
                       }}>
                         <FaChartLine style={{ color: 'white', fontSize: '18px' }} />
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('statistics.yearAppointments')}</span>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>Turnos del Año</span>
                     </div>
                   </div>
                   <div style={{ fontSize: '36px', fontWeight: '900', color: '#2f97d1', marginBottom: '4px', position: 'relative' }}>
@@ -599,14 +947,14 @@ const StatisticsPage = () => {
                       }}>
                         <FaCalendarCheck style={{ color: 'white', fontSize: '18px' }} />
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('statistics.monthAppointments')}</span>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>Turnos del Mes</span>
                     </div>
                   </div>
                   <div style={{ fontSize: '36px', fontWeight: '900', color: '#28a745', marginBottom: '4px', position: 'relative' }}>
                     {stats.turns.thisMonth || 0}
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
-                    📆 {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { month: 'long', year: 'numeric' })}
+                    📆 {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
                   </div>
                 </div>
 
@@ -655,17 +1003,224 @@ const StatisticsPage = () => {
                       }}>
                         <FaCalendarDay style={{ color: 'white', fontSize: '18px' }} />
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>{t('statistics.dayAppointments')}</span>
+                      <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>Turnos del Día</span>
                     </div>
                   </div>
                   <div style={{ fontSize: '36px', fontWeight: '900', color: '#17a2b8', marginBottom: '4px', position: 'relative' }}>
                     {stats.turns.today || 0}
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
-                    🗓️ {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    🗓️ {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Interactive Chart */}
+        <div className="content-card" style={{ marginBottom: '32px' }}>
+          <div className="card-header">
+            <h3 className="card-title">
+              <FaChartLine />
+              Tendencia de Turnos
+            </h3>
+            <div className="card-actions" style={{ display: 'flex', gap: '8px' }}>
+              <button
+                className={`btn ${chartPeriod === 'day' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handlePeriodChange('day')}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  borderRadius: '8px',
+                  border: chartPeriod === 'day' ? '2px solid var(--primary-medical)' : '2px solid var(--border-color)',
+                  background: chartPeriod === 'day' ? 'var(--primary-medical)' : 'transparent',
+                  color: chartPeriod === 'day' ? 'white' : 'var(--text-primary)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <FaCalendarDay style={{ marginRight: '6px' }} />
+                Día
+              </button>
+              <button
+                className={`btn ${chartPeriod === 'month' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handlePeriodChange('month')}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  borderRadius: '8px',
+                  border: chartPeriod === 'month' ? '2px solid var(--primary-medical)' : '2px solid var(--border-color)',
+                  background: chartPeriod === 'month' ? 'var(--primary-medical)' : 'transparent',
+                  color: chartPeriod === 'month' ? 'white' : 'var(--text-primary)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <FaCalendarCheck style={{ marginRight: '6px' }} />
+                Mes
+              </button>
+              <button
+                className={`btn ${chartPeriod === 'year' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handlePeriodChange('year')}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  borderRadius: '8px',
+                  border: chartPeriod === 'year' ? '2px solid var(--primary-medical)' : '2px solid var(--border-color)',
+                  background: chartPeriod === 'year' ? 'var(--primary-medical)' : 'transparent',
+                  color: chartPeriod === 'year' ? 'white' : 'var(--text-primary)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <FaChartBar style={{ marginRight: '6px' }} />
+                Año
+              </button>
+            </div>
+          </div>
+          <div className="card-content" style={{ padding: '24px' }}>
+            <div style={{ position: 'relative', height: '320px' }}>
+              <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                {/* Título del período */}
+                <div style={{ 
+                  marginBottom: '20px', 
+                  padding: '12px 20px', 
+                  background: 'linear-gradient(135deg, rgba(47, 151, 209, 0.1) 0%, rgba(47, 151, 209, 0.05) 100%)',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  border: '1px solid rgba(47, 151, 209, 0.2)'
+                }}>
+                  <p style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: 'var(--primary-medical)' }}>
+                    {chartPeriod === 'day' && `Turnos por Hora - ${new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`}
+                    {chartPeriod === 'month' && `Turnos por Día - ${new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}`}
+                    {chartPeriod === 'year' && `Turnos por Mes - ${new Date().getFullYear()}`}
+                    {chartPeriod === 'day' && <span style={{ marginLeft: '12px', fontSize: '12px', fontWeight: '500', color: 'var(--success-color)' }}>●  Actualizándose automáticamente</span>}
+                  </p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+                    Total: {chartData.data.reduce((a, b) => a + b, 0)} turnos
+                  </p>
+                </div>
+
+                  {/* Gráfica de barras */}
+                  <div style={{ 
+                    flex: 1, 
+                    display: 'flex', 
+                    alignItems: 'flex-end', 
+                    gap: chartPeriod === 'day' ? '4px' : chartPeriod === 'month' ? '3px' : '8px',
+                    padding: '0 10px 30px 10px',
+                    position: 'relative',
+                    minHeight: '200px'
+                  }}>
+                    {/* Líneas de referencia horizontales */}
+                    <div style={{ position: 'absolute', top: 0, left: 10, right: 10, bottom: 30 }}>
+                      {[0, 25, 50, 75, 100].map(percent => (
+                        <div key={percent} style={{
+                          position: 'absolute',
+                          bottom: `${percent}%`,
+                          left: 0,
+                          right: 0,
+                          height: '1px',
+                          background: 'var(--border-color)',
+                          opacity: 0.3
+                        }}></div>
+                      ))}
+                    </div>
+
+                    {chartData.data.map((value, index) => {
+                      const maxValue = Math.max(...chartData.data, 1);
+                      const heightPercent = maxValue > 0 ? (value / maxValue) * 100 : 0;
+                      
+                      return (
+                        <div 
+                          key={index} 
+                          style={{ 
+                            flex: 1, 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            alignItems: 'center',
+                            height: '100%',
+                            position: 'relative',
+                            zIndex: 1,
+                            minWidth: chartPeriod === 'day' ? '8px' : chartPeriod === 'month' ? '6px' : '15px'
+                          }}
+                          title={`${chartData.labels[index]}: ${value} turnos`}
+                        >
+                          {/* Contenedor de barra con altura fija */}
+                          <div style={{
+                            width: '100%',
+                            flex: 1,
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            justifyContent: 'center',
+                            position: 'relative'
+                          }}>
+                            {/* Barra */}
+                            <div
+                              style={{
+                                width: '100%',
+                                height: value > 0 ? `${Math.max(heightPercent, 5)}%` : '2px',
+                                background: value > 0 
+                                  ? 'linear-gradient(to top, var(--primary-medical), var(--accent-medical))' 
+                                  : 'rgba(226, 232, 240, 0.5)',
+                                borderRadius: '4px 4px 0 0',
+                                transition: 'all 0.3s ease',
+                                cursor: value > 0 ? 'pointer' : 'default',
+                                boxShadow: value > 0 ? '0 2px 8px rgba(47, 151, 209, 0.3)' : 'none',
+                                position: 'relative',
+                                transformOrigin: 'bottom'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (value > 0) {
+                                  e.currentTarget.style.opacity = '0.8';
+                                  e.currentTarget.style.transform = 'scaleY(1.05)';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (value > 0) {
+                                  e.currentTarget.style.opacity = '1';
+                                  e.currentTarget.style.transform = 'scaleY(1)';
+                                }
+                              }}
+                            >
+                              {/* Valor encima de la barra */}
+                              {value > 0 && (
+                                <div style={{
+                                  position: 'absolute',
+                                  top: '-20px',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  fontSize: '11px',
+                                  fontWeight: '700',
+                                  color: 'var(--primary-medical)',
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  {value}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Etiqueta */}
+                          <div style={{
+                            marginTop: '8px',
+                            fontSize: chartPeriod === 'day' ? '9px' : chartPeriod === 'month' ? '10px' : '11px',
+                            color: 'var(--text-muted)',
+                            fontWeight: '600',
+                            transform: chartPeriod === 'day' ? 'rotate(-45deg)' : 'none',
+                            transformOrigin: 'center',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {chartData.labels[index]}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
             </div>
           </div>
         </div>
@@ -676,7 +1231,7 @@ const StatisticsPage = () => {
             <div className="card-header">
               <h3 className="card-title">
                 <FaHospital />
-                {t('statistics.officesByMedicalArea')}
+                Consultorios por Área Médica
               </h3>
             </div>
             <div className="card-content">
