@@ -424,6 +424,35 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 8px;
+}
+
+/* Scrollbar personalizado para activity-list */
+.activity-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.activity-list::-webkit-scrollbar-track {
+    background: rgba(108, 117, 125, 0.1);
+    border-radius: 4px;
+}
+
+.activity-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-medical), var(--accent-medical));
+    border-radius: 4px;
+}
+
+.activity-list::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-medical);
+}
+
+/* Firefox scrollbar */
+.activity-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-medical) rgba(108, 117, 125, 0.1);
 }
 
 .activity-item {
