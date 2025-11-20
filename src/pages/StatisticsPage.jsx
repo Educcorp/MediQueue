@@ -582,77 +582,79 @@ const StatisticsPage = () => {
           alignItems: 'start'
         }}
         className="stats-content-grid">
-          {/* Turns by Status Chart */}
-          <div className="content-card">
-            <div className="card-header">
-              <h3 className="card-title">
-                <FaChartPie />
-                Turnos por Estado
-              </h3>
-              <div className="card-actions">
+          {/* Columna izquierda - Turnos por Estado y Distribución */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Turns by Status Chart */}
+            <div className="content-card">
+              <div className="card-header">
+                <h3 className="card-title">
+                  <FaChartPie />
+                  Turnos por Estado
+                </h3>
+                <div className="card-actions">
+                </div>
               </div>
-            </div>
-            <div className="card-content" style={{ padding: '18px 24px' }}>
-              {Object.keys(stats.turns.byStatus).length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {Object.entries(stats.turns.byStatus).map(([status, count]) => {
-                    const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
-                    const colors = {
-                      'En espera': 'var(--info-color)',
-                      'Atendido': 'var(--success-color)',
-                      'Cancelado': 'var(--danger-color)',
-                      'En atención': 'var(--warning-color)'
-                    };
-                    const color = colors[status] || 'var(--primary-medical)';
+              <div className="card-content" style={{ padding: '18px 24px' }}>
+                {Object.keys(stats.turns.byStatus).length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {Object.entries(stats.turns.byStatus).map(([status, count]) => {
+                      const percentage = stats.turns.total > 0 ? (count / stats.turns.total * 100).toFixed(1) : 0;
+                      const colors = {
+                        'En espera': 'var(--info-color)',
+                        'Atendido': 'var(--success-color)',
+                        'Cancelado': 'var(--danger-color)',
+                        'En atención': 'var(--warning-color)'
+                      };
+                      const color = colors[status] || 'var(--primary-medical)';
 
-                    return (
-                      <div key={status} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{
-                          width: '12px',
-                          height: '12px',
-                          borderRadius: '50%',
-                          backgroundColor: color
-                        }}></div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                              {status}
-                            </span>
-                            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-                              {count} ({percentage}%)
-                            </span>
-                          </div>
+                      return (
+                        <div key={status} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <div style={{
-                            width: '100%',
-                            height: '6px',
-                            backgroundColor: 'var(--border-color)',
-                            borderRadius: '3px',
-                            overflow: 'hidden'
-                          }}>
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            backgroundColor: color
+                          }}></div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                                {status}
+                              </span>
+                              <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+                                {count} ({percentage}%)
+                              </span>
+                            </div>
                             <div style={{
-                              width: `${percentage}%`,
-                              height: '100%',
-                              backgroundColor: color,
-                              transition: 'width 0.3s ease'
-                            }}></div>
+                              width: '100%',
+                              height: '6px',
+                              backgroundColor: 'var(--border-color)',
+                              borderRadius: '3px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                width: `${percentage}%`,
+                                height: '100%',
+                                backgroundColor: color,
+                                transition: 'width 0.3s ease'
+                              }}></div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="empty-state" style={{ padding: '40px 20px' }}>
-                  <FaChartPie />
-                  <h3>Sin datos de turnos</h3>
-                  <p>No hay información de turnos para mostrar</p>
-                </div>
-              )}
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="empty-state" style={{ padding: '40px 20px' }}>
+                    <FaChartPie />
+                    <h3>Sin datos de turnos</h3>
+                    <p>No hay información de turnos para mostrar</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Circular Chart - Distribución de Estados en la misma columna */}
-          <div className="content-card">
+            {/* Circular Chart - Distribución de Estados */}
+            <div className="content-card">
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartPie />
@@ -833,9 +835,10 @@ const StatisticsPage = () => {
               )}
             </div>
           </div>
+          </div>
 
           {/* Quick Stats */}
-          <div className="content-card" style={{ gridRow: 'span 2' }}>
+          <div className="content-card">
             <div className="card-header">
               <h3 className="card-title">
                 <FaChartBar />
