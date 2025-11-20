@@ -20,7 +20,8 @@
         "react-dom": "^18.2.0",
         "react-i18next": "^16.2.4",
         "react-icons": "^5.5.0",
-        "react-router-dom": "^6.8.1"
+        "react-router-dom": "^6.8.1",
+        "resend": "^6.4.2"
     },
     "devDependencies": {
         "@types/react": "^18.0.28",

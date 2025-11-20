@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_CONFIG } from '../utils/constants';
+import { getDeviceId } from '../utils/deviceId';
 
 // Crear instancia de axios con configuración base
 const api = axios.create({
@@ -10,7 +11,7 @@ const api = axios.create({
     },
 });
 
-// Interceptor para incluir token en requests
+// Interceptor para incluir token y device ID en requests
 api.interceptors.request.use(
     (config) => {
         // Buscar token en localStorage primero, luego en sessionStorage
@@ -18,6 +19,15 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        
+        // Incluir Device ID en todas las peticiones
+        try {
+            const deviceId = getDeviceId();
+            config.headers['X-Device-Id'] = deviceId;
+        } catch (error) {
+            console.error('Error obteniendo Device ID:', error);
+        }
+        
         return config;
     },
     (error) => {

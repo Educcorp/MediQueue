@@ -445,12 +445,14 @@
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: linear-gradient(135deg, var(--primary-medical), var(--accent-medical));
+    /* Background se define dinámicamente en el JSX según el color del área */
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
 }
 
 .activity-content {
@@ -468,6 +470,9 @@
     font-size: 12px;
     color: var(--text-muted);
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .activity-status {
@@ -483,9 +488,46 @@
     color: #856404;
 }
 
-.status-badge.completado {
+.status-badge.completado,
+.status-badge.atendido {
     background: rgba(40, 167, 69, 0.2);
     color: #155724;
+}
+
+[data-theme="dark"] .status-badge.completado,
+[data-theme="dark"] .status-badge.atendido {
+    background: rgba(52, 211, 153, 0.25);
+    color: #34d399;
+}
+
+.status-badge.en_espera {
+    background: rgba(255, 193, 7, 0.2);
+    color: #856404;
+}
+
+[data-theme="dark"] .status-badge.en_espera {
+    background: rgba(245, 158, 11, 0.25);
+    color: #f59e0b;
+}
+
+.status-badge.llamando {
+    background: rgba(23, 162, 184, 0.2);
+    color: #0c5460;
+}
+
+[data-theme="dark"] .status-badge.llamando {
+    background: rgba(56, 189, 248, 0.25);
+    color: #38bdf8;
+}
+
+.status-badge.cancelado {
+    background: rgba(220, 53, 69, 0.2);
+    color: #721c24;
+}
+
+[data-theme="dark"] .status-badge.cancelado {
+    background: rgba(239, 68, 68, 0.25);
+    color: #ef4444;
 }
 
 .empty-state {

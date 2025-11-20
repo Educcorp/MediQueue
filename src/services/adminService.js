@@ -259,8 +259,8 @@ class AdminService {
             errors.push('El teléfono debe tener un formato válido');
         }
 
-        if (adminData.tipo_usuario && ![1, 2].includes(adminData.tipo_usuario)) {
-            errors.push('El tipo de usuario debe ser 1 (Administrador) o 2 (Supervisor)');
+        if (adminData.tipo_usuario && ![1, 1].includes(adminData.tipo_usuario)) {
+            errors.push('El tipo de usuario debe ser 1 (Administrador)');
         }
 
         return errors;
