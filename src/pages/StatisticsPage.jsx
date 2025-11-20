@@ -1059,6 +1059,11 @@ const StatisticsPage = () => {
                 {/* Gráfica Circular SVG */}
                 <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0 }}>
                   <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                    <defs>
+                      <filter id="shadow">
+                        <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.3"/>
+                      </filter>
+                    </defs>
                     {(() => {
                       const colors = {
                         'En espera': '#17a2b8',
@@ -1106,15 +1111,21 @@ const StatisticsPage = () => {
                             <path
                               d={pathData}
                               fill={color}
-                              stroke="var(--card-bg)"
-                              strokeWidth="2"
+                              stroke="#ffffff"
+                              strokeWidth="3"
+                              filter="url(#shadow)"
                               style={{
                                 cursor: 'pointer',
-                                transition: 'opacity 0.3s ease',
-                                opacity: 0.9
+                                transition: 'all 0.3s ease',
+                                opacity: 1
                               }}
-                              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.9'}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.05)';
+                                e.currentTarget.style.transformOrigin = 'center';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                              }}
                             >
                               <title>{`${status}: ${count} turnos (${percentage.toFixed(1)}%)`}</title>
                             </path>
