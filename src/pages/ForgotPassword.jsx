@@ -2,18 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 import '../styles/ForgotPassword.css';
-import { FaEnvelope, FaArrowLeft, FaUserCheck } from 'react-icons/fa';
+import { FaEnvelope, FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 const ForgotPassword = () => {
   const { t } = useTranslation(['admin', 'common']);
-  const { quickLogin } = useAuth();
-  const [step, setStep] = useState(1); // 1: Ingreso de email, 2: Confirmación
+  const [emailSent, setEmailSent] = useState(false); // true cuando se envió el email
   const [email, setEmail] = useState('');
-  const [adminData, setAdminData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
   const [randomGif, setRandomGif] = useState('');
@@ -56,63 +53,24 @@ const ForgotPassword = () => {
     setLocalError(null);
 
     try {
-      console.log('Verificando correo:', email);
-      const response = await axios.post(`${API_URL}/auth/verify-email-exists`, {
+      console.log('Solicitando recuperación de contraseña para:', email);
+      const response = await axios.post(`${API_URL}/auth/request-password-reset`, {
         s_email: email
       });
 
       console.log('Respuesta del servidor:', response.data);
       
       if (response.data.success) {
-        // Guardar datos del admin y pasar al paso 2
-        setAdminData(response.data.data);
-        setStep(2);
+        // Mostrar mensaje de éxito
+        setEmailSent(true);
       }
     } catch (err) {
-      console.error('Error al verificar correo:', err);
-      if (err.response?.status === 404) {
-        setLocalError('El correo electrónico no está registrado');
-      } else if (err.response?.status === 403) {
+      console.error('Error al solicitar recuperación:', err);
+      if (err.response?.status === 403) {
         setLocalError(err.response.data.message || 'Debe verificar su correo electrónico primero');
       } else {
         setLocalError(err.response?.data?.message || 'Ha ocurrido un error. Por favor, intente nuevamente más tarde.');
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleConfirmIdentity = async () => {
-    setIsLoading(true);
-    setLocalError(null);
-
-    try {
-      console.log('Confirmando identidad para:', email);
-      const response = await axios.post(`${API_URL}/auth/confirm-identity`, {
-        s_email: email
-      });
-
-      console.log('Respuesta de confirmación:', response.data);
-      
-      if (response.data.success) {
-        // Guardar token y datos del usuario usando el AuthContext
-        const authData = response.data.data;
-        
-        // Usar quickLogin para manejar correctamente el contexto y localStorage
-        const loginResult = quickLogin(authData, true);
-        
-        if (loginResult.success) {
-          console.log('✅ Acceso concedido, redirigiendo al dashboard');
-          
-          // Redirigir al dashboard
-          navigate('/admin/dashboard');
-        } else {
-          setLocalError(loginResult.message || 'Error al iniciar sesión');
-        }
-      }
-    } catch (err) {
-      console.error('Error al confirmar identidad:', err);
-      setLocalError(err.response?.data?.message || 'Ha ocurrido un error. Por favor, intente nuevamente más tarde.');
     } finally {
       setIsLoading(false);
     }
@@ -169,12 +127,12 @@ const ForgotPassword = () => {
         {/* Welcome Messages */}
         <div className="welcome-messages">
           <h2 className="forgot-password-title">
-            {step === 1 ? 'Acceso Rápido' : '¿En verdad eres tú?'}
+            {emailSent ? '¡Correo Enviado!' : 'Recuperar Contraseña'}
           </h2>
           <p className="welcome-text">
-            {step === 1 
-              ? 'Ingrese su correo electrónico de administrador' 
-              : `Hola ${adminData?.nombre} ${adminData?.apellido}`}
+            {emailSent 
+              ? 'Revisa tu bandeja de entrada' 
+              : 'Ingrese su correo electrónico de administrador'}
           </p>
         </div>
 
@@ -185,8 +143,8 @@ const ForgotPassword = () => {
           </div>
         )}
 
-        {/* PASO 1: Ingreso de Email */}
-        {step === 1 && (
+        {/* Formulario de Ingreso de Email */}
+        {!emailSent && (
           <>
             <form onSubmit={handleSubmit} className="forgot-password-form">
               <div className="form-group">
@@ -213,7 +171,7 @@ const ForgotPassword = () => {
                 <span></span>
                 <span></span>
                 <span></span>
-                {isLoading ? 'Verificando...' : 'Continuar'}
+                {isLoading ? 'Enviando...' : 'Enviar Enlace de Recuperación'}
               </button>
             </form>
 
@@ -227,43 +185,46 @@ const ForgotPassword = () => {
           </>
         )}
 
-        {/* PASO 2: Confirmación de Identidad */}
-        {step === 2 && (
+        {/* Mensaje de Éxito */}
+        {emailSent && (
           <>
             <div className="confirmation-message">
-              <FaUserCheck className="confirmation-icon" />
+              <FaCheckCircle className="confirmation-icon" style={{ color: '#4a90a4' }} />
               <p className="confirmation-text">
-                Confirma que eres tú para acceder al panel de administración
+                Se ha enviado un enlace de recuperación a tu correo electrónico
               </p>
-              <div className="admin-info">
-                <p><strong>Correo:</strong> {adminData?.email}</p>
+              <div className="admin-info" style={{ textAlign: 'center' }}>
+                <p style={{ marginBottom: '10px' }}><strong>Correo:</strong> {email}</p>
+                <p style={{ fontSize: '14px', color: '#5f6368', lineHeight: '1.6' }}>
+                  Por favor, revisa tu bandeja de entrada (y carpeta de spam) para encontrar el correo con las instrucciones para restablecer tu contraseña.
+                </p>
+                <p style={{ fontSize: '13px', color: '#d93025', marginTop: '15px' }}>
+                  ⚠️ El enlace expirará en 1 hora por seguridad.
+                </p>
               </div>
             </div>
 
             <div className="confirmation-buttons">
               <button
-                onClick={handleConfirmIdentity}
-                className={`submit-button ${isLoading ? 'loading' : ''}`}
-                disabled={isLoading}
+                onClick={handleBackToLogin}
+                className="submit-button"
               >
                 <span></span>
                 <span></span>
                 <span></span>
                 <span></span>
-                {isLoading ? 'Ingresando...' : 'Sí, soy yo'}
+                Volver al Inicio de Sesión
               </button>
 
               <button
                 onClick={() => {
-                  setStep(1);
+                  setEmailSent(false);
                   setEmail('');
-                  setAdminData(null);
                   setLocalError(null);
                 }}
                 className="cancel-button"
-                disabled={isLoading}
               >
-                No, regresar
+                Reenviar correo
               </button>
             </div>
           </>
