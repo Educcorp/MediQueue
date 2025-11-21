@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './LoadingScreen.css';
 
 const LoadingScreen = ({
-    message = "Cargando dashboard...",
+    message = "Loading dashboard...",
     showProgress = false
 }) => {
     const [progress, setProgress] = useState(0);

@@ -279,21 +279,40 @@ const PatientManagement = () => {
     } catch (error) {
       console.error('Error guardando paciente:', error);
 
-      // Mensaje simple y amigable
-      const errorMessage = editingPatient
+      // Mensaje más específico según el tipo de error
+      let errorMessage = editingPatient
         ? 'No es posible actualizar el paciente'
         : 'No es posible crear el paciente';
+      
+      let errorDetails = '';
+
+      // Error 409 - Conflicto (teléfono o email duplicado)
+      if (error.response?.status === 409) {
+        errorMessage = editingPatient
+          ? 'Cannot update patient'
+          : 'Patient already exists';
+        errorDetails = 'A patient with this phone number or email already exists in the system.';
+      }
+      // Error 400 - Validación
+      else if (error.response?.status === 400) {
+        errorMessage = 'Invalid data';
+        errorDetails = error.response?.data?.message || 'Please check the entered information.';
+      }
+      // Otros errores
+      else if (error.response?.data?.message) {
+        errorDetails = error.response.data.message;
+      }
 
       setErrorModalData({
         message: errorMessage,
-        details: ''
+        details: errorDetails
       });
       setShowErrorModal(true);
 
-      // Auto-cerrar después de 4 segundos
+      // Auto-cerrar después de 5 segundos
       setTimeout(() => {
         setShowErrorModal(false);
-      }, 4000);
+      }, 5000);
     }
   };
 
@@ -1208,7 +1227,7 @@ const PatientManagement = () => {
 
               {/* Mensaje principal */}
               <p style={{
-                margin: '0 0 24px 0',
+                margin: errorModalData.details ? '0 0 12px 0' : '0 0 24px 0',
                 color: 'var(--text-secondary)',
                 fontSize: '16px',
                 lineHeight: '1.6',
@@ -1216,6 +1235,23 @@ const PatientManagement = () => {
               }}>
                 {errorModalData.message}
               </p>
+
+              {/* Mensaje de detalles (opcional) */}
+              {errorModalData.details && (
+                <p style={{
+                  margin: '0 0 24px 0',
+                  color: 'var(--text-muted)',
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  textAlign: 'center',
+                  padding: '12px',
+                  background: isDarkMode ? 'rgba(220, 53, 69, 0.1)' : 'rgba(220, 53, 69, 0.05)',
+                  borderRadius: '8px',
+                  border: `1px solid ${isDarkMode ? 'rgba(220, 53, 69, 0.2)' : 'rgba(220, 53, 69, 0.1)'}`
+                }}>
+                  {errorModalData.details}
+                </p>
+              )}
             </div>
 
             {/* Barra de progreso de auto-cierre */}
@@ -1229,7 +1265,7 @@ const PatientManagement = () => {
               <div style={{
                 height: '100%',
                 background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
-                animation: 'autoCloseProgress 4s linear forwards'
+                animation: 'autoCloseProgress 5s linear forwards'
               }} />
             </div>
 
