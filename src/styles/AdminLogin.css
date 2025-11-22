@@ -832,7 +832,7 @@
 }
 
 .forgot-password-link a:hover {
-    color: #0004ff;
+    color: #313131;
     background: rgba(119, 184, 206, 0.1);
     transform: translateY(-2px);
     text-decoration: none;
