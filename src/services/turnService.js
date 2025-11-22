@@ -90,6 +90,28 @@ const turnService = {
         }
     },
 
+    // Actualizar paciente asignado al turno
+    async updateTurnPatient(uk_turno, uk_paciente) {
+        try {
+            const response = await api.put(`/turnos/${uk_turno}/paciente`, { uk_paciente });
+            return response.data.data;
+        } catch (error) {
+            console.error('Error actualizando paciente del turno:', error);
+            throw error;
+        }
+    },
+
+    // Actualizar turno completo (paciente y observaciones)
+    async updateTurn(uk_turno, turnData) {
+        try {
+            const response = await api.put(`/turnos/${uk_turno}`, turnData);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error actualizando turno:', error);
+            throw error;
+        }
+    },
+
     // Cancelar turno
     async cancelTurn(uk_turno) {
         try {
