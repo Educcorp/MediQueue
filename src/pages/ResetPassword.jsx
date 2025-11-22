@@ -45,7 +45,14 @@ const ResetPassword = () => {
       }
 
       try {
-        console.log('Verificando token:', token.substring(0, 10) + '...');
+        console.log('═══════════════════════════════════════════════════════════════');
+        console.log('🔍 DEBUG - Token Capturado:');
+        console.log('   Token completo:', token);
+        console.log('   Longitud del token:', token ? token.length : 0);
+        console.log('   Primeros 20 caracteres:', token ? token.substring(0, 20) : 'N/A');
+        console.log('   URL completa:', window.location.href);
+        console.log('═══════════════════════════════════════════════════════════════');
+        
         const response = await axios.get(`${API_URL}/auth/verify-reset-token`, {
           params: { token }
         });
@@ -76,12 +83,35 @@ const ResetPassword = () => {
     setRandomGif(medicalGifs[randomIndex]);
   }, []);
 
+  // Validar requisitos de contraseña en tiempo real
+  const validatePasswordRequirements = (password) => {
+    return {
+      minLength: password.length >= 6,
+      hasLowercase: /[a-z]/.test(password),
+      hasUppercase: /[A-Z]/.test(password),
+      hasNumber: /\d/.test(password)
+    };
+  };
+
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    minLength: false,
+    hasLowercase: false,
+    hasUppercase: false,
+    hasNumber: false
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    // Validar requisitos en tiempo real para el campo de contraseña
+    if (name === 'password') {
+      setPasswordRequirements(validatePasswordRequirements(value));
+    }
+    
     setLocalError(null);
     setSuccessMessage(null);
   };
@@ -103,11 +133,31 @@ const ResetPassword = () => {
       return;
     }
 
+    // Validación de longitud mínima
     if (formData.password.length < 6) {
       setLocalError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
 
+    // Validación de minúscula
+    if (!/[a-z]/.test(formData.password)) {
+      setLocalError('La contraseña debe contener al menos una letra minúscula');
+      return;
+    }
+
+    // Validación de mayúscula
+    if (!/[A-Z]/.test(formData.password)) {
+      setLocalError('La contraseña debe contener al menos una letra mayúscula');
+      return;
+    }
+
+    // Validación de número
+    if (!/\d/.test(formData.password)) {
+      setLocalError('La contraseña debe contener al menos un número');
+      return;
+    }
+
+    // Validación de coincidencia
     if (formData.password !== formData.confirmPassword) {
       setLocalError('Las contraseñas no coinciden');
       return;
@@ -288,6 +338,49 @@ const ResetPassword = () => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
+            
+            {/* Indicador de requisitos de contraseña */}
+            {formData.password && (
+              <div style={{ marginTop: '10px', fontSize: '13px' }}>
+                <p style={{ margin: '0 0 8px 0', color: '#5f6368', fontWeight: '500' }}>
+                  Requisitos de contraseña:
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: passwordRequirements.minLength ? '#34a853' : '#ea4335' }}>
+                      {passwordRequirements.minLength ? '✓' : '✗'}
+                    </span>
+                    <span style={{ color: passwordRequirements.minLength ? '#34a853' : '#5f6368' }}>
+                      Mínimo 6 caracteres
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: passwordRequirements.hasLowercase ? '#34a853' : '#ea4335' }}>
+                      {passwordRequirements.hasLowercase ? '✓' : '✗'}
+                    </span>
+                    <span style={{ color: passwordRequirements.hasLowercase ? '#34a853' : '#5f6368' }}>
+                      Al menos una minúscula (a-z)
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: passwordRequirements.hasUppercase ? '#34a853' : '#ea4335' }}>
+                      {passwordRequirements.hasUppercase ? '✓' : '✗'}
+                    </span>
+                    <span style={{ color: passwordRequirements.hasUppercase ? '#34a853' : '#5f6368' }}>
+                      Al menos una mayúscula (A-Z)
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: passwordRequirements.hasNumber ? '#34a853' : '#ea4335' }}>
+                      {passwordRequirements.hasNumber ? '✓' : '✗'}
+                    </span>
+                    <span style={{ color: passwordRequirements.hasNumber ? '#34a853' : '#5f6368' }}>
+                      Al menos un número (0-9)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="form-group">
