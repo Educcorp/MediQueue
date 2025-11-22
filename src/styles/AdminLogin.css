@@ -821,7 +821,7 @@
 }
 
 .forgot-password-link a {
-    color: #77b8ce;
+    color: #000000;
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
@@ -832,7 +832,7 @@
 }
 
 .forgot-password-link a:hover {
-    color: #5a9bb8;
+    color: #0004ff;
     background: rgba(119, 184, 206, 0.1);
     transform: translateY(-2px);
     text-decoration: none;
