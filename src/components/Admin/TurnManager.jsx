@@ -391,9 +391,18 @@ const TurnManager = () => {
         })
       ]);
 
+      console.log('🔍 DEBUG - Pacientes recibidos del backend:', patientsData);
+      console.log('🔍 DEBUG - Cantidad de pacientes:', patientsData?.length);
+      if (patientsData?.length > 0) {
+        console.log('🔍 DEBUG - Primer paciente:', patientsData[0]);
+        console.log('🔍 DEBUG - ck_estado del primer paciente:', patientsData[0]?.ck_estado);
+      }
+      
       setPatients(patientsData);
       setConsultorios(consultoriosData);
       setAreas(areasData);
+      
+      console.log('✅ Estado actualizado - patients.length:', patientsData?.length);
     } catch (error) {
       setError('Error cargando datos: ' + error.message);
       console.error('Error cargando datos:', error);
@@ -541,8 +550,12 @@ const TurnManager = () => {
 
     try {
       if (editingTurn) {
-        // Actualizar observaciones del turno
-        await turnService.updateTurnObservations(editingTurn.uk_turno, formData.s_observaciones);
+        // Actualizar turno (paciente y observaciones)
+        const updateData = {
+          uk_paciente: formData.uk_paciente || null,
+          s_observaciones: formData.s_observaciones
+        };
+        await turnService.updateTurn(editingTurn.uk_turno, updateData);
         alert(t('admin:turns.messages.updateSuccess'));
       } else {
         // Crear nuevo turno
@@ -1102,6 +1115,19 @@ const TurnManager = () => {
                         <td>{getAreaInfo(turn.uk_consultorio)}</td>
                         <td>
                           <div className="turn-actions" style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              onClick={() => handleEdit(turn)}
+                              className="btn btn-secondary"
+                              style={{ 
+                                padding: '4px 8px', 
+                                fontSize: '12px',
+                                background: '#77b8ce',
+                                border: 'none'
+                              }}
+                              title={t('admin:turns.edit')}
+                            >
+                              <FaEdit style={{ color: 'white' }} />
+                            </button>
                             {turn.s_estado === 'EN_ESPERA' && (
                               <>
                                 <button
@@ -1229,7 +1255,7 @@ const TurnManager = () => {
               justifyContent: 'space-between'
             }}>
               <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-                {editingTurn ? 'Editar Turno' : 'Nuevo Turno'}
+                {editingTurn ? t('admin:turns.editTurn') : t('admin:turns.newTurn')}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -1248,49 +1274,115 @@ const TurnManager = () => {
 
             <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
               <div className="form-group">
-                <label>Consultorio *</label>
+                <label>{t('admin:turns.form.office')} *</label>
                 <select
                   name="uk_consultorio"
                   value={formData.uk_consultorio}
                   onChange={handleInputChange}
                   className="form-control"
                   required
+                  style={{
+                    padding: '12px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '2px solid var(--border-color)',
+                    backgroundColor: 'var(--bg-white)'
+                  }}
                 >
-                  <option value="">Seleccionar consultorio</option>
+                  <option value="">{t('admin:turns.form.selectOffice')}</option>
                   {consultorios.map(consultorio => (
                     <option key={consultorio.uk_consultorio} value={consultorio.uk_consultorio}>
-                      Consultorio {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
+                      {t('admin:turns.office')} {consultorio.i_numero_consultorio} - {getAreaInfo(consultorio.uk_consultorio)}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="form-group">
-                <label>Paciente (opcional)</label>
+              <div className="form-group" style={{
+                background: 'linear-gradient(135deg, rgba(119, 184, 206, 0.08) 0%, rgba(119, 184, 206, 0.03) 100%)',
+                padding: '16px',
+                borderRadius: '12px',
+                border: '2px dashed rgba(119, 184, 206, 0.3)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <FaUser style={{ color: '#77b8ce', fontSize: '18px' }} />
+                  <label style={{ margin: 0, fontWeight: '600', color: 'var(--text-primary)' }}>
+                    {t('admin:turns.form.patient')} ({t('admin:turns.form.optional')})
+                  </label>
+                </div>
                 <select
                   name="uk_paciente"
                   value={formData.uk_paciente}
                   onChange={handleInputChange}
                   className="form-control"
+                  style={{
+                    padding: '12px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '2px solid rgba(119, 184, 206, 0.3)',
+                    backgroundColor: 'var(--bg-white)',
+                    cursor: 'pointer'
+                  }}
                 >
-                  <option value="">Sin paciente asignado</option>
-                  {patients.map(patient => (
-                    <option key={patient.uk_paciente} value={patient.uk_paciente}>
-                      {patient.s_nombre} {patient.s_apellido} - {patient.c_telefono}
-                    </option>
-                  ))}
+                  <option value="">{t('admin:turns.form.noPatientAssigned')}</option>
+                  {(() => {
+                    console.log('🔍 RENDER - Total pacientes en estado:', patients.length);
+                    console.log('🔍 RENDER - Pacientes completos:', patients);
+                    const activosPreFiltro = patients.length;
+                    const filtrados = patients.filter(p => {
+                      console.log(`🔍 Paciente ${p.s_nombre}: ck_estado="${p.ck_estado}", tipo=${typeof p.ck_estado}`);
+                      return p.ck_estado === 'ACTIVO';
+                    });
+                    console.log(`🔍 RENDER - Pacientes antes del filtro: ${activosPreFiltro}, después del filtro: ${filtrados.length}`);
+                    return filtrados.map(patient => (
+                      <option key={patient.uk_paciente} value={patient.uk_paciente}>
+                        👤 {patient.s_nombre} {patient.s_apellido} • 📞 {patient.c_telefono}
+                        {patient.s_email ? ` • ✉️ ${patient.s_email}` : ''}
+                      </option>
+                    ));
+                  })()}
                 </select>
+                <p style={{
+                  margin: '8px 0 0 0',
+                  fontSize: '12px',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <span style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    background: '#77b8ce',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '10px',
+                    fontWeight: 'bold'
+                  }}>i</span>
+                  {t('admin:turns.form.patientHelp')}
+                </p>
               </div>
 
               <div className="form-group">
-                <label>Observaciones</label>
+                <label>{t('admin:turns.form.observations')}</label>
                 <textarea
                   name="s_observaciones"
                   value={formData.s_observaciones}
                   onChange={handleInputChange}
                   rows="3"
                   className="form-control"
-                  placeholder="Observaciones adicionales..."
+                  placeholder={t('admin:turns.form.observationsPlaceholder')}
+                  style={{
+                    padding: '12px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '2px solid var(--border-color)',
+                    backgroundColor: 'var(--bg-white)',
+                    resize: 'vertical'
+                  }}
                 />
               </div>
 

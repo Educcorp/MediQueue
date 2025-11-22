@@ -94,13 +94,13 @@ const AdminFooter = ({ isDarkMode = false }) => {
             }}>
               {[
                 { name: 'Dashboard', href: '/admin/dashboard' },
-                { name: 'Gestión de Turnos', href: '/admin/turns' },
-                { name: 'Historial de Turnos', href: '/admin/historial' },
-                { name: 'Pacientes', href: '/admin/patients' },
-                { name: 'Consultorios', href: '/admin/consultorios' },
-                { name: 'Estadísticas', href: '/admin/statistics' },
-                { name: 'Acerca de Nosotros', href: '/about' },
-                { name: 'Política de Privacidad', href: '/privacy' }
+                { name: 'Turn Management', href: '/admin/turns' },
+                { name: 'Turn History', href: '/admin/historial' },
+                { name: 'Patients', href: '/admin/patients' },
+                { name: 'Offices', href: '/admin/consultorios' },
+                { name: 'Statistics', href: '/admin/statistics' },
+                { name: 'About Us', href: '/about' },
+                { name: 'Privacy Policy', href: '/privacy' }
               ].map((link) => (
                 <a
                   key={link.name}

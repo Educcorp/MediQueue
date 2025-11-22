@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const TestSpinner = ({ message = "Cargando..." }) => {
+const TestSpinner = ({ message = "Loading..." }) => {
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
   const isDarkMode = theme === 'dark';

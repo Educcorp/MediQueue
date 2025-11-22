@@ -175,6 +175,7 @@
     "historialTitle": "Ver Historial de Turnos",
     "listTitle": "Lista de Turnos",
     "createTurn": "Crear Turno",
+    "newTurn": "Nuevo Turno",
     "editTurn": "Editar Turno",
     "deleteTurn": "Eliminar Turno",
     "viewTurn": "Ver Turno",
@@ -184,6 +185,7 @@
     "guest": "Invitado",
     "patientNotFound": "Paciente no encontrado",
     "officeNotFound": "Consultorio no encontrado",
+    "edit": "Editar",
     "markAsAttended": "Marcar como atendido",
     "cancel": "Cancelar turno",
     "area": "Área",
@@ -231,6 +233,16 @@
       "complete": "Completar",
       "cancel": "Cancelar",
       "noPresent": "No Presente"
+    },
+    "form": {
+      "office": "Consultorio",
+      "selectOffice": "Seleccionar consultorio",
+      "patient": "Paciente",
+      "optional": "opcional",
+      "noPatientAssigned": "Sin paciente asignado (Invitado)",
+      "observations": "Observaciones",
+      "observationsPlaceholder": "Observaciones adicionales...",
+      "patientHelp": "Selecciona un paciente existente o déjalo vacío para un turno de invitado"
     },
     "messages": {
       "updateSuccess": "Turno actualizado exitosamente",

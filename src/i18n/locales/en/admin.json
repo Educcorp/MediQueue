@@ -175,6 +175,7 @@
     "historialTitle": "View Appointment History",
     "listTitle": "Appointment List",
     "createTurn": "Create Appointment",
+    "newTurn": "New Appointment",
     "editTurn": "Edit Appointment",
     "deleteTurn": "Delete Appointment",
     "viewTurn": "View Appointment",
@@ -184,6 +185,7 @@
     "guest": "Guest",
     "patientNotFound": "Patient not found",
     "officeNotFound": "Office not found",
+    "edit": "Edit",
     "markAsAttended": "Mark as attended",
     "cancel": "Cancel appointment",
     "area": "Area",
@@ -231,6 +233,16 @@
       "complete": "Complete",
       "cancel": "Cancel",
       "noPresent": "Not Present"
+    },
+    "form": {
+      "office": "Office",
+      "selectOffice": "Select office",
+      "patient": "Patient",
+      "optional": "optional",
+      "noPatientAssigned": "No patient assigned (Guest)",
+      "observations": "Observations",
+      "observationsPlaceholder": "Additional observations...",
+      "patientHelp": "Select an existing patient or leave empty for a guest appointment"
     },
     "messages": {
       "updateSuccess": "Appointment updated successfully",
@@ -316,7 +328,24 @@
     "stats": {
       "total": "Total Patients",
       "active": "Active",
+      "inactive": "Inactive Patients",
+      "withEmail": "With Email",
       "newThisMonth": "New this month"
+    },
+    "recordsFound": "records found",
+    "listTitle": "Patient List",
+    "filters": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "age": "Age",
+      "status": "Status",
+      "registrationDate": "Registration Date",
+      "actions": "Actions"
     },
     "empty": "No patients registered"
   },
