@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
-import { generateTurnTicket } from '../services/ticketService';
+import { printThermalTicket } from '../services/ticketService';
 import Footer from '../components/Footer';
 import '../styles/TakeTurn.css';
 
@@ -282,9 +282,9 @@ const TakeTurn = () => {
           id: result.id || result.uk_turno
         };
 
-        // Generar ticket PDF automáticamente
-        await generateTurnTicket(ticketData);
-        console.log('✅ Ticket PDF generado y descargado automáticamente');
+        // Imprimir ticket térmico de 58mm automáticamente
+        printThermalTicket(ticketData);
+        console.log('✅ Ticket térmico enviado a impresora 58mm');
       } catch (ticketError) {
         console.error('⚠️ Error al generar ticket (no afecta el turno):', ticketError);
         // No mostramos error al usuario porque el turno se creó correctamente

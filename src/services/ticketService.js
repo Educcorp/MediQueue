@@ -2,8 +2,289 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 /**
+ * Genera e imprime ticket térmico de 58mm directamente en la impresora
+ * Optimizado para impresoras térmicas MERION y similares (58mm, B/N, 203dpi)
+ */
+export const printThermalTicket = (turnData) => {
+    try {
+        // Crear ventana de impresión con HTML optimizado para impresora térmica 58mm
+        const printWindow = window.open('', '', 'width=400,height=600');
+        
+        if (!printWindow) {
+            console.error('No se pudo abrir ventana de impresión');
+            return false;
+        }
+
+        const fecha = turnData.fecha_creacion ?
+            new Date(turnData.fecha_creacion).toLocaleDateString('es-AR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }) :
+            new Date().toLocaleDateString('es-AR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+        const hora = turnData.fecha_creacion ?
+            new Date(turnData.fecha_creacion).toLocaleTimeString('es-AR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) :
+            new Date().toLocaleTimeString('es-AR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+        // HTML optimizado para impresión térmica 58mm
+        const ticketHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Turno ${turnData.numero_turno}</title>
+    <style>
+        /* Reset y configuración para impresora térmica de 58mm */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @page {
+            size: 58mm auto;
+            margin: 0;
+        }
+        
+        @media print {
+            body {
+                width: 58mm;
+                margin: 0;
+                padding: 0;
+            }
+        }
+        
+        body {
+            width: 58mm;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            line-height: 1.3;
+            color: #000;
+            background: #fff;
+            padding: 3mm;
+        }
+        
+        /* Encabezado */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 3mm;
+            margin-bottom: 3mm;
+        }
+        
+        .logo-text {
+            font-size: 14pt;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 1mm;
+        }
+        
+        .subtitle {
+            font-size: 7pt;
+            margin-bottom: 2mm;
+        }
+        
+        /* Número de turno destacado */
+        .turn-number-box {
+            text-align: center;
+            border: 2px solid #000;
+            padding: 4mm 2mm;
+            margin: 3mm 0;
+            background: #f0f0f0;
+        }
+        
+        .turn-label {
+            font-size: 10pt;
+            font-weight: bold;
+            margin-bottom: 2mm;
+        }
+        
+        .turn-number {
+            font-size: 24pt;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        /* Información del turno */
+        .info-section {
+            margin: 3mm 0;
+            font-size: 8pt;
+        }
+        
+        .info-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 1.5mm 0;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 1mm;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .info-value {
+            text-align: right;
+        }
+        
+        /* Instrucciones */
+        .instructions {
+            margin-top: 4mm;
+            padding: 3mm;
+            border: 1px solid #000;
+            background: #f5f5f5;
+        }
+        
+        .instructions-title {
+            font-size: 8pt;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 2mm;
+            border-bottom: 1px solid #000;
+            padding-bottom: 1mm;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            font-size: 6.5pt;
+            line-height: 1.4;
+        }
+        
+        .instructions li {
+            margin: 1mm 0;
+            padding-left: 2mm;
+        }
+        
+        .instructions li:before {
+            content: "• ";
+            font-weight: bold;
+        }
+        
+        /* Pie de página */
+        .footer {
+            margin-top: 4mm;
+            padding-top: 2mm;
+            border-top: 2px dashed #000;
+            text-align: center;
+            font-size: 6.5pt;
+        }
+        
+        .footer-line {
+            margin: 1mm 0;
+        }
+        
+        /* Línea de corte */
+        .cut-line {
+            margin-top: 4mm;
+            text-align: center;
+            font-size: 7pt;
+            border-top: 1px dashed #000;
+            padding-top: 2mm;
+        }
+    </style>
+</head>
+<body>
+    <!-- ENCABEZADO -->
+    <div class="header">
+        <div class="logo-text">MEDIQUEUE</div>
+        <div class="subtitle">Sistema de Turnos Médicos</div>
+    </div>
+    
+    <!-- NÚMERO DE TURNO -->
+    <div class="turn-number-box">
+        <div class="turn-label">TURNO N°</div>
+        <div class="turn-number">${turnData.numero_turno || 'N/A'}</div>
+    </div>
+    
+    <!-- INFORMACIÓN DEL TURNO -->
+    <div class="info-section">
+        <div class="info-line">
+            <span class="info-label">Área:</span>
+            <span class="info-value">${turnData.area_nombre || 'General'}</span>
+        </div>
+        
+        ${turnData.consultorio_numero ? `
+        <div class="info-line">
+            <span class="info-label">Consultorio:</span>
+            <span class="info-value">Consultorio ${turnData.consultorio_numero}</span>
+        </div>
+        ` : ''}
+        
+        <div class="info-line">
+            <span class="info-label">Fecha:</span>
+            <span class="info-value">${fecha}</span>
+        </div>
+        
+        <div class="info-line">
+            <span class="info-label">Hora:</span>
+            <span class="info-value">${hora}</span>
+        </div>
+    </div>
+    
+    <!-- INSTRUCCIONES -->
+    <div class="instructions">
+        <div class="instructions-title">Instrucciones:</div>
+        <ul>
+            <li>Conserve este ticket hasta ser atendido</li>
+            <li>Esté atento al llamado de su turno</li>
+            <li>Presente este ticket al ser llamado</li>
+            <li>En caso de ausencia, el turno será reasignado automáticamente</li>
+        </ul>
+    </div>
+    
+    <!-- PIE DE PÁGINA -->
+    <div class="footer">
+        <div class="footer-line">Gracias por utilizar MediQueue</div>
+        <div class="footer-line">www.mediqueue.com</div>
+    </div>
+    
+    <!-- LÍNEA DE CORTE -->
+    <div class="cut-line">✂ ----------------------- ✂</div>
+    
+    <script>
+        // Imprimir automáticamente al cargar
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+                // Cerrar ventana después de imprimir
+                setTimeout(function() {
+                    window.close();
+                }, 500);
+            }, 250);
+        };
+    </script>
+</body>
+</html>`;
+
+        printWindow.document.write(ticketHTML);
+        printWindow.document.close();
+
+        console.log('✅ Ticket térmico enviado a impresora');
+        return true;
+
+    } catch (error) {
+        console.error('❌ Error al imprimir ticket térmico:', error);
+        throw error;
+    }
+};
+
+/**
  * Genera y descarga automáticamente un ticket PDF para un turno
  * Formato similar a los tickets bancarios con diseño profesional
+ * (Mantiene compatibilidad con versión anterior para descargas)
  */
 export const generateTurnTicket = (turnData) => {
     try {
