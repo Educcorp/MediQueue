@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import turnService from '../services/turnService';
 import areaService from '../services/areaService';
+import { generateTurnTicket } from '../services/ticketService';
 import Footer from '../components/Footer';
 import '../styles/TakeTurn.css';
 
@@ -261,6 +262,33 @@ const TakeTurn = () => {
       setTurnResult(result);
       setShowSuccess(true);
       setCountdown(5); // Iniciar countdown de 5 segundos
+
+      // 🎫 GENERAR Y DESCARGAR TICKET AUTOMÁTICAMENTE
+      try {
+        // Obtener la letra del área desde los datos del área seleccionada
+        const areaLetra = selectedArea.s_letra || selectedArea.s_nombre_area?.charAt(0) || 'A';
+        const numeroTurno = result.i_numero_turno || result.numero_turno || result.id;
+
+        // Formatear número de turno con letra (ej: C1, M2, P3)
+        const numeroTurnoConLetra = `${areaLetra}${numeroTurno}`;
+
+        const ticketData = {
+          numero_turno: numeroTurnoConLetra,
+          paciente_nombre: 'Paciente', // Anónimo en modo público
+          area_nombre: selectedArea.s_nombre_area,
+          consultorio_numero: result.asignacion_automatica?.consultorio_asignado?.numero || null,
+          fecha_creacion: new Date().toISOString(),
+          estado: 'espera',
+          id: result.id || result.uk_turno
+        };
+
+        // Generar ticket PDF automáticamente
+        await generateTurnTicket(ticketData);
+        console.log('✅ Ticket PDF generado y descargado automáticamente');
+      } catch (ticketError) {
+        console.error('⚠️ Error al generar ticket (no afecta el turno):', ticketError);
+        // No mostramos error al usuario porque el turno se creó correctamente
+      }
 
     } catch (error) {
       console.error('Error generando turno:', error);
