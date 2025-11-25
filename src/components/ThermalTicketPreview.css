@@ -63,102 +63,153 @@
 .thermal-ticket-preview {
     width: 58mm;
     margin: 0 auto;
-    font-family: 'Courier New', monospace;
+    font-family: 'Georgia', 'Garamond', serif;
     font-size: 9pt;
+    font-weight: bold;
     line-height: 1.3;
     color: #000;
     background: #fff;
-    padding: 3mm;
-    border: 2px solid #cbd5e0;
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 2mm;
+    border: 3px double #2d3748;
+    border-radius: 0;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Ornamento superior */
+.thermal-ticket-preview .ornament-top {
+    text-align: center;
+    font-size: 10pt;
+    font-weight: 900;
+    margin-bottom: 1mm;
+    letter-spacing: 2mm;
 }
 
 /* Encabezado */
 .thermal-ticket-preview .header {
     text-align: center;
+    border-top: 2px solid #000;
     border-bottom: 2px solid #000;
-    padding-bottom: 3mm;
-    margin-bottom: 3mm;
+    padding: 1.5mm 0;
+    margin-bottom: 1mm;
 }
 
 .thermal-ticket-preview .logo-text {
-    font-size: 14pt;
-    font-weight: bold;
-    letter-spacing: 1px;
-    margin-bottom: 1mm;
+    font-size: 13pt;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 0.5mm;
+    font-family: 'Georgia', serif;
+    text-transform: uppercase;
 }
 
 .thermal-ticket-preview .subtitle {
     font-size: 7pt;
-    margin-bottom: 2mm;
+    font-weight: normal;
+    font-style: italic;
+    letter-spacing: 0.5px;
+}
+
+/* Divisor decorativo */
+.thermal-ticket-preview .divider {
+    text-align: center;
+    font-size: 9pt;
+    font-weight: 900;
+    margin: 1mm 0;
+    letter-spacing: 2mm;
 }
 
 /* Número de turno destacado */
 .thermal-ticket-preview .turn-number-box {
     text-align: center;
-    border: 2px solid #000;
-    padding: 4mm 2mm;
-    margin: 3mm 0;
-    background: #f0f0f0;
+    border: 3px double #000;
+    padding: 2mm;
+    margin: 1mm 0;
+    background: #000;
+    color: #fff;
 }
 
 .thermal-ticket-preview .turn-label {
-    font-size: 10pt;
-    font-weight: bold;
-    margin-bottom: 2mm;
+    font-size: 8pt;
+    font-weight: 900;
+    margin-bottom: 1mm;
+    letter-spacing: 1px;
+    font-family: 'Georgia', serif;
 }
 
 .thermal-ticket-preview .turn-number {
-    font-size: 24pt;
-    font-weight: bold;
+    font-size: 28pt;
+    font-weight: 900;
     letter-spacing: 2px;
+    font-family: 'Georgia', serif;
+    line-height: 1;
 }
 
 /* Información del turno */
 .thermal-ticket-preview .info-section {
-    margin: 3mm 0;
+    margin: 1mm 0;
     font-size: 8pt;
+    border: 2px solid #000;
+    padding: 2mm;
+    background: #fff;
 }
 
 .thermal-ticket-preview .info-line {
     display: flex;
     justify-content: space-between;
-    margin: 1.5mm 0;
-    border-bottom: 1px dashed #ccc;
+    align-items: center;
+    margin: 1mm 0;
     padding-bottom: 1mm;
+    border-bottom: 1px solid #000;
+}
+
+.thermal-ticket-preview .info-line:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .thermal-ticket-preview .info-label {
-    font-weight: bold;
+    font-weight: 900;
     text-transform: uppercase;
+    font-size: 7pt;
+    letter-spacing: 0.3px;
+}
+
+.thermal-ticket-preview .info-label::before {
+    content: "◆ ";
+    font-size: 6pt;
 }
 
 .thermal-ticket-preview .info-value {
     text-align: right;
+    font-weight: 700;
+    font-family: 'Georgia', serif;
+    font-size: 8pt;
 }
 
 /* Instrucciones */
 .thermal-ticket-preview .instructions {
-    margin-top: 4mm;
-    padding: 3mm;
-    border: 1px solid #000;
-    background: #f5f5f5;
+    margin-top: 2mm;
+    padding: 2mm;
+    border: 2px solid #000;
+    background: #fff;
 }
 
 .thermal-ticket-preview .instructions-title {
     font-size: 8pt;
-    font-weight: bold;
+    font-weight: 900;
     text-align: center;
     text-transform: uppercase;
-    margin-bottom: 2mm;
+    margin-bottom: 1.5mm;
     border-bottom: 1px solid #000;
     padding-bottom: 1mm;
+    letter-spacing: 0.5px;
+    font-family: 'Georgia', serif;
 }
 
 .thermal-ticket-preview .instructions ul {
     list-style: none;
     font-size: 6.5pt;
+    font-weight: normal;
     line-height: 1.4;
     margin: 0;
     padding: 0;
@@ -167,33 +218,48 @@
 .thermal-ticket-preview .instructions li {
     margin: 1mm 0;
     padding-left: 2mm;
+    text-indent: -2mm;
 }
 
 .thermal-ticket-preview .instructions li:before {
-    content: "• ";
-    font-weight: bold;
+    content: "◆ ";
+    font-weight: 900;
+    font-size: 7pt;
 }
 
 /* Pie de página */
 .thermal-ticket-preview .footer {
-    margin-top: 4mm;
-    padding-top: 2mm;
-    border-top: 2px dashed #000;
+    margin-top: 2mm;
+    padding-top: 1.5mm;
+    border-top: 2px solid #000;
     text-align: center;
     font-size: 6.5pt;
+    font-weight: normal;
+    font-style: italic;
 }
 
 .thermal-ticket-preview .footer-line {
-    margin: 1mm 0;
+    margin: 0.5mm 0;
+}
+
+/* Ornamento inferior */
+.thermal-ticket-preview .ornament-bottom {
+    text-align: center;
+    font-size: 9pt;
+    font-weight: 900;
+    margin-top: 1.5mm;
+    letter-spacing: 2mm;
 }
 
 /* Línea de corte */
 .thermal-ticket-preview .cut-line {
-    margin-top: 4mm;
+    margin-top: 2mm;
     text-align: center;
-    font-size: 7pt;
+    font-size: 8pt;
+    font-weight: 900;
     border-top: 1px dashed #000;
-    padding-top: 2mm;
+    padding-top: 1.5mm;
+    letter-spacing: 2mm;
 }
 
 /* Información adicional */
