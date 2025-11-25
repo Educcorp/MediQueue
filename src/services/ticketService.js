@@ -102,20 +102,25 @@ export const printThermalTicket = (turnData) => {
             margin: 0;
         }
         
-        /* Número de turno - Grande y destacado */
+        /* Número de turno - Grande y destacado con fondo NEGRO para impresión */
         .turn-box {
             text-align: center;
-            border: 2px solid #000;
-            padding: 1mm 4mm;
+            border: 3px solid #000;
+            padding: 2mm 4mm;
             margin: 0;
-            background: #272727ff;
-            color: #fff;
+            background-color: #000 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
         
         .turn-label {
             font-size: 7pt;
             margin-bottom: 0.5mm;
-            color: #fff;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
         .turn-number {
@@ -123,7 +128,9 @@ export const printThermalTicket = (turnData) => {
             font-weight: bold;
             line-height: 1;
             letter-spacing: 0px;
-            color: #fff;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
         /* Información compacta */
