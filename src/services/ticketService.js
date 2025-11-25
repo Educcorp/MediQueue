@@ -59,223 +59,149 @@ export const printThermalTicket = (turnData) => {
         
         @media print {
             body {
-                width: 54mm;
+                width: 58mm;
                 margin: 0;
                 padding: 0;
             }
         }
         
         body {
-            width: 54mm;
-            font-family: 'Georgia', 'Garamond', serif;
-            font-size: 8pt;
-            font-weight: bold;
-            line-height: 1.2;
+            width: 58mm;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            line-height: 1.3;
             color: #000;
             background: #fff;
-            padding: 2mm;
-        }
-        
-        /* Ornamento superior */
-        .ornament-top {
-            text-align: center;
-            font-size: 8pt;
-            font-weight: 900;
-            margin-bottom: 1mm;
-            letter-spacing: 1mm;
-        }
-        
-        /* Divisor decorativo */
-        .divider {
-            text-align: center;
-            font-size: 7pt;
-            font-weight: 900;
-            margin: 1mm 0;
-            letter-spacing: 1mm;
+            padding: 3mm;
         }
         
         /* Encabezado */
         .header {
             text-align: center;
-            border-top: 2px solid #000;
             border-bottom: 2px solid #000;
-            padding: 1.5mm 0;
-            margin-bottom: 1mm;
+            padding-bottom: 3mm;
+            margin-bottom: 3mm;
         }
         
         .logo-text {
-            font-size: 11pt;
-            font-weight: 900;
+            font-size: 14pt;
+            font-weight: bold;
             letter-spacing: 1px;
-            margin-bottom: 0.5mm;
-            font-family: 'Georgia', serif;
-            text-transform: uppercase;
+            margin-bottom: 1mm;
         }
         
         .subtitle {
-            font-size: 6pt;
-            font-weight: normal;
-            font-style: italic;
-            letter-spacing: 0.3px;
+            font-size: 7pt;
+            margin-bottom: 2mm;
         }
         
         /* Número de turno destacado */
         .turn-number-box {
             text-align: center;
             border: 2px solid #000;
-            padding: 2mm 1mm;
-            margin: 1mm 0;
-            background: #000;
-            color: #fff;
+            padding: 4mm 2mm;
+            margin: 3mm 0;
+            background: #f0f0f0;
         }
         
         .turn-label {
-            font-size: 7pt;
-            font-weight: 900;
-            margin-bottom: 0.5mm;
-            letter-spacing: 0.5px;
-            font-family: 'Georgia', serif;
+            font-size: 10pt;
+            font-weight: bold;
+            margin-bottom: 2mm;
         }
         
         .turn-number {
             font-size: 24pt;
-            font-weight: 900;
-            letter-spacing: 1px;
-            font-family: 'Georgia', serif;
-            line-height: 1;
+            font-weight: bold;
+            letter-spacing: 2px;
         }
         
         /* Información del turno */
         .info-section {
-            margin: 1mm 0;
-            font-size: 7pt;
-            border: 1px solid #000;
-            padding: 1.5mm;
-            background: #fff;
+            margin: 3mm 0;
+            font-size: 8pt;
         }
         
         .info-line {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin: 0.8mm 0;
-            padding-bottom: 0.8mm;
-            border-bottom: 1px solid #ccc;
-        }
-        
-        .info-line:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
+            margin: 1.5mm 0;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 1mm;
         }
         
         .info-label {
-            font-weight: 900;
+            font-weight: bold;
             text-transform: uppercase;
-            font-size: 6.5pt;
-            letter-spacing: 0.2px;
-        }
-        
-        .info-label::before {
-            content: "◆ ";
-            font-size: 5pt;
         }
         
         .info-value {
             text-align: right;
-            font-weight: 700;
-            font-family: 'Georgia', serif;
-            font-size: 7pt;
         }
         
         /* Instrucciones */
         .instructions {
-            margin-top: 1.5mm;
-            padding: 1.5mm;
+            margin-top: 4mm;
+            padding: 3mm;
             border: 1px solid #000;
-            background: #fff;
+            background: #f5f5f5;
         }
         
         .instructions-title {
-            font-size: 7pt;
-            font-weight: 900;
+            font-size: 8pt;
+            font-weight: bold;
             text-align: center;
             text-transform: uppercase;
-            margin-bottom: 1mm;
+            margin-bottom: 2mm;
             border-bottom: 1px solid #000;
-            padding-bottom: 0.8mm;
-            letter-spacing: 0.3px;
-            font-family: 'Georgia', serif;
+            padding-bottom: 1mm;
         }
         
         .instructions ul {
             list-style: none;
-            font-size: 5.5pt;
-            font-weight: normal;
-            line-height: 1.3;
-            margin: 0;
-            padding: 0;
+            font-size: 6.5pt;
+            line-height: 1.4;
         }
         
         .instructions li {
-            margin: 0.8mm 0;
+            margin: 1mm 0;
             padding-left: 2mm;
-            text-indent: -2mm;
         }
         
         .instructions li:before {
-            content: "◆ ";
-            font-weight: 900;
-            font-size: 6pt;
+            content: "• ";
+            font-weight: bold;
         }
         
         /* Pie de página */
         .footer {
-            margin-top: 1.5mm;
-            padding-top: 1mm;
-            border-top: 1px solid #000;
+            margin-top: 4mm;
+            padding-top: 2mm;
+            border-top: 2px dashed #000;
             text-align: center;
-            font-size: 5.5pt;
-            font-weight: normal;
-            font-style: italic;
+            font-size: 6.5pt;
         }
         
         .footer-line {
-            margin: 0.3mm 0;
-        }
-        
-        /* Ornamento inferior */
-        .ornament-bottom {
-            text-align: center;
-            font-size: 7pt;
-            font-weight: 900;
-            margin-top: 1mm;
-            letter-spacing: 1mm;
+            margin: 1mm 0;
         }
         
         /* Línea de corte */
         .cut-line {
-            margin-top: 1.5mm;
+            margin-top: 4mm;
             text-align: center;
             font-size: 7pt;
-            font-weight: 900;
             border-top: 1px dashed #000;
-            padding-top: 1mm;
-            letter-spacing: 1.5mm;
+            padding-top: 2mm;
         }
     </style>
 </head>
 <body>
-    <!-- ORNAMENTO SUPERIOR -->
-    <div class="ornament-top">◈ ◇ ◈</div>
-    
     <!-- ENCABEZADO -->
     <div class="header">
         <div class="logo-text">MEDIQUEUE</div>
-        <div class="subtitle">~ Sistema de Turnos Médicos ~</div>
+        <div class="subtitle">Sistema de Turnos Médicos</div>
     </div>
-    
-    <!-- DIVISOR -->
-    <div class="divider">◆ ◇ ◆</div>
     
     <!-- NÚMERO DE TURNO -->
     <div class="turn-number-box">
@@ -283,37 +209,34 @@ export const printThermalTicket = (turnData) => {
         <div class="turn-number">${turnData.numero_turno || 'N/A'}</div>
     </div>
     
-    <!-- DIVISOR -->
-    <div class="divider">◇ ◆ ◇</div>
-    
     <!-- INFORMACIÓN DEL TURNO -->
     <div class="info-section">
         <div class="info-line">
-            <span class="info-label">Área</span>
+            <span class="info-label">Área:</span>
             <span class="info-value">${turnData.area_nombre || 'General'}</span>
         </div>
         
         ${turnData.consultorio_numero ? `
         <div class="info-line">
-            <span class="info-label">Consultorio</span>
+            <span class="info-label">Consultorio:</span>
             <span class="info-value">Consultorio ${turnData.consultorio_numero}</span>
         </div>
         ` : ''}
         
         <div class="info-line">
-            <span class="info-label">Fecha</span>
+            <span class="info-label">Fecha:</span>
             <span class="info-value">${fecha}</span>
         </div>
         
         <div class="info-line">
-            <span class="info-label">Hora</span>
+            <span class="info-label">Hora:</span>
             <span class="info-value">${hora}</span>
         </div>
     </div>
     
     <!-- INSTRUCCIONES -->
     <div class="instructions">
-        <div class="instructions-title">Instrucciones</div>
+        <div class="instructions-title">Instrucciones:</div>
         <ul>
             <li>Conserve este ticket hasta ser atendido</li>
             <li>Esté atento al llamado de su turno</li>
@@ -324,15 +247,12 @@ export const printThermalTicket = (turnData) => {
     
     <!-- PIE DE PÁGINA -->
     <div class="footer">
-        <div class="footer-line">~ Gracias por utilizar MediQueue ~</div>
+        <div class="footer-line">Gracias por utilizar MediQueue</div>
         <div class="footer-line">www.mediqueue.com</div>
     </div>
     
-    <!-- ORNAMENTO INFERIOR -->
-    <div class="ornament-bottom">◈ ◇ ◈</div>
-    
     <!-- LÍNEA DE CORTE -->
-    <div class="cut-line">✂ ─ ─ ─ ✂</div>
+    <div class="cut-line">✂ ----------------------- ✂</div>
     
     <script>
         // Imprimir automáticamente al cargar

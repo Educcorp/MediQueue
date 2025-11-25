@@ -40,55 +40,46 @@ const ThermalTicketPreview = ({ turnData, onClose }) => {
 
                 {/* Ticket Preview - Simulación exacta de 58mm */}
                 <div className="thermal-ticket-preview">
-                    {/* ORNAMENTO SUPERIOR */}
-                    <div className="ornament-top">◈ ◇ ◈</div>
-                    
                     {/* ENCABEZADO */}
                     <div className="header">
                         <div className="logo-text">MEDIQUEUE</div>
-                        <div className="subtitle">~ Sistema de Turnos Médicos ~</div>
+                        <div className="subtitle">Sistema de Turnos Médicos</div>
                     </div>
-                    
-                    {/* DIVISOR */}
-                    <div className="divider">◆ ◇ ◆</div>
 
                     {/* NÚMERO DE TURNO */}
                     <div className="turn-number-box">
                         <div className="turn-label">TURNO N°</div>
                         <div className="turn-number">{turnData.numero_turno || 'N/A'}</div>
                     </div>
-                    
-                    {/* DIVISOR */}
-                    <div className="divider">◇ ◆ ◇</div>
 
                     {/* INFORMACIÓN DEL TURNO */}
                     <div className="info-section">
                         <div className="info-line">
-                            <span className="info-label">Área</span>
+                            <span className="info-label">Área:</span>
                             <span className="info-value">{turnData.area_nombre || 'General'}</span>
                         </div>
 
                         {turnData.consultorio_numero && (
                             <div className="info-line">
-                                <span className="info-label">Consultorio</span>
+                                <span className="info-label">Consultorio:</span>
                                 <span className="info-value">Consultorio {turnData.consultorio_numero}</span>
                             </div>
                         )}
 
                         <div className="info-line">
-                            <span className="info-label">Fecha</span>
+                            <span className="info-label">Fecha:</span>
                             <span className="info-value">{fecha}</span>
                         </div>
 
                         <div className="info-line">
-                            <span className="info-label">Hora</span>
+                            <span className="info-label">Hora:</span>
                             <span className="info-value">{hora}</span>
                         </div>
                     </div>
 
                     {/* INSTRUCCIONES */}
                     <div className="instructions">
-                        <div className="instructions-title">Instrucciones</div>
+                        <div className="instructions-title">Instrucciones:</div>
                         <ul>
                             <li>Conserve este ticket hasta ser atendido</li>
                             <li>Esté atento al llamado de su turno</li>
@@ -99,15 +90,12 @@ const ThermalTicketPreview = ({ turnData, onClose }) => {
 
                     {/* PIE DE PÁGINA */}
                     <div className="footer">
-                        <div className="footer-line">~ Gracias por utilizar MediQueue ~</div>
+                        <div className="footer-line">Gracias por utilizar MediQueue</div>
                         <div className="footer-line">www.mediqueue.com</div>
                     </div>
-                    
-                    {/* ORNAMENTO INFERIOR */}
-                    <div className="ornament-bottom">◈ ◇ ◈</div>
 
                     {/* LÍNEA DE CORTE */}
-                    <div className="cut-line">✂ ─ ─ ─ ✂</div>
+                    <div className="cut-line">✂ ----------------------- ✂</div>
                 </div>
 
                 <div className="thermal-preview-info">

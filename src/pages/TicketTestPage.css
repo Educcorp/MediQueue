@@ -82,13 +82,13 @@
 }
 
 .action-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
     gap: 12px;
     margin-top: 24px;
 }
 
 .btn {
+    flex: 1;
     padding: 14px 20px;
     border: none;
     border-radius: 8px;
@@ -122,29 +122,6 @@
     background: #38a169;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
-}
-
-.btn-download {
-    background: #ed8936;
-    color: white;
-}
-
-.btn-download:hover {
-    background: #dd6b20;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
-}
-
-.btn-both {
-    background: #9f7aea;
-    color: white;
-    grid-column: span 2;
-}
-
-.btn-both:hover {
-    background: #805ad5;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.4);
 }
 
 /* Panel de ejemplos */
