@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { printThermalTicket } from '../services/ticketService';
+import { printThermalTicket, generateTurnTicket } from '../services/ticketService';
 import ThermalTicketPreview from '../components/ThermalTicketPreview';
 import './TicketTestPage.css';
 
@@ -18,6 +18,18 @@ const TicketTestPage = () => {
 
     const handlePrintTest = () => {
         printThermalTicket(testData);
+    };
+
+    const handleDownloadPDF = () => {
+        generateTurnTicket(testData);
+    };
+
+    const handlePrintAndDownload = () => {
+        // Hacer ambas cosas: imprimir térmico y descargar PDF
+        printThermalTicket(testData);
+        setTimeout(() => {
+            generateTurnTicket(testData);
+        }, 500); // Pequeño delay para no saturar
     };
 
     const handlePreview = () => {
@@ -134,7 +146,19 @@ const TicketTestPage = () => {
                                 className="btn btn-print" 
                                 onClick={handlePrintTest}
                             >
-                                🖨️ Imprimir Prueba
+                                🖨️ Imprimir Térmico
+                            </button>
+                            <button 
+                                className="btn btn-download" 
+                                onClick={handleDownloadPDF}
+                            >
+                                📄 Descargar PDF
+                            </button>
+                            <button 
+                                className="btn btn-both" 
+                                onClick={handlePrintAndDownload}
+                            >
+                                🖨️📄 Ambos
                             </button>
                         </div>
                     </div>

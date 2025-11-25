@@ -282,9 +282,14 @@ const TakeTurn = () => {
           id: result.id || result.uk_turno
         };
 
-        // Imprimir ticket térmico de 58mm automáticamente
+        // 1. Imprimir ticket térmico de 58mm automáticamente
         printThermalTicket(ticketData);
         console.log('✅ Ticket térmico enviado a impresora 58mm');
+
+        // 2. Descargar PDF como respaldo
+        const { generateTurnTicket } = await import('../services/ticketService');
+        await generateTurnTicket(ticketData);
+        console.log('✅ Ticket PDF descargado como respaldo');
       } catch (ticketError) {
         console.error('⚠️ Error al generar ticket (no afecta el turno):', ticketError);
         // No mostramos error al usuario porque el turno se creó correctamente
