@@ -9,7 +9,6 @@ import AdminDashboard from './pages/AdminDashboard'
 import ModernAdminDashboard from './pages/ModernAdminDashboard'
 import DashboardDemo from './components/Common/DashboardDemo'
 import AdminUsersPage from './pages/AdminUsersPage'
-import AdminSettingsPage from './pages/AdminSettingsPage'
 import ConsultorioManagement from './pages/ConsultorioManagement'
 import PatientManagement from './pages/PatientManagement'
 import StatisticsPage from './pages/StatisticsPage'
@@ -122,16 +121,6 @@ function App() {
           element={
             <ProtectedRoute>
               <StatisticsPage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Ruta para configuración */}
-        <Route
-          path="/admin/settings"
-          element={
-            <ProtectedRoute>
-              <AdminSettingsPage />
             </ProtectedRoute>
           }
         />

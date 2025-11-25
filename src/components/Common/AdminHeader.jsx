@@ -157,12 +157,6 @@ const AdminHeader = () => {
             label: t('admin:users.title'),
             permission: 'admin',
             icon: <FaUserCog />
-        },
-        {
-            path: '/admin/settings',
-            label: t('common:navigation.settings'),
-            permission: 'admin',
-            icon: <FaCog />
         }
     ];
 

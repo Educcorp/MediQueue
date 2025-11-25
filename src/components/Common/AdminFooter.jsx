@@ -136,7 +136,7 @@ const AdminFooter = ({ isDarkMode = false }) => {
               fontWeight: '600',
               color: isDarkMode ? '#ffffff' : '#2d3748'
             }}>
-              {t('navigation.settings')}
+              {t('footer.system.title')}
             </h4>
             <div style={{
               display: 'flex',

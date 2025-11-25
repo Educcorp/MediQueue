@@ -59,8 +59,7 @@ export const ROUTES = {
     ADMIN_USERS: '/admin/users',
     ADMIN_AREAS: '/admin/areas',
     ADMIN_CONSULTORIOS: '/admin/consultorios',
-    ADMIN_STATISTICS: '/admin/statistics',
-    ADMIN_SETTINGS: '/admin/settings'
+    ADMIN_STATISTICS: '/admin/statistics'
 };
 
 // Permisos del sistema
@@ -71,8 +70,7 @@ export const PERMISSIONS = {
     MANAGE_TURNS: 'manage_turns',
     VIEW_STATISTICS: 'view_statistics',
     MANAGE_AREAS: 'manage_areas',
-    MANAGE_CONSULTORIOS: 'manage_consultorios',
-    MANAGE_SETTINGS: 'manage_settings'
+    MANAGE_CONSULTORIOS: 'manage_consultorios'
 };
 
 // Configuración de paginación

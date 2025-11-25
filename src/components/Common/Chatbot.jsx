@@ -72,7 +72,6 @@ const Chatbot = () => {
             '/admin/consultorios': 'Gestión de consultorios - Configuración de espacios médicos',
             '/admin/patients': 'Gestión de pacientes - Administración de información de pacientes',
             '/admin/statistics': 'Estadísticas - Reportes y métricas del sistema',
-            '/admin/settings': 'Configuración - Ajustes del sistema MediQueue',
             '/privacy': 'Política de privacidad - Información sobre protección de datos médicos'
         };
 
