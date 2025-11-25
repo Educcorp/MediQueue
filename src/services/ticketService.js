@@ -71,7 +71,7 @@ export const printThermalTicket = (turnData) => {
             font-weight: bold;
             color: #000;
             background: #fff;
-            padding: 1mm 0mm;
+            padding: 1mm 4mm;
         }
         
         /* Decoración superior */
@@ -106,13 +106,16 @@ export const printThermalTicket = (turnData) => {
         .turn-box {
             text-align: center;
             border: 2px solid #000;
-            padding: 1mm 0mm;
+            padding: 1mm 4mm;
             margin: 0;
+            background: #000;
+            color: #fff;
         }
         
         .turn-label {
             font-size: 7pt;
             margin-bottom: 0.5mm;
+            color: #fff;
         }
         
         .turn-number {
@@ -120,6 +123,7 @@ export const printThermalTicket = (turnData) => {
             font-weight: bold;
             line-height: 1;
             letter-spacing: 0px;
+            color: #fff;
         }
         
         /* Información compacta */
