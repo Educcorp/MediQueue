@@ -71,7 +71,7 @@ export const printThermalTicket = (turnData) => {
             font-weight: bold;
             color: #000;
             background: #fff;
-            padding: 1mm 1mm;
+            padding: 1mm 0mm;
         }
         
         /* Decoración superior */
@@ -246,7 +246,7 @@ export const printThermalTicket = (turnData) => {
     <!-- Footer -->
     <div class="footer">
         Gracias por utilizar MediQueue<br>
-        www.mediqueue.com
+        www.mediqueue.app
     </div>
     
     <!-- Decoración inferior -->
