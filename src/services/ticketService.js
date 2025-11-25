@@ -67,97 +67,98 @@ export const printThermalTicket = (turnData) => {
         body {
             width: 58mm;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 10pt;
+            font-size: 9pt;
             font-weight: bold;
             color: #000;
             background: #fff;
-            padding: 2mm 3mm;
+            padding: 1mm 1mm;
         }
         
-        /* Decoración superior estilo Hollow Knight */
+        /* Decoración superior */
         .deco-top {
             text-align: center;
-            font-size: 8pt;
-            margin-bottom: 1mm;
+            font-size: 6pt;
+            margin-bottom: 0.5mm;
         }
         
         /* Título principal compacto */
         .title {
             text-align: center;
-            font-size: 14pt;
+            font-size: 10pt;
             font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 0.5mm;
+            letter-spacing: 0px;
+            margin-bottom: 0mm;
         }
         
         .subtitle {
             text-align: center;
-            font-size: 7pt;
-            margin-bottom: 2mm;
+            font-size: 6pt;
+            margin-bottom: 1mm;
         }
         
         .divider {
             text-align: center;
-            font-size: 6pt;
-            margin: 1mm 0;
+            font-size: 5pt;
+            margin: 0.5mm 0;
         }
         
         /* Número de turno - Grande y destacado */
         .turn-box {
             text-align: center;
-            border: 3px double #000;
-            padding: 2mm;
-            margin: 2mm 0;
+            border: 2px solid #000;
+            padding: 1mm 0mm;
+            margin: 1mm 0;
         }
         
         .turn-label {
-            font-size: 8pt;
-            margin-bottom: 1mm;
+            font-size: 7pt;
+            margin-bottom: 0.5mm;
         }
         
         .turn-number {
-            font-size: 28pt;
+            font-size: 22pt;
             font-weight: bold;
             line-height: 1;
+            letter-spacing: 0px;
         }
         
         /* Información compacta */
         .info {
-            font-size: 9pt;
-            margin: 2mm 0;
+            font-size: 7pt;
+            margin: 1mm 0;
         }
         
         .info-row {
-            display: flex;
-            justify-content: space-between;
+            text-align: center;
             margin: 0.5mm 0;
-            padding: 0.5mm 0;
+            padding: 0.3mm 0;
             border-bottom: 1px solid #000;
         }
         
         .label {
             font-weight: bold;
+            font-size: 7pt;
         }
         
         .value {
-            text-align: right;
+            font-size: 7pt;
         }
         
         /* Instrucciones minimalistas */
         .instructions {
-            border: 2px solid #000;
-            padding: 2mm;
-            margin: 2mm 0;
-            font-size: 7pt;
-            line-height: 1.4;
+            border: 1px solid #000;
+            padding: 1mm;
+            margin: 1mm 0;
+            font-size: 5.5pt;
+            line-height: 1.3;
         }
         
         .inst-title {
             text-align: center;
-            font-size: 7pt;
+            font-size: 6pt;
             font-weight: bold;
-            margin-bottom: 1mm;
-            padding-bottom: 1mm;
+            margin-bottom: 0.5mm;
+            padding-bottom: 0.5mm;
             border-bottom: 1px solid #000;
         }
         
@@ -166,7 +167,7 @@ export const printThermalTicket = (turnData) => {
         }
         
         .inst-list li {
-            margin: 0.5mm 0;
+            margin: 0.3mm 0;
         }
         
         .inst-list li:before {
@@ -176,15 +177,15 @@ export const printThermalTicket = (turnData) => {
         /* Footer minimalista */
         .footer {
             text-align: center;
-            font-size: 6pt;
-            margin-top: 2mm;
-            padding-top: 1mm;
+            font-size: 5pt;
+            margin-top: 1mm;
+            padding-top: 0.5mm;
         }
         
         .deco-bottom {
             text-align: center;
-            font-size: 8pt;
-            margin-top: 1mm;
+            font-size: 6pt;
+            margin-top: 0.5mm;
         }
     </style>
 </head>
@@ -209,25 +210,21 @@ export const printThermalTicket = (turnData) => {
     <!-- Información del turno -->
     <div class="info">
         <div class="info-row">
-            <span class="label">ÁREA:</span>
-            <span class="value">${turnData.area_nombre || 'General'}</span>
+            <span class="label">ÁREA:</span> ${turnData.area_nombre || 'General'}
         </div>
         
         ${turnData.consultorio_numero ? `
         <div class="info-row">
-            <span class="label">CONSULTORIO:</span>
-            <span class="value">Consul. ${turnData.consultorio_numero}</span>
+            <span class="label">CONSULTORIO:</span> ${turnData.consultorio_numero}
         </div>
         ` : ''}
         
         <div class="info-row">
-            <span class="label">FECHA:</span>
-            <span class="value">${fecha}</span>
+            <span class="label">FECHA:</span> ${fecha}
         </div>
         
         <div class="info-row">
-            <span class="label">HORA:</span>
-            <span class="value">${hora}</span>
+            <span class="label">HORA:</span> ${hora}
         </div>
     </div>
     
