@@ -108,7 +108,7 @@ export const printThermalTicket = (turnData) => {
             border: 2px solid #000;
             padding: 1mm 4mm;
             margin: 0;
-            background: #272727ff;
+            background: #171717ff;
             color: #fff;
         }
         
