@@ -99,7 +99,7 @@ export const printThermalTicket = (turnData) => {
         .divider {
             text-align: center;
             font-size: 5pt;
-            margin: 0.5mm 0;
+            margin: 0;
         }
         
         /* Número de turno - Grande y destacado */
@@ -107,7 +107,7 @@ export const printThermalTicket = (turnData) => {
             text-align: center;
             border: 2px solid #000;
             padding: 1mm 0mm;
-            margin: 1mm 0;
+            margin: 0;
         }
         
         .turn-label {
@@ -125,7 +125,7 @@ export const printThermalTicket = (turnData) => {
         /* Información compacta */
         .info {
             font-size: 7pt;
-            margin: 1mm 0;
+            margin: 0;
         }
         
         .info-row {
@@ -148,7 +148,7 @@ export const printThermalTicket = (turnData) => {
         .instructions {
             border: 1px solid #000;
             padding: 1mm;
-            margin: 1mm 0;
+            margin: 0;
             font-size: 5.5pt;
             line-height: 1.3;
         }
@@ -164,10 +164,12 @@ export const printThermalTicket = (turnData) => {
         
         .inst-list {
             list-style: none;
+            text-align: left;
         }
         
         .inst-list li {
-            margin: 0.3mm 0;
+            margin: 0.5mm 0;
+            display: block;
         }
         
         .inst-list li:before {
@@ -178,14 +180,14 @@ export const printThermalTicket = (turnData) => {
         .footer {
             text-align: center;
             font-size: 5pt;
-            margin-top: 1mm;
+            margin: 0;
             padding-top: 0.5mm;
         }
         
         .deco-bottom {
             text-align: center;
             font-size: 6pt;
-            margin-top: 0.5mm;
+            margin: 0;
         }
     </style>
 </head>
