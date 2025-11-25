@@ -37,15 +37,14 @@ export const printThermalTicket = (turnData) => {
                 minute: '2-digit'
             });
 
-        // HTML optimizado para impresión térmica 58mm
+        // HTML optimizado para impresión térmica 58mm - Diseño minimalista compacto
         const ticketHTML = `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Ticket Turno ${turnData.numero_turno}</title>
+    <title>Ticket ${turnData.numero_turno}</title>
     <style>
-        /* Reset y configuración para impresora térmica de 58mm */
         * {
             margin: 0;
             padding: 0;
@@ -67,205 +66,197 @@ export const printThermalTicket = (turnData) => {
         
         body {
             width: 58mm;
-            font-family: 'Courier New', monospace;
-            font-size: 9pt;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10pt;
             font-weight: bold;
-            line-height: 1.2;
             color: #000;
             background: #fff;
-            padding: 3mm;
+            padding: 2mm 3mm;
         }
         
-        /* Encabezado */
-        .header {
+        /* Decoración superior estilo Hollow Knight */
+        .deco-top {
             text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 3mm;
-            margin-bottom: 3mm;
-        }
-        
-        .logo-text {
-            font-size: 12pt;
-            font-weight: bold;
-            letter-spacing: 0.5px;
+            font-size: 8pt;
             margin-bottom: 1mm;
         }
         
-        .subtitle {
-            font-size: 7pt;
+        /* Título principal compacto */
+        .title {
+            text-align: center;
+            font-size: 14pt;
             font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 0.5mm;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 7pt;
             margin-bottom: 2mm;
         }
         
-        /* Número de turno destacado */
-        .turn-number-box {
+        .divider {
             text-align: center;
-            border: 3px solid #000;
-            padding: 3mm 2mm;
-            margin: 3mm 0;
-            background: #f0f0f0;
+            font-size: 6pt;
+            margin: 1mm 0;
+        }
+        
+        /* Número de turno - Grande y destacado */
+        .turn-box {
+            text-align: center;
+            border: 3px double #000;
+            padding: 2mm;
+            margin: 2mm 0;
         }
         
         .turn-label {
-            font-size: 9pt;
-            font-weight: bold;
-            margin-bottom: 2mm;
+            font-size: 8pt;
+            margin-bottom: 1mm;
         }
         
         .turn-number {
-            font-size: 22pt;
+            font-size: 28pt;
             font-weight: bold;
-            letter-spacing: 1px;
+            line-height: 1;
         }
         
-        /* Información del turno */
-        .info-section {
-            margin: 3mm 0;
-            font-size: 7pt;
-            font-weight: bold;
+        /* Información compacta */
+        .info {
+            font-size: 9pt;
+            margin: 2mm 0;
         }
         
-        .info-line {
+        .info-row {
             display: flex;
             justify-content: space-between;
-            margin: 1.5mm 0;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 1mm;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .info-value {
-            text-align: right;
-            font-weight: bold;
-        }
-        
-        /* Instrucciones */
-        .instructions {
-            margin-top: 3mm;
-            padding: 2mm;
-            border: 2px solid #000;
-            background: #f5f5f5;
-        }
-        
-        .instructions-title {
-            font-size: 7pt;
-            font-weight: bold;
-            text-align: center;
-            text-transform: uppercase;
-            margin-bottom: 2mm;
+            margin: 0.5mm 0;
+            padding: 0.5mm 0;
             border-bottom: 1px solid #000;
-            padding-bottom: 1mm;
         }
         
-        .instructions ul {
-            list-style: none;
-            font-size: 6pt;
-            font-weight: bold;
-            line-height: 1.3;
-        }
-        
-        .instructions li {
-            margin: 1mm 0;
-            padding-left: 2mm;
-        }
-        
-        .instructions li:before {
-            content: "• ";
+        .label {
             font-weight: bold;
         }
         
-        /* Pie de página */
-        .footer {
-            margin-top: 3mm;
-            padding-top: 2mm;
-            border-top: 2px dashed #000;
-            text-align: center;
-            font-size: 6pt;
-            font-weight: bold;
+        .value {
+            text-align: right;
         }
         
-        .footer-line {
-            margin: 1mm 0;
+        /* Instrucciones minimalistas */
+        .instructions {
+            border: 2px solid #000;
+            padding: 2mm;
+            margin: 2mm 0;
+            font-size: 7pt;
+            line-height: 1.4;
         }
         
-        /* Línea de corte */
-        .cut-line {
-            margin-top: 4mm;
+        .inst-title {
             text-align: center;
             font-size: 7pt;
-            border-top: 1px dashed #000;
-            padding-top: 2mm;
+            font-weight: bold;
+            margin-bottom: 1mm;
+            padding-bottom: 1mm;
+            border-bottom: 1px solid #000;
+        }
+        
+        .inst-list {
+            list-style: none;
+        }
+        
+        .inst-list li {
+            margin: 0.5mm 0;
+        }
+        
+        .inst-list li:before {
+            content: "◆ ";
+        }
+        
+        /* Footer minimalista */
+        .footer {
+            text-align: center;
+            font-size: 6pt;
+            margin-top: 2mm;
+            padding-top: 1mm;
+        }
+        
+        .deco-bottom {
+            text-align: center;
+            font-size: 8pt;
+            margin-top: 1mm;
         }
     </style>
 </head>
 <body>
-    <!-- ENCABEZADO -->
-    <div class="header">
-        <div class="logo-text">MEDIQUEUE</div>
-        <div class="subtitle">Sistema de Turnos Médicos</div>
-    </div>
+    <!-- Decoración superior -->
+    <div class="deco-top">╔═══════════════════╗</div>
     
-    <!-- NÚMERO DE TURNO -->
-    <div class="turn-number-box">
+    <!-- Título -->
+    <div class="title">MEDIQUEUE</div>
+    <div class="subtitle">Sistema de Turnos Médicos</div>
+    
+    <div class="divider">─────────────────────</div>
+    
+    <!-- Número de turno -->
+    <div class="turn-box">
         <div class="turn-label">TURNO N°</div>
         <div class="turn-number">${turnData.numero_turno || 'N/A'}</div>
     </div>
     
-    <!-- INFORMACIÓN DEL TURNO -->
-    <div class="info-section">
-        <div class="info-line">
-            <span class="info-label">Área:</span>
-            <span class="info-value">${turnData.area_nombre || 'General'}</span>
+    <div class="divider">─────────────────────</div>
+    
+    <!-- Información del turno -->
+    <div class="info">
+        <div class="info-row">
+            <span class="label">ÁREA:</span>
+            <span class="value">${turnData.area_nombre || 'General'}</span>
         </div>
         
         ${turnData.consultorio_numero ? `
-        <div class="info-line">
-            <span class="info-label">Consultorio:</span>
-            <span class="info-value">Consultorio ${turnData.consultorio_numero}</span>
+        <div class="info-row">
+            <span class="label">CONSULTORIO:</span>
+            <span class="value">Consul. ${turnData.consultorio_numero}</span>
         </div>
         ` : ''}
         
-        <div class="info-line">
-            <span class="info-label">Fecha:</span>
-            <span class="info-value">${fecha}</span>
+        <div class="info-row">
+            <span class="label">FECHA:</span>
+            <span class="value">${fecha}</span>
         </div>
         
-        <div class="info-line">
-            <span class="info-label">Hora:</span>
-            <span class="info-value">${hora}</span>
+        <div class="info-row">
+            <span class="label">HORA:</span>
+            <span class="value">${hora}</span>
         </div>
     </div>
     
-    <!-- INSTRUCCIONES -->
+    <div class="divider">─────────────────────</div>
+    
+    <!-- Instrucciones -->
     <div class="instructions">
-        <div class="instructions-title">Instrucciones:</div>
-        <ul>
-            <li>Conserve este ticket hasta ser atendido</li>
-            <li>Esté atento al llamado de su turno</li>
-            <li>Presente este ticket al ser llamado</li>
-            <li>En caso de ausencia, el turno será reasignado automáticamente</li>
+        <div class="inst-title">INSTRUCCIONES</div>
+        <ul class="inst-list">
+            <li>Conserve ticket hasta ser atendido</li>
+            <li>Esté atento al llamado</li>
+            <li>Presente ticket al ser llamado</li>
+            <li>Turno reasignado si ausente</li>
         </ul>
     </div>
     
-    <!-- PIE DE PÁGINA -->
+    <!-- Footer -->
     <div class="footer">
-        <div class="footer-line">Gracias por utilizar MediQueue</div>
-        <div class="footer-line">www.mediqueue.com</div>
+        Gracias por utilizar MediQueue<br>
+        www.mediqueue.com
     </div>
     
-    <!-- LÍNEA DE CORTE -->
-    <div class="cut-line">✂ ----------------------- ✂</div>
+    <!-- Decoración inferior -->
+    <div class="deco-bottom">╚═══════════════════╝</div>
     
     <script>
-        // Imprimir automáticamente al cargar
         window.onload = function() {
             setTimeout(function() {
                 window.print();
-                // Cerrar ventana después de imprimir
                 setTimeout(function() {
                     window.close();
                 }, 500);
