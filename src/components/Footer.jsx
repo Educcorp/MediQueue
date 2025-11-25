@@ -30,7 +30,7 @@ const Footer = ({ isDarkMode = false }) => {
           gap: '32px',
           marginBottom: '24px'
         }}>
-          
+
           {/* Brand Section */}
           <div>
             <div style={{
@@ -48,9 +48,9 @@ const Footer = ({ isDarkMode = false }) => {
                 justifyContent: 'center',
                 padding: '3px'
               }}>
-                <img 
-                  src="/images/favicon.png" 
-                  alt="MediQueue Logo" 
+                <img
+                  src="/images/favicon.png"
+                  alt="MediQueue Logo"
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
@@ -95,13 +95,13 @@ const Footer = ({ isDarkMode = false }) => {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaPhone style={{ fontSize: '12px' }} />
-                <span>(123) 456-7890</span>
+                <span>(314) 174-1239</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaEnvelope style={{ fontSize: '12px' }} />
-                <a 
-                  href="https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Consulta%20MediQueue&body=Hola,%20tengo%20una%20consulta%20sobre%20MediQueue." 
-                  target="_blank" 
+                <a
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Consulta%20MediQueue&body=Hola,%20tengo%20una%20consulta%20sobre%20MediQueue."
+                  target="_blank"
                   rel="noopener noreferrer"
                   style={{
                     color: isDarkMode ? '#a0aec0' : '#718096',
@@ -191,27 +191,27 @@ const Footer = ({ isDarkMode = false }) => {
                 gap: '12px'
               }}>
                 {[
-                  { 
-                    icon: FaEnvelope, 
-                    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Soporte%20MediQueue&body=Hola,%20necesito%20ayuda%20con%20MediQueue.', 
+                  {
+                    icon: FaEnvelope,
+                    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=educcorp3@gmail.com&su=Soporte%20MediQueue&body=Hola,%20necesito%20ayuda%20con%20MediQueue.',
                     color: '#e53e3e',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaGithub, 
-                    href: 'https://github.com/Educcorp/MediQueue', 
+                  {
+                    icon: FaGithub,
+                    href: 'https://github.com/Educcorp/MediQueue',
                     color: isDarkMode ? '#ffffff' : '#2d3748',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaLinkedin, 
-                    href: 'https://www.linkedin.com/in/educcorp-inc-158297356/', 
+                  {
+                    icon: FaLinkedin,
+                    href: 'https://www.linkedin.com/in/educcorp-inc-158297356/',
                     color: '#3182ce',
                     target: '_blank'
                   },
-                  { 
-                    icon: FaXTwitter, 
-                    href: 'https://x.com/Educcorp', 
+                  {
+                    icon: FaXTwitter,
+                    href: 'https://x.com/Educcorp',
                     color: isDarkMode ? '#ffffff' : '#000000',
                     target: '_blank'
                   }
