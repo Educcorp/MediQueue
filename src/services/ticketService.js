@@ -69,7 +69,8 @@ export const printThermalTicket = (turnData) => {
             width: 58mm;
             font-family: 'Courier New', monospace;
             font-size: 9pt;
-            line-height: 1.3;
+            font-weight: bold;
+            line-height: 1.2;
             color: #000;
             background: #fff;
             padding: 3mm;
@@ -84,49 +85,51 @@ export const printThermalTicket = (turnData) => {
         }
         
         .logo-text {
-            font-size: 14pt;
+            font-size: 12pt;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             margin-bottom: 1mm;
         }
         
         .subtitle {
             font-size: 7pt;
+            font-weight: bold;
             margin-bottom: 2mm;
         }
         
         /* Número de turno destacado */
         .turn-number-box {
             text-align: center;
-            border: 2px solid #000;
-            padding: 4mm 2mm;
+            border: 3px solid #000;
+            padding: 3mm 2mm;
             margin: 3mm 0;
             background: #f0f0f0;
         }
         
         .turn-label {
-            font-size: 10pt;
+            font-size: 9pt;
             font-weight: bold;
             margin-bottom: 2mm;
         }
         
         .turn-number {
-            font-size: 24pt;
+            font-size: 22pt;
             font-weight: bold;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
         /* Información del turno */
         .info-section {
             margin: 3mm 0;
-            font-size: 8pt;
+            font-size: 7pt;
+            font-weight: bold;
         }
         
         .info-line {
             display: flex;
             justify-content: space-between;
             margin: 1.5mm 0;
-            border-bottom: 1px dashed #ccc;
+            border-bottom: 1px dashed #000;
             padding-bottom: 1mm;
         }
         
@@ -137,18 +140,19 @@ export const printThermalTicket = (turnData) => {
         
         .info-value {
             text-align: right;
+            font-weight: bold;
         }
         
         /* Instrucciones */
         .instructions {
-            margin-top: 4mm;
-            padding: 3mm;
-            border: 1px solid #000;
+            margin-top: 3mm;
+            padding: 2mm;
+            border: 2px solid #000;
             background: #f5f5f5;
         }
         
         .instructions-title {
-            font-size: 8pt;
+            font-size: 7pt;
             font-weight: bold;
             text-align: center;
             text-transform: uppercase;
@@ -159,8 +163,9 @@ export const printThermalTicket = (turnData) => {
         
         .instructions ul {
             list-style: none;
-            font-size: 6.5pt;
-            line-height: 1.4;
+            font-size: 6pt;
+            font-weight: bold;
+            line-height: 1.3;
         }
         
         .instructions li {
@@ -175,11 +180,12 @@ export const printThermalTicket = (turnData) => {
         
         /* Pie de página */
         .footer {
-            margin-top: 4mm;
+            margin-top: 3mm;
             padding-top: 2mm;
             border-top: 2px dashed #000;
             text-align: center;
-            font-size: 6.5pt;
+            font-size: 6pt;
+            font-weight: bold;
         }
         
         .footer-line {
