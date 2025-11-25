@@ -4,17 +4,10 @@ import 'jspdf-autotable';
 /**
  * Genera e imprime ticket térmico de 58mm directamente en la impresora
  * Optimizado para impresoras térmicas MERION y similares (58mm, B/N, 203dpi)
+ * Usa iframe oculto para impresión completamente invisible
  */
 export const printThermalTicket = (turnData) => {
     try {
-        // Crear ventana de impresión minimizada y oculta
-        const printWindow = window.open('', '_blank', 'width=300,height=400,left=10000,top=10000');
-        
-        if (!printWindow) {
-            console.error('No se pudo abrir ventana de impresión');
-            return false;
-        }
-
         const fecha = turnData.fecha_creacion ?
             new Date(turnData.fecha_creacion).toLocaleDateString('es-AR', {
                 day: '2-digit',
@@ -268,30 +261,54 @@ export const printThermalTicket = (turnData) => {
         window.onload = function() {
             setTimeout(function() {
                 window.print();
-            }, 50);
+            }, 100);
         };
         
         // Detectar fin de impresión y cerrar
         window.onafterprint = function() {
             setTimeout(function() {
                 window.close();
-            }, 50);
+            }, 100);
         };
         
-        // Fallback: cerrar si no imprime en 3 segundos
+        // Fallback: cerrar si no imprime en 5 segundos
         setTimeout(function() {
             if (window) {
                 window.close();
             }
-        }, 3000);
+        }, 5000);
     </script>
 </body>
 </html>`;
 
-        printWindow.document.write(ticketHTML);
-        printWindow.document.close();
+        // Crear iframe oculto para impresión silenciosa
+        let printFrame = document.getElementById('thermal-print-frame');
+        
+        // Si no existe, crear el iframe
+        if (!printFrame) {
+            printFrame = document.createElement('iframe');
+            printFrame.id = 'thermal-print-frame';
+            printFrame.name = 'thermal-print-frame';
+            printFrame.style.position = 'absolute';
+            printFrame.style.top = '-10000px';
+            printFrame.style.left = '-10000px';
+            printFrame.style.width = '1px';
+            printFrame.style.height = '1px';
+            printFrame.style.opacity = '0';
+            printFrame.style.visibility = 'hidden';
+            printFrame.style.border = 'none';
+            document.body.appendChild(printFrame);
+        }
 
-        console.log('✅ Ticket térmico enviado a impresora');
+        // Escribir contenido en el iframe
+        const frameDoc = printFrame.contentWindow || printFrame.contentDocument;
+        const doc = frameDoc.document || frameDoc;
+        
+        doc.open();
+        doc.write(ticketHTML);
+        doc.close();
+
+        console.log('✅ Ticket térmico enviado a impresora (iframe oculto)');
         return true;
 
     } catch (error) {

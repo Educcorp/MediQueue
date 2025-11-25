@@ -36,7 +36,6 @@ const TakeTurn = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isCooldownError, setIsCooldownError] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
   const [areas, setAreas] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -241,7 +240,6 @@ const TakeTurn = () => {
   const handleSelectArea = (area) => {
     setSelectedArea(area);
     setError('');
-    setIsCooldownError(false);
   };
 
   const handleTakeAreaTurn = async () => {
@@ -292,32 +290,7 @@ const TakeTurn = () => {
 
     } catch (error) {
       console.error('Error generando turno:', error);
-
-      // Manejar específicamente el error de cooldown (429)
-      if (error.response?.status === 429) {
-        const errorData = error.response?.data;
-        const timeRemaining = errorData?.data?.timeRemaining;
-
-        // Mensaje personalizado para cooldown
-        let cooldownMessage = error.response?.data?.message ||
-          'Por favor espera antes de solicitar otro turno';
-
-        if (timeRemaining) {
-          const minutes = Math.floor(timeRemaining / 60);
-          const seconds = timeRemaining % 60;
-          if (minutes > 0) {
-            cooldownMessage = `Debes esperar ${minutes} minuto${minutes > 1 ? 's' : ''} y ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
-          } else {
-            cooldownMessage = `Debes esperar ${seconds} segundo${seconds > 1 ? 's' : ''} antes de solicitar otro turno`;
-          }
-        }
-
-        setError(cooldownMessage);
-        setIsCooldownError(true);
-      } else {
-        setError(error.response?.data?.message || t('takeTurn:errors.generatingError'));
-        setIsCooldownError(false);
-      }
+      setError(error.response?.data?.message || t('takeTurn:errors.generatingError'));
     } finally {
       setLoading(false);
     }
@@ -332,7 +305,6 @@ const TakeTurn = () => {
     setShowSuccess(false);
     setTurnResult(null);
     setError('');
-    setIsCooldownError(false);
   };
 
   const handleNewTurn = () => {
@@ -340,7 +312,6 @@ const TakeTurn = () => {
     setShowSuccess(false);
     setTurnResult(null);
     setError('');
-    setIsCooldownError(false);
     setCountdown(5);
   };
 
@@ -578,7 +549,7 @@ const TakeTurn = () => {
         {error && (
           <div className="error-message-touch">
             <div className="error-content">
-              <h3>{isCooldownError ? 'En espera' : `⚠️ ${t('common:messages.error')}`}</h3>
+              <h3>⚠️ {t('common:messages.error')}</h3>
               <p>{error}</p>
             </div>
           </div>
