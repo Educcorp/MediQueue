@@ -7,8 +7,8 @@ import 'jspdf-autotable';
  */
 export const printThermalTicket = (turnData) => {
     try {
-        // Crear ventana de impresión oculta fuera de la pantalla
-        const printWindow = window.open('', '', 'width=1,height=1,left=-1000,top=-1000');
+        // Crear ventana de impresión con HTML optimizado para impresora térmica 58mm
+        const printWindow = window.open('', '', 'width=400,height=600');
         
         if (!printWindow) {
             console.error('No se pudo abrir ventana de impresión');
@@ -108,7 +108,7 @@ export const printThermalTicket = (turnData) => {
             border: 2px solid #000;
             padding: 1mm 4mm;
             margin: 0;
-            background:  #272727ff;
+            background: #000;
             color: #fff;
         }
         
@@ -258,20 +258,13 @@ export const printThermalTicket = (turnData) => {
     
     <script>
         window.onload = function() {
-            // Imprimir automáticamente sin mostrar diálogo
             setTimeout(function() {
                 window.print();
-                // Cerrar ventana inmediatamente después de enviar a imprimir
                 setTimeout(function() {
                     window.close();
-                }, 100);
-            }, 100);
+                }, 500);
+            }, 250);
         };
-        
-        // Ocultar completamente la ventana
-        window.addEventListener('DOMContentLoaded', function() {
-            document.body.style.opacity = '0';
-        });
     </script>
 </body>
 </html>`;
