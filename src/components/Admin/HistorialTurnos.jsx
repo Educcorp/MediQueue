@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import AdminHeader from '../Common/AdminHeader';
 import AdminFooter from '../Common/AdminFooter';
@@ -217,6 +218,7 @@ const getAreaClass = (areaName) => {
 };
 
 const HistorialTurnos = () => {
+  const { t } = useTranslation(['admin', 'common']);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -307,9 +309,9 @@ const HistorialTurnos = () => {
 
   // Estados de turnos disponibles
   const turnStatuses = [
-    { value: 'EN_ESPERA', label: 'Waiting', color: 'info', indicator: '#ffc107' },
-    { value: 'ATENDIDO', label: 'Attended', color: 'success', indicator: '#28a745' },
-    { value: 'CANCELADO', label: 'Cancelled', color: 'danger', indicator: '#dc3545' },
+    { value: 'EN_ESPERA', label: t('admin:turns.statuses.waiting'), color: 'info', indicator: '#ffc107' },
+    { value: 'ATENDIDO', label: t('admin:turns.statuses.attended'), color: 'success', indicator: '#28a745' },
+    { value: 'CANCELADO', label: t('admin:turns.statuses.cancelled'), color: 'danger', indicator: '#dc3545' },
   ];
 
   // Cargar datos al montar el componente
@@ -461,14 +463,14 @@ const HistorialTurnos = () => {
   };
 
   const getPatientName = (uk_paciente) => {
-    if (!uk_paciente) return 'Guest';
+    if (!uk_paciente) return t('admin:turns.labels.guest');
     const patient = patients.find(p => p.uk_paciente === uk_paciente);
-    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : 'Patient not found';
+    return patient ? `${patient.s_nombre} ${patient.s_apellido}` : t('admin:turns.labels.patientNotFound');
   };
 
   const getConsultorioInfo = (uk_consultorio) => {
     const consultorio = consultorios.find(c => c.uk_consultorio === uk_consultorio);
-    return consultorio ? `Office ${consultorio.i_numero_consultorio}` : 'Office not found';
+    return consultorio ? `${t('admin:turns.labels.office')} ${consultorio.i_numero_consultorio}` : t('admin:turns.labels.officeNotFound');
   };
 
   const getAreaInfo = (uk_consultorio) => {
@@ -494,8 +496,8 @@ const HistorialTurnos = () => {
         combined.push({
           type: 'consultorio',
           id: consultorio.uk_consultorio,
-          name: `Office ${consultorio.i_numero_consultorio}`,
-          displayName: `Office ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
+          name: `${t('admin:turns.labels.office')} ${consultorio.i_numero_consultorio}`,
+          displayName: `${t('admin:turns.labels.office')} ${consultorio.i_numero_consultorio} - ${area.s_nombre_area}`,
           areaName: area.s_nombre_area,
           areaColor: areaColor,
           icon: AreaIconComponent,
@@ -516,7 +518,7 @@ const HistorialTurnos = () => {
         iconComponent: FaHospital,
         areaColor: '#4A90E2',
         className: '',
-        displayName: 'All offices'
+        displayName: t('admin:turns.filters.allOffices')
       };
     }
 
@@ -567,7 +569,7 @@ const HistorialTurnos = () => {
   }, [turns.length, currentTurns.length, currentPage, turnsPerPage]);
 
   if (loading) {
-    return <TestSpinner message="Loading turn history..." />;
+    return <TestSpinner message={t('common:loading')} />;
   }
 
   return (
@@ -581,16 +583,16 @@ const HistorialTurnos = () => {
             <FaHistory />
           </div>
           <div className="page-header-content">
-            <h1 className="page-title">Turn History</h1>
+            <h1 className="page-title">{t('admin:turns.historyTitle')}</h1>
             <p className="page-subtitle">
-              View and review complete turn history - {turns.length} turns found
+              {t('admin:turns.historySubtitle', { count: turns.length })}
             </p>
           </div>
           <div className="page-actions">
             <button
               className="btn btn-secondary"
               onClick={startTutorial}
-              title="View tutorial"
+              title={t('common:buttons.viewTutorial')}
               style={{ padding: '8px 12px' }}
             >
               <FaQuestionCircle />
@@ -598,12 +600,12 @@ const HistorialTurnos = () => {
             <button
               className="btn btn-secondary"
               onClick={() => navigate('/admin/turns')}
-              title="Go to Turn Management"
+              title={t('admin:turns.goToTurnManagement')}
             >
-              <FaCalendarCheck /> Turn Management
+              <FaCalendarCheck /> {t('admin:turns.turnManagement')}
             </button>
             <button className="btn btn-secondary" onClick={loadTurns}>
-              <FaSync /> Refresh
+              <FaSync /> {t('common:buttons.refresh')}
             </button>
           </div>
         </div>
@@ -623,7 +625,7 @@ const HistorialTurnos = () => {
         <div className="filters-section">
           <div className="filter-group date-range-filter">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label style={{ margin: 0 }}>DATES</label>
+              <label style={{ margin: 0 }}>{t('admin:turns.filters.dates').toUpperCase()}</label>
               <button
                 type="button"
                 onClick={() => {
@@ -638,7 +640,7 @@ const HistorialTurnos = () => {
                   height: 'auto',
                   lineHeight: '1'
                 }}
-                title="Reset to last month"
+                title={t('admin:turns.filters.resetToLastMonth')}
               >
                 <FaSync style={{ fontSize: '10px' }} />
               </button>
@@ -668,8 +670,8 @@ const HistorialTurnos = () => {
                     e.target.showPicker && e.target.showPicker();
                   }}
                   className="form-control"
-                  placeholder="Start date"
-                  title="Start date"
+                  placeholder={t('admin:turns.filters.startDate')}
+                  title={t('admin:turns.filters.startDate')}
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
@@ -680,7 +682,7 @@ const HistorialTurnos = () => {
                 whiteSpace: 'nowrap',
                 padding: '0 6px',
                 flexShrink: 0
-              }}>to</span>
+              }}>{t('admin:turns.filters.to')}</span>
               <div className="date-input-wrapper" style={{ flex: '1', minWidth: '0' }}>
                 <input
                   type="date"
@@ -699,15 +701,15 @@ const HistorialTurnos = () => {
                   }}
                   min={selectedStartDate}
                   className="form-control"
-                  placeholder="End date"
-                  title="End date"
+                  placeholder={t('admin:turns.filters.endDate')}
+                  title={t('admin:turns.filters.endDate')}
                   style={{ width: '100%', minWidth: '0' }}
                 />
               </div>
             </div>
           </div>
           <div className="filter-group">
-            <label>STATUS</label>
+            <label>{t('admin:turns.filters.status').toUpperCase()}</label>
             <div className="custom-status-select">
               <div
                 ref={statusButtonRef}
@@ -728,7 +730,7 @@ const HistorialTurnos = () => {
                   <div className={`status-icon status-${selectedStatus.toLowerCase()}`}>
                     {React.createElement(getStatusIcon(selectedStatus))}
                   </div>
-                  <span>{selectedStatus === 'todos' ? 'All statuses' : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
+                  <span>{selectedStatus === 'todos' ? t('admin:turns.filters.allStatuses') : turnStatuses.find(s => s.value === selectedStatus)?.label}</span>
                 </div>
                 <div className="dropdown-arrow">
                   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -763,7 +765,7 @@ const HistorialTurnos = () => {
                       <div className="status-icon status-todos">
                         <FaList />
                       </div>
-                      <span>All statuses</span>
+                      <span>{t('admin:turns.filters.allStatuses')}</span>
                     </div>
                     {turnStatuses.map(status => (
                       <div
@@ -787,7 +789,7 @@ const HistorialTurnos = () => {
             </div>
           </div>
           <div className="filter-group">
-            <label>ÁREA Y CONSULTORIO</label>
+            <label>{t('admin:turns.filters.areaAndOffice').toUpperCase()}</label>
             <div className="custom-area-select">
               <div
                 ref={areaButtonRef}
@@ -869,7 +871,7 @@ const HistorialTurnos = () => {
                           <FaHospital />
                         </span>
                       </div>
-                      <span>All offices</span>
+                      <span>{t('admin:turns.filters.allOffices')}</span>
                     </div>
                     {getCombinedAreaConsultorioList().map(item => (
                       <div
@@ -906,7 +908,7 @@ const HistorialTurnos = () => {
           </div>
           <div className="filter-group">
             <button className="btn btn-secondary">
-              <FaFilter /> Apply Filters
+              <FaFilter /> {t('admin:turns.filters.applyFilters')}
             </button>
           </div>
         </div>
@@ -916,7 +918,7 @@ const HistorialTurnos = () => {
           <div className="card-header">
             <h3 className="card-title">
               <FaClipboardList />
-              Turn Records
+              {t('admin:turns.records.title')}
             </h3>
             <div className="card-actions">
               <span style={{
@@ -924,7 +926,7 @@ const HistorialTurnos = () => {
                 color: 'var(--text-muted)',
                 fontWeight: 500
               }}>
-                {turns.length} record{turns.length !== 1 ? 's' : ''} found
+                {turns.length} {turns.length === 1 ? t('admin:turns.records.foundSingular') : t('admin:turns.records.found')}
               </span>
             </div>
           </div>
@@ -933,8 +935,8 @@ const HistorialTurnos = () => {
             {turns.length === 0 ? (
               <div className="empty-state">
                 <FaHistory />
-                <h3>No turns in history</h3>
-                <p>No turns found for the selected filters</p>
+                <h3>{t('admin:turns.empty.historyTitle')}</h3>
+                <p>{t('admin:turns.empty.historySubtitle')}</p>
               </div>
             ) : (
               <div className="history-cards" style={{
@@ -1113,14 +1115,14 @@ const HistorialTurnos = () => {
             {turns.length > turnsPerPage && (
               <div className="pagination-bar">
                 <div className="pagination-info">
-                  <span>Page {currentPage} of {totalPages} | {turns.length} turns total</span>
+                  <span>{t('admin:turns.pagination.page')} {currentPage} {t('admin:turns.pagination.of')} {totalPages} | {turns.length} {t('admin:turns.pagination.turnsTotal')}</span>
                 </div>
                 <div className="pagination-controls">
                   <button
                     onClick={goToFirstPage}
                     disabled={currentPage === 1}
                     className="pagination-btn"
-                    title="First page"
+                    title={t('admin:turns.pagination.firstPage')}
                   >
                     <FaAngleDoubleLeft />
                   </button>
@@ -1128,7 +1130,7 @@ const HistorialTurnos = () => {
                     onClick={goToPreviousPage}
                     disabled={currentPage === 1}
                     className="pagination-btn"
-                    title="Previous page"
+                    title={t('admin:turns.pagination.previousPage')}
                   >
                     <FaChevronLeft />
                   </button>
@@ -1136,7 +1138,7 @@ const HistorialTurnos = () => {
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
                     className="pagination-btn"
-                    title="Next page"
+                    title={t('admin:turns.pagination.nextPage')}
                   >
                     <FaChevronRight />
                   </button>
@@ -1144,7 +1146,7 @@ const HistorialTurnos = () => {
                     onClick={goToLastPage}
                     disabled={currentPage === totalPages}
                     className="pagination-btn"
-                    title="Last page"
+                    title={t('admin:turns.pagination.lastPage')}
                   >
                     <FaAngleDoubleRight />
                   </button>

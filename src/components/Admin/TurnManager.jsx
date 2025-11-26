@@ -181,6 +181,7 @@ const TurnManager = () => {
   // Estados para el modal de notificación de éxito
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [attendedTurn, setAttendedTurn] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(''); // Para mensajes personalizados
 
   // Detectar tema actual
   const [theme, setTheme] = useState(() => localStorage.getItem('mq-theme') || 'light');
@@ -397,11 +398,11 @@ const TurnManager = () => {
         console.log('🔍 DEBUG - Primer paciente:', patientsData[0]);
         console.log('🔍 DEBUG - ck_estado del primer paciente:', patientsData[0]?.ck_estado);
       }
-      
+
       setPatients(patientsData);
       setConsultorios(consultoriosData);
       setAreas(areasData);
-      
+
       console.log('✅ Estado actualizado - patients.length:', patientsData?.length);
     } catch (error) {
       setError('Error cargando datos: ' + error.message);
@@ -469,9 +470,20 @@ const TurnManager = () => {
       try {
         await turnService.deleteTurn(turn.uk_turno);
         await loadTurns();
-        alert('Turno eliminado correctamente');
+        setError(null);
+
+        // Mostrar modal de éxito
+        setAttendedTurn(turn);
+        setSuccessMessage('Turno eliminado correctamente');
+        setShowSuccessModal(true);
+
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          setAttendedTurn(null);
+          setSuccessMessage('');
+        }, 3000);
       } catch (error) {
-        alert('Error eliminando turno: ' + error.message);
+        setError('Error eliminando turno: ' + error.message);
         console.error('Error eliminando turno:', error);
       }
     }
@@ -481,9 +493,20 @@ const TurnManager = () => {
     try {
       await turnService.updateTurnStatus(turn.uk_turno, newStatus);
       await loadTurns();
-      alert(`Estado del turno #${turn.i_numero_turno} actualizado a "${turnStatuses.find(s => s.value === newStatus)?.label}"`);
+      setError(null);
+
+      // Mostrar modal de éxito
+      setAttendedTurn(turn);
+      setSuccessMessage(`Estado del turno #${turn.i_numero_turno} actualizado a "${turnStatuses.find(s => s.value === newStatus)?.label}"`);
+      setShowSuccessModal(true);
+
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        setAttendedTurn(null);
+        setSuccessMessage('');
+      }, 3000);
     } catch (error) {
-      alert('Error actualizando estado: ' + error.message);
+      setError('Error actualizando estado: ' + error.message);
       console.error('Error actualizando estado:', error);
     }
   };
@@ -510,6 +533,7 @@ const TurnManager = () => {
   const closeSuccessModal = () => {
     setShowSuccessModal(false);
     setAttendedTurn(null);
+    setSuccessMessage('');
   };
 
   const handleCancelTurn = (turn) => {
@@ -544,7 +568,7 @@ const TurnManager = () => {
     e.preventDefault();
 
     if (!formData.uk_consultorio) {
-      alert('Seleccione consultorio');
+      setError('Por favor seleccione un consultorio');
       return;
     }
 
@@ -556,7 +580,27 @@ const TurnManager = () => {
           s_observaciones: formData.s_observaciones
         };
         await turnService.updateTurn(editingTurn.uk_turno, updateData);
-        alert(t('admin:turns.messages.updateSuccess'));
+
+        // Mostrar modal de éxito personalizado
+        await loadTurns();
+        setShowModal(false);
+        setFormData({
+          uk_consultorio: '',
+          uk_paciente: '',
+          s_observaciones: ''
+        });
+
+        // Configurar y mostrar modal de éxito
+        setAttendedTurn(editingTurn);
+        setSuccessMessage(t('admin:turns.messages.updateSuccess'));
+        setShowSuccessModal(true);
+
+        // Auto-cerrar el modal después de 3 segundos
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          setAttendedTurn(null);
+          setSuccessMessage('');
+        }, 3000);
       } else {
         // Crear nuevo turno
         // Para asignar un paciente ya existente, usar el endpoint estándar /turnos
@@ -567,15 +611,15 @@ const TurnManager = () => {
           ...(formData.uk_paciente ? { uk_paciente: formData.uk_paciente } : {})
         };
         await turnService.createTurn(payload);
-      }
 
-      await loadTurns();
-      setShowModal(false);
-      setFormData({
-        uk_consultorio: '',
-        uk_paciente: '',
-        s_observaciones: ''
-      });
+        await loadTurns();
+        setShowModal(false);
+        setFormData({
+          uk_consultorio: '',
+          uk_paciente: '',
+          s_observaciones: ''
+        });
+      }
     } catch (error) {
       let errorMessage = 'Error guardando turno';
       if (error.response && error.response.data) {
@@ -583,7 +627,7 @@ const TurnManager = () => {
       } else {
         errorMessage += ': ' + error.message;
       }
-      alert(errorMessage);
+      setError(errorMessage);
       console.error('Error guardando turno:', error);
     }
   };
@@ -1118,8 +1162,8 @@ const TurnManager = () => {
                             <button
                               onClick={() => handleEdit(turn)}
                               className="btn btn-secondary"
-                              style={{ 
-                                padding: '4px 8px', 
+                              style={{
+                                padding: '4px 8px',
                                 fontSize: '12px',
                                 background: '#77b8ce',
                                 border: 'none'
@@ -1461,72 +1505,74 @@ const TurnManager = () => {
 
               {/* Mensaje principal */}
               <p style={{
-                margin: '0 0 20px 0',
+                margin: successMessage ? '0 0 24px 0' : '0 0 20px 0',
                 color: 'var(--text-secondary)',
                 fontSize: '15px',
                 lineHeight: '1.6',
                 textAlign: 'center'
               }}>
-                El turno <strong>#{attendedTurn.i_numero_turno}</strong> ha sido marcado como atendido correctamente
+                {successMessage || `El turno #${attendedTurn.i_numero_turno} ha sido marcado como atendido correctamente`}
               </p>
 
-              {/* Información del turno */}
-              <div style={{
-                background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
-                padding: '16px',
-                borderRadius: '12px',
-                marginBottom: '24px',
-                border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.25)'}`
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <FaUser style={{ color: '#77b8ce', fontSize: '14px' }} />
+              {/* Información del turno - solo mostrar cuando no hay successMessage personalizado */}
+              {!successMessage && (
+                <div style={{
+                  background: isDarkMode ? 'rgba(119, 184, 206, 0.08)' : 'rgba(216, 240, 244, 0.4)',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  marginBottom: '24px',
+                  border: `1px solid ${isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.25)'}`
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FaUser style={{ color: '#77b8ce', fontSize: '14px' }} />
+                    </div>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                      {getPatientName(attendedTurn.uk_paciente)}
+                    </span>
                   </div>
-                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
-                    {getPatientName(attendedTurn.uk_paciente)}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <FaHospital style={{ color: '#77b8ce', fontSize: '14px' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FaHospital style={{ color: '#77b8ce', fontSize: '14px' }} />
+                    </div>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                      {getConsultorioInfo(attendedTurn.uk_consultorio)}
+                    </span>
                   </div>
-                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
-                    {getConsultorioInfo(attendedTurn.uk_consultorio)}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <FaClock style={{ color: '#77b8ce', fontSize: '14px' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: isDarkMode ? 'rgba(119, 184, 206, 0.15)' : 'rgba(119, 184, 206, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FaClock style={{ color: '#77b8ce', fontSize: '14px' }} />
+                    </div>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
+                      {new Date(attendedTurn.d_fecha).toLocaleDateString('es-ES')} - {attendedTurn.t_hora}
+                    </span>
                   </div>
-                  <span style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500' }}>
-                    {new Date(attendedTurn.d_fecha).toLocaleDateString('es-ES')} - {attendedTurn.t_hora}
-                  </span>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Barra de progreso de auto-cierre */}
