@@ -1,13 +1,13 @@
 {
-    "common": {
-      "loading": "Cargando...",
-      "error": "Error",
-      "success": "Éxito",
-      "noData": "No hay datos disponibles",
-      "confirmDelete": "¿Está seguro de eliminar este elemento?",
-      "actions": "Acciones"
-    },
-    "dashboard": {
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "noData": "No hay datos disponibles",
+    "confirmDelete": "¿Está seguro de eliminar este elemento?",
+    "actions": "Acciones"
+  },
+  "dashboard": {
     "title": "Panel de Control",
     "subtitle": "Bienvenido al sistema de gestión de turnos médicos",
     "loadingDashboard": "Cargando dashboard...",
@@ -100,7 +100,6 @@
       "active": "Activo"
     }
   },
-  
   "stats": {
     "totalTurns": "Total Turnos",
     "activeTurns": "Turnos Activos",
@@ -120,7 +119,6 @@
     "thisMonth": "+1% este mes",
     "increase": "+8% este mes"
   },
-  
   "cards": {
     "manageTurns": {
       "title": "Gestionar Turnos",
@@ -153,7 +151,6 @@
       "configure": "Configurar"
     }
   },
-  
   "systemInfo": {
     "title": "Información del Sistema",
     "version": "Versión",
@@ -162,16 +159,18 @@
     "active": "Activo",
     "system": "Sistema"
   },
-  
   "errors": {
     "loadingError": "Error cargando datos del dashboard",
     "retry": "Reintentar"
   },
-  
   "turns": {
     "title": "Gestión de Turnos",
     "subtitle": "Administra todos los turnos del sistema - {{count}} turnos encontrados",
     "history": "Historial",
+    "historyTitle": "Historial de Turnos",
+    "historySubtitle": "Ver y revisar el historial completo de turnos - {{count}} turnos encontrados",
+    "turnManagement": "Gestión de Turnos",
+    "goToTurnManagement": "Ir a Gestión de Turnos",
     "historialTitle": "Ver Historial de Turnos",
     "listTitle": "Lista de Turnos",
     "createTurn": "Crear Turno",
@@ -203,6 +202,7 @@
     "filters": {
       "dates": "Fechas",
       "resetToToday": "Reiniciar a hoy",
+      "resetToLastMonth": "Reiniciar al último mes",
       "startDate": "Fecha inicial",
       "endDate": "Fecha final",
       "to": "a",
@@ -215,7 +215,9 @@
     "statuses": {
       "waiting": "En espera",
       "attended": "Atendido",
-      "cancelled": "Cancelado"
+      "cancelled": "Cancelado",
+      "inAttention": "En atención",
+      "notPresent": "No presente"
     },
     "table": {
       "turn": "Turno",
@@ -252,10 +254,32 @@
     },
     "empty": {
       "title": "No hay turnos registrados",
-      "subtitle": "No se encontraron turnos para los filtros seleccionados"
+      "subtitle": "No se encontraron turnos para los filtros seleccionados",
+      "historyTitle": "No hay turnos en el historial",
+      "historySubtitle": "No se encontraron turnos para los filtros seleccionados"
+    },
+    "records": {
+      "title": "Registros de Turnos",
+      "found": "registros encontrados",
+      "foundSingular": "registro encontrado"
+    },
+    "pagination": {
+      "page": "Página",
+      "of": "de",
+      "turnsTotal": "turnos en total",
+      "firstPage": "Primera página",
+      "previousPage": "Página anterior",
+      "nextPage": "Página siguiente",
+      "lastPage": "Última página"
+    },
+    "labels": {
+      "guest": "Invitado",
+      "patientNotFound": "Paciente no encontrado",
+      "officeNotFound": "Consultorio no encontrado",
+      "office": "Consultorio",
+      "area": "Área"
     }
   },
-  
   "patients": {
     "title": "Gestión de Pacientes",
     "subtitle": "Administra la información de los pacientes",
@@ -332,7 +356,6 @@
     },
     "empty": "No hay pacientes registrados"
   },
-  
   "users": {
     "title": "Gestión de Usuarios",
     "subtitle": "Administra los usuarios administradores del sistema",
@@ -407,7 +430,6 @@
     },
     "empty": "No hay usuarios registrados"
   },
-
   "statistics": {
     "title": "Estadísticas del Sistema",
     "subtitle": "Análisis y métricas generales del sistema MediQueue",
@@ -457,14 +479,14 @@
     },
     "periods": {
       "today": "Hoy",
+      "day": "Día",
       "week": "Esta Semana",
-      "month": "Este Mes",
-      "year": "Este Año",
+      "month": "Mes",
+      "year": "Año",
       "custom": "Personalizado"
     },
     "noData": "No hay datos disponibles para el período seleccionado"
   },
-  
   "login": {
     "title": "Panel de Administración",
     "welcome": "El Sistema les da la Bienvenida",

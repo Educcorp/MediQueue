@@ -214,10 +214,10 @@ const HomePage = () => {
                 ) : (
                   <select
                     className="area-selector-dropdown"
-                    value={selectedArea || ''}
+                    value={selectedArea || 'general'}
                     onChange={(e) => setSelectedArea(e.target.value || null)}
                   >
-                    <option value="">{t('home:areaSelector.selectPlaceholder')}</option>
+                    <option value="" disabled hidden>{t('home:areaSelector.selectPlaceholder')}</option>
                     <option value="general">{t('home:areaSelector.generalView')}</option>
                     {areas.map((area) => (
                       <option
@@ -368,7 +368,7 @@ const HomePage = () => {
                                 <p>{t('home:monitor.noActiveAppointments')}</p>
                               </div>
                             ) : (
-                              <div 
+                              <div
                                 className={`area-current-turn ${(areaData.currentTurn.s_estado || areaData.currentTurn.estado) === 'LLAMANDO' ? 'calling' : ''}`}
                                 data-label-current={t('home:monitor.currentTurn')}
                                 data-label-calling={t('home:turnDisplay.callingLabel')}

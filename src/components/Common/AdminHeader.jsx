@@ -120,13 +120,13 @@ const AdminHeader = () => {
         },
         {
             path: '/admin/turns',
-            label: t('admin:turns.title').replace(' de Turnos', '').replace(' Management', ''),
+            label: t('admin:turns.title').replace('Gestión de ', '').replace(' de Turnos', '').replace(' Management', ''),
             permission: 'supervisor',
             icon: <FaCalendarCheck />
         },
         {
             path: '/admin/patients',
-            label: t('admin:patients.title').replace(' de Pacientes', '').replace(' Management', ''),
+            label: t('admin:patients.title').replace('Gestión de ', '').replace(' de Pacientes', '').replace(' Management', ''),
             permission: 'supervisor',
             icon: <FaUserInjured />
         },
@@ -138,7 +138,7 @@ const AdminHeader = () => {
         },
         {
             path: '/admin/statistics',
-            label: t('admin:statistics.title').replace(' del Sistema', '').replace(' of the system', '').replace('System ', ''),
+            label: t('admin:statistics.title').replace(' del Sistema', '').replace(' of the System', '').replace('System ', ''),
             permission: 'supervisor',
             icon: <FaChartLine />
         }

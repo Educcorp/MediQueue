@@ -2,7 +2,6 @@
   "appName": "MediQueue",
   "appNameFull": "MediQueue®",
   "appDescription": "Sistema de Gestión de Turnos Médicos",
-  
   "buttons": {
     "create": "Crear",
     "edit": "Editar",
@@ -34,9 +33,10 @@
     "next": "Siguiente",
     "previous": "Anterior",
     "retry": "Reintentar",
-    "actions": "Acciones"
+    "actions": "Acciones",
+    "viewTutorial": "Ver tutorial"
   },
-  
+  "loading": "Cargando...",
   "messages": {
     "loading": "Cargando...",
     "saving": "Guardando...",
@@ -67,7 +67,6 @@
     "optionalField": "Este campo es opcional",
     "selectOption": "Selecciona una opción"
   },
-  
   "status": {
     "active": "Activo",
     "inactive": "Inactivo",
@@ -81,7 +80,6 @@
     "calling": "Llamando",
     "notPresent": "No Presente"
   },
-  
   "turnStatus": {
     "enEspera": "En espera",
     "llamando": "Llamando",
@@ -89,7 +87,6 @@
     "cancelado": "Cancelado",
     "noPresente": "No Presente"
   },
-  
   "days": {
     "monday": "Lunes",
     "tuesday": "Martes",
@@ -99,7 +96,6 @@
     "saturday": "Sábado",
     "sunday": "Domingo"
   },
-  
   "months": {
     "january": "Enero",
     "february": "Febrero",
@@ -114,7 +110,6 @@
     "november": "Noviembre",
     "december": "Diciembre"
   },
-  
   "time": {
     "today": "Hoy",
     "yesterday": "Ayer",
@@ -133,7 +128,6 @@
     "day": "día",
     "days": "días"
   },
-  
   "navigation": {
     "home": "Inicio",
     "dashboard": "Panel de Control",
@@ -148,13 +142,11 @@
     "help": "Ayuda",
     "about": "Acerca de"
   },
-  
   "roles": {
     "admin": "Administrador",
     "supervisor": "Supervisor",
     "user": "Usuario"
   },
-  
   "footer": {
     "description": "Sistema integral de gestión de turnos médicos. Optimizando la experiencia de pacientes y profesionales de la salud.",
     "contactTitle": "Contacto & Horarios",
@@ -188,7 +180,6 @@
       "updateDate": "Octubre 2025"
     }
   },
-  
   "language": {
     "spanish": "Español",
     "english": "English",
@@ -198,4 +189,3 @@
     "changeLanguage": "Cambiar idioma"
   }
 }
-
