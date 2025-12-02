@@ -557,23 +557,70 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .take-turn-container {
+    padding: 80px 20px 32px;
+  }
+
+  .header-card {
+    padding: 16px 20px;
+  }
+
+  .header-title {
+    font-size: 22px;
+  }
+
+  .areas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .take-turn-container {
-    padding: 24px 16px;
+    padding: 70px 16px 24px;
+  }
+
+  .take-turn-content {
+    max-width: 100%;
+  }
+
+  .header-card {
+    flex-wrap: wrap;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .header-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .header-title {
+    font-size: 20px;
+  }
+
+  .header-subtitle {
+    font-size: 13px;
+  }
+
+  .back-button {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
   }
 
   .turn-form-card {
-    padding: 32px 24px;
+    padding: 24px 20px;
   }
 
   .form-header h2 {
-    font-size: 28px;
+    font-size: 22px;
     flex-direction: column;
     gap: 12px;
   }
 
   .form-header h2 i {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .form-row {
@@ -593,9 +640,9 @@
   }
 
   .main-take-turn-button {
-    font-size: 20px;
-    padding: 20px 40px;
-    min-width: 240px;
+    font-size: 17px;
+    padding: 18px 32px;
+    min-width: 220px;
   }
 
   .main-take-turn-button i {
@@ -603,41 +650,168 @@
   }
 
   .info-card {
-    padding: 24px 20px;
+    padding: 20px;
   }
 
   .info-card h3 {
-    font-size: 18px;
+    font-size: 17px;
     flex-direction: column;
     gap: 8px;
     text-align: center;
+  }
+
+  .areas-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .area-card {
+    margin-bottom: 0;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .option-card {
+    padding: 24px;
+  }
+  
+  .option-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+  
+  .option-content h2 {
+    font-size: 20px;
+  }
+  
+  .option-button {
+    padding: 14px 20px;
+    font-size: 14px;
+  }
+  
+  .areas-grid-simple {
+    grid-template-columns: 1fr;
+  }
+  
+  .selected-area-card {
+    padding: 24px;
+    margin: 0 16px;
+  }
+  
+  .area-icon-large {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+  
+  .area-info-confirmation h2 {
+    font-size: 20px;
+  }
+
+  .selected-consultorio-card {
+    padding: 24px;
+    margin: 0 16px;
+  }
+  
+  .consultorio-header {
+    margin-bottom: 24px;
+  }
+  
+  .consultorio-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+  
+  .consultorio-info h2 {
+    font-size: 20px;
+  }
+  
+  .confirm-button {
+    padding: 14px 24px;
+    font-size: 14px;
+  }
+
+  .success-card-compact {
+    padding: 36px 24px;
+    margin: 0 16px;
+  }
+  
+  .success-title-compact {
+    font-size: 26px;
+  }
+  
+  .success-subtitle-compact {
+    font-size: 16px;
+  }
+
+  .turn-info-compact {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .turn-number-compact .number {
+    font-size: 40px;
+  }
+
+  .turn-area-compact .area {
+    font-size: 18px;
   }
 }
 
 @media (max-width: 480px) {
   .take-turn-container {
-    padding: 20px 12px;
+    padding: 60px 12px 20px;
+  }
+
+  .header-card {
+    padding: 14px;
+  }
+
+  .header-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .header-subtitle {
+    font-size: 12px;
   }
 
   .turn-form-card {
-    padding: 24px 16px;
-    border-radius: 16px;
+    padding: 20px 14px;
+    border-radius: 14px;
   }
 
   .form-header h2 {
+    font-size: 20px;
+  }
+
+  .form-header h2 i {
     font-size: 24px;
   }
 
   .form-input,
   .form-select {
-    padding: 16px 18px;
+    padding: 14px 16px;
     font-size: 15px;
   }
 
   .main-take-turn-button {
-    font-size: 18px;
-    padding: 18px 32px;
+    font-size: 16px;
+    padding: 16px 28px;
     min-width: 200px;
+  }
+
+  .main-take-turn-button i {
+    font-size: 22px;
   }
 
   .info-list li {
@@ -645,13 +819,111 @@
   }
 
   .form-label {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .cancel-button,
   .submit-button {
-    padding: 12px 24px;
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+
+  .option-card {
+    padding: 20px;
+  }
+  
+  .option-features {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .area-button {
+    padding: 16px;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .area-icon-button {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+  
+  .selected-area-card {
+    padding: 20px;
+    margin: 0 12px;
+  }
+  
+  .section-header h2 {
+    font-size: 20px;
+  }
+  
+  .section-header p {
     font-size: 14px;
+  }
+
+  .area-card {
+    border-radius: 12px;
+  }
+  
+  .area-header {
+    padding: 14px 16px;
+  }
+  
+  .area-content {
+    padding: 14px 16px;
+  }
+  
+  .area-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .area-info h3 {
+    font-size: 16px;
+  }
+  
+  .consultorio-content {
+    padding: 10px 12px;
+  }
+  
+  .selected-consultorio-card {
+    padding: 20px;
+    margin: 0 12px;
+  }
+
+  .success-card-compact {
+    padding: 28px 20px;
+  }
+
+  .success-icon-compact {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+  }
+
+  .success-title-compact {
+    font-size: 22px;
+  }
+
+  .success-subtitle-compact {
+    font-size: 14px;
+  }
+
+  .turn-number-compact .number {
+    font-size: 36px;
+  }
+
+  .turn-area-compact .area {
+    font-size: 16px;
+  }
+
+  .generate-turn-button {
+    padding: 16px 32px;
+    font-size: 16px;
+    min-width: 240px;
   }
 }
 

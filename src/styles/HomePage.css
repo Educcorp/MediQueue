@@ -20,6 +20,7 @@
   background: var(--bg-main, linear-gradient(135deg, #d8f0f4 0%, #77b8ce 100%));
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
+  padding-top: 80px; /* Espacio para header fijo */
 }
 
 /* Brand Bar */
@@ -447,6 +448,10 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
+  .main-outer-container {
+    padding-top: 70px;
+  }
+
   .turns-homepage {
     grid-template-columns: 1fr;
     gap: 32px;
@@ -468,11 +473,24 @@
   .sidebar {
     max-height: 400px;
   }
+
+  .modern-panels-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modern-areas-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
 }
 
 @media (max-width: 768px) {
+  .main-outer-container {
+    padding-top: 65px;
+  }
+
   .brand-bar {
-    padding: 20px 24px;
+    padding: 20px 16px;
   }
 
   .brand-inner {
@@ -497,11 +515,11 @@
   }
 
   .brand-name {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .brand-tag {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .turns-homepage {
@@ -532,11 +550,86 @@
     gap: 12px;
     align-items: flex-start;
   }
+
+  .modern-areas-grid {
+    grid-template-columns: 1fr;
+    padding: 16px 0;
+    gap: 16px;
+  }
+  
+  .modern-area-card {
+    padding: 20px;
+    min-height: 100px;
+  }
+  
+  .modern-next-turn {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .turn-number {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .turn-number .number {
+    font-size: 28px;
+  }
+
+  .general-monitor-layout {
+    padding: 16px;
+  }
+  
+  .general-header {
+    padding: 20px;
+    margin-bottom: 24px;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .general-title h1 {
+    font-size: 24px;
+  }
+  
+  .general-stats {
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .areas-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .area-card {
+    padding: 16px;
+  }
+  
+  .area-current-turn {
+    flex-direction: row;
+    gap: 12px;
+  }
+  
+  .turn-display-small {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .turn-number-small {
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 480px) {
+  .main-outer-container {
+    padding-top: 60px;
+  }
+
   .brand-bar {
-    padding: 16px 20px;
+    padding: 16px 12px;
   }
 
   .brand-logo {
@@ -550,7 +643,11 @@
   }
 
   .brand-name {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  .brand-tag {
+    font-size: 12px;
   }
 
   .turns-homepage {
@@ -567,6 +664,7 @@
 
   .turn-room-big {
     font-size: 18px;
+    flex-direction: column;
   }
 
   .pill {
@@ -580,6 +678,41 @@
 
   .sidebar-title {
     font-size: 18px;
+  }
+
+  .modern-area-card {
+    padding: 16px;
+  }
+
+  .area-card-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .area-card-content h3 {
+    font-size: 16px;
+  }
+
+  .general-title h1 {
+    font-size: 20px;
+  }
+
+  .general-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .stat-item {
+    padding: 12px 16px;
+  }
+
+  .stat-number {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 10px;
   }
 }
 
