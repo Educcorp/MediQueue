@@ -140,26 +140,62 @@ npm start (Backend)
 
 ##
 
-## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Grinning%20Cat%20with%20Smiling%20Eyes.png" alt="Grinning Cat with Smiling Eyes" width="25" height="25" />  Equipo de Desarrollo
-
+## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Grinning%20Cat%20with%20Smiling%20Eyes.png" alt="Grinning Cat with Smiling Eyes" width="25" height="25" />  EducCorp Team 
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/tu-usuario">
-        <img src="https://via.placeholder.com/100x100/77b8ce/ffffff?text=Dev" width="100px;" alt="Desarrollador Principal"/>
+      <a href="https://github.com/Dami-Val">
+        <img src="https://github.com/Dami-Val.png" width="100px;" alt="Damian Valencia"/>
         <br />
-        <sub><b>Tu Nombre</b></sub>
+        <sub><b>Damian Valencia</b></sub>
       </a>
       <br />
       <a href="#" title="Code">💻</a>
       <a href="#" title="Design">🎨</a>
-      <a href="#" title="Medical">⚕️</a>
     </td>
-    <!-- Agregar más miembros del equipo según sea necesario -->
+    <td align="center">
+      <a href="https://github.com/Gregorio-Yahir">
+        <img src="https://www.educstation.com/assets/images/faces/Grego.png" width="100px;" alt="Gregorio Yahir"/>
+        <br />
+        <sub><b>Gregorio Sánchez</b></sub>
+      </a>
+      <br />
+      <a href="#" title="Code">💻</a>
+      <a href="#" title="Design">🎨</a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Emma-Pal">
+        <img src="https://www.educstation.com/assets/images/faces/Emma.png" width="100px;" alt="Emmanuel Palacios"/>
+        <br />
+        <sub><b>Emmanuel Palacios</b></sub>
+      </a>
+      <br />
+      <a href="#" title="Code">💻</a>
+      <a href="#" title="Design">🎨</a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/YoselinRs">
+        <img src="https://github.com/YoselinRs.png" width="100px;" alt="Yoselin"/>
+        <br />
+        <sub><b>Yoselin Reynaga </b></sub>
+      </a>
+      <br />
+      <a href="#" title="Code">💻</a>
+      <a href="#" title="Design">🎨</a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/pjusto930">
+        <img src="https://www.educstation.com/assets/images/faces/Priscila.png" width="100px;" alt="Priscila Justo"/>
+        <br />
+        <sub><b>Priscila Justo</b></sub>
+      </a>
+      <br />
+      <a href="#" title="Code">💻</a>
+      <a href="#" title="Design">🎨</a>
+    </td>
+    <!-- Add more team members as needed -->
   </tr>
 </table>
-
-##
 
 ## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Mobile%20Phone.png" alt="Mobile Phone" width="50" height="50" />  Contacto
 
